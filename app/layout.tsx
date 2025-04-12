@@ -1,4 +1,3 @@
-'use client';
 import './globals.css';
 import Link from 'next/link';
 import { useEffect, useState, useRef } from 'react';
@@ -36,24 +35,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="en">
-      <Head>
+      <head>
+        {/* ✅ Favicon & Metadata */}
         <link rel="icon" href="/favicon.ico" />
         <meta name="theme-color" content="#000000" />
-        <title>Dark Wonderful World</title>
-      </Head>
+        <meta name="description" content="Official Website of Unda Alunda | New album out May 1 2025" />
+        <title>Unda Alunda | Official Website</title>
+      </head>
 
       <body style={{
         margin: 0,
         fontFamily: 'Cinzel, serif',
-        backgroundColor: '#000000' // ✅ ป้องกันแสงแฟลชขาวระหว่างโหลด
+        backgroundColor: '#000000'
       }}>
         {pathname === '/' && (
           <>
             <div className="hero-wrapper">
-              {/* 🌌 Background of the Moon */}
               <div className="catmoon-background" />
-
-              {/* 🌕 Logo on the Moon */}
               <div className="hero-text-image">
                 <Image
                   src="/text-hero-section.png"
@@ -64,7 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 />
               </div>
 
-              {/* 💻 Desktop Headline */}
+              {/* Desktop Headline */}
               <div className="hero-text desktop-only">
                 <p className="hero-line1">
                   THE NEW ALBUM'S COMING <span className="highlight">MAY 1 2025</span>
@@ -77,7 +75,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </p>
               </div>
 
-              {/* 📱 Mobile Headline */}
+              {/* Mobile Headline */}
               <div className="hero-text mobile-only">
                 <p className="hero-line1">THE NEW ALBUM'S COMING</p>
                 <p className="hero-line1"><span className="highlight">MAY 1 2025</span></p>
@@ -90,7 +88,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </div>
             </div>
 
-            {/* 🎯 Button Group Links */}
             <div
               ref={buttonGroupRef}
               className={`button-group ${showButtons ? 'fade-in' : ''}`}
