@@ -397,41 +397,13 @@ main,
   flex-wrap: wrap;
   justify-content: center;
   gap: 1rem;
-  margin-top: 2.5rem;
-}
-
-.info-button {
-  padding: 0.6rem 1.4rem;
-  border: 1px solid #9a1d2e;
-  color: #f8fcdc;
-  font-family: 'Cinzel', serif;
-  font-size: 12px;
-  letter-spacing: 0.1em;
-  text-decoration: none;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.info-button:hover {
-  background-color: #9a1d2e;
-  color: #fff;
-}
-
-@media (max-width: 768px) {
-  .info-button {
-    font-size: 10px;
-    padding: 0.5rem 1rem;
-  }
-}
-
-.button-group {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 0rem;
+  margin-top: 2rem;
   opacity: 0;
   transform: translateY(20px);
   transition: opacity 1s ease, transform 1s ease;
+
+  /* ✅ ป้องกันปุ่มโดนขอบล่างบังในมือถือใหม่ๆ */
+  padding-bottom: calc(env(safe-area-inset-bottom) + 2rem);
 }
 
 .button-group.fade-in {
@@ -439,23 +411,10 @@ main,
   transform: translateY(0);
 }
 
-.info-button {
-  position: relative;
-  background-color: transparent;
-  border: 1px solid #f8fcdc;
-  padding: 0.75rem 1.5rem;
-  font-family: 'Cinzel', serif;
-  font-size: 12px;
-  letter-spacing: 0.15rem;
-  color: #f8fcdc;
-  text-decoration: none;
-  overflow: hidden;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
+/* === BUTTON STYLE === */
 .info-button {
   background-color: transparent;
-  border: 0.5px solid #dc9e63;
+  border: 1px solid #dc9e63;
   padding: 0.7rem 1.8rem;
   font-family: 'Cinzel', serif;
   color: #dc9e63;
@@ -471,6 +430,14 @@ main,
   font-weight: 300;
 }
 
+.info-button:hover {
+  background-color: #dc9e63;
+  color: #0d0d0d;
+  mix-blend-mode: difference;
+  border-color: #dc9e63;
+  transform: scale(1.03);
+}
+
 /* 💻 Tablet: ≤ 1279px */
 @media (max-width: 1279px) {
   .info-button {
@@ -484,7 +451,7 @@ main,
   .button-group {
     flex-direction: column;
     align-items: center;
-    gap: 0.75rem; /* ช่องห่างระหว่างปุ่ม */
+    gap: 0.75rem;
   }
 
   .info-button {
@@ -495,14 +462,6 @@ main,
     font-size: 11px;
     font-weight: bold;
   }
-}
-
-.info-button:hover {
-  background-color: #dc9e63;
-  color: #0d0d0d;
-  mix-blend-mode: difference;
-  border-color: #dc9e63;
-  transform: scale(1.03);
 }
 
 /* === TRANSCRIPTION PRODUCT SECTION === */
