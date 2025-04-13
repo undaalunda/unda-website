@@ -42,7 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" href="/favicon.ico" />
         <meta name="theme-color" content="#000000" />
         <meta name="description" content="Official Website of Unda Alunda | New album out May 1 2025" />
-        <title>Unda Alunda | Official Website</title>
+        <title>Unda Alunda | Official Website & Merch Store</title>
       </head>
 
       <body style={{

@@ -4,18 +4,21 @@ import Link from 'next/link';
 
 export default function HomePage() {
   const videoRef = useRef<HTMLDivElement>(null);
-  const productRef = useRef<HTMLDivElement>(null);
+  const transcriptionRef = useRef<HTMLDivElement>(null);
+  const stemsRef = useRef<HTMLDivElement>(null);
 
   const [showVideo, setShowVideo] = useState(false);
-  const [showProducts, setShowProducts] = useState(false);
+  const [showTranscriptions, setShowTranscriptions] = useState(false);
+  const [showStems, setShowStems] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach(entry => {
+        entries.forEach((entry) => {
           if (entry.isIntersecting) {
             if (entry.target === videoRef.current) setShowVideo(true);
-            if (entry.target === productRef.current) setShowProducts(true);
+            if (entry.target === transcriptionRef.current) setShowTranscriptions(true);
+            if (entry.target === stemsRef.current) setShowStems(true);
           }
         });
       },
@@ -23,21 +26,20 @@ export default function HomePage() {
     );
 
     if (videoRef.current) observer.observe(videoRef.current);
-    if (productRef.current) observer.observe(productRef.current);
+    if (transcriptionRef.current) observer.observe(transcriptionRef.current);
+    if (stemsRef.current) observer.observe(stemsRef.current);
 
     return () => {
       if (videoRef.current) observer.unobserve(videoRef.current);
-      if (productRef.current) observer.unobserve(productRef.current);
+      if (transcriptionRef.current) observer.unobserve(transcriptionRef.current);
+      if (stemsRef.current) observer.unobserve(stemsRef.current);
     };
   }, []);
 
   return (
     <main className="homepage-main">
       {/* 🎬 YouTube Video */}
-      <section
-        ref={videoRef}
-        className={`video-section ${showVideo ? 'fade-in' : ''}`}
-      >
+      <section ref={videoRef} className={`video-section ${showVideo ? 'fade-in' : ''}`}>
         <iframe
           className="youtube-frame"
           src="https://www.youtube.com/embed/ZwXeCx8cAIM"
@@ -50,8 +52,8 @@ export default function HomePage() {
 
       {/* 🎼 Learn the Music */}
       <section
-        ref={productRef}
-        className={`transcription-section ${showProducts ? 'fade-in-section' : ''}`}
+        ref={transcriptionRef}
+        className={`transcription-section ${showTranscriptions ? 'fade-in-section' : ''}`}
       >
         <h2 className="transcription-sub">LEARN THE MUSIC</h2>
         <h3 className="transcription-title">Transcriptions</h3>
@@ -90,7 +92,6 @@ export default function HomePage() {
           </Link>
         </div>
 
-        {/* 🛒 SHOP ALL BUTTON */}
         <div className="shopall-button-wrapper">
           <Link href="/shop" className="info-button">
             SHOP ALL
@@ -99,41 +100,42 @@ export default function HomePage() {
       </section>
 
       {/* 🎸 Jam the Tracks */}
-<section className={`transcription-section ${showProducts ? 'fade-in-section' : ''}`}>
-  <h2 className="transcription-sub">JAM THE TRACKS</h2>
-  <h3 className="transcription-title">Stems & Backing tracks</h3>
+      <section
+        ref={stemsRef}
+        className={`stems-section ${showStems ? 'fade-in-section' : ''}`}
+      >
+        <h2 className="stems-sub">JAM THE TRACKS</h2>
+        <h3 className="stems-title">Stems & Backing Tracks</h3>
 
-  <div className="product-row">
-    {[
-      { src: '/anomic-no-drums.jpg', title: 'ANOMIC', type: 'DRUMS', price: '$18.00' },
-      { src: '/jyy-no-guitars.jpg', title: 'JYY', type: 'GUITARS', price: '$18.00' },
-      { src: '/atlantic-no-lead-guitar.jpg', title: 'ATLANTIC', type: 'LEAD GUITAR', price: '$19.00' },
-      { src: '/out-of-the-dark-no-drums.jpg', title: 'OUT OF THE DARK', type: 'DRUMS', price: '$22.00' },
-      { src: '/feign-no-guitars.jpg', title: 'FEIGN', type: 'GUITARS', price: '$22.00' },
-      { src: '/the-dark-no-keys.jpg', title: 'THE DARK', type: 'KEYS', price: '$15.00' },
-      { src: '/atlantic-no-bass.jpg', title: 'ATLANTIC', type: 'BASS', price: '$22.00' },
-      { src: '/feign-no-bass.jpg', title: 'FEIGN', type: 'BASS', price: '$22.00' },
-    ].map((product, i) => (
-      <div key={i} className="product-item">
-        <img src={product.src} alt={product.title} className="product-image" />
-        <div className="product-label-group">
-          <p className="product-title">Dark Wonderful World</p>
-          <p className="product-subtitle">{product.title}</p>
-          <p className="product-subtitle-small">{product.type}</p>
-          <p className="product-subtitle-small">Backing track</p>
-          <p className="product-price">{product.price}</p>
+        <div className="stems-row">
+          {[
+            { src: '/anomic-no-drums.jpg', title: 'ANOMIC', type: 'DRUMS', price: '$18.00' },
+            { src: '/jyy-no-guitars.jpg', title: 'JYY', type: 'GUITARS', price: '$18.00' },
+            { src: '/atlantic-no-lead-guitar.jpg', title: 'ATLANTIC', type: 'LEAD GUITAR', price: '$19.00' },
+            { src: '/out-of-the-dark-no-drums.jpg', title: 'OUT OF THE DARK', type: 'DRUMS', price: '$22.00' },
+            { src: '/feign-no-guitars.jpg', title: 'FEIGN', type: 'GUITARS', price: '$22.00' },
+            { src: '/the-dark-no-keys.jpg', title: 'THE DARK', type: 'KEYS', price: '$15.00' },
+            { src: '/reddown-no-bass.jpg', title: 'RED DOWN', type: 'BASS', price: '$18.00' },
+            { src: '/quietness-no-bass.jpg', title: 'QUIETNESS', type: 'BASS', price: '$18.00' },
+          ].map((product, i) => (
+            <Link href="/shop" key={i} className="stems-item product-label-link">
+              <img src={product.src} alt={product.title} className="stems-image" />
+              <div className="stems-label-group">
+                <p className="stems-title-text">{product.title}</p>
+                <p className="stems-subtitle-tiny">{product.type}</p>
+                <p className="stems-subtitle-tiny">Backing track</p>
+                <p className="stems-price">{product.price}</p>
+              </div>
+            </Link>
+          ))}
         </div>
-      </div>
-    ))}
-  </div>
 
-  {/* 🛒 SHOP ALL BUTTON */}
-  <div className="shopall-button-wrapper">
-    <Link href="/shop" className="info-button">
-      SHOP ALL
-    </Link>
-  </div>
-</section>
+        <div className="shopall-button-wrapper">
+          <Link href="/shop" className="info-button">
+            SHOP ALL
+          </Link>
+        </div>
+      </section>
     </main>
   );
 }
