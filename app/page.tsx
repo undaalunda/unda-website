@@ -126,6 +126,13 @@ export default function HomePage() {
       </div>
     ))}
   </div>
+
+  {/* 🛒 SHOP ALL BUTTON */}
+  <div className="shopall-button-wrapper">
+    <Link href="/shop" className="info-button">
+      SHOP ALL
+    </Link>
+  </div>
 </section>
     </main>
   );
