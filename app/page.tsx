@@ -97,6 +97,36 @@ export default function HomePage() {
           </Link>
         </div>
       </section>
+
+      {/* 🎸 Jam the Tracks */}
+<section className={`transcription-section ${showProducts ? 'fade-in-section' : ''}`}>
+  <h2 className="transcription-sub">JAM THE TRACKS</h2>
+  <h3 className="transcription-title">Stems & Backing tracks</h3>
+
+  <div className="product-row">
+    {[
+      { src: '/anomic-no-drums.jpg', title: 'ANOMIC', type: 'DRUMS', price: '$18.00' },
+      { src: '/jyy-no-guitars.jpg', title: 'JYY', type: 'GUITARS', price: '$18.00' },
+      { src: '/atlantic-no-lead-guitar.jpg', title: 'ATLANTIC', type: 'LEAD GUITAR', price: '$19.00' },
+      { src: '/out-of-the-dark-no-drums.jpg', title: 'OUT OF THE DARK', type: 'DRUMS', price: '$22.00' },
+      { src: '/feign-no-guitars.jpg', title: 'FEIGN', type: 'GUITARS', price: '$22.00' },
+      { src: '/the-dark-no-keys.jpg', title: 'THE DARK', type: 'KEYS', price: '$15.00' },
+      { src: '/atlantic-no-bass.jpg', title: 'ATLANTIC', type: 'BASS', price: '$22.00' },
+      { src: '/feign-no-bass.jpg', title: 'FEIGN', type: 'BASS', price: '$22.00' },
+    ].map((product, i) => (
+      <div key={i} className="product-item">
+        <img src={product.src} alt={product.title} className="product-image" />
+        <div className="product-label-group">
+          <p className="product-title">Dark Wonderful World</p>
+          <p className="product-subtitle">{product.title}</p>
+          <p className="product-subtitle-small">{product.type}</p>
+          <p className="product-subtitle-small">Backing track</p>
+          <p className="product-price">{product.price}</p>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
     </main>
   );
 }
