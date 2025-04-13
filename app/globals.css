@@ -826,3 +826,14 @@ main,
     transform: translateY(0);
   }
 }
+
+.fade-trigger {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.fade-trigger.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+}
