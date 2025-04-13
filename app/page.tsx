@@ -61,7 +61,7 @@ export default function HomePage() {
             <img src="/product-guitar.png" alt="Guitar Book" className="product-image" />
             <div className="product-label-group">
               <p className="product-title">Dark Wonderful World</p>
-              <p className="product-subtitle">The Complete Guitar Transcription</p>
+              <p className="product-subtitle">The Complete GUITARS Transcription</p>
             </div>
           </Link>
 
@@ -69,7 +69,7 @@ export default function HomePage() {
             <img src="/product-keys.png" alt="Keys Book" className="product-image" />
             <div className="product-label-group">
               <p className="product-title">Dark Wonderful World</p>
-              <p className="product-subtitle">The Complete Keys Transcription</p>
+              <p className="product-subtitle">The Complete KEYS Transcription</p>
             </div>
           </Link>
 
@@ -77,7 +77,7 @@ export default function HomePage() {
             <img src="/product-bass.png" alt="Bass Book" className="product-image" />
             <div className="product-label-group">
               <p className="product-title">Dark Wonderful World</p>
-              <p className="product-subtitle">The Complete Bass Transcription</p>
+              <p className="product-subtitle">The Complete BASS Transcription</p>
             </div>
           </Link>
 
@@ -85,7 +85,7 @@ export default function HomePage() {
             <img src="/product-drums.png" alt="Drums Book" className="product-image" />
             <div className="product-label-group">
               <p className="product-title">Dark Wonderful World</p>
-              <p className="product-subtitle">The Complete Drums Transcription</p>
+              <p className="product-subtitle">The Complete DRUMS Transcription</p>
             </div>
           </Link>
         </div>
