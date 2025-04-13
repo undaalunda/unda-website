@@ -22,7 +22,10 @@ export default function HomePage() {
           }
         });
       },
-      { threshold: 0.3 }
+      {
+        threshold: 0.4, // ต้องให้ปรากฏ 40% ถึงจะถือว่าเข้า
+        rootMargin: '0px 0px -20% 0px' // รอให้มันเข้าจริง ๆ ก่อนถึงจะ fade
+      }
     );
 
     if (videoRef.current) observer.observe(videoRef.current);
