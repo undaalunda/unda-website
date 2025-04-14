@@ -398,12 +398,26 @@ main,
 
 .since-note {
   text-align: center;
-  font-size: 0.65rem; /* ตัวเล็กจิ๋วแต่เจ็บ */
-  color: #bcbcbc; /* สีเทาหม่นๆแบบผู้ใหญ่รู้โลก */
-  letter-spacing: 0.2em; /* ห่างแบบเว้นระยะหายใจ */
+  font-size: 0.65rem; /* 💻 Desktop default */
+  color: #bcbcbc; /* สีเทาหม่นใจ */
+  letter-spacing: 0.2em;
   font-family: 'Cinzel', serif;
-  text-transform: uppercase; /* พิมพ์ใหญ่ทั้งหมด */
+  text-transform: uppercase;
   margin-top: -0.5rem;
+}
+
+/* 💻 Tablet หรือจอไม่ใหญ่เกินไป (≤1279px) */
+@media (max-width: 1279px) {
+  .since-note {
+    font-size: 0.6rem;
+  }
+}
+
+/* 📱 Mobile จอเล็ก (≤768px) */
+@media (max-width: 768px) {
+  .since-note {
+    font-size: 0.55rem;
+  }
 }
 
 /* === TRANSCRIPTION PRODUCT SECTION === */
