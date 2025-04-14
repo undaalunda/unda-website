@@ -12,12 +12,16 @@
   }
 }
 
-html, body {
+html {
+  background-color: #410203; /* fallback ก่อนโหลดภาพ */
+}
+
+body {
+  /* อย่าไปใส่ background-color: transparent ที่นี่! */
   min-height: 100%;
   margin: 0;
   padding: 0;
   position: relative;
-  background: transparent;
   overscroll-behavior: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -36,23 +40,8 @@ body::before {
   background-repeat: no-repeat;
   z-index: -1;
   pointer-events: none;
-
-  /* ✅ บังคับ GPU render เพื่อให้ Safari ใจอ่อน */
   will-change: transform;
   transform: translate3d(0, 0, 0);
-}
-
-/* === BASE LAYOUT === */
-html,
-body {
-  margin: 0;
-  padding: 0;
-  height: auto;
-  min-height: 100%;
-  background-color: transparent;
-  position: relative;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
 }
 
 /* Optional: make sure content stacks correctly */
