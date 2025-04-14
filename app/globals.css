@@ -187,11 +187,11 @@ main,
 .hero-line1 {
   font-size: 16px; /* 💻 desktop default */
   letter-spacing: 0.55em;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .hero-line2 {
-  font-size: 11px;
+  font-size: 11.5px;
   letter-spacing: 0.33em;
   line-height: 2.2;
   margin-top: 0.5rem;
@@ -200,18 +200,18 @@ main,
 /* 💻 Breakpoint: ≤1279px */
 @media (max-width: 1279px) {
   .hero-line1 {
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .hero-line2 {
-    font-size: 10px;
+    font-size: 11px;
   }
 }
 
 /* 📱 Breakpoint: ≤768px */
 @media (max-width: 768px) {
   .hero-line1 {
-    font-size: 13.9px;
+    font-size: 12px;
   }
 
   .hero-line2 {

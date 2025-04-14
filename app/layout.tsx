@@ -21,13 +21,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }
         });
       },
-      { threshold: 0.3 }
+      {
+        threshold: 0.1, // เห็นแค่ 10% ก็พอแล้ว
+        rootMargin: '0px 0px -20% 0px', // ดันขึ้น 20% เพื่อให้มองเห็นเร็วขึ้น
+      }
     );
-
+  
     if (buttonGroupRef.current) {
       observer.observe(buttonGroupRef.current);
     }
-
+  
     return () => {
       if (buttonGroupRef.current) {
         observer.unobserve(buttonGroupRef.current);
