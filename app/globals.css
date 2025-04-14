@@ -62,7 +62,7 @@ main,
   z-index: 0;
 }
 
-/* === HERO SECTION === */
+/* === HERO SECTION: FIXED === */
 .hero-wrapper {
   width: 100vw;
   height: 100vh;
@@ -74,6 +74,7 @@ main,
   justify-content: flex-end;
   padding-bottom: 6vh;
   z-index: 0;
+  margin-top: 0; /* ✅ ไม่ดันขึ้น ไม่ลอย */
 }
 
 .catmoon-background {
@@ -266,7 +267,6 @@ main,
   font-family: 'Cinzel', serif;
   text-align: center;
   color: #f8fcdc;
-  margin-top: 6rem;
 }
 
 /* === VIDEO SECTION === */
@@ -283,7 +283,7 @@ main,
   max-width: 960px;
   margin-left: auto;
   margin-right: auto;
-  margin-top: -10rem;
+  margin-top: 1rem;
 }
 
 .video-section.fade-in {
@@ -309,7 +309,7 @@ main,
 
 @media (max-width: 768px) {
   .video-section {
-    margin-top: -10rem; /* 👈 ปรับเพื่อใกล้ปุ่มบนมือถือ */
+    margin-top: 0rem; /* 👈 ปรับเพื่อใกล้ปุ่มบนมือถือ */
   }
 
   .youtube-frame {
@@ -398,6 +398,16 @@ main,
     padding: 0.8rem 1.2rem;
     font-weight: bold;
   }
+}
+
+.since-note {
+  text-align: center;
+  font-size: 0.65rem; /* ตัวเล็กจิ๋วแต่เจ็บ */
+  color: #bcbcbc; /* สีเทาหม่นๆแบบผู้ใหญ่รู้โลก */
+  letter-spacing: 0.2em; /* ห่างแบบเว้นระยะหายใจ */
+  font-family: 'Cinzel', serif;
+  text-transform: uppercase; /* พิมพ์ใหญ่ทั้งหมด */
+  margin-top: -0.5rem;
 }
 
 /* === TRANSCRIPTION PRODUCT SECTION === */
