@@ -12,18 +12,23 @@
   }
 }
 
+/* ✅ html ต้องโปร่งใส ไม่งั้นทับ bg image */
 html {
-  background-color: #410203; /* fallback ก่อนโหลดภาพ */
+  background-color: transparent;
+  overflow-x: hidden; /* กันเลื่อนข้าง */
 }
 
 body {
-  /* อย่าไปใส่ background-color: transparent ที่นี่! */
   min-height: 100%;
   margin: 0;
   padding: 0;
   position: relative;
+  overflow-x: hidden;
   overscroll-behavior: auto;
   -webkit-overflow-scrolling: touch;
+
+  /* ✅ ตรงนี้สิที่ควรมี fallback background */
+  background-color: #410203;
 }
 
 /* === GLOBAL BACKGROUND FIXED === */
@@ -40,10 +45,11 @@ body::before {
   background-repeat: no-repeat;
   z-index: -1;
   pointer-events: none;
+
+  /* ✅ บังคับ GPU render เพื่อให้ Safari ใจอ่อน */
   will-change: transform;
   transform: translate3d(0, 0, 0);
 }
-
 /* Optional: make sure content stacks correctly */
 main,
 .homepage-main {
