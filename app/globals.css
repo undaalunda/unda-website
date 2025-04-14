@@ -18,6 +18,7 @@ html {
   overflow-x: hidden; /* กันเลื่อนข้าง */
 }
 
+/* ✅ ให้ Safari, iOS, ทุกอย่างแสดง fallback เป็น #410203 ตอนโหลดหรือ overscroll */
 body {
   min-height: 100%;
   margin: 0;
@@ -27,8 +28,7 @@ body {
   overscroll-behavior: auto;
   -webkit-overflow-scrolling: touch;
 
-  /* ✅ ตรงนี้สิที่ควรมี fallback background */
-  background-color: #410203;
+  background-color: #410203; /* ✅ อันนี้คือหัวใจ */
 }
 
 /* === GLOBAL BACKGROUND FIXED === */
@@ -46,11 +46,12 @@ body::before {
   z-index: -1;
   pointer-events: none;
 
-  /* ✅ บังคับ GPU render เพื่อให้ Safari ใจอ่อน */
+  /* ✅ Safari GPU render: ใจเย็นหน่อยลูก */
   will-change: transform;
   transform: translate3d(0, 0, 0);
 }
-/* Optional: make sure content stacks correctly */
+
+/* === BASE LAYOUT === */
 main,
 .homepage-main {
   position: relative;
@@ -69,7 +70,7 @@ main,
   justify-content: flex-end;
   padding-bottom: 6vh;
   z-index: 0;
-  margin-top: 0; /* ✅ ไม่ดันขึ้น ไม่ลอย */
+  margin-top: 0;
 }
 
 .catmoon-background {
