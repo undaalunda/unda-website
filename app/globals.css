@@ -27,8 +27,7 @@ body {
   overflow-x: hidden;
   overscroll-behavior: auto;
   -webkit-overflow-scrolling: touch;
-
-  background-color: #410203; /* ✅ อันนี้คือหัวใจ */
+  background-color: #410203;
 }
 
 /* === GLOBAL BACKGROUND FIXED === */
@@ -45,8 +44,6 @@ body::before {
   background-repeat: no-repeat;
   z-index: -1;
   pointer-events: none;
-
-  /* ✅ Safari GPU render: ใจเย็นหน่อยลูก */
   will-change: transform;
   transform: translate3d(0, 0, 0);
 }
@@ -83,8 +80,6 @@ main,
   background-size: cover;
   background-position: center;
   z-index: -1;
-  
-
   mask-image: linear-gradient(to bottom,
     rgba(0, 0, 0, 1) 0%,
     rgba(0, 0, 0, 1) 65%,
@@ -101,26 +96,26 @@ main,
   content: '';
   position: absolute;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.15); /* 👈 ปรับความมืดตามใจเลย เช่น 0.3 = 30% ดำ */
-  z-index: 1; /* ต้องสูงกว่า background แต่ต่ำกว่าเนื้อหา */
+  background-color: rgba(0, 0, 0, 0.15);
+  z-index: 1;
 }
 
-/* === HERO IMAGE TEXT SECTION === */
-
-.hero-wrapper {
-  position: relative; /* จำเป็นสำหรับ absolute ที่อยู่ข้างใน */
+.hero-header-image img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
 }
 
+/* 🧊 TEXT IMAGE ตรงกลาง HERO */
 .hero-text-image {
   position: absolute;
-  top: 12vh; /* ตำแหน่งหลักบน desktop */
+  top: 12vh;
   left: 50%;
   transform: translateX(-50%);
   width: 80%;
   max-width: 500px;
   z-index: 10;
   pointer-events: none;
-
   opacity: 0;
   animation: fadeInHero 1.3s ease-out 0.2s forwards;
 }
@@ -143,30 +138,42 @@ main,
   }
 }
 
-/* 💻 Tablet: ≤1279px */
+/* 📱 Responsive */
 @media (max-width: 1279px) {
   .hero-text-image {
     top: 12vh;
     width: 90%;
     max-width: 470px;
   }
-}
 
-/* 📱 Mobile: ≤768px */
-@media (max-width: 768px) {
-  .hero-text-image {
-    top: 12vh;
-    width: 95%;
-    max-width: 430px;
+  .hero-header-image {
+    top: 4vh;
+    width: 90%;
+    max-width: 360px;
   }
 }
 
-/* 📱 Extra-Smol Devices: ≤480px */
+@media (max-width: 768px) {
+  .hero-text-image {
+    width: 95%;
+    max-width: 430px;
+  }
+
+  .hero-header-image {
+    width: 95%;
+    max-width: 320px;
+  }
+}
+
 @media (max-width: 480px) {
   .hero-text-image {
-    top: 12vh;
     width: 100%;
     max-width: 400px;
+  }
+
+  .hero-header-image {
+    width: 100%;
+    max-width: 280px;
   }
 }
 
@@ -182,7 +189,7 @@ main,
 }
 
 .hero-line1 {
-  font-size: 16px; /* 💻 desktop default */
+  font-size: 16px;
   letter-spacing: 0.55em;
   line-height: 1.6;
 }
@@ -194,29 +201,29 @@ main,
   margin-top: 0.5rem;
 }
 
-/* 💻 Breakpoint: ≤1279px */
 @media (max-width: 1279px) {
   .hero-line1 {
     font-size: 14px;
   }
-
   .hero-line2 {
     font-size: 11px;
   }
 }
 
-/* 📱 Breakpoint: ≤768px */
 @media (max-width: 768px) {
   .hero-line1 {
     font-size: 12px;
   }
-
   .hero-line2 {
     font-size: 10px;
   }
+
+  .hero-line2:last-child {
+    margin-top: -0.3rem;
+  }
 }
 
-/* 👁️‍🗨️ Display control for text layout */
+/* 👁️‍🗨️ TEXT DISPLAY MODE */
 .desktop-only {
   display: block;
 }
@@ -235,19 +242,11 @@ main,
   }
 }
 
-/* 📱 Breakpoint: ≤768px – เพิ่ม margin ระหว่างบรรทัดสุดท้าย */
-@media (max-width: 768px) {
-  .hero-line2:last-child {
-    margin-top: -0.3rem; /* 👈 ปรับตรงนี้ได้ตามใจเลย */
-  }
-}
-
-/* 🎯 HIGHLIGHT */
+/* 🎯 CTA HIGHLIGHT */
 .hero-text .highlight {
   color: #dc9e63;
 }
 
-/* 🎯 CTA LINK */
 .hero-cta-link {
   color: #dc9e63;
   text-decoration: none;
@@ -329,7 +328,7 @@ main,
   flex-wrap: wrap;
   justify-content: center;
   gap: 1rem;
-  margin-top: 2rem;
+  margin-top: 0rem;
   padding-bottom: calc(env(safe-area-inset-bottom) + 2rem); /* ป้องกันบังขอบ */
   opacity: 0;
   transform: translateY(20px);
