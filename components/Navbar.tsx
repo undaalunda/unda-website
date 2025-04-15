@@ -56,7 +56,7 @@ export default function Navbar() {
         </div>
 
         {/* 🎯 Right Icons */}
-        <div className="flex items-center gap-6 z-10 mr-2">
+        <div className="flex items-center gap-6 md:pr-2 z-10">
           {/* 👤 User icon (desktop only) */}
           <Link
             href="/account"

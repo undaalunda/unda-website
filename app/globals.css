@@ -95,25 +95,6 @@ main,
   z-index: 1;
 }
 
-.hero-logo-image {
-  position: absolute;
-  top: 1vh;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 12;
-  width: 65%;
-  max-width: 320px;
-  opacity: 0;
-  pointer-events: none;
-  animation: fadeInHero 1.3s ease-out 0.1s forwards;
-}
-
-.hero-logo-image img {
-  width: 100%;
-  height: auto;
-  object-fit: contain;
-}
-
 .hero-text-image {
   position: absolute;
   top: 12vh;
@@ -145,11 +126,6 @@ main,
 }
 
 @media (max-width: 1279px) {
-  .hero-logo-image {
-    top: 1.5vh;
-    max-width: 280px;
-  }
-
   .hero-text-image {
     top: 12vh;
     width: 90%;
@@ -164,11 +140,6 @@ main,
 }
 
 @media (max-width: 768px) {
-  .hero-logo-image {
-    top: 1.2vh;
-    max-width: 240px;
-  }
-
   .hero-text-image {
     width: 95%;
     max-width: 430px;
@@ -181,10 +152,6 @@ main,
 }
 
 @media (max-width: 480px) {
-  .hero-logo-image {
-    top: 2.8vh;
-    max-width: 200px;
-  }
 
   .hero-text-image {
     width: 100%;
