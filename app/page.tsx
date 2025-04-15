@@ -49,6 +49,19 @@ export default function HomePage() {
       {/* 🪐 Hero Section */}
       <div className="hero-wrapper">
         <div className="catmoon-background" />
+
+        {/* 🔥 UNDΛ Logo Image on top */}
+        <div className="hero-logo-image">
+          <Image
+            src="/unda-alunda-header.png"
+            alt="Unda Alunda Logo"
+            width={280}
+            height={80}
+            priority
+          />
+        </div>
+
+        {/* ✨ Hero Text Title Image */}
         <div className="hero-text-image">
           <Image
             src="/text-hero-section.png"
@@ -59,6 +72,7 @@ export default function HomePage() {
           />
         </div>
 
+        {/* 💻 Desktop Text */}
         <div className="hero-text desktop-only">
           <p className="hero-line1">
             THE NEW ALBUM'S COMING <span className="highlight">MAY 1 2025</span>
@@ -71,6 +85,7 @@ export default function HomePage() {
           </p>
         </div>
 
+        {/* 📱 Mobile Text */}
         <div className="hero-text mobile-only">
           <p className="hero-line1">THE NEW ALBUM'S COMING</p>
           <p className="hero-line1"><span className="highlight">MAY 1 2025</span></p>
