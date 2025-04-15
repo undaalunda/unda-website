@@ -49,19 +49,6 @@ export default function HomePage() {
       {/* 🪐 Hero Section */}
       <div className="hero-wrapper">
         <div className="catmoon-background" />
-
-        {/* 🔥 Logo Header Image */}
-        <div className="hero-header-image">
-          <Image
-            src="/unda-alunda-header.png"
-            alt="Unda Alunda Header"
-            width={500}
-            height={150}
-            priority
-          />
-        </div>
-
-        {/* 🧊 Text Over Moon */}
         <div className="hero-text-image">
           <Image
             src="/text-hero-section.png"
@@ -72,7 +59,6 @@ export default function HomePage() {
           />
         </div>
 
-        {/* 📣 Desktop Text */}
         <div className="hero-text desktop-only">
           <p className="hero-line1">
             THE NEW ALBUM'S COMING <span className="highlight">MAY 1 2025</span>
@@ -85,7 +71,6 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* 📱 Mobile Text */}
         <div className="hero-text mobile-only">
           <p className="hero-line1">THE NEW ALBUM'S COMING</p>
           <p className="hero-line1"><span className="highlight">MAY 1 2025</span></p>
@@ -98,7 +83,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Spacer */}
+      {/* Spacer after Hero */}
       <div className="after-hero-spacing" />
 
       {/* 🧭 Button Section + Since */}
