@@ -2,23 +2,21 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #410203;
+  --foreground: #190000;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #410203;
+    --background: #190000;
     --foreground: #ededed;
   }
 }
 
-/* ✅ html ต้องโปร่งใส ไม่งั้นทับ bg image */
 html {
   background-color: transparent;
-  overflow-x: hidden; /* กันเลื่อนข้าง */
+  overflow-x: hidden;
 }
 
-/* ✅ ให้ Safari, iOS, ทุกอย่างแสดง fallback เป็น #410203 ตอนโหลดหรือ overscroll */
 body {
   min-height: 100%;
   margin: 0;
@@ -27,10 +25,9 @@ body {
   overflow-x: hidden;
   overscroll-behavior: auto;
   -webkit-overflow-scrolling: touch;
-  background-color: #410203;
+  background-color: #190000;
 }
 
-/* === GLOBAL BACKGROUND FIXED === */
 body::before {
   content: '';
   position: fixed;
@@ -48,14 +45,12 @@ body::before {
   transform: translate3d(0, 0, 0);
 }
 
-/* === BASE LAYOUT === */
 main,
 .homepage-main {
   position: relative;
   z-index: 0;
 }
 
-/* === HERO SECTION: FIXED === */
 .hero-wrapper {
   width: 100vw;
   height: 100vh;
@@ -100,10 +95,9 @@ main,
   z-index: 1;
 }
 
-/* === LOGO IMAGE ON TOP OF HERO SECTION === */
 .hero-logo-image {
   position: absolute;
-  top: 1.2vh;
+  top: 1vh;
   left: 50%;
   transform: translateX(-50%);
   z-index: 12;
@@ -120,7 +114,6 @@ main,
   object-fit: contain;
 }
 
-/* 🧊 TEXT IMAGE ตรงกลาง HERO */
 .hero-text-image {
   position: absolute;
   top: 12vh;
@@ -140,7 +133,6 @@ main,
   object-fit: contain;
 }
 
-/* 🎬 Fade-in Animation */
 @keyframes fadeInHero {
   from {
     opacity: 0;
@@ -152,7 +144,6 @@ main,
   }
 }
 
-/* 📱 Responsive */
 @media (max-width: 1279px) {
   .hero-logo-image {
     top: 1.5vh;
@@ -174,7 +165,7 @@ main,
 
 @media (max-width: 768px) {
   .hero-logo-image {
-    top: 1.5vh;
+    top: 1.2vh;
     max-width: 240px;
   }
 
@@ -191,7 +182,7 @@ main,
 
 @media (max-width: 480px) {
   .hero-logo-image {
-    top: 1.5vh;
+    top: 2.8vh;
     max-width: 200px;
   }
 
@@ -203,6 +194,77 @@ main,
   .hero-header-image {
     width: 100%;
     max-width: 280px;
+  }
+}
+
+/* === NAVBAR (Fading + Layout Fix) === */
+.navbar-inner-wrapper {
+  transition: opacity 0.7s ease, transform 0.7s ease;
+  transform-origin: top center;
+}
+
+/* สำหรับ layout breakpoint */
+@media (max-width: 768px) {
+  .navbar-inner-wrapper {
+    gap: 1rem;
+  }
+}
+
+/* ปรับไอคอนตอน active (theme-based red) */
+button:active svg,
+.navbar-icon:active svg {
+  stroke: #9a1d2e;
+}
+
+/* ให้ svg transition นุ่มนวล */
+button svg,
+.navbar-icon svg {
+  transition: stroke 0.3s ease;
+}
+
+/* === NAVBAR ICONS === */
+.navbar-icon {
+  color: #f8fcdc99; /* #f8fcdc/60 */
+  transition: color 0.3s ease, stroke 0.3s ease;
+}
+
+.navbar-icon:active {
+  color: #dc9e63;
+}
+
+.navbar-icon svg {
+  transition: stroke 0.3s ease;
+}
+
+.navbar-icon:active svg {
+  stroke: #dc9e63;
+}
+
+/* === NAVBAR CENTER LOGO RESPONSIVE === */
+.logo-navbar-img {
+  width: 220px;
+  height: auto;
+  object-fit: contain;
+}
+
+/* 💻 Tablet */
+@media (max-width: 1279px) {
+  .logo-navbar-img {
+    width: 200px;
+  }
+}
+
+/* 📱 Mobile */
+@media (max-width: 768px) {
+  .logo-navbar-img {
+    width: 180px;
+  }
+}
+
+/* 📱 XS Devices */
+@media (max-width: 480px) {
+  .logo-navbar-img {
+    width: 160px;
   }
 }
 

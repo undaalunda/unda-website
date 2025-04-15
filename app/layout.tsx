@@ -1,7 +1,7 @@
 'use client';
 
 import './globals.css';
-import { usePathname } from 'next/navigation';
+import Navbar from '../components/Navbar'; // ✅ เปลี่ยน path ถ้าไฟล์อยู่ที่อื่น
 import type { ReactNode } from 'react';
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -17,7 +17,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <title>Unda Alunda | Official Website & Merch Store</title>
       </head>
       <body className="bg-black text-white m-0 p-0 overflow-x-hidden">
-        {/* Ensure no unwanted top space and allow background to sit correctly */}
+        {/* 🧠 Global Navbar */}
+        <Navbar />
+
+        {/* 🧱 Content Wrapper */}
         <div id="__layout" className="min-h-screen w-full relative">
           {children}
         </div>
