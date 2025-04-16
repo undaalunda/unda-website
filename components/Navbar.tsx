@@ -60,44 +60,44 @@ export default function Navbar() {
       {/* 💎 Navbar Content */}
       <div className="relative flex items-center justify-between px-4 py-8 h-full">
         {/* 🍔 Hamburger / X */}
-<button
-  onClick={() => setMenuOpen(!menuOpen)}
-  className="cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors z-50"
->
-  <div
-    className={`transition-transform duration-200 ease-in-out ${
-      menuOpen ? 'rotate-180 scale-100' : 'rotate-0 scale-100'
-    }`}
-  >
-    {menuOpen ? (
-      <X size={28} strokeWidth={1.2} />
-    ) : (
-      <Menu size={23} strokeWidth={1.2} />
-    )}
-  </div>
-</button>
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors z-50"
+        >
+          <div
+            className={`transition-transform duration-200 ease-in-out ${
+              menuOpen ? 'rotate-180 scale-100' : 'rotate-0 scale-100'
+            }`}
+          >
+            {menuOpen ? (
+              <X size={28} strokeWidth={1.2} />
+            ) : (
+              <Menu size={23} strokeWidth={1.2} />
+            )}
+          </div>
+        </button>
 
-{/* 🎯 Right Icons */}
-<div className="flex items-center gap-6 pr-1 z-40">
-  <Link
-    href="/account"
-    className="hidden md:block cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
-  >
-    <User size={23} strokeWidth={1.2} />
-  </Link>
-  <Link
-    href="/cart"
-    className="cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
-  >
-    <ShoppingCart size={23} strokeWidth={1.2} />
-  </Link>
-  <Link
-    href="/search"
-    className="hidden md:block cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
-  >
-    <Search size={23} strokeWidth={1.2} />
-  </Link>
-</div>
+        {/* 🎯 Right Icons */}
+        <div className="flex items-center gap-6 pr-1 z-40">
+          <Link
+            href="/account"
+            className="hidden md:block cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
+          >
+            <User size={23} strokeWidth={1.2} />
+          </Link>
+          <Link
+            href="/cart"
+            className="cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
+          >
+            <ShoppingCart size={23} strokeWidth={1.2} />
+          </Link>
+          <Link
+            href="/search"
+            className="hidden md:block cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
+          >
+            <Search size={23} strokeWidth={1.2} />
+          </Link>
+        </div>
 
         {/* 🌕 Logo CENTER ALWAYS — Scroll */}
         <div
@@ -132,14 +132,13 @@ export default function Navbar() {
 
       {/* 🍽️ Fullscreen Menu */}
       {menuOpen && (
-        <div className="fixed inset-0 bg-transparent flex flex-col items-center justify-center text-[#f8fcdc] text-lg font-semibold tracking-widest space-y-6 z-30 backdrop-blur-none">
+        <div className="fixed inset-0 bg-transparent flex flex-col items-center justify-center text-[#f8fcdc] text-lg font-semibold tracking-widest space-y-6 z-30 backdrop-blur-none font-[Cinzel]">
           <Link href="/" onClick={() => setMenuOpen(false)} className="hover:text-[#dc9e63]">HOME</Link>
-          <Link href="/tour" onClick={() => setMenuOpen(false)} className="hover:text-[#dc9e63]">TOUR DATES</Link>
-          <Link href="/uk" onClick={() => setMenuOpen(false)} className="hover:text-[#dc9e63]">UK STORE</Link>
-          <Link href="/us" onClick={() => setMenuOpen(false)} className="hover:text-[#dc9e63]">US STORE</Link>
-          <Link href="/eu" onClick={() => setMenuOpen(false)} className="hover:text-[#dc9e63]">EU STORE</Link>
-          <Link href="/au" onClick={() => setMenuOpen(false)} className="hover:text-[#dc9e63]">AU STORE</Link>
-          <Link href="/follow" onClick={() => setMenuOpen(false)} className="hover:text-[#dc9e63]">FOLLOW</Link>
+          <Link href="/shop" onClick={() => setMenuOpen(false)} className="hover:text-[#dc9e63]">SHOP</Link>
+          <Link href="/music" onClick={() => setMenuOpen(false)} className="hover:text-[#dc9e63]">MUSIC</Link>
+          <Link href="/about" onClick={() => setMenuOpen(false)} className="hover:text-[#dc9e63]">ABOUT</Link>
+          <Link href="/tour" onClick={() => setMenuOpen(false)} className="hover:text-[#dc9e63]">TOUR</Link>
+          <Link href="/contact" onClick={() => setMenuOpen(false)} className="hover:text-[#dc9e63]">CONTACT</Link>
         </div>
       )}
     </header>
