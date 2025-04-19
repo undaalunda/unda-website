@@ -902,6 +902,81 @@ button svg,
   justify-content: center;
 }
 
+/* 🎧 Bandsintown Widget Styling — Layout + Button */
+
+.bit-widget-initializer {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 3rem 1rem;
+  font-family: 'Cinzel', serif;
+  color: #f8fcdc;
+  background: transparent !important;
+}
+
+.bit-widget-initializer * {
+  font-family: inherit !important;
+  color: inherit !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* 🪪 Layout of each event row */
+.bit-widget-initializer .event-row {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid rgba(248, 252, 220, 0.1);
+}
+
+/* 🎯 Flex layout for the inner columns */
+.bit-widget-initializer .event-row > div:nth-child(1) {
+  flex: 2;
+  text-align: left;
+}
+
+.bit-widget-initializer .event-row > div:nth-child(2) {
+  flex: 1.5;
+  text-align: center;
+}
+
+.bit-widget-initializer .event-row > div:nth-child(3) {
+  flex: 1.5;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* 🎟️ Default buttons */
+.bit-widget-initializer .bit-button,
+.bit-widget-initializer button {
+  background-color: #190000 !important;
+  color: #f8fcdc !important;
+  border: 1px solid #190000 !important;
+  border-radius: 1.5rem;
+  padding: 0.45rem 1.1rem;
+  font-weight: 600;
+  font-size: 0.82rem;
+  text-align: center;
+  text-decoration: none !important;
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+/* ✋ Request a Show button */
+.bit-widget-initializer .bit-button.bit-offers {
+  background-color: #190000 !important;
+  color: #f8fcdc !important;
+  border: 1px solid #190000 !important;
+}
+
+/* 🔥 Hover effect */
+.bit-widget-initializer .bit-button:hover,
+.bit-widget-initializer .bit-button.bit-offers:hover {
+  background-color: #190000 !important;
+  color: black !important;
+}
+
 /* === ✨ FADE IN ANIMATION === */
 
 .fade-in-section {
