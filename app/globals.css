@@ -687,7 +687,7 @@ button svg,
   justify-content: center;
 }
 
-/* === STEMS & BACKING TRACKS PRODUCT SECTION === */
+/* === STEMS & BACKING TRACKS, MUSIC & MERCH PRODUCT SECTION === */
 
 .stems-section {
   text-align: center;
@@ -791,23 +791,23 @@ button svg,
 }
 
 .stems-title-text {
-  font-size: 1rem;
+  font-size: 0.724rem;
   font-weight: 600;
   letter-spacing: 0.05em;
   color: #dc9e63;
 }
 
 .stems-subtitle {
-  font-size: 0.85rem; /* เดิม 0.8 → เพิ่มนิดเพื่อเทียบกับ Transcription */
-  font-weight: 400;
+  font-size: 0.78rem; /* เดิม 0.8 → เพิ่มนิดเพื่อเทียบกับ Transcription */
+  font-weight: 200;
   letter-spacing: 0.05em;
   margin-top: 0.25rem;
   color: #f8fcdc;
 }
 
 .stems-subtitle-tiny {
-  font-size: 0.75rem; /* เดิม 0.65 → เพิ่มนิดให้บาลานซ์กับด้านบน */
-  font-weight: 300;
+  font-size: 0.77rem; /* เดิม 0.65 → เพิ่มนิดให้บาลานซ์กับด้านบน */
+  font-weight: 100;
   color: #f8fcdc;
   margin-top: 0.15rem;
   letter-spacing: 0.02em;
@@ -815,7 +815,7 @@ button svg,
 }
 
 .stems-price {
-  font-size: 1rem;
+  font-size: 0.8rem;
   font-weight: bold;
   margin-top: 0.4rem;
   color: #cc3f33;
@@ -824,54 +824,29 @@ button svg,
   transition: color 0.3s ease;
 }
 
+.backing-line { /* 🎸 Backing Track Hover Line Animation */
+  display: block;
+  height: 1px;
+  width: 40%;
+  background-color: #710000;
+  margin: 0.3rem auto;
+  transition: width 0.6s ease;
+}
+
+.stems-item:hover .backing-line {
+  width: 70%;
+}
+
 /* === FONT SIZE RESPONSIVE BREAKPOINTS === */
 
 /* 💻 Desktop: ≤1279px */
 @media (max-width: 1279px) {
   .stems-title-text {
-    font-size: 0.9rem;
-  }
-
-  .stems-subtitle {
-    font-size: 0.75rem;
-  }
-
-  .stems-subtitle-tiny {
-    font-size: 0.75rem; /* 👈 now same as subtitle */
-  }
-
-  .stems-price {
-    font-size: 0.75rem;
-  }
-}
-
-/* 📱 Tablet: ≤768px */
-@media (max-width: 768px) {
-  .stems-title-text {
-    font-size: 0.8rem;
+    font-size: 0.724rem;
   }
 
   .stems-subtitle {
     font-size: 0.7rem;
-  }
-
-  .stems-subtitle-tiny {
-    font-size: 0.7rem; /* 👈 now same as subtitle */
-  }
-
-  .stems-price {
-    font-size: 0.7rem;
-  }
-}
-
-/* 📱 Extra Small: ≤480px */
-@media (max-width: 480px) {
-  .stems-title-text {
-    font-size: 0.75rem;
-  }
-
-  .stems-subtitle {
-    font-size: 0.65rem;
   }
 
   .stems-subtitle-tiny {
@@ -879,7 +854,45 @@ button svg,
   }
 
   .stems-price {
-    font-size: 0.65rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* 📱 Tablet: ≤768px */
+@media (max-width: 768px) {
+  .stems-title-text {
+    font-size: 0.724rem;
+  }
+
+  .stems-subtitle {
+    font-size: 0.7rem;
+  }
+
+  .stems-subtitle-tiny {
+    font-size: 0.66rem; /* 👈 now same as subtitle */
+  }
+
+  .stems-price {
+    font-size: 0.8rem;
+  }
+}
+
+/* 📱 Extra Small: ≤480px */
+@media (max-width: 480px) {
+  .stems-title-text {
+    font-size: 0.724rem;
+  }
+
+  .stems-subtitle {
+    font-size: 0.7rem;
+  }
+
+  .stems-subtitle-tiny {
+    font-size: 0.66rem; /* 👈 now same as subtitle */
+  }
+
+  .stems-price {
+    font-size: 0.8rem;
   }
 }
 

@@ -9,11 +9,13 @@ export default function HomePage() {
   const transcriptionRef = useRef<HTMLDivElement>(null);
   const stemsRef = useRef<HTMLDivElement>(null);
   const buttonGroupRef = useRef<HTMLDivElement>(null);
+  const musicMerchRef = useRef<HTMLDivElement>(null);
 
   const [showVideo, setShowVideo] = useState(false);
   const [showTranscriptions, setShowTranscriptions] = useState(false);
   const [showStems, setShowStems] = useState(false);
   const [showButtons, setShowButtons] = useState(false);
+  const [showMerch, setShowMerch] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -24,6 +26,7 @@ export default function HomePage() {
             if (entry.target === transcriptionRef.current) setShowTranscriptions(true);
             if (entry.target === stemsRef.current) setShowStems(true);
             if (entry.target === buttonGroupRef.current) setShowButtons(true);
+            if (entry.target === musicMerchRef.current) setShowMerch(true);
           }
         });
       },
@@ -33,12 +36,12 @@ export default function HomePage() {
       }
     );
 
-    [videoRef, transcriptionRef, stemsRef, buttonGroupRef].forEach((ref) => {
+    [videoRef, transcriptionRef, stemsRef, buttonGroupRef, musicMerchRef].forEach((ref) => {
       if (ref.current) observer.observe(ref.current);
     });
 
     return () => {
-      [videoRef, transcriptionRef, stemsRef, buttonGroupRef].forEach((ref) => {
+      [videoRef, transcriptionRef, stemsRef, buttonGroupRef, musicMerchRef].forEach((ref) => {
         if (ref.current) observer.unobserve(ref.current);
       });
     };
@@ -46,51 +49,31 @@ export default function HomePage() {
 
   return (
     <main className="homepage-main">
-      {/* 🪐 Hero Section */}
       <div className="hero-wrapper">
         <div className="catmoon-background" />
-
-        {/* ✨ Hero Text Title Image */}
         <div className="hero-text-image">
-          <Image
-            src="/text-hero-section.png"
-            alt="Dark Wonderful World on Moon"
-            height={400}
-            width={600}
-            priority
-          />
+          <Image src="/text-hero-section.png" alt="Dark Wonderful World on Moon" height={400} width={600} priority />
         </div>
-
-        {/* 💻 Desktop Text */}
         <div className="hero-text desktop-only">
           <p className="hero-line1">
             THE NEW ALBUM'S COMING <span className="highlight">MAY 1 2025</span>
           </p>
           <p className="hero-line2">
-            AVAILABLE NOW TO{' '}
-            <Link href="/preorder" className="hero-cta-link">PRE-ORDER</Link>{' '}
-            &{' '}
-            <Link href="/presave" className="hero-cta-link">PRE-SAVE</Link>
+            AVAILABLE NOW TO <Link href="/preorder" className="hero-cta-link">PRE-ORDER</Link> & <Link href="/presave" className="hero-cta-link">PRE-SAVE</Link>
           </p>
         </div>
-
-        {/* 📱 Mobile Text */}
         <div className="hero-text mobile-only">
           <p className="hero-line1">THE NEW ALBUM'S COMING</p>
           <p className="hero-line1"><span className="highlight">MAY 1 2025</span></p>
           <p className="hero-line2">AVAILABLE NOW TO</p>
           <p className="hero-line2">
-            <Link href="/preorder" className="hero-cta-link">PRE-ORDER</Link>{' '}
-            &{' '}
-            <Link href="/presave" className="hero-cta-link">PRE-SAVE</Link>
+            <Link href="/preorder" className="hero-cta-link">PRE-ORDER</Link> & <Link href="/presave" className="hero-cta-link">PRE-SAVE</Link>
           </p>
         </div>
       </div>
 
-      {/* Spacer after Hero */}
       <div className="after-hero-spacing" />
 
-      {/* 🧭 Button Section + Since */}
       <div>
         <div ref={buttonGroupRef} className={`button-group ${showButtons ? 'fade-in' : ''}`}>
           <Link href="/scores" className="info-button">SCORES</Link>
@@ -102,7 +85,6 @@ export default function HomePage() {
         <p className="since-note">Delivering Worldwide Since 2025</p>
       </div>
 
-      {/* 🎬 YouTube Section */}
       <section ref={videoRef} className={`video-section ${showVideo ? 'fade-in' : ''}`}>
         <iframe
           className="youtube-frame"
@@ -114,7 +96,6 @@ export default function HomePage() {
         ></iframe>
       </section>
 
-      {/* 🎼 Transcriptions */}
       <section className="transcription-section">
         <div ref={transcriptionRef} className={`fade-trigger ${showTranscriptions ? 'fade-in' : ''}`}>
           <h2 className="transcription-sub">LEARN THE MUSIC</h2>
@@ -136,29 +117,71 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 🎸 Stems Section */}
       <section className="stems-section">
         <div ref={stemsRef} className={`fade-trigger ${showStems ? 'fade-in' : ''}`}>
           <h2 className="stems-sub">JAM THE TRACKS</h2>
           <h3 className="stems-title">Stems & Backing Tracks</h3>
           <div className="stems-row">
             {[
-              { src: '/anomic-no-drums.jpg', title: 'ANOMIC', type: 'DRUMS', price: '$18.00' },
-              { src: '/jyy-no-guitars.jpg', title: 'JYY', type: 'GUITARS', price: '$18.00' },
-              { src: '/atlantic-no-lead-guitar.jpg', title: 'ATLANTIC', type: 'LEAD GUITAR', price: '$19.00' },
-              { src: '/out-of-the-dark-no-drums.jpg', title: 'OUT OF THE DARK', type: 'DRUMS', price: '$22.00' },
-              { src: '/feign-no-guitars.jpg', title: 'FEIGN', type: 'GUITARS', price: '$22.00' },
-              { src: '/the-dark-no-keys.jpg', title: 'THE DARK', type: 'KEYS', price: '$15.00' },
-              { src: '/reddown-no-bass.jpg', title: 'RED DOWN', type: 'BASS', price: '$18.00' },
-              { src: '/quietness-no-bass.jpg', title: 'QUIETNESS', type: 'BASS', price: '$18.00' },
+              { src: '/anomic-no-drums.jpg', title: 'ANOMIC', type: 'DRUMS', price: '$8.00' },
+              { src: '/jyy-no-guitars.jpg', title: 'JYY', type: 'GUITARS', price: '$8.00' },
+              { src: '/atlantic-no-lead-guitar.jpg', title: 'ATLANTIC', type: 'LEAD GUITAR', price: '$9.00' },
+              { src: '/out-of-the-dark-no-drums.jpg', title: 'OUT OF THE DARK', type: 'DRUMS', price: '$12.00' },
+              { src: '/feign-no-guitars.jpg', title: 'FEIGN', type: 'GUITARS', price: '$12.00' },
+              { src: '/the-dark-no-keys.jpg', title: 'THE DARK', type: 'KEYS', price: '$5.00' },
+              { src: '/reddown-no-bass.jpg', title: 'RED DOWN', type: 'BASS', price: '$8.00' },
+              { src: '/quietness-no-bass.jpg', title: 'QUIETNESS', type: 'BASS', price: '$8.00' },
             ].map((product, i) => (
               <Link href="/shop" key={i} className="stems-item product-label-link">
                 <img src={product.src} alt={product.title} className="stems-image" />
                 <div className="stems-label-group">
                   <p className="stems-title-text">{product.title}</p>
                   <p className="stems-subtitle-tiny">{product.type}</p>
-                  <p className="stems-subtitle-tiny">Backing track</p>
-                  <p className="stems-price">{product.price}</p>
+                  <span className="backing-line always-on"></span>
+                  <p className="stems-subtitle-tiny tracking-wide uppercase text-center backing-text">BACKING TRACK</p>
+                  <p className="stems-price text-[#f8fcdc]">{product.price}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+          <div className="shopall-button-wrapper">
+            <Link href="/shop" className="info-button">SHOP ALL</Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="stems-section">
+        <div ref={musicMerchRef} className={`fade-trigger ${showMerch ? 'fade-in' : ''}`}>
+          <h2 className="stems-sub">MUSIC IN YOUR HANDS</h2>
+          <h3 className="stems-title">Music & Merch</h3>
+          <div className="stems-row">
+            {[
+              { src: '/audio-digipak-dww.png', title: 'DARK WONDERFUL WORLD', type1: 'AUDIO ALBUM CD (Digipak)', price: '$25.00' },
+              { src: '/live-cd-dww.png', title: 'DARK WONDERFUL WORLD', type1: 'LIVE ALBUM CD', price: '$15.00' },
+              { src: '/black-cats-scores-tee.png', title: 'CAT SCORES T-SHIRT', type1: 'BLACK', price: '$29.95' },
+              { src: '/white-cats-scores-tee.png', title: 'CAT SCORES T-SHIRT', type1: 'WHITE', price: '$29.95' },
+              { src: '/a-cat-to-the-moon-stickers.png', title: 'A CAT TO THE MOON', type1: 'STICKERS', price: '$5.00' },
+              { src: '/a-musician-cats.png', title: 'A MUSICIAN CATS', type1: 'STICKERS', price: '$5.00' },
+              { src: '/unda-alunda-sign-keychain.png', title: 'UNDA ALUNDA', type1: 'SIGNED KEYCHAIN', price: '$9.95' },
+              { src: '/full-guitars-transcription.png', title: 'FULL GUITARS TRANSCRIPTION', type1: 'PRINTED BOOK', price: '$49.95' },
+              { src: '/dark-wonderful-world-dual-album-merch-bundle.png', title: 'DARK WONDERFUL WORLD', type1: 'DUAL ALBUM MERCH BUNDLE', price: { original: '$109.85', sale: '$87.88' } },
+              { src: '/dark-wonderful-world-album-merch-bundle.png', title: 'DARK WONDERFUL WORLD', type1: 'ALBUM MERCH BUNDLE', price: { original: '$64.90', sale: '$51.92' } },
+              { src: '/dark-wonderful-world-book-&-bonus-merch-bundle.png', title: 'DARK WONDERFUL WORLD', type1: 'BOOK & BONUS MERCH BUNDLE', price: { original: '$94.90', sale: '$75.92' } },
+              { src: '/dark-wonderful-world-book-&-merch-bundle.png', title: 'DARK WONDERFUL WORLD', type1: 'BOOK & MERCH BUNDLE', price: { original: '$84.90', sale: '$67.92' } },
+            ].map((item, i) => (
+              <Link href="/shop" key={i} className="stems-item product-label-link">
+                <img src={item.src} alt={item.title} className="stems-image" />
+                <div className="stems-label-group">
+                  <p className="stems-title-text">{item.title}</p>
+                  <p className="stems-subtitle-tiny">{item.type1}</p>
+                  {typeof item.price === 'string' ? (
+                    <p className="stems-price text-[#f8fcdc]">{item.price}</p>
+                  ) : (
+                    <p className="stems-price">
+                      <span className="line-through mr-1 text-[#f8fcdc]">{item.price.original}</span>
+                      <span className="text-[#cc3f33]">{item.price.sale}</span>
+                    </p>
+                  )}
                 </div>
               </Link>
             ))}
