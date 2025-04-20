@@ -850,7 +850,7 @@ button svg,
   }
 
   .stems-subtitle-tiny {
-    font-size: 0.65rem; /* 👈 now same as subtitle */
+    font-size: 0.65rem;
   }
 
   .stems-price {
@@ -869,7 +869,7 @@ button svg,
   }
 
   .stems-subtitle-tiny {
-    font-size: 0.66rem; /* 👈 now same as subtitle */
+    font-size: 0.66rem;
   }
 
   .stems-price {
@@ -888,7 +888,7 @@ button svg,
   }
 
   .stems-subtitle-tiny {
-    font-size: 0.66rem; /* 👈 now same as subtitle */
+    font-size: 0.66rem;
   }
 
   .stems-price {
@@ -896,85 +896,159 @@ button svg,
   }
 }
 
+/* 🛒 Button Section */
 .shopall-button-wrapper {
   margin-top: 3rem;
   display: flex;
   justify-content: center;
 }
 
-/* 🎧 Bandsintown Widget Styling — Layout + Button */
+/* Tour Section */
 
-.bit-widget-initializer {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 3rem 1rem;
-  font-family: 'Cinzel', serif;
-  color: #f8fcdc;
-  background: transparent !important;
+.tour-section {
+  background: radial-gradient(circle, rgba(20, 10, 5, 0.85) 0%, rgba(0, 0, 0, 0.95) 100%);
+  padding: 4rem 2rem;
+  text-align: center;
+  position: relative;
+  z-index: 2;
 }
 
-.bit-widget-initializer * {
-  font-family: inherit !important;
-  color: inherit !important;
-  background: transparent !important;
-  box-shadow: none !important;
-}
-
-/* 🪪 Layout of each event row */
-.bit-widget-initializer .event-row {
-  display: flex !important;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.25rem 0;
-  border-bottom: 1px solid rgba(248, 252, 220, 0.1);
-}
-
-/* 🎯 Flex layout for the inner columns */
-.bit-widget-initializer .event-row > div:nth-child(1) {
-  flex: 2;
+/* 🧭 ชิดซ้ายแบบ Plini */
+.tour-text-wrapper {
+  max-width: 960px;
+  margin: 0 auto 2rem auto;
   text-align: left;
+  padding-left: 5rem;
 }
 
-.bit-widget-initializer .event-row > div:nth-child(2) {
-  flex: 1.5;
-  text-align: center;
+.tour-description {
+  font-size: 1rem;
+  font-style: italic;
+  color: #d6c89f;
+  opacity: 0.9;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.25rem;
 }
 
-.bit-widget-initializer .event-row > div:nth-child(3) {
-  flex: 1.5;
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
+.tour-subtext {
+  font-size: 0.9rem;
+  color: #a18f69;
+  text-transform: uppercase;
+  margin: 0.5rem 0 2rem;
+  letter-spacing: 1px;
 }
 
-/* 🎟️ Default buttons */
-.bit-widget-initializer .bit-button,
-.bit-widget-initializer button {
-  background-color: #190000 !important;
-  color: #f8fcdc !important;
-  border: 1px solid #190000 !important;
-  border-radius: 1.5rem;
-  padding: 0.45rem 1.1rem;
-  font-weight: 600;
-  font-size: 0.82rem;
-  text-align: center;
-  text-decoration: none !important;
-  display: inline-block;
-  transition: all 0.3s ease;
+.bit-no-events-wrapper {
+  margin-top: 7rem;
 }
 
-/* ✋ Request a Show button */
-.bit-widget-initializer .bit-button.bit-offers {
-  background-color: #190000 !important;
-  color: #f8fcdc !important;
-  border: 1px solid #190000 !important;
+.no-events {
+  margin-bottom: 2rem;
 }
 
-/* 🔥 Hover effect */
-.bit-widget-initializer .bit-button:hover,
-.bit-widget-initializer .bit-button.bit-offers:hover {
-  background-color: #190000 !important;
-  color: black !important;
+.bit-no-events-wrapper .info-button {
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 1279px) {
+  .tour-text-wrapper {
+    max-width: 960px;
+    margin: 0 auto 2rem auto;
+    text-align: left;
+    padding-left: 4rem; /* เดสก์ท็อปกว้างหน่อย */
+  }
+  
+  .tour-description {
+    font-size: 0.95rem;
+    text-align: left;
+  }
+
+  .tour-subtext {
+    font-size: 0.85rem;
+    text-align: left;
+  }
+
+  .event-row {
+    font-size: 0.82rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .event-row > div {
+    width: 100%;
+    text-align: left;
+  }
+
+  .event-actions {
+    display: flex;
+    justify-content: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .tour-text-wrapper {
+    padding-left: 1rem; /* แคบลงนิดนึง ไม่ให้มันแน่นไป */
+  }
+
+  .tour-description {
+    font-size: 0.9rem;
+    text-align: left;
+  }
+
+  .tour-subtext {
+    font-size: 0.8rem;
+    text-align: left;
+  }
+
+  .event-row {
+    font-size: 0.8rem;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tour-text-wrapper {
+    padding-left: 0rem; /* ชิดขอบแต่ไม่แนบเกินไป */
+  }
+
+  .tour-description {
+    font-size: 0.85rem;
+    text-align: left;
+  }
+
+  .tour-subtext {
+    font-size: 0.75rem;
+    text-align: left;
+  }
+
+  .event-row {
+    font-size: 0.75rem;
+  }
+
+  .info-button.small {
+    padding: 0.4rem 1rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* 🕶️ อนิเมชัน Fade-in ที่เท่กว่าเดิม */
+.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+  animation: fadeUp 1s ease-out;
+}
+
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* === ✨ FADE IN ANIMATION === */

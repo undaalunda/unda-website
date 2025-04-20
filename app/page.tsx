@@ -5,12 +5,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 export default function HomePage() {
-  const videoRef = useRef<HTMLDivElement>(null);
-  const transcriptionRef = useRef<HTMLDivElement>(null);
-  const stemsRef = useRef<HTMLDivElement>(null);
-  const buttonGroupRef = useRef<HTMLDivElement>(null);
-  const musicMerchRef = useRef<HTMLDivElement>(null);
-  const tourRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef(null);
+  const transcriptionRef = useRef(null);
+  const stemsRef = useRef(null);
+  const buttonGroupRef = useRef(null);
+  const musicMerchRef = useRef(null);
+  const tourRef = useRef(null);
 
   const [showVideo, setShowVideo] = useState(false);
   const [showTranscriptions, setShowTranscriptions] = useState(false);
@@ -18,7 +18,7 @@ export default function HomePage() {
   const [showButtons, setShowButtons] = useState(false);
   const [showMerch, setShowMerch] = useState(false);
   const [showTour, setShowTour] = useState(false);
-  const [events, setEvents] = useState<any[]>([]);
+  const [events, setEvents] = useState([]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -52,67 +52,17 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://widget.bandsintown.com/main.min.js';
-    script.async = true;
-    document.body.appendChild(script);
-
-    script.onload = () => {
-      let retries = 0;
-      const maxRetries = 20;
-
-      const interval = setInterval(() => {
-        const btn = document.querySelector('.bit-button.bit-offers') as HTMLElement;
-        const rows = document.querySelectorAll('.bit-widget-initializer .event-row') as NodeListOf<HTMLElement>;
-
-        if (btn) {
-          Object.assign(btn.style, {
-            backgroundColor: '#080000',
-            color: '#f8fcdc',
-            border: 'none',
-            borderRadius: '1.5rem',
-            padding: '0.5rem 1.25rem',
-            fontWeight: 'bold',
-            fontSize: '0.85rem',
-            textAlign: 'center',
-            textDecoration: 'none',
-            display: 'inline-block',
-          });
-        }
-
-        rows.forEach((row) => {
-          row.style.display = 'flex';
-          row.style.alignItems = 'center';
-          row.style.justifyContent = 'space-between';
-          row.style.padding = '1.25rem 0';
-          row.style.borderBottom = '1px solid rgba(248,252,220,0.1)';
-          row.style.flexWrap = 'nowrap';
-          row.style.gap = '1rem';
-
-          const children = row.querySelectorAll('div');
-          if (children.length >= 3) {
-            children[0].style.flex = '2';
-            children[1].style.flex = '1.5';
-            children[1].style.textAlign = 'center';
-            children[2].style.flex = '1.5';
-            children[2].style.display = 'flex';
-            children[2].style.justifyContent = 'flex-end';
-            children[2].style.gap = '0.5rem';
-          }
-        });
-
-        if (btn && rows.length) {
-          clearInterval(interval);
-        } else if (++retries >= maxRetries) {
-          clearInterval(interval);
-          console.warn('Bandsintown widget failed to load in time.');
-        }
-      }, 300);
-    };
+    fetch('https://rest.bandsintown.com/artists/Unda%20Alunda/events?app_id=f869d34726b9e0efbb02df0d871608af')
+      .then((res) => res.json())
+      .then((data) => {
+        console.log('[BIT EVENTS]', data);
+        setEvents(data);
+      })
+      .catch((err) => console.error('[Bandsintown API Error]', err));
   }, []);
 
   return (
-    <main className="homepage-main">
+    <main className="homepage-main" style={{ overflow: 'visible' }}>
       <div className="hero-wrapper">
         <div className="catmoon-background" />
         <div className="hero-text-image">
@@ -257,20 +207,79 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section ref={tourRef} className={`tour-section ${showTour ? 'fade-in' : ''}`}>
-        <h2 className="stems-sub">SEE IT LIVE</h2>
-        <h3 className="stems-title">Tour Dates</h3>
-        <div
-          className="bit-widget-initializer"
-          data-artist-name="Unda Alunda"
-          data-display-limit="10"
-          data-request-show="true"
-          data-text-color="#f8fcdc"
-          data-background-color="transparent"
-          data-link-color="#cc3f33"
-          data-font="inherit"
-        ></div>
-      </section>
+      <section
+  ref={tourRef}
+  className={`tour-section ${showTour ? 'fade-in' : ''}`}
+>
+  <h2 className="stems-sub">SEE IT LIVE</h2>
+  <h3 className="stems-title">Tour Dates</h3>
+
+  {/* 👇 Text ชิดซ้ายแบบวง Plini */}
+  <div className="tour-text-wrapper">
+    <p className="tour-description">
+      Track to get concert, live stream and tour updates.
+    </p>
+    <p className="tour-subtext">Upcoming Dates</p>
+  </div>
+
+  {events.length > 0 ? (
+    <div className="tour-table-wrapper">
+      {events.map((event: any, i: number) => (
+        <div key={i} className="event-row">
+          <div className="event-date">
+            {new Date(event.datetime ?? '').toLocaleDateString('en-US', {
+              weekday: 'short',
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+            })}
+          </div>
+
+          <div className="event-venue">
+            <span className="event-name">
+              {event.venue?.name ?? 'Unknown Venue'}
+            </span>
+            <br />
+            <span className="event-location">
+              {event.venue?.city ?? 'Nowhere'},{' '}
+              {event.venue?.country ?? 'Unknown'}
+            </span>
+          </div>
+
+          <div className="event-actions">
+            {Array.isArray(event.offers) && event.offers.length > 0 ? (
+              event.offers.map((offer: any, j: number) => (
+                <a
+                  key={j}
+                  href={offer.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="info-button small"
+                >
+                  {offer.type?.toUpperCase() || 'TICKETS'}
+                </a>
+              ))
+            ) : (
+              <span className="no-offers">No tickets</span>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <div className="bit-no-events-wrapper">
+      <p className="no-events">NO UPCOMING TOUR DATES</p>
+      <a
+        href="https://www.bandsintown.com/a/15554165?request=true"
+        target="_blank"
+        rel="noreferrer"
+        className="info-button"
+      >
+        REQUEST A SHOW
+      </a>
+    </div>
+  )}
+</section>
     </main>
   );
 }
