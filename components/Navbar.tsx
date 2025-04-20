@@ -52,7 +52,7 @@ export default function Navbar() {
     <header className="fixed top-0 left-0 w-full z-50 h-[96px]">
       {/* 🔥 Fade Background */}
       <div
-        className={`absolute inset-0 bg-[#140000] transition-opacity duration-[1200ms] pointer-events-none ${
+        className={`absolute inset-0 bg-[#160000] transition-opacity duration-[1200ms] pointer-events-none ${
           scrolledDown ? 'opacity-100' : 'opacity-0'
         }`}
       />
