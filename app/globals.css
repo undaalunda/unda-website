@@ -936,6 +936,12 @@ button svg,
   }
 }
 
+/* ปรับมุมปุ่ม RSVP และ TICKETS ใน Bandsintown widget */
+.bit-button,
+.bit-button--solid {
+  border-radius: 3px !important; /* หรือใส่เป็น 8px, 12px แล้วแต่ style นาย */
+}
+
 /* 🕶️ อนิเมชัน Fade-in ที่เท่กว่าเดิม */
 .fade-in {
   opacity: 1;
