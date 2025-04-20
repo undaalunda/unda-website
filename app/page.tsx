@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import Script from 'next/script';
 
 export default function HomePage() {
   const videoRef = useRef(null);
@@ -12,13 +13,17 @@ export default function HomePage() {
   const musicMerchRef = useRef(null);
   const tourRef = useRef(null);
 
+  const [isClient, setIsClient] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
   const [showTranscriptions, setShowTranscriptions] = useState(false);
   const [showStems, setShowStems] = useState(false);
   const [showButtons, setShowButtons] = useState(false);
   const [showMerch, setShowMerch] = useState(false);
   const [showTour, setShowTour] = useState(false);
-  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    setIsClient(true); // ✅ สำคัญมาก เพื่อให้ widget โหลดเฉพาะ client-side
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -51,18 +56,16 @@ export default function HomePage() {
     };
   }, []);
 
-  useEffect(() => {
-    fetch('https://rest.bandsintown.com/artists/Unda%20Alunda/events?app_id=f869d34726b9e0efbb02df0d871608af')
-      .then((res) => res.json())
-      .then((data) => {
-        console.log('[BIT EVENTS]', data);
-        setEvents(data);
-      })
-      .catch((err) => console.error('[Bandsintown API Error]', err));
-  }, []);
-
   return (
     <main className="homepage-main" style={{ overflow: 'visible' }}>
+      {/* 👇 Only load widget client-side */}
+      {isClient && (
+        <Script
+          src="https://widget.bandsintown.com/main.min.js"
+          strategy="afterInteractive"
+        />
+      )}
+
       <div className="hero-wrapper">
         <div className="catmoon-background" />
         <div className="hero-text-image">
@@ -85,7 +88,6 @@ export default function HomePage() {
           </p>
         </div>
       </div>
-
 
       <div className="after-hero-spacing" />
 
@@ -207,79 +209,34 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section
-  ref={tourRef}
-  className={`tour-section ${showTour ? 'fade-in' : ''}`}
->
-  <h2 className="stems-sub">SEE IT LIVE</h2>
-  <h3 className="stems-title">Tour Dates</h3>
+      {/* 👇 TOUR SECTION */}
+      <section ref={tourRef} className={`tour-section ${showTour ? 'fade-in' : ''}`}>
+        <h2 className="stems-sub">SEE IT LIVE</h2>
+        <h3 className="stems-title">Tour Dates</h3>
 
-  {/* 👇 Text ชิดซ้ายแบบวง Plini */}
-  <div className="tour-text-wrapper">
-    <p className="tour-description">
-      Track to get concert, live stream and tour updates.
-    </p>
-    <p className="tour-subtext">Upcoming Dates</p>
+        <div className="tour-widget-container">
+  <div style={{ textAlign: 'left' }}>
+    {isClient ? (
+      <div className="bit-widget-initializer"
+        data-artist-name="Unda Alunda"
+        data-background-color="transparent"
+        data-separator-color="rgba(255,255,255,0.1)"
+        data-text-color="#f8fcdc"
+        data-link-color="#dc9e63"
+        data-display-local-dates="false"
+        data-display-past-dates="false"
+        data-auto-style="false"
+        data-display-limit="10"
+        data-date-format="ddd, MMM D, YYYY"
+        data-request-show="true"
+        data-language="en"
+      />
+    ) : (
+      <div style={{ height: '400px' }} />
+    )}
   </div>
-
-  {events.length > 0 ? (
-    <div className="tour-table-wrapper">
-      {events.map((event: any, i: number) => (
-        <div key={i} className="event-row">
-          <div className="event-date">
-            {new Date(event.datetime ?? '').toLocaleDateString('en-US', {
-              weekday: 'short',
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric',
-            })}
-          </div>
-
-          <div className="event-venue">
-            <span className="event-name">
-              {event.venue?.name ?? 'Unknown Venue'}
-            </span>
-            <br />
-            <span className="event-location">
-              {event.venue?.city ?? 'Nowhere'},{' '}
-              {event.venue?.country ?? 'Unknown'}
-            </span>
-          </div>
-
-          <div className="event-actions">
-            {Array.isArray(event.offers) && event.offers.length > 0 ? (
-              event.offers.map((offer: any, j: number) => (
-                <a
-                  key={j}
-                  href={offer.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="info-button small"
-                >
-                  {offer.type?.toUpperCase() || 'TICKETS'}
-                </a>
-              ))
-            ) : (
-              <span className="no-offers">No tickets</span>
-            )}
-          </div>
-        </div>
-      ))}
-    </div>
-  ) : (
-    <div className="bit-no-events-wrapper">
-      <p className="no-events">NO UPCOMING TOUR DATES</p>
-      <a
-        href="https://www.bandsintown.com/a/15554165?request=true"
-        target="_blank"
-        rel="noreferrer"
-        className="info-button"
-      >
-        REQUEST A SHOW
-      </a>
-    </div>
-  )}
-</section>
+</div>
+      </section>
     </main>
   );
 }

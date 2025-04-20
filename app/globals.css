@@ -904,144 +904,36 @@ button svg,
 }
 
 /* Tour Section */
+.tour-widget-container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
 
-.tour-section {
-  background: transparent;
-  padding: 4rem 2rem;
-  text-align: center;
-  position: relative;
-  z-index: 2;
+  /* สไตล์พื้นฐาน */
+  max-width: 100%;
 }
 
-/* 🧭 ชิดซ้ายแบบ Plini */
-.tour-text-wrapper {
-  max-width: 960px;
-  margin: 0 auto 2rem auto;
-  text-align: left;
-  padding-left: 5rem;
-}
-
-.tour-description {
-  font-size: 1rem;
-  font-style: italic;
-  color: #d6c89f;
-  opacity: 0.9;
-  letter-spacing: 0.5px;
-  margin-bottom: 0.25rem;
-}
-
-.tour-subtext {
-  font-size: 0.9rem;
-  color: #a18f69;
-  text-transform: uppercase;
-  margin: 0.5rem 0 2rem;
-  letter-spacing: 1px;
-}
-
-.bit-no-events-wrapper {
-  margin-top: 7rem;
-}
-
-.no-events {
-  margin-bottom: 2rem;
-  color: #bcbcbc;
-  font-weight: 500;
-  font-size: 0.7rem; /* 👈 เพิ่มบรรทัดนี้เข้าไป */
-  text-transform: uppercase; /* optional: ให้มันดูชัดแบบมีดีไซน์ */
-  letter-spacing: 1px;
-}
-
-.bit-no-events-wrapper .info-button {
-  margin-top: 1.5rem;
-}
-
-@media (max-width: 1279px) {
-  .tour-text-wrapper {
-    max-width: 960px;
-    margin: 0 auto 2rem auto;
-    text-align: left;
-    padding-left: 4rem; /* เดสก์ท็อปกว้างหน่อย */
-  }
-  
-  .tour-description {
-    font-size: 0.95rem;
-    text-align: left;
-  }
-
-  .tour-subtext {
-    font-size: 0.85rem;
-    text-align: left;
-  }
-
-  .event-row {
-    font-size: 0.82rem;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
-  }
-
-  .event-row > div {
-    width: 100%;
-    text-align: left;
-  }
-
-  .event-actions {
-    display: flex;
-    justify-content: flex-start;
-    gap: 0.5rem;
+/* Tablet breakpoint */
+@media (min-width: 768px) {
+  .tour-widget-container {
+    max-width: 640px;
   }
 }
 
-@media (max-width: 768px) {
-  .tour-text-wrapper {
-    padding-left: 1rem; /* แคบลงนิดนึง ไม่ให้มันแน่นไป */
-  }
-
-  .tour-description {
-    font-size: 0.9rem;
-    text-align: left;
-  }
-
-  .tour-subtext {
-    font-size: 0.8rem;
-    text-align: left;
-  }
-
-  .event-row {
-    font-size: 0.8rem;
-    gap: 0.5rem;
+/* Desktop breakpoint */
+@media (min-width: 1024px) {
+  .tour-widget-container {
+    max-width: 900px;
   }
 }
 
-@media (max-width: 480px) {
-  .tour-text-wrapper {
-    padding-left: 0rem; /* ชิดขอบแต่ไม่แนบเกินไป */
+/* XL screen */
+@media (min-width: 1280px) {
+  .tour-widget-container {
+    max-width: 1100px;
   }
-
-  .tour-description {
-    font-size: 0.85rem;
-    text-align: left;
-  }
-
-  .tour-subtext {
-    font-size: 0.75rem;
-    text-align: left;
-  }
-
-  .event-row {
-    font-size: 0.75rem;
-  }
-
-  .info-button.small {
-    padding: 0.4rem 1rem;
-    font-size: 0.75rem;
-  }
-}
-
-#bandsintown-track-button {
-  margin-top: 2rem;
-  display: flex;
-  justify-content: center;
 }
 
 /* 🕶️ อนิเมชัน Fade-in ที่เท่กว่าเดิม */
@@ -1080,7 +972,7 @@ button svg,
 .fade-trigger {
   opacity: 0;
   transform: translateY(30px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
+  transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
 .fade-trigger.fade-in {
