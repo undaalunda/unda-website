@@ -906,7 +906,7 @@ button svg,
 /* Tour Section */
 
 .tour-section {
-  background: radial-gradient(circle, rgba(20, 10, 5, 0.85) 0%, rgba(0, 0, 0, 0.95) 100%);
+  background: transparent;
   padding: 4rem 2rem;
   text-align: center;
   position: relative;
@@ -944,6 +944,11 @@ button svg,
 
 .no-events {
   margin-bottom: 2rem;
+  color: #bcbcbc;
+  font-weight: 500;
+  font-size: 0.7rem; /* 👈 เพิ่มบรรทัดนี้เข้าไป */
+  text-transform: uppercase; /* optional: ให้มันดูชัดแบบมีดีไซน์ */
+  letter-spacing: 1px;
 }
 
 .bit-no-events-wrapper .info-button {
@@ -1031,6 +1036,12 @@ button svg,
     padding: 0.4rem 1rem;
     font-size: 0.75rem;
   }
+}
+
+#bandsintown-track-button {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
 }
 
 /* 🕶️ อนิเมชัน Fade-in ที่เท่กว่าเดิม */
