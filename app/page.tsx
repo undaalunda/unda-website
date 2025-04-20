@@ -210,9 +210,12 @@ export default function HomePage() {
       </section>
 
       {/* 👇 TOUR SECTION */}
-      <section ref={tourRef} className={`tour-section ${showTour ? 'fade-in' : ''}`}>
-        <h2 className="stems-sub">SEE IT LIVE</h2>
-        <h3 className="stems-title">Tour Dates</h3>
+      <section ref={tourRef} className="tour-section">
+  <div className={`fade-trigger ${showTour ? 'fade-in' : ''}`}>
+    {/* เฉพาะ title หรือเนื้อหาข้างบนเท่านั้น */}
+    <h2 className="stems-sub">SEE IT LIVE</h2>
+    <h3 className="stems-title">Tour Dates</h3>
+  </div>
 
         <div className="tour-widget-container">
   <div style={{ textAlign: 'left' }}>

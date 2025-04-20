@@ -942,24 +942,6 @@ button svg,
   border-radius: 3px !important; /* หรือใส่เป็น 8px, 12px แล้วแต่ style นาย */
 }
 
-/* 🕶️ อนิเมชัน Fade-in ที่เท่กว่าเดิม */
-.fade-in {
-  opacity: 1;
-  transform: translateY(0);
-  animation: fadeUp 1s ease-out;
-}
-
-@keyframes fadeUp {
-  0% {
-    opacity: 0;
-    transform: translateY(40px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 /* === ✨ FADE IN ANIMATION === */
 
 .fade-in-section {
