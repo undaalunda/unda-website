@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Script from 'next/script';
+import NewsletterForm from '../components/NewsletterForm';
 
 export default function HomePage() {
   const videoRef = useRef(null);
@@ -12,6 +13,7 @@ export default function HomePage() {
   const buttonGroupRef = useRef(null);
   const musicMerchRef = useRef(null);
   const tourRef = useRef(null);
+  const newsletterRef = useRef(null);
 
   const [isClient, setIsClient] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
@@ -22,7 +24,7 @@ export default function HomePage() {
   const [showTour, setShowTour] = useState(false);
 
   useEffect(() => {
-    setIsClient(true); // ✅ สำคัญมาก เพื่อให้ widget โหลดเฉพาะ client-side
+    setIsClient(true);
   }, []);
 
   useEffect(() => {
@@ -173,7 +175,7 @@ export default function HomePage() {
           <h3 className="stems-title">Music & Merch</h3>
           <div className="stems-row">
             {[
-              { src: '/audio-digipak-dww.png', title: 'DARK WONDERFUL WORLD', type1: 'AUDIO ALBUM CD (Digipak)', price: '$25.00' },
+              { src: '/audio-digipak-dww.png', title: 'DARK WONDERFUL WORLD', type1: 'AUDIO ALBUM CD (DIGIPAK)', price: '$25.00' },
               { src: '/live-cd-dww.png', title: 'DARK WONDERFUL WORLD', type1: 'LIVE ALBUM CD', price: '$15.00' },
               { src: '/black-cats-scores-tee.png', title: 'CAT SCORES T-SHIRT', type1: 'BLACK', price: '$29.95' },
               { src: '/white-cats-scores-tee.png', title: 'CAT SCORES T-SHIRT', type1: 'WHITE', price: '$29.95' },
@@ -181,10 +183,10 @@ export default function HomePage() {
               { src: '/a-musician-cats.png', title: 'A MUSICIAN CATS', type1: 'STICKERS', price: '$5.00' },
               { src: '/unda-alunda-sign-keychain.png', title: 'UNDA ALUNDA', type1: 'SIGNED KEYCHAIN', price: '$9.95' },
               { src: '/full-guitars-transcription.png', title: 'FULL GUITARS TRANSCRIPTION', type1: 'PRINTED BOOK', price: '$49.95' },
-              { src: '/dark-wonderful-world-dual-album-merch-bundle.png', title: 'DARK WONDERFUL WORLD', type1: 'DUAL ALBUM MERCH BUNDLE', price: { original: '$109.85', sale: '$87.88' } },
               { src: '/dark-wonderful-world-album-merch-bundle.png', title: 'DARK WONDERFUL WORLD', type1: 'ALBUM MERCH BUNDLE', price: { original: '$64.90', sale: '$51.92' } },
-              { src: '/dark-wonderful-world-book-&-bonus-merch-bundle.png', title: 'DARK WONDERFUL WORLD', type1: 'BOOK & BONUS MERCH BUNDLE', price: { original: '$94.90', sale: '$75.92' } },
               { src: '/dark-wonderful-world-book-&-merch-bundle.png', title: 'DARK WONDERFUL WORLD', type1: 'BOOK & MERCH BUNDLE', price: { original: '$84.90', sale: '$67.92' } },
+              { src: '/dark-wonderful-world-book-&-bonus-merch-bundle.png', title: 'DARK WONDERFUL WORLD', type1: 'BOOK & BONUS MERCH BUNDLE', price: { original: '$94.90', sale: '$75.92' } },
+              { src: '/dark-wonderful-world-dual-album-merch-bundle.png', title: 'DARK WONDERFUL WORLD', type1: 'DUAL ALBUM MERCH BUNDLE', price: { original: '$109.85', sale: '$87.88' } },
             ].map((item, i) => (
               <Link href="/shop" key={i} className="stems-item product-label-link">
                 <img src={item.src} alt={item.title} className="stems-image" />
@@ -210,35 +212,35 @@ export default function HomePage() {
       </section>
 
       {/* 👇 TOUR SECTION */}
-      <section ref={tourRef} className="tour-section">
+<section ref={tourRef} className="tour-section">
   <div className={`fade-trigger ${showTour ? 'fade-in' : ''}`}>
-    {/* เฉพาะ title หรือเนื้อหาข้างบนเท่านั้น */}
     <h2 className="stems-sub">SEE IT LIVE</h2>
     <h3 className="stems-title">Tour Dates</h3>
   </div>
-
-        <div className="tour-widget-container">
-  <div style={{ textAlign: 'left' }}>
-    {isClient ? (
-      <div className="bit-widget-initializer"
-        data-artist-name="Sleep Token"
-        data-background-color="transparent"
-        data-separator-color="rgba(255,255,255,0.1)"
-        data-text-color="#f8fcdc"
-        data-link-color="#dc9e63"
-        data-display-local-dates="false"
-        data-display-past-dates="false"
-        data-auto-style="false"
-        data-date-format="ddd, MMM D, YYYY"
-        data-request-show="true"
-        data-language="en"
-      />
-    ) : (
-      <div style={{ height: '400px' }} />
-    )}
+  <div className="tour-widget-container">
+    <div style={{ textAlign: 'left' }}>
+      {isClient ? (
+        <div className="bit-widget-initializer"
+          data-artist-name="Unda Alunda"
+          data-background-color="transparent"
+          data-limit="10" 
+          data-separator-color="rgba(255,255,255,0.1)"
+          data-text-color="#f8fcdc"
+          data-link-color="#dc9e63"
+          data-display-local-dates="false"
+          data-display-past-dates="false"
+          data-auto-style="false"
+          data-display-limit="10"
+          data-date-format="ddd, MMM D, YYYY"
+          data-request-show="true"
+          data-language="en"
+        />
+      ) : (
+        <div style={{ height: '400px' }} />
+      )}
+    </div>
   </div>
-</div>
-      </section>
+</section>
     </main>
   );
 }

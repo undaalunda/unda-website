@@ -4,11 +4,12 @@ import './globals.css';
 import Navbar from '../components/Navbar';
 import type { ReactNode } from 'react';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
+import NewsletterForm from '../components/NewsletterForm';
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // ให้ Navbar toggle menu ส่งมาที่ layout
   useEffect(() => {
     const handler = (e: any) => {
       if (e.detail === true || e.detail === false) {
@@ -29,6 +30,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           content="Official Website of Unda Alunda | New album out May 1 2025"
         />
         <title>Unda Alunda | Official Website & Merch Store</title>
+
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+        />
       </head>
       <body
         className="bg-[#190000] text-[#f8fcdc] m-0 p-0 overflow-x-hidden"
@@ -46,6 +52,80 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           }`}
         >
           {children}
+
+          {/* 🔥 Newsletter & Footer Section */}
+          <section className="newsletter-section">
+            <div className="footer-logo-social">
+            <Image
+  src="/footer-logo-v7.png"
+  alt="Unda Alunda Cat Logo"
+  width={120}
+  height={120}
+  className="glow-logo mx-auto mb-6"
+/>
+
+              <div className="social-icons mb-6">
+                <a
+                  href="https://www.facebook.com/UndaAlunda"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <i className="fab fa-facebook" />
+                </a>
+                <a
+                  href="https://www.youtube.com/@undaalunda"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <i className="fab fa-youtube" />
+                </a>
+                <a
+                  href="https://www.instagram.com/undalunda"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <i className="fab fa-instagram" />
+                </a>
+                <a
+                  href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0?si=JsdyQRqGRCGYfxU_nB_qvQ"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <i className="fab fa-spotify" />
+                </a>
+                <a
+                  href="https://twitter.com/undaalunda"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <i className="fab fa-x-twitter" />
+                </a>
+                <a
+                  href="https://www.threads.net/@undalunda"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <i className="fab fa-threads" />
+                </a>
+              </div>
+            </div>
+
+            <div className="newsletter-form-wrapper mb-10">
+              <NewsletterForm />
+            </div>
+
+            {/* 🖋️ Footer Bottom */}
+            <div className="footer-bottom">
+              <div className="footer-links mb-2 text-sm text-[#dc9e63]">
+                <a href="/terms">Terms & Conditions</a>
+                <span className="divider px-2">|</span>
+                <a href="/privacy">Privacy Policy</a>
+              </div>
+              <p className="copyright text-xs text-[#f8fcdc] mb-4">
+                Copyright © 2025 UNDA ALUNDA
+              </p>
+            </div>
+          </section>
         </div>
       </body>
     </html>
