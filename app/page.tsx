@@ -221,7 +221,7 @@ export default function HomePage() {
     <div style={{ textAlign: 'left' }}>
       {isClient ? (
         <div className="bit-widget-initializer"
-          data-artist-name="Unda Alunda"
+          data-artist-name="Sleep Token"
           data-background-color="transparent"
           data-limit="10" 
           data-separator-color="rgba(255,255,255,0.1)"
