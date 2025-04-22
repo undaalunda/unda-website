@@ -1102,7 +1102,7 @@ button svg,
 }
 
 .newsletter-divider {
-  height: 0.08px;
+  height: 1px;
   background-color: #dc9e63;
   transform: scaleY(0.5); /* ทำให้มันบางลงครึ่งหนึ่ง */
   width: 150px;
