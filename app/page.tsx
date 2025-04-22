@@ -176,13 +176,13 @@ export default function HomePage() {
           <div className="stems-row">
             {[
               { src: '/audio-digipak-dww.png', title: 'DARK WONDERFUL WORLD', type1: 'AUDIO ALBUM CD (DIGIPAK)', price: '$25.00' },
-              { src: '/full-guitars-transcription.png', title: 'FULL GUITARS TRANSCRIPTION', type1: 'PRINTED BOOK', price: '$49.95' },
-              { src: '/unda-alunda-sign-keychain.png', title: 'UNDA ALUNDA', type1: 'SIGNED KEYCHAIN', price: '$9.95' },
               { src: '/live-cd-dww.png', title: 'DARK WONDERFUL WORLD', type1: 'LIVE ALBUM CD', price: '$15.00' },
               { src: '/black-cats-scores-tee.png', title: 'CAT SCORES T-SHIRT', type1: 'BLACK', price: '$29.95' },
               { src: '/white-cats-scores-tee.png', title: 'CAT SCORES T-SHIRT', type1: 'WHITE', price: '$29.95' },
               { src: '/a-cat-to-the-moon-stickers.png', title: 'A CAT TO THE MOON', type1: 'STICKERS', price: '$5.00' },
               { src: '/a-musician-cats.png', title: 'A MUSICIAN CATS', type1: 'STICKERS', price: '$5.00' },
+              { src: '/unda-alunda-sign-keychain.png', title: 'UNDA ALUNDA', type1: 'SIGNED KEYCHAIN', price: '$9.95' },
+              { src: '/full-guitars-transcription.png', title: 'FULL GUITARS TRANSCRIPTION', type1: 'PRINTED BOOK', price: '$49.95' },
               { src: '/dark-wonderful-world-album-merch-bundle.png', title: 'DARK WONDERFUL WORLD', type1: 'ALBUM MERCH BUNDLE', price: { original: '$64.90', sale: '$51.92' } },
               { src: '/dark-wonderful-world-book-&-merch-bundle.png', title: 'DARK WONDERFUL WORLD', type1: 'BOOK & MERCH BUNDLE', price: { original: '$84.90', sale: '$67.92' } },
               { src: '/dark-wonderful-world-book-&-bonus-merch-bundle.png', title: 'DARK WONDERFUL WORLD', type1: 'BOOK & BONUS MERCH BUNDLE', price: { original: '$94.90', sale: '$75.92' } },
