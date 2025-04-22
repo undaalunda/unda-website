@@ -230,7 +230,7 @@ export default function HomePage() {
           data-display-local-dates="false"
           data-display-past-dates="false"
           data-auto-style="false"
-          data-display-limit="10"
+          data-display-limit="5"
           data-date-format="ddd, MMM D, YYYY"
           data-request-show="true"
           data-language="en"
