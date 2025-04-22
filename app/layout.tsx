@@ -83,12 +83,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </div>
 
             {/* 🖋️ Footer Bottom */}
-<div className="footer-bottom">
-  <div className="footer-links mb-2 text-sm text-[#dc9e63]">
+            <div className="footer-bottom">
+  <div className="footer-links">
     <a href="/shipping">Shipping & Returns</a>
-    <span className="divider px-2">|</span>
+    <span className="divider">|</span>
     <a href="/terms">Terms & Conditions</a>
-    <span className="divider px-2">|</span>
+    <span className="divider">|</span>
     <a href="/privacy">Privacy Policy</a>
   </div>
   <p className="copyright text-xs text-[#f8fcdc] mb-4">

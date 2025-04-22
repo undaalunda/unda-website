@@ -43,7 +43,7 @@ export default function HomePage() {
       },
       {
         threshold: 0.01,
-        rootMargin: '0px 0px -50% 0px',
+        rootMargin: '0px 0px 0px 0px',
       }
     );
 

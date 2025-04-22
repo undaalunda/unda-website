@@ -1118,17 +1118,22 @@ button svg,
 
 /* 👉 ปรับขนาด + เว้นระยะของลิงก์ด้านบน */
 .footer-links {
-  font-size: 0.9rem; /* ขึ้นจากเดิมนิดหน่อย */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  flex-direction: row;
+  font-size: 0.9rem;
   font-weight: 500;
-  margin-bottom: 1.5rem; /* เว้นห่างจาก copyright มากขึ้น */
-  margin-top: -2.5rem; /* ดันให้มันอยู่ใกล้กับ Newsletter มากขึ้น */
+  margin-bottom: 1.5rem;
+  margin-top: -2.5rem;
+  text-align: center;
+  flex-wrap: wrap;
 }
 
 .footer-links a {
   color: #dc9e63;
   text-decoration: none;
-  margin: 0 0.4rem;
-  transition: opacity 0.3s ease;
 }
 
 .footer-links a:hover {
@@ -1138,6 +1143,18 @@ button svg,
 .divider {
   padding: 0 0.3rem;
   color: #dc9e63;
+}
+
+/* 💻 Tablet and smaller (≤768px) เปลี่ยนเป็นแนวตั้ง */
+@media (max-width: 768px) {
+  .footer-links {
+    flex-direction: column;
+    gap: 0.01rem;
+  }
+
+  .divider {
+    display: none;
+  }
 }
 
 /* 👇 Copyright */
