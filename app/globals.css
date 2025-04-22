@@ -52,6 +52,8 @@ main,
   z-index: 0;
 }
 
+/* Hero Section (Background + CTA) */
+
 .hero-wrapper {
   width: 100vw;
   height: 100vh;
@@ -498,7 +500,7 @@ button svg,
 .transcription-title {
   font-weight: 600;
   font-size: 2rem;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.07em;
   margin-bottom: 3rem;
   color: #dc9e63;
 }
@@ -568,7 +570,7 @@ button svg,
 /* 📱 Extra-Smol Devices: ≤480px */
 @media (max-width: 480px) {
   .product-image {
-    width: 100px;
+    width: 140px;
   }
 }
 
@@ -606,30 +608,21 @@ button svg,
   font-family: 'Cinzel', serif;
 }
 
+/* === TRANSCRIPTIONS PRODRUCT FONT SIZE === */
+
 .product-title {
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 0.05em;
   color: #dc9e63;
 }
 
 .product-subtitle {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 300;
   letter-spacing: 0.1em;
   margin-top: 0.2rem;
   color: #f8fcdc;
-}
-
-/* === TRANSCRIPTIONS PRODRUCT FONT SIZE === */
-
-/* Default (Desktop ≥1280px) */
-.product-title {
-  font-size: 1rem; /* ใหญ่ขึ้นนิดนึง */
-}
-
-.product-subtitle {
-  font-size: 0.8rem;
 }
 
 /* 💻 Tablet: ≤1279px */
@@ -701,7 +694,7 @@ button svg,
 .stems-title {
   font-weight: 600;
   font-size: 2rem;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.07em;
   margin-bottom: 3rem;
   color: #dc9e63;
 }
@@ -766,7 +759,7 @@ button svg,
 }
 @media (max-width: 480px) {
   .stems-image {
-    width: 100px;
+    width: 140px;
   }
 }
 
@@ -921,7 +914,7 @@ button svg,
 }
 
 /* XL screen */
-@media (min-width: 1279px) {
+@media (min-width: 1280px) {
   .tour-widget-container {
     max-width: 960px;
   }
@@ -988,8 +981,9 @@ button svg,
 }
 
 .newsletter-title {
-  font-size: 1.875rem;
-  font-weight: 600;
+  font-size: 1.7rem;
+  font-weight: 400;
+  letter-spacing: 0.18em;
   text-align: center;
   text-transform: none; /* <-- เอา uppercase ออกตามคำสั่งนาย */
   color: #dc9e63;
@@ -1057,6 +1051,8 @@ button svg,
   -webkit-appearance: none;
   -moz-appearance: none;
   background-image: none;
+
+  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
 }
 
 .newsletter-input::placeholder {
@@ -1090,11 +1086,13 @@ button svg,
   font-weight: 600;
   padding: 0.75rem;
   font-size: 1rem;
+  letter-spacing: 0.1em;
   border-radius: 0.375rem;
   border: none;
   cursor: pointer;
   transition: opacity 0.3s ease;
   margin-top: 1.5rem;
+  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; 
 }
 
 .newsletter-button:hover {
@@ -1146,6 +1144,13 @@ button svg,
 .footer-bottom .copyright {
   font-size: 0.72rem;
   color: #f8fcdc;
+}
+
+/* Tour/Page */
+
+.tour-page-main {
+  margin-top: 15rem;  /* หรือ padding ถ้าเธออยากให้มันหายใจโล่งๆ */
+  margin-bottom: 20rem;
 }
 
 /* === ✨ FADE IN ANIMATION === */

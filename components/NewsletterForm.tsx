@@ -5,7 +5,7 @@ import React from 'react';
 export default function NewsletterForm() {
   return (
     <section className="newsletter-container">
-      <h3 className="newsletter-title">Newsletter Sign Up</h3>
+      <h3 className="newsletter-title">NEWSLETTER SIGN UP</h3>
 
       <form
         action="https://gmail.us1.list-manage.com/subscribe/post?u=3b4e88384cbe530945e9a9cfd&amp;id=835cafe901&amp;f_id=0070cce0f0"
@@ -24,7 +24,7 @@ export default function NewsletterForm() {
             className="newsletter-input"
           />
           <select name="MMERGE7" className="newsletter-select">
-          <option value="">Select a country</option>
+          <option value="">Select a country...</option>
   <option value="United States">United States</option>
   <option value="United Kingdom">United Kingdom</option>
   <option value="Canada">Canada</option>

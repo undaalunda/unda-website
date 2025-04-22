@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import './globals.css';
 import Navbar from '../components/Navbar';
 import type { ReactNode } from 'react';
@@ -82,16 +83,18 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </div>
 
             {/* 🖋️ Footer Bottom */}
-            <div className="footer-bottom">
-              <div className="footer-links mb-2 text-sm text-[#dc9e63]">
-                <a href="/terms">Terms & Conditions</a>
-                <span className="divider px-2">|</span>
-                <a href="/privacy">Privacy Policy</a>
-              </div>
-              <p className="copyright text-xs text-[#f8fcdc] mb-4">
-                Copyright © 2025 UNDA ALUNDA
-              </p>
-            </div>
+<div className="footer-bottom">
+  <div className="footer-links mb-2 text-sm text-[#dc9e63]">
+    <a href="/shipping">Shipping & Returns</a>
+    <span className="divider px-2">|</span>
+    <a href="/terms">Terms & Conditions</a>
+    <span className="divider px-2">|</span>
+    <a href="/privacy">Privacy Policy</a>
+  </div>
+  <p className="copyright text-xs text-[#f8fcdc] mb-4">
+    Copyright © 2025 UNDA ALUNDA
+  </p>
+</div>
           </section>
         </div>
       </body>

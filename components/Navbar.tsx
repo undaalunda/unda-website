@@ -3,12 +3,14 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation'; // 👈 สำคัญ!
 import { Menu, X, User, ShoppingCart, Search } from 'lucide-react';
 
 export default function Navbar() {
   const [scrolledDown, setScrolledDown] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname(); // 👈 ใช้ path ปัจจุบัน
 
   useEffect(() => {
     setHasMounted(true);
@@ -47,6 +49,8 @@ export default function Navbar() {
   }, [menuOpen]);
 
   if (!hasMounted) return null;
+
+  const isHomepage = pathname === '/';
 
   return (
     <header className="fixed top-0 left-0 w-full z-50 h-[96px]">
@@ -99,10 +103,10 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* 🌕 Logo CENTER ALWAYS — Scroll */}
+        {/* 🌕 Logo CENTER ALWAYS — conditional */}
         <div
           className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-40 transition-opacity duration-[1200ms] ${
-            scrolledDown ? 'opacity-100' : 'opacity-0'
+            scrolledDown || !isHomepage ? 'opacity-100' : 'opacity-0'
           }`}
         >
           <Image

@@ -118,14 +118,14 @@ export default function HomePage() {
       <section className="transcription-section">
         <div ref={transcriptionRef} className={`fade-trigger ${showTranscriptions ? 'fade-in' : ''}`}>
           <h2 className="transcription-sub">LEARN THE MUSIC</h2>
-          <h3 className="transcription-title">Transcriptions</h3>
+          <h3 className="transcription-title">TRANSCRIPTIONS</h3>
           <div className="product-row">
             {["guitar", "keys", "bass", "drums"].map((inst, i) => (
               <Link href={`/${inst}`} key={i} className="product-item product-label-link">
                 <img src={`/product-${inst}.png`} alt={`${inst} Book`} className="product-image" />
                 <div className="product-label-group">
-                  <p className="product-title">Dark Wonderful World</p>
-                  <p className="product-subtitle">The Complete {inst.toUpperCase()} Transcription</p>
+                  <p className="product-title">DARK WONDERFUL WORLD</p>
+                  <p className="product-subtitle">THE COMPLETE {inst.toUpperCase()} TRANSCRIPTION</p>
                 </div>
               </Link>
             ))}
@@ -139,7 +139,7 @@ export default function HomePage() {
       <section className="stems-section">
         <div ref={stemsRef} className={`fade-trigger ${showStems ? 'fade-in' : ''}`}>
           <h2 className="stems-sub">JAM THE TRACKS</h2>
-          <h3 className="stems-title">Stems & Backing Tracks</h3>
+          <h3 className="stems-title">STEMS & BACKING TRACKS</h3>
           <div className="stems-row">
             {[
               { src: '/anomic-no-drums.jpg', title: 'ANOMIC', type: 'DRUMS', price: '$8.00' },
@@ -172,7 +172,7 @@ export default function HomePage() {
       <section className="stems-section">
         <div ref={musicMerchRef} className={`fade-trigger ${showMerch ? 'fade-in' : ''}`}>
           <h2 className="stems-sub">MUSIC IN YOUR HANDS</h2>
-          <h3 className="stems-title">Music & Merch</h3>
+          <h3 className="stems-title">MUSIC & MERCH</h3>
           <div className="stems-row">
             {[
               { src: '/audio-digipak-dww.png', title: 'DARK WONDERFUL WORLD', type1: 'AUDIO ALBUM CD (DIGIPAK)', price: '$25.00' },
@@ -215,13 +215,13 @@ export default function HomePage() {
 <section ref={tourRef} className="tour-section">
   <div className={`fade-trigger ${showTour ? 'fade-in' : ''}`}>
     <h2 className="stems-sub">SEE IT LIVE</h2>
-    <h3 className="stems-title">Tour Dates</h3>
+    <h3 className="stems-title">TOUR DATES</h3>
   </div>
   <div className="tour-widget-container">
     <div style={{ textAlign: 'left' }}>
       {isClient ? (
         <div className="bit-widget-initializer"
-          data-artist-name="Sleep Token"
+          data-artist-name="Unda Alunda"
           data-background-color="transparent"
           data-limit="10" 
           data-separator-color="rgba(255,255,255,0.1)"
