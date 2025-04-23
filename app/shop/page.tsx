@@ -1,11 +1,12 @@
-'use client';
+import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
 
-import { useSearchParams } from 'next/navigation';
-import ShopPageContent from '../../components/ShopPageContent';
+const ShopPageWrapper = dynamic(() => import('../../components/ShopPageWrapper'), { ssr: false });
 
-export default function ShopPageWrapper() {
-  const searchParams = useSearchParams();
-  const tabParam = searchParams.get('tab') as 'MERCH' | 'MUSIC' | 'BUNDLES' | 'DIGITAL' | null;
-
-  return <ShopPageContent tabParam={tabParam} />;
+export default function ShopPage() {
+  return (
+    <Suspense fallback={<div className="text-center text-white">Loading shop...</div>}>
+      <ShopPageWrapper />
+    </Suspense>
+  );
 }
