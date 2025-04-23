@@ -86,11 +86,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               {/* 🖋️ Footer Bottom */}
               <div className="footer-bottom">
                 <div className="footer-links">
-                  <a href="/shipping">Shipping & Returns</a>
+                  <a href="/shipping">SHIPPING & RETURNS</a>
                   <span className="divider">|</span>
-                  <a href="/terms">Terms & Conditions</a>
+                  <a href="/terms">TERMS & CONDITIONS</a>
                   <span className="divider">|</span>
-                  <a href="/privacy">Privacy Policy</a>
+                  <a href="/privacy">PRIVACY POLICY</a>
                 </div>
                 <p className="copyright text-xs text-[#f8fcdc] mb-4">
                   Copyright © 2025 UNDA ALUNDA
