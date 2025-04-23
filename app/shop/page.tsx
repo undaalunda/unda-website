@@ -107,3 +107,4 @@ export default function ShopPage() {
     </main>
   );
 }
+export const dynamic = 'force-dynamic';
