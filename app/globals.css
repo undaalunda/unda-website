@@ -1170,6 +1170,39 @@ button svg,
   margin-bottom: 20rem;
 }
 
+/* ปุ่มMerch, Music, Bundles Shoppage */
+
+/* ปุ่มเมื่อถูกคลิกแล้ว (active) */
+.active-tab {
+  background-color: #dc9e63;
+  color: #0f0f0f;
+}
+
+/* ยังให้ hover ทำงานด้วย */
+.info-button:hover {
+  background-color: #dc9e63;
+  color: #0f0f0f;
+  mix-blend-mode: difference;
+}
+
+.shop-newsletter-wrapper .newsletter-section {
+  margin-top: 8rem; /* แค่ของ shop */
+  padding-top: 4rem;
+  padding-bottom: 6rem;
+  background: none; /* ถ้าอยากเอาพื้นหลังออก */
+  border-top: 1px solid rgba(255, 255, 255, 0.05); /* ตกแต่งแยกเฉพาะได้เลย */
+}
+
+.shop-newsletter-wrapper .newsletter-title {
+  font-size: 2rem;
+  color: #dc9e63;
+  margin-bottom: 1.5rem;
+}
+
+.shop-page-main .stems-row {
+  margin-top: 4rem;
+}
+
 /* === ✨ FADE IN ANIMATION === */
 
 .fade-in-section {

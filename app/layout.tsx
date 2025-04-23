@@ -54,48 +54,50 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         >
           {children}
 
-          {/* 🔥 Newsletter & Footer Section */}
-          <section className="newsletter-section">
-            <div className="footer-logo-social">
-              <Image
-                src="/footer-logo-v7.png"
-                alt="Unda Alunda Cat Logo"
-                width={120}
-                height={120}
-                className="glow-logo mx-auto mb-6"
-              />
+          {/* ✅ Newsletter & Footer Section - Moved lower with margin */}
+          <div className="global-newsletter-wrapper mt-40">
+            <section className="newsletter-section">
+              <div className="footer-logo-social">
+                <Image
+                  src="/footer-logo-v7.png"
+                  alt="Unda Alunda Cat Logo"
+                  width={120}
+                  height={120}
+                  className="glow-logo mx-auto mb-6"
+                />
 
-              <div className="social-icons mb-6">
-                <a href="https://www.facebook.com/UndaAlunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-facebook" /></a>
-                <a href="https://www.youtube.com/@undaalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-youtube" /></a>
-                <a href="https://www.instagram.com/undalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-instagram" /></a>
-                <a href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0?si=JsdyQRqGRCGYfxU_nB_qvQ" target="_blank" rel="noopener noreferrer"><i className="fab fa-spotify" /></a>
-                <a href="https://twitter.com/undaalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-x-twitter" /></a>
-                <a href="https://www.threads.net/@undalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-threads" /></a>
+                <div className="social-icons mb-6">
+                  <a href="https://www.facebook.com/UndaAlunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-facebook" /></a>
+                  <a href="https://www.youtube.com/@undaalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-youtube" /></a>
+                  <a href="https://www.instagram.com/undalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-instagram" /></a>
+                  <a href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0?si=JsdyQRqGRCGYfxU_nB_qvQ" target="_blank" rel="noopener noreferrer"><i className="fab fa-spotify" /></a>
+                  <a href="https://twitter.com/undaalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-x-twitter" /></a>
+                  <a href="https://www.threads.net/@undalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-threads" /></a>
+                </div>
+
+                {/* ✨ Divider Line Here */}
+                <div className="newsletter-divider"></div>
               </div>
 
-              {/* ✨ Divider Line Here */}
-              <div className="newsletter-divider"></div>
-            </div>
+              <div className="newsletter-form-wrapper mb-10">
+                <NewsletterForm />
+              </div>
 
-            <div className="newsletter-form-wrapper mb-10">
-              <NewsletterForm />
-            </div>
-
-            {/* 🖋️ Footer Bottom */}
-            <div className="footer-bottom">
-  <div className="footer-links">
-    <a href="/shipping">Shipping & Returns</a>
-    <span className="divider">|</span>
-    <a href="/terms">Terms & Conditions</a>
-    <span className="divider">|</span>
-    <a href="/privacy">Privacy Policy</a>
-  </div>
-  <p className="copyright text-xs text-[#f8fcdc] mb-4">
-    Copyright © 2025 UNDA ALUNDA
-  </p>
-</div>
-          </section>
+              {/* 🖋️ Footer Bottom */}
+              <div className="footer-bottom">
+                <div className="footer-links">
+                  <a href="/shipping">Shipping & Returns</a>
+                  <span className="divider">|</span>
+                  <a href="/terms">Terms & Conditions</a>
+                  <span className="divider">|</span>
+                  <a href="/privacy">Privacy Policy</a>
+                </div>
+                <p className="copyright text-xs text-[#f8fcdc] mb-4">
+                  Copyright © 2025 UNDA ALUNDA
+                </p>
+              </div>
+            </section>
+          </div>
         </div>
       </body>
     </html>

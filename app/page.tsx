@@ -13,7 +13,6 @@ export default function HomePage() {
   const buttonGroupRef = useRef(null);
   const musicMerchRef = useRef(null);
   const tourRef = useRef(null);
-  const newsletterRef = useRef(null);
 
   const [isClient, setIsClient] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
@@ -60,7 +59,6 @@ export default function HomePage() {
 
   return (
     <main className="homepage-main" style={{ overflow: 'visible' }}>
-      {/* 👇 Only load widget client-side */}
       {isClient && (
         <Script
           src="https://widget.bandsintown.com/main.min.js"
@@ -93,16 +91,23 @@ export default function HomePage() {
 
       <div className="after-hero-spacing" />
 
-      <div>
-        <div ref={buttonGroupRef} className={`button-group ${showButtons ? 'fade-in' : ''}`}>
-          <Link href="/scores" className="info-button">SCORES</Link>
-          <Link href="/stems-samples" className="info-button">STEMS & SAMPLES</Link>
-          <Link href="/merch" className="info-button">MERCH</Link>
-          <Link href="/physical" className="info-button">PHYSICAL ALBUMS</Link>
-          <Link href="/digital" className="info-button">DIGITAL ALBUMS</Link>
-        </div>
-        <p className="since-note">Delivering Worldwide Since 2025</p>
-      </div>
+<div>
+  <div ref={buttonGroupRef} className={`button-group ${showButtons ? 'fade-in' : ''}`}>
+    <Link href="/shop?tab=DIGITAL" className="info-button">SCORES</Link>
+    <Link href="/shop?tab=DIGITAL" className="info-button">STEMS & SAMPLES</Link>
+    <Link href="/shop?tab=MERCH" className="info-button">MERCH</Link>
+    <Link href="/shop?tab=MUSIC" className="info-button">PHYSICAL ALBUMS</Link>
+    <a
+      href="https://undaalunda.bandcamp.com/album/dark-wonderful-world-live-in-thailand"
+      className="info-button"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      DIGITAL ALBUMS
+    </a>
+  </div>
+  <p className="since-note">Delivering Worldwide Since 2025</p>
+</div>
 
       <section ref={videoRef} className={`video-section ${showVideo ? 'fade-in' : ''}`}>
         <iframe
@@ -116,31 +121,31 @@ export default function HomePage() {
       </section>
 
       <section className="transcription-section">
-        <div ref={transcriptionRef} className={`fade-trigger ${showTranscriptions ? 'fade-in' : ''}`}>
-          <h2 className="transcription-sub">LEARN THE MUSIC</h2>
-          <h3 className="transcription-title">TRANSCRIPTIONS</h3>
-          <div className="product-row">
-            {["guitar", "keys", "bass", "drums"].map((inst, i) => (
-              <Link href={`/${inst}`} key={i} className="product-item product-label-link">
-                <img src={`/product-${inst}.png`} alt={`${inst} Book`} className="product-image" />
-                <div className="product-label-group">
-                  <p className="product-title">DARK WONDERFUL WORLD</p>
-                  <p className="product-subtitle">THE COMPLETE {inst.toUpperCase()} TRANSCRIPTION</p>
-                </div>
-              </Link>
-            ))}
+  <div ref={transcriptionRef} className={`fade-trigger ${showTranscriptions ? 'fade-in' : ''}`}>
+    <h2 className="transcription-sub">LEARN THE MUSIC</h2>
+    <h3 className="transcription-title">TRANSCRIPTIONS</h3>
+    <div className="product-row">
+      {["guitar", "keys", "bass", "drums"].map((inst, i) => (
+        <Link href={`/${inst}`} key={i} className="product-item product-label-link">
+          <img src={`/product-${inst}.png`} alt={`${inst} Book`} className="product-image" />
+          <div className="product-label-group">
+            <p className="product-title">DARK WONDERFUL WORLD</p>
+            <p className="product-subtitle">THE COMPLETE {inst.toUpperCase()} TRANSCRIPTION</p>
           </div>
-          <div className="shopall-button-wrapper">
-            <Link href="/shop" className="info-button">SHOP ALL</Link>
-          </div>
-        </div>
-      </section>
+        </Link>
+      ))}
+    </div>
+    <div className="shopall-button-wrapper">
+      <Link href="/shop?tab=DIGITAL" className="info-button">SHOP ALL</Link>
+    </div>
+  </div>
+</section>
 
-      <section className="stems-section">
-        <div ref={stemsRef} className={`fade-trigger ${showStems ? 'fade-in' : ''}`}>
-          <h2 className="stems-sub">JAM THE TRACKS</h2>
-          <h3 className="stems-title">STEMS & BACKING TRACKS</h3>
-          <div className="stems-row">
+<section className="stems-section">
+  <div ref={stemsRef} className={`fade-trigger ${showStems ? 'fade-in' : ''}`}>
+    <h2 className="stems-sub">JAM THE TRACKS</h2>
+    <h3 className="stems-title">STEMS & BACKING TRACKS</h3>
+    <div className="stems-row">
             {[
               { src: '/anomic-no-drums.jpg', title: 'ANOMIC', type: 'DRUMS', price: '$8.00' },
               { src: '/jyy-no-guitars.jpg', title: 'JYY', type: 'GUITARS', price: '$8.00' },
@@ -163,17 +168,17 @@ export default function HomePage() {
               </Link>
             ))}
           </div>
-          <div className="shopall-button-wrapper">
-            <Link href="/shop" className="info-button">SHOP ALL</Link>
-          </div>
-        </div>
-      </section>
+    <div className="shopall-button-wrapper">
+      <Link href="/shop?tab=DIGITAL" className="info-button">SHOP ALL</Link>
+    </div>
+  </div>
+</section>
 
-      <section className="stems-section">
-        <div ref={musicMerchRef} className={`fade-trigger ${showMerch ? 'fade-in' : ''}`}>
-          <h2 className="stems-sub">MUSIC IN YOUR HANDS</h2>
-          <h3 className="stems-title">MUSIC & MERCH</h3>
-          <div className="stems-row">
+<section className="stems-section">
+  <div ref={musicMerchRef} className={`fade-trigger ${showMerch ? 'fade-in' : ''}`}>
+    <h2 className="stems-sub">MUSIC IN YOUR HANDS</h2>
+    <h3 className="stems-title">MUSIC & MERCH</h3>
+    <div className="stems-row">
             {[
               { src: '/audio-digipak-dww.png', title: 'DARK WONDERFUL WORLD', type1: 'AUDIO ALBUM CD (DIGIPAK)', price: '$25.00' },
               { src: '/live-cd-dww.png', title: 'DARK WONDERFUL WORLD', type1: 'LIVE ALBUM CD', price: '$15.00' },
@@ -204,12 +209,12 @@ export default function HomePage() {
                 </div>
               </Link>
             ))}
-          </div>
-          <div className="shopall-button-wrapper">
-            <Link href="/shop" className="info-button">SHOP ALL</Link>
-          </div>
-        </div>
-      </section>
+         </div>
+    <div className="shopall-button-wrapper">
+      <Link href="/shop?tab=MERCH" className="info-button">SHOP ALL</Link>
+    </div>
+  </div>
+</section>
 
       {/* 👇 TOUR SECTION */}
 <section ref={tourRef} className="tour-section">
