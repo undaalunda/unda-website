@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Script from 'next/script';
-import NewsletterForm from '../components/NewsletterForm';
 
 export default function HomePage() {
   const videoRef = useRef(null);
@@ -40,10 +39,7 @@ export default function HomePage() {
           }
         });
       },
-      {
-        threshold: 0.01,
-        rootMargin: '0px 0px 0px 0px',
-      }
+      { threshold: 0.01, rootMargin: '0px 0px 0px 0px' }
     );
 
     [videoRef, transcriptionRef, stemsRef, buttonGroupRef, musicMerchRef, tourRef].forEach((ref) => {
@@ -60,10 +56,7 @@ export default function HomePage() {
   return (
     <main className="homepage-main" style={{ overflow: 'visible' }}>
       {isClient && (
-        <Script
-          src="https://widget.bandsintown.com/main.min.js"
-          strategy="afterInteractive"
-        />
+        <Script src="https://widget.bandsintown.com/main.min.js" strategy="afterInteractive" />
       )}
 
       <div className="hero-wrapper">
@@ -72,9 +65,7 @@ export default function HomePage() {
           <Image src="/text-hero-section.png" alt="Dark Wonderful World on Moon" height={400} width={600} priority />
         </div>
         <div className="hero-text desktop-only">
-          <p className="hero-line1">
-            THE NEW ALBUM'S COMING <span className="highlight">MAY 1 2025</span>
-          </p>
+          <p className="hero-line1">THE NEW ALBUM'S COMING <span className="highlight">MAY 1 2025</span></p>
           <p className="hero-line2">
             AVAILABLE NOW TO <Link href="/preorder" className="hero-cta-link">PRE-ORDER</Link> & <Link href="/presave" className="hero-cta-link">PRE-SAVE</Link>
           </p>
@@ -91,23 +82,18 @@ export default function HomePage() {
 
       <div className="after-hero-spacing" />
 
-<div>
-  <div ref={buttonGroupRef} className={`button-group ${showButtons ? 'fade-in' : ''}`}>
-    <Link href="/shop?tab=DIGITAL" className="info-button">SCORES</Link>
-    <Link href="/shop?tab=DIGITAL" className="info-button">STEMS & SAMPLES</Link>
-    <Link href="/shop?tab=MERCH" className="info-button">MERCH</Link>
-    <Link href="/shop?tab=MUSIC" className="info-button">PHYSICAL ALBUMS</Link>
-    <a
-      href="https://undaalunda.bandcamp.com/album/dark-wonderful-world-live-in-thailand"
-      className="info-button"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      DIGITAL ALBUMS
-    </a>
-  </div>
-  <p className="since-note">Delivering Worldwide Since 2025</p>
-</div>
+      <div>
+        <div ref={buttonGroupRef} className={`button-group ${showButtons ? 'fade-in' : ''}`}>
+          <Link href="/shop?tab=DIGITAL" className="info-button">SCORES</Link>
+          <Link href="/shop?tab=DIGITAL" className="info-button">STEMS & SAMPLES</Link>
+          <Link href="/shop?tab=MERCH" className="info-button">MERCH</Link>
+          <Link href="/shop?tab=MUSIC" className="info-button">PHYSICAL ALBUMS</Link>
+          <a href="https://undaalunda.bandcamp.com/album/dark-wonderful-world-live-in-thailand" className="info-button" target="_blank" rel="noopener noreferrer">
+            DIGITAL ALBUMS
+          </a>
+        </div>
+        <p className="since-note">Delivering Worldwide Since 2025</p>
+      </div>
 
       <section ref={videoRef} className={`video-section ${showVideo ? 'fade-in' : ''}`}>
         <iframe
