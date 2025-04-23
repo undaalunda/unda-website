@@ -936,7 +936,7 @@ button svg,
 }
 
 .glow-logo {
-  width: 150px;
+  width: 140px;
   height: auto;
   filter: drop-shadow(0 0 4px #dc9e63)
           drop-shadow(0 0 8px #996a3f)

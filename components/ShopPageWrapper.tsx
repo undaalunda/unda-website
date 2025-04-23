@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import ShopPageContent from '../../components/ShopPageContent';
+import ShopPageContent from './ShopPageContent';
 
 export default function ShopPageWrapper() {
   const searchParams = useSearchParams();
