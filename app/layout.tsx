@@ -2,11 +2,13 @@
 
 import Link from 'next/link';
 import './globals.css';
-import Navbar from '../components/Navbar';
+import dynamic from 'next/dynamic';
 import type { ReactNode } from 'react';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import NewsletterForm from '../components/NewsletterForm';
+
+const Navbar = dynamic(() => import('../components/Navbar'), { ssr: false });
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
