@@ -57,7 +57,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           {children}
 
           {/* ✅ Newsletter & Footer Section - Moved lower with margin */}
-          <div className="global-newsletter-wrapper mt-40">
+          <div className="global-newsletter-wrapper mt-10">
             <section className="newsletter-section">
               <div className="footer-logo-social">
                 <Image

@@ -24,23 +24,21 @@ export default function ProductPage() {
   useEffect(() => {
     if (product) {
       let relatedPool: Product[] = [];
-  
+
       if (product.category === 'Backing Track') {
-        // Digital: แสดงเฉพาะ Backing Track (และอนาคต Stems, Tabs)
         relatedPool = allItems.filter(
           (item) =>
             item.id !== product.id &&
-            ['Backing Track'].includes(item.category)
+            item.category === 'Backing Track'
         );
       } else {
-        // Physical: แสดง Music, Merch, Bundles
         relatedPool = allItems.filter(
           (item) =>
             item.id !== product.id &&
             ['Music', 'Merch', 'Bundles'].includes(item.category)
         );
       }
-  
+
       const shuffled = [...relatedPool].sort(() => Math.random() - 0.5).slice(0, 8);
       setRelatedProducts(shuffled);
     }
@@ -68,7 +66,7 @@ export default function ProductPage() {
         <span className="text-[#dc9e63]">{product.title}</span>
       </div>
 
-      {/* Product Detail Section */}
+      {/* Product Detail */}
       <div className="product-detail-wrapper">
         <div className="product-detail-image">
           <Image
@@ -122,7 +120,6 @@ export default function ProductPage() {
           <div className="stems-row">
             {relatedProducts.map((item) => {
               const isBackingTrack = item.category === 'Backing Track';
-
               return (
                 <Link
                   href={`/shop/${item.id}`}
@@ -137,33 +134,28 @@ export default function ProductPage() {
                     className="stems-image"
                   />
                   <div className="stems-label-group">
-  <p className="stems-title-text">{item.title}</p>
-  {/* 🔻 โชว์ subtitle แบบตัด BACKING TRACK ออก ถ้าเป็น Backing Track */}
-  <p className="stems-subtitle">
-    {isBackingTrack
-      ? item.subtitle.replace(/BACKING TRACK/gi, '').trim()
-      : item.subtitle}
-  </p>
+                    <p className="stems-title-text">{item.title}</p>
+                    <p className="stems-subtitle">
+                      {isBackingTrack
+                        ? item.subtitle.replace(/BACKING TRACK/gi, '').trim()
+                        : item.subtitle}
+                    </p>
 
-  {/* 🔻 ขีดเส้นเฉพาะ Backing Track */}
-  {isBackingTrack && <span className="backing-line" />}
+                    {isBackingTrack && (
+                      <>
+                        <span className="backing-line" />
+                        <p className="stems-subtitle-tiny">BACKING TRACK</p>
+                      </>
+                    )}
 
-  {/* 🔻 Label ประเภทใหญ่ เช่น Backing Track */}
-  {isBackingTrack && (
-    <p className="stems-subtitle-tiny">BACKING TRACK</p>
-  )}
-
-  {/* 🔻 ราคาสินค้า */}
-  <p className="stems-price">
-    {isBundle(item.price) ? (
-      <>
-        <span className="line-through text-[#f8fcdc] mr-2">
-          {item.price.original}
-        </span>
-        {item.price.sale}
-      </>
-    ) : (
-      item.price
+                    <p className="stems-price">
+                      {isBundle(item.price) ? (
+                        <>
+                          <span className="line-through text-[#f8fcdc] mr-2">{item.price.original}</span>
+                          {item.price.sale}
+                        </>
+                      ) : (
+                        item.price
                       )}
                     </p>
                   </div>

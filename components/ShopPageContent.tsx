@@ -21,7 +21,7 @@ export default function ShopPageContent({ tabParam }: Props) {
     if (activeTab === 'MERCH') return item.category === 'Merch';
     if (activeTab === 'MUSIC') return item.category === 'Music';
     if (activeTab === 'BUNDLES') return item.category === 'Bundles';
-    if (activeTab === 'DIGITAL') return item.category === 'Backing Track'; // หรือ Digital ถ้าแก้ชื่อไว้
+    if (activeTab === 'DIGITAL') return item.category === 'Backing Track';
     return false;
   });
 
@@ -31,15 +31,15 @@ export default function ShopPageContent({ tabParam }: Props) {
         Shop
       </h1>
 
-      <div className="flex justify-center gap-4 mb-10 flex-wrap">
+      <div className="shop-tab-group mb-10">
         {['MERCH', 'MUSIC', 'BUNDLES', 'DIGITAL'].map((tab) => (
           <button
-            key={tab}
-            onClick={() => setActiveTab(tab as any)}
-            className={`info-button ${activeTab === tab ? 'active-tab' : ''}`}
-          >
-            {tab}
-          </button>
+          key={tab}
+          onClick={() => setActiveTab(tab as any)}
+          className={`info-button shop-tab-button ${activeTab === tab ? 'active-tab' : ''}`}
+        >
+          {tab}
+        </button>
         ))}
       </div>
 
@@ -49,33 +49,55 @@ export default function ShopPageContent({ tabParam }: Props) {
         </p>
       ) : (
         <div className="stems-row">
-          {itemsToRender.map((item) => (
-            <Link
-              key={item.id}
-              href={`/shop/${item.id}`}
-              className="stems-item product-label-link cursor-pointer"
-            >
-              <img
-                src={item.image}
-                alt={item.title}
-                className="stems-image"
-                width={200}
-                height={200}
-              />
-              <div className="stems-label-group">
-                <p className="stems-title-text">{item.title}</p>
-                <p className="stems-subtitle-tiny">{item.subtitle}</p>
-                {typeof item.price === 'object' ? (
-                  <p className="stems-price">
-                    <span className="line-through mr-1 text-[#f8fcdc]">{item.price.original}</span>
-                    <span className="text-[#cc3f33]">{item.price.sale}</span>
+          {itemsToRender.map((item) => {
+            const isBackingTrack = item.category === 'Backing Track';
+
+            return (
+              <Link
+                key={item.id}
+                href={`/shop/${item.id}`}
+                className={`stems-item product-label-link cursor-pointer ${isBackingTrack ? 'is-backing' : ''}`}
+              >
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="stems-image"
+                  width={200}
+                  height={200}
+                />
+                <div className="stems-label-group">
+                  <p className="stems-title-text">{item.title}</p>
+
+                  {/* subtitle */}
+                  <p className="stems-subtitle">
+                    {isBackingTrack
+                      ? item.subtitle.replace(/BACKING TRACK/gi, '').trim()
+                      : item.subtitle}
                   </p>
-                ) : (
-                  <p className="stems-price text-[#f8fcdc]">{item.price}</p>
-                )}
-              </div>
-            </Link>
-          ))}
+
+                  {/* เส้นเฉพาะ Backing Track */}
+                  {isBackingTrack && <span className="backing-line" />}
+
+                  {/* BACKING TRACK label */}
+                  {isBackingTrack && (
+                    <p className="stems-subtitle-tiny">BACKING TRACK</p>
+                  )}
+
+                  {/* ราคาสินค้า */}
+                  <p className="stems-price">
+                    {typeof item.price === 'object' ? (
+                      <>
+                        <span className="line-through text-[#f8fcdc] mr-1">{item.price.original}</span>
+                        <span className="text-[#cc3f33]">{item.price.sale}</span>
+                      </>
+                    ) : (
+                      item.price
+                    )}
+                  </p>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       )}
     </main>

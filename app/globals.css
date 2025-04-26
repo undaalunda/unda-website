@@ -245,7 +245,7 @@ button svg,
   text-align: center;
   font-family: 'Cinzel', serif;
   color: #f8fcdc;
-  padding: 1rem;
+  padding: 2rem;
   max-width: 90%;
 }
 
@@ -383,14 +383,14 @@ button svg,
   }
 }
 
-/* === BUTTON GROUP === */
+/* === BUTTON GROUP (Homepage ปุ่มใหญ่ๆ เช่น SCORES / STEMS / MERCH / PHYSICAL / DIGITAL) === */
 .button-group {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 1rem;
   margin-top: 0rem;
-  padding-bottom: calc(env(safe-area-inset-bottom) + 2rem); /* ป้องกันบังขอบ */
+  padding-bottom: calc(env(safe-area-inset-bottom) + 2rem);
   opacity: 0;
   transform: translateY(20px);
   transition: opacity 1s ease, transform 1s ease;
@@ -401,7 +401,7 @@ button svg,
   transform: translateY(0);
 }
 
-/* === INFO BUTTON STYLE === */
+/* ปุ่มใน Homepage (ใหญ่ๆ) */
 .info-button {
   background-color: transparent;
   border: 1px solid #dc9e63;
@@ -414,28 +414,23 @@ button svg,
   border-radius: 3px;
   font-weight: 500;
   text-align: center;
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease,
-    border-color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
   cursor: pointer;
 }
 
-/* 😌 Hover แบบนุ่มๆ ไม่เขย่าไม่เด้ง */
+/* 😌 Hover นุ่มๆ */
 .info-button:hover {
   background-color: #dc9e63;
   color: #0d0d0d;
-  border-color: #dc9e63;
   mix-blend-mode: difference;
 }
 
-/* === RESPONSIVE === */
-
+/* --- Breakpoints --- */
 /* 💻 Tablet: ≤1279px */
 @media (max-width: 1279px) {
   .info-button {
     font-size: 10px;
-    padding: 0.6rem 1.2rem;
+    padding: 0.7rem 1.3rem;
   }
 }
 
@@ -444,7 +439,6 @@ button svg,
   .button-group {
     flex-direction: column;
     align-items: center;
-    gap: 0.75rem;
   }
 
   .info-button {
@@ -455,6 +449,84 @@ button svg,
     font-weight: bold;
   }
 }
+
+/* === SHOP PAGE TAB GROUP (ปุ่ม MERCH / MUSIC / BUNDLES / DIGITAL) === */
+.shop-tab-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+/* ปุ่มเล็กลงหน่อย */
+.shop-tab-button {
+  min-width: 160px;
+  padding: 0.75rem 1.5rem;
+  font-size: 14px;
+  font-family: 'Cinzel', serif;
+  color: #dc9e63;
+  background: transparent;
+  border: 1px solid #dc9e63;
+  border-radius: 3px;
+  font-weight: 500;
+  text-align: center;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  white-space: nowrap;
+}
+
+/* 😌 Hover นุ่มๆ */
+.shop-tab-button:hover {
+  background-color: #dc9e63;
+  color: #0d0d0d;
+}
+
+/* ถ้า Active */
+.shop-tab-button.active-tab {
+  background-color: #dc9e63;
+  color: #0d0d0d;
+}
+
+/* --- Breakpoints --- */
+/* 💻 Tablet: <1280px */
+@media (max-width: 1279px) {
+  .shop-tab-button {
+    min-width: 120px;
+    padding: 0.65rem 1.3rem;
+    font-size: 13px;
+  }
+}
+
+/* 📱 Mobile: <768px */
+@media (max-width: 927px) {
+  .shop-tab-group {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .shop-tab-button {
+    min-width: 100px;
+    width: auto; /* ⬅️ ไม่ยืดเต็มจอแล้วนะจ๊ะ */
+    padding: 0.5rem 0.3rem;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 696px) {
+  .shop-tab-group {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .shop-tab-button {
+    min-width: 80px;
+    width: auto; /* ⬅️ ไม่ยืดเต็มจอแล้วนะจ๊ะ */
+    padding: 0.5rem 0.3rem;
+    font-size: 9px;
+  }
+}
+
 
 /* Contact Layout */
 
