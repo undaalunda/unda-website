@@ -7,6 +7,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 
+function isBundle(
+  price: string | { original: string; sale: string }
+): price is { original: string; sale: string } {
+  return typeof price === 'object' && price !== null && 'original' in price && 'sale' in price;
+}
+
 export default function ProductPage() {
   const params = useParams();
   const slug = params.slug as string;
@@ -17,8 +23,25 @@ export default function ProductPage() {
 
   useEffect(() => {
     if (product) {
-      const others = allItems.filter((item) => item.id !== product.id);
-      const shuffled = [...others].sort(() => Math.random() - 0.5).slice(0, 8);
+      let relatedPool: Product[] = [];
+  
+      if (product.category === 'Backing Track') {
+        // Digital: แสดงเฉพาะ Backing Track (และอนาคต Stems, Tabs)
+        relatedPool = allItems.filter(
+          (item) =>
+            item.id !== product.id &&
+            ['Backing Track'].includes(item.category)
+        );
+      } else {
+        // Physical: แสดง Music, Merch, Bundles
+        relatedPool = allItems.filter(
+          (item) =>
+            item.id !== product.id &&
+            ['Music', 'Merch', 'Bundles'].includes(item.category)
+        );
+      }
+  
+      const shuffled = [...relatedPool].sort(() => Math.random() - 0.5).slice(0, 8);
       setRelatedProducts(shuffled);
     }
   }, [product?.id]);
@@ -57,11 +80,11 @@ export default function ProductPage() {
         </div>
 
         <div className="product-detail-info">
-        <h1 className="product-detail-title">{product.title}</h1>
-        <p className="product-detail-subtitle">{product.subtitle}</p>
+          <h1 className="product-detail-title">{product.title}</h1>
+          <p className="product-detail-subtitle">{product.subtitle}</p>
 
           <div className="product-price">
-            {typeof product.price === 'object' ? (
+            {isBundle(product.price) ? (
               <>
                 <span className="line-through text-[#f8fcdc]/40 mr-2">{product.price.original}</span>
                 <span>{product.price.sale}</span>
@@ -96,22 +119,57 @@ export default function ProductPage() {
       {relatedProducts.length > 0 && (
         <div className="related-products-wrapper">
           <h2 className="related-products-title">RELATED PRODUCTS</h2>
-          <div className="related-products-row">
-            {relatedProducts.map((item) => (
-              <Link href={`/shop/${item.id}`} key={item.id} className="related-product-item">
-                <Image
-                  src={item.image}
-                  alt={item.title}
-                  width={200}
-                  height={200}
-                />
-                <p className="related-product-title">{item.title}</p>
-                <p className="related-product-subtitle">{item.subtitle}</p>
-                <p className="related-product-price">
-                  {typeof item.price === 'string' ? item.price : item.price.sale}
-                </p>
-              </Link>
-            ))}
+          <div className="stems-row">
+            {relatedProducts.map((item) => {
+              const isBackingTrack = item.category === 'Backing Track';
+
+              return (
+                <Link
+                  href={`/shop/${item.id}`}
+                  key={item.id}
+                  className={`stems-item ${isBackingTrack ? 'is-backing' : ''}`}
+                >
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    width={200}
+                    height={200}
+                    className="stems-image"
+                  />
+                  <div className="stems-label-group">
+  <p className="stems-title-text">{item.title}</p>
+  {/* 🔻 โชว์ subtitle แบบตัด BACKING TRACK ออก ถ้าเป็น Backing Track */}
+  <p className="stems-subtitle">
+    {isBackingTrack
+      ? item.subtitle.replace(/BACKING TRACK/gi, '').trim()
+      : item.subtitle}
+  </p>
+
+  {/* 🔻 ขีดเส้นเฉพาะ Backing Track */}
+  {isBackingTrack && <span className="backing-line" />}
+
+  {/* 🔻 Label ประเภทใหญ่ เช่น Backing Track */}
+  {isBackingTrack && (
+    <p className="stems-subtitle-tiny">BACKING TRACK</p>
+  )}
+
+  {/* 🔻 ราคาสินค้า */}
+  <p className="stems-price">
+    {isBundle(item.price) ? (
+      <>
+        <span className="line-through text-[#f8fcdc] mr-2">
+          {item.price.original}
+        </span>
+        {item.price.sale}
+      </>
+    ) : (
+      item.price
+                      )}
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       )}

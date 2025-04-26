@@ -933,7 +933,8 @@ button svg,
   transition: color 0.3s ease;
 }
 
-.backing-line { /* 🎸 Backing Track Hover Line Animation */
+/* เดิม: ทุก .stems-item:hover .backing-line ได้หมดเลย — ไม่ดี */
+.backing-line {
   display: block;
   height: 1px;
   width: 40%;
@@ -942,7 +943,8 @@ button svg,
   transition: width 0.6s ease;
 }
 
-.stems-item:hover .backing-line {
+/* ✅ ให้ hover ทำงานเฉพาะ is-backing */
+.is-backing:hover .backing-line {
   width: 70%;
 }
 
@@ -1313,11 +1315,11 @@ button svg,
 }
 
 .shop-newsletter-wrapper .newsletter-section {
-  margin-top: 8rem; /* แค่ของ shop */
-  padding-top: 4rem;
-  padding-bottom: 6rem;
-  background: none; /* ถ้าอยากเอาพื้นหลังออก */
-  border-top: 1px solid rgba(255, 255, 255, 0.05); /* ตกแต่งแยกเฉพาะได้เลย */
+  margin-top: 3rem;
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+  background: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .shop-newsletter-wrapper .newsletter-title {

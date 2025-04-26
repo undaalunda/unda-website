@@ -81,7 +81,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 <div className="newsletter-divider"></div>
               </div>
 
-              <div className="newsletter-form-wrapper mb-10">
+              <div className="shop-newsletter-wrapper">
                 <NewsletterForm />
               </div>
 
