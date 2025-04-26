@@ -245,19 +245,19 @@ button svg,
   text-align: center;
   font-family: 'Cinzel', serif;
   color: #f8fcdc;
-  padding: 2.6rem;
+  padding: 3rem;
   max-width: 90%;
 }
 
 .hero-line1 {
   font-size: 16px;
-  letter-spacing: 0.44em;
+  letter-spacing: 0.36em;
   line-height: 1.6;
 }
 
 .hero-line2 {
   font-size: 11.5px;
-  letter-spacing: 0.28em;
+  letter-spacing: 0.17em;
   line-height: 2.2;
   margin-top: 0.5rem;
 }
