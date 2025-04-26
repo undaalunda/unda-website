@@ -4,8 +4,34 @@ import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Script from 'next/script';
+import { allItems } from '../components/allItems'; // import สินค้าจาก allItems
+
+const blacklist = [
+  'bass-book',
+  'keys-book',
+  'drums-book',
+  'cat-scores-white',
+  'album-merch-bundle',
+  'book-merch-bundle',
+  'book-bonus-bundle',
+  'book-bundle',
+  'apparel-book-bundle',
+  'sticker-book-bundle'
+];
+
+const homepageItems = allItems.filter(
+  (item) => 
+    (item.category === 'Merch' || item.category === 'Bundles' || item.category === 'Music') &&
+    !blacklist.includes(item.id)
+);
 
 export default function HomePage() {
+  const merchItems = allItems.filter((item) => item.category === 'Merch');
+  const musicItems = allItems.filter((item) => item.category === 'Music');
+  const bundleItems = allItems.filter((item) => item.category === 'Bundles');
+
+  const musicAndMerchItems = [...musicItems, ...merchItems, ...bundleItems];
+
   const videoRef = useRef(null);
   const transcriptionRef = useRef(null);
   const stemsRef = useRef(null);
@@ -59,6 +85,7 @@ export default function HomePage() {
         <Script src="https://widget.bandsintown.com/main.min.js" strategy="afterInteractive" />
       )}
 
+      {/* HERO SECTION */}
       <div className="hero-wrapper">
         <div className="catmoon-background" />
         <div className="hero-text-image">
@@ -82,6 +109,7 @@ export default function HomePage() {
 
       <div className="after-hero-spacing" />
 
+      {/* BUTTON GROUP SECTION */}
       <div>
         <div ref={buttonGroupRef} className={`button-group ${showButtons ? 'fade-in' : ''}`}>
           <Link href="/shop?tab=DIGITAL" className="info-button">SCORES</Link>
@@ -95,6 +123,7 @@ export default function HomePage() {
         <p className="since-note">Delivering Worldwide Since 2025</p>
       </div>
 
+      {/* VIDEO SECTION */}
       <section ref={videoRef} className={`video-section ${showVideo ? 'fade-in' : ''}`}>
         <iframe
           className="youtube-frame"
@@ -106,17 +135,50 @@ export default function HomePage() {
         ></iframe>
       </section>
 
+      {/* TRANSCRIPTION SECTION */}
       <section className="transcription-section">
-  <div ref={transcriptionRef} className={`fade-trigger ${showTranscriptions ? 'fade-in' : ''}`}>
-    <h2 className="transcription-sub">LEARN THE MUSIC</h2>
-    <h3 className="transcription-title">TRANSCRIPTIONS</h3>
-    <div className="product-row">
-      {["guitar", "keys", "bass", "drums"].map((inst, i) => (
-        <Link href={`/${inst}`} key={i} className="product-item product-label-link">
-          <img src={`/product-${inst}.png`} alt={`${inst} Book`} className="product-image" />
-          <div className="product-label-group">
-            <p className="product-title">DARK WONDERFUL WORLD</p>
-            <p className="product-subtitle">THE COMPLETE {inst.toUpperCase()} TRANSCRIPTION</p>
+        <div ref={transcriptionRef} className={`fade-trigger ${showTranscriptions ? 'fade-in' : ''}`}>
+          <h2 className="transcription-sub">LEARN THE MUSIC</h2>
+          <h3 className="transcription-title">TRANSCRIPTIONS</h3>
+          <div className="product-row">
+            {["guitar", "keys", "bass", "drums"].map((inst, i) => (
+              <Link href={`/${inst}`} key={i} className="product-item product-label-link">
+                <img src={`/product-${inst}.png`} alt={`${inst} Book`} className="product-image" />
+                <div className="product-label-group">
+                  <p className="product-title">DARK WONDERFUL WORLD</p>
+                  <p className="product-subtitle">THE COMPLETE {inst.toUpperCase()} TRANSCRIPTION</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+          <div className="shopall-button-wrapper">
+            <Link href="/shop?tab=DIGITAL" className="info-button">SHOP ALL</Link>
+          </div>
+        </div>
+      </section>
+
+       <section className="stems-section">
+  <div ref={stemsRef} className={`fade-trigger ${showStems ? 'fade-in' : ''}`}>
+    <h2 className="stems-sub">JAM THE TRACKS</h2>
+    <h3 className="stems-title">STEMS & BACKINGS</h3>
+    <div className="stems-row">
+      {allItems.filter(item => item.category === 'Backing Track').map((item) => (
+        <Link href={`/shop/${item.id}`} key={item.id} className="stems-item product-label-link">
+          <Image src={item.image} alt={item.title} width={200} height={200} className="stems-image" />
+          <div className="stems-label-group">
+            <p className="stems-title-text">{item.title}</p>
+            {/* 👇ตรงนี้แหละ แก้เลย */}
+            <p className="stems-subtitle-tiny">
+              {item.subtitle
+                .replace(' BACKING TRACK', '')
+                .replace(' STEM', '')
+                .replace(' TAB', '')}
+            </p>
+            <span className="backing-line always-on"></span>
+            <p className="stems-subtitle-tiny tracking-wide uppercase text-center backing-text">
+              BACKING TRACK
+            </p>
+            <p className="stems-price">{typeof item.price === 'string' ? item.price : item.price.sale}</p>
           </div>
         </Link>
       ))}
@@ -127,111 +189,72 @@ export default function HomePage() {
   </div>
 </section>
 
-<section className="stems-section">
-  <div ref={stemsRef} className={`fade-trigger ${showStems ? 'fade-in' : ''}`}>
-    <h2 className="stems-sub">JAM THE TRACKS</h2>
-    <h3 className="stems-title">STEMS & BACKING TRACKS</h3>
-    <div className="stems-row">
-            {[
-              { src: '/anomic-no-drums.jpg', title: 'ANOMIC', type: 'DRUMS', price: '$8.00' },
-              { src: '/jyy-no-guitars.jpg', title: 'JYY', type: 'GUITARS', price: '$8.00' },
-              { src: '/atlantic-no-lead-guitar.jpg', title: 'ATLANTIC', type: 'LEAD GUITAR', price: '$9.00' },
-              { src: '/out-of-the-dark-no-drums.jpg', title: 'OUT OF THE DARK', type: 'DRUMS', price: '$12.00' },
-              { src: '/feign-no-guitars.jpg', title: 'FEIGN', type: 'GUITARS', price: '$12.00' },
-              { src: '/the-dark-no-keys.jpg', title: 'THE DARK', type: 'KEYS', price: '$5.00' },
-              { src: '/reddown-no-bass.jpg', title: 'RED DOWN', type: 'BASS', price: '$8.00' },
-              { src: '/quietness-no-bass.jpg', title: 'QUIETNESS', type: 'BASS', price: '$8.00' },
-            ].map((product, i) => (
-              <Link href="/shop" key={i} className="stems-item product-label-link">
-                <img src={product.src} alt={product.title} className="stems-image" />
-                <div className="stems-label-group">
-                  <p className="stems-title-text">{product.title}</p>
-                  <p className="stems-subtitle-tiny">{product.type}</p>
-                  <span className="backing-line always-on"></span>
-                  <p className="stems-subtitle-tiny tracking-wide uppercase text-center backing-text">BACKING TRACK</p>
-                  <p className="stems-price text-[#f8fcdc]">{product.price}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-    <div className="shopall-button-wrapper">
-      <Link href="/shop?tab=DIGITAL" className="info-button">SHOP ALL</Link>
-    </div>
-  </div>
-</section>
-
+      {/* MUSIC & MERCH SECTION */}
 <section className="stems-section">
   <div ref={musicMerchRef} className={`fade-trigger ${showMerch ? 'fade-in' : ''}`}>
     <h2 className="stems-sub">MUSIC IN YOUR HANDS</h2>
     <h3 className="stems-title">MUSIC & MERCH</h3>
     <div className="stems-row">
-            {[
-              { src: '/audio-digipak-dww.png', title: 'DARK WONDERFUL WORLD', type1: 'AUDIO ALBUM CD (DIGIPAK)', price: '$25.00' },
-              { src: '/live-cd-dww.png', title: 'DARK WONDERFUL WORLD', type1: 'LIVE ALBUM CD', price: '$15.00' },
-              { src: '/black-cats-scores-tee.png', title: 'CAT SCORES T-SHIRT', type1: 'BLACK', price: '$29.95' },
-              { src: '/white-cats-scores-tee.png', title: 'CAT SCORES T-SHIRT', type1: 'WHITE', price: '$29.95' },
-              { src: '/a-cat-to-the-moon-stickers.png', title: 'A CAT TO THE MOON', type1: 'STICKERS', price: '$5.00' },
-              { src: '/a-musician-cats.png', title: 'A MUSICIAN CATS', type1: 'STICKERS', price: '$5.00' },
-              { src: '/unda-alunda-sign-keychain.png', title: 'UNDA ALUNDA', type1: 'SIGNED KEYCHAIN', price: '$9.95' },
-              { src: '/full-guitars-transcription.png', title: 'FULL GUITARS TRANSCRIPTION', type1: 'PRINTED BOOK', price: '$49.95' },
-              { src: '/dark-wonderful-world-album-merch-bundle.png', title: 'DARK WONDERFUL WORLD', type1: 'ALBUM MERCH BUNDLE', price: { original: '$64.90', sale: '$51.92' } },
-              { src: '/dark-wonderful-world-book-&-merch-bundle.png', title: 'DARK WONDERFUL WORLD', type1: 'BOOK & MERCH BUNDLE', price: { original: '$84.90', sale: '$67.92' } },
-              { src: '/dark-wonderful-world-book-&-bonus-merch-bundle.png', title: 'DARK WONDERFUL WORLD', type1: 'BOOK & BONUS MERCH BUNDLE', price: { original: '$94.90', sale: '$75.92' } },
-              { src: '/dark-wonderful-world-dual-album-merch-bundle.png', title: 'DARK WONDERFUL WORLD', type1: 'DUAL ALBUM MERCH BUNDLE', price: { original: '$109.85', sale: '$87.88' } },
-            ].map((item, i) => (
-              <Link href="/shop" key={i} className="stems-item product-label-link">
-                <img src={item.src} alt={item.title} className="stems-image" />
-                <div className="stems-label-group">
-                  <p className="stems-title-text">{item.title}</p>
-                  <p className="stems-subtitle-tiny">{item.type1}</p>
-                  {typeof item.price === 'string' ? (
-                    <p className="stems-price text-[#f8fcdc]">{item.price}</p>
-                  ) : (
-                    <p className="stems-price">
-                      <span className="line-through mr-1 text-[#f8fcdc]">{item.price.original}</span>
-                      <span className="text-[#cc3f33]">{item.price.sale}</span>
-                    </p>
-                  )}
-                </div>
-              </Link>
-            ))}
-         </div>
+      {homepageItems.map((item, i) => (
+        <Link href={`/shop/${item.id}`} key={i} className="stems-item product-label-link">
+          <img src={item.image} alt={item.title} className="stems-image" />
+          <div className="stems-label-group">
+            <p className="stems-title-text">{item.title}</p>
+            <p className="stems-subtitle-tiny">
+              {/* ✅ ลบ BACKING TRACK, STEM, TAB ออกจาก subtitle เฉพาะตอนโชว์ */}
+              {item.subtitle
+                .replace(' BACKING TRACK', '')
+                .replace(' STEM', '')
+                .replace(' TAB', '')}
+            </p>
+            {typeof item.price === 'string' ? (
+              <p className="stems-price">{item.price}</p>
+            ) : (
+              <p className="stems-price">
+                <span className="line-through text-[#f8fcdc] mr-1">{item.price.original}</span>
+                <span className="text-[#cc3f33]">{item.price.sale}</span>
+              </p>
+            )}
+          </div>
+        </Link>
+      ))}
+    </div>
     <div className="shopall-button-wrapper">
       <Link href="/shop?tab=MERCH" className="info-button">SHOP ALL</Link>
     </div>
   </div>
 </section>
 
-      {/* 👇 TOUR SECTION */}
-<section ref={tourRef} className="tour-section">
-  <div className={`fade-trigger ${showTour ? 'fade-in' : ''}`}>
-    <h2 className="stems-sub">SEE IT LIVE</h2>
-    <h3 className="stems-title">TOUR DATES</h3>
-  </div>
-  <div className="tour-widget-container">
-    <div style={{ textAlign: 'left' }}>
-      {isClient ? (
-        <div className="bit-widget-initializer"
-          data-artist-name="Sleep token"
-          data-background-color="transparent"
-          data-limit="10" 
-          data-separator-color="rgba(255,255,255,0.1)"
-          data-text-color="#f8fcdc"
-          data-link-color="#dc9e63"
-          data-display-local-dates="false"
-          data-display-past-dates="false"
-          data-auto-style="false"
-          data-display-limit="5"
-          data-date-format="ddd, MMM D, YYYY"
-          data-request-show="true"
-          data-language="en"
-        />
-      ) : (
-        <div style={{ height: '400px' }} />
-      )}
-    </div>
-  </div>
-</section>
+      {/* TOUR SECTION */}
+      <section ref={tourRef} className="tour-section">
+        <div className={`fade-trigger ${showTour ? 'fade-in' : ''}`}>
+          <h2 className="stems-sub">SEE IT LIVE</h2>
+          <h3 className="stems-title">TOUR DATES</h3>
+        </div>
+        <div className="tour-widget-container">
+          <div style={{ textAlign: 'left' }}>
+            {isClient ? (
+              <div className="bit-widget-initializer"
+                data-artist-name="Unda Alunda"
+                data-background-color="transparent"
+                data-limit="10"
+                data-separator-color="rgba(255,255,255,0.1)"
+                data-text-color="#f8fcdc"
+                data-link-color="#dc9e63"
+                data-display-local-dates="false"
+                data-display-past-dates="false"
+                data-auto-style="false"
+                data-display-limit="5"
+                data-date-format="ddd, MMM D, YYYY"
+                data-request-show="true"
+                data-language="en"
+              />
+            ) : (
+              <div style={{ height: '400px' }} />
+            )}
+          </div>
+        </div>
+      </section>
     </main>
   );
 }

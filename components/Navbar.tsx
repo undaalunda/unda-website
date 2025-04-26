@@ -302,28 +302,27 @@ export default function Navbar() {
   }}
   className="relative w-full max-w-xl"
 >
-        <div className="relative">
-          <span className="absolute top-1/2 left-4 -translate-y-1/2 text-[#f8fcdc]/50">
-            <Search size={20} />
-          </span>
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            autoFocus
-            className="w-full pl-12 pr-4 py-3 text-lg text-[#f8fcdc] caret-[#dc9e63] bg-transparent border border-[#dc9e63] rounded-md placeholder:text-[#777] outline-none"
-          />
-        </div>
-        <button
-          type="button"
-          onClick={() => setSearchOpen(false)}
-          className="absolute top-4 right-4 text-[#f8fcdc] hover:text-[#dc9e63] transition cursor-pointer"
-        >
-          <X size={24} strokeWidth={1.4} />
-        </button>
-      </form>
-
+<div className="relative">
+    <span className="absolute top-1/2 left-4 -translate-y-1/2 text-[#f8fcdc]/50">
+      <Search size={20} />
+    </span>
+    <input
+      type="text"
+      placeholder="Search..."
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+      autoFocus
+      className="w-full pl-12 pr-12 py-2 text-base text-[#f8fcdc] caret-[#dc9e63] bg-transparent border border-[#dc9e63] rounded-md placeholder:text-[#777] outline-none"
+    />
+    <button
+      type="button"
+      onClick={() => setSearchOpen(false)}
+      className="absolute top-1/2 right-4 -translate-y-1/2 text-[#f8fcdc] hover:text-[#dc9e63] transition"
+    >
+      <X size={24} strokeWidth={1.4} />
+    </button>
+  </div>
+</form>
       {delayedQuery.length === 0 && (
   <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mt-6 w-full max-w-5xl mx-auto">
     
@@ -406,7 +405,7 @@ export default function Navbar() {
       </div>
 
       {/* RIGHT COLUMN: Products */}
-      <div className="flex flex-col gap-3 max-h-[420px] overflow-y-auto pr-2">
+      <div className="flex flex-col gap-3 max-h-[400px] overflow-y-auto pr-2">
   <h4 className="text-sm mb-2 font-semibold text-[#f8fcdc]">Products</h4>
   {filtered.length === 0 ? (
     <div className="mt-1">
@@ -418,7 +417,7 @@ export default function Navbar() {
   ) : (
     filtered.map((item) => (
       <Link
-        href={item.url}
+        href={item.url === '/shop' ? `/shop/${item.id}` : item.url}
         key={item.id}
         onClick={() => {
           setSearchOpen(false);

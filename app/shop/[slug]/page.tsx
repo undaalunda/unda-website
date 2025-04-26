@@ -13,6 +13,16 @@ function isBundle(
   return typeof price === 'object' && price !== null && 'original' in price && 'sale' in price;
 }
 
+// สร้างฟังก์ชันดึง Stock Status
+function getStockStatus(product: Product): 'in-stock' | 'out-of-stock' | 'pre-order' | null {
+  if (['Music', 'Merch', 'Bundles'].includes(product.category)) {
+    if (product.id === 'signed-keychain') return 'out-of-stock';
+    // เพิ่ม logic pre-order ในอนาคตได้ตรงนี้
+    return 'in-stock';
+  }
+  return null;
+}
+
 export default function ProductPage() {
   const params = useParams();
   const slug = params.slug as string;
@@ -27,15 +37,11 @@ export default function ProductPage() {
 
       if (product.category === 'Backing Track') {
         relatedPool = allItems.filter(
-          (item) =>
-            item.id !== product.id &&
-            item.category === 'Backing Track'
+          (item) => item.id !== product.id && item.category === 'Backing Track'
         );
       } else {
         relatedPool = allItems.filter(
-          (item) =>
-            item.id !== product.id &&
-            ['Music', 'Merch', 'Bundles'].includes(item.category)
+          (item) => item.id !== product.id && ['Music', 'Merch', 'Bundles'].includes(item.category)
         );
       }
 
@@ -55,8 +61,11 @@ export default function ProductPage() {
     );
   }
 
+  const stockStatus = getStockStatus(product);
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-start text-[#f8fcdc] font-[Cinzel] px-4 md:px-6 pt-32 pb-24">
+      
       {/* Breadcrumb */}
       <div className="w-full max-w-5xl mb-10 text-sm text-[#f8fcdc]/70">
         <Link href="/" className="hover:text-[#dc9e63] no-underline">Home</Link>
@@ -67,21 +76,30 @@ export default function ProductPage() {
       </div>
 
       {/* Product Detail */}
-      <div className="product-detail-wrapper">
-        <div className="product-detail-image">
-          <Image
-            src={product.image}
-            alt={product.title}
-            width={600}
-            height={600}
-          />
+      <div className="flex flex-col md:flex-row gap-8 w-full max-w-5xl">
+        
+        {/* รูปสินค้า */}
+        <div className="w-full md:w-1/2 flex justify-center">
+          <div className="sticky top-32 self-start w-full max-w-[500px]">
+            <div className="relative aspect-square w-full">
+              <Image
+                src={product.image}
+                alt={product.title}
+                fill
+                sizes="(max-width: 768px) 80vw, 50vw"
+                className="object-contain"
+                priority
+              />
+            </div>
+          </div>
         </div>
 
-        <div className="product-detail-info">
-          <h1 className="product-detail-title">{product.title}</h1>
-          <p className="product-detail-subtitle">{product.subtitle}</p>
+        {/* ข้อมูลสินค้า */}
+        <div className="w-full md:w-1/2 flex flex-col">
+          <h1 className="text-3xl font-bold text-[#dc9e63]">{product.title}</h1>
+          <p className="text-base mt-2">{product.subtitle}</p>
 
-          <div className="product-price">
+          <div className="product-price mt-4">
             {isBundle(product.price) ? (
               <>
                 <span className="line-through text-[#f8fcdc]/40 mr-2">{product.price.original}</span>
@@ -92,7 +110,34 @@ export default function ProductPage() {
             )}
           </div>
 
-          <div className="product-quantity-wrapper">
+          {/* Stock Status */}
+{stockStatus && (
+  <div className="mt-2 text-sm font-semibold">
+    {stockStatus === 'in-stock' && <span className="text-green-300/70 italic">IN STOCK</span>}
+    {stockStatus === 'out-of-stock' && <span className="text-red-400/70 italic">OUT OF STOCK</span>}
+    {stockStatus === 'pre-order' && <span className="text-yellow-300/70 italic">PRE-ORDER</span>}
+  </div>
+)}
+
+          {/* Description */}
+          {/* Description */}
+          {product.description && (
+  <div className="product-description mt-6 text-[#f8fcdc]/80 leading-relaxed text-base whitespace-pre-line">
+    {product.description.split('\n').map((line, idx) => {
+      const trimmedLine = line.trim();
+      if (trimmedLine === '') {
+        return <div key={idx} className="h-4" />; // 👈 ช่องว่างถ้าเจอบรรทัดว่าง
+      } else if (trimmedLine.startsWith('Please Note:')) {
+        return <p key={idx} className="italic text-[#f8fcdc]/50 mt-4">{line}</p>;
+      } else {
+        return <p key={idx}>{line}</p>;
+      }
+    })}
+  </div>
+)}
+
+          {/* Quantity */}
+          <div className="product-quantity-wrapper mt-8">
             <label className="text-sm font-medium text-[#f8fcdc]">Quantity:</label>
             <input
               type="number"
@@ -103,11 +148,16 @@ export default function ProductPage() {
             />
           </div>
 
-          <button className="add-to-cart-button">
-            Add {quantity} to Cart
+          {/* Add to Cart */}
+          <button
+            className="add-to-cart-button mt-4"
+            disabled={stockStatus === 'out-of-stock'}
+          >
+            {stockStatus === 'out-of-stock' ? 'Unavailable' : `Add ${quantity} to Cart`}
           </button>
 
-          <Link href="/shop" className="back-to-shop-link">
+          {/* Back to Shop */}
+          <Link href="/shop" className="back-to-shop-link mt-4">
             ← Back to Shop
           </Link>
         </div>
@@ -115,9 +165,9 @@ export default function ProductPage() {
 
       {/* Related Products */}
       {relatedProducts.length > 0 && (
-        <div className="related-products-wrapper">
-          <h2 className="related-products-title">RELATED PRODUCTS</h2>
-          <div className="stems-row">
+        <div className="related-products-wrapper mt-20 w-full max-w-5xl">
+          <h2 className="text-2xl font-bold text-[#dc9e63] mb-8">RELATED PRODUCTS</h2>
+          <div className="stems-row grid grid-cols-2 md:grid-cols-4 gap-6">
             {relatedProducts.map((item) => {
               const isBackingTrack = item.category === 'Backing Track';
               return (
@@ -133,7 +183,7 @@ export default function ProductPage() {
                     height={200}
                     className="stems-image"
                   />
-                  <div className="stems-label-group">
+                  <div className="stems-label-group mt-2">
                     <p className="stems-title-text">{item.title}</p>
                     <p className="stems-subtitle">
                       {isBackingTrack
