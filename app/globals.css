@@ -1315,11 +1315,11 @@ button svg,
 }
 
 .shop-newsletter-wrapper .newsletter-section {
-  margin-top: 3rem;
-  padding-top: 2.5rem;
-  padding-bottom: 2.5rem;
-  background: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: 8rem; /* แค่ของ shop */
+  padding-top: 4rem;
+  padding-bottom: 6rem;
+  background: none; /* ถ้าอยากเอาพื้นหลังออก */
+  border-top: 1px solid rgba(255, 255, 255, 0.05); /* ตกแต่งแยกเฉพาะได้เลย */
 }
 
 .shop-newsletter-wrapper .newsletter-title {
