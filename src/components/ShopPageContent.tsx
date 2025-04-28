@@ -1,3 +1,5 @@
+/* ShopPageContext.tsx */
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -29,7 +31,7 @@ export default function ShopPageContent({ tabParam }: Props) {
   });
 
   return (
-    <main className="shop-page-main min-h-screen text-[#f8fcdc] font-[Cinzel] px-4 pt-50 pb-4">
+    <main className="shop-page-main min-h-screen text-[#f8fcdc] font-[Cinzel] px-4 pt-35 pb-4">
       <h1 className="text-center text-4xl font-bold text-[#dc9e63] mb-10 uppercase tracking-wider">
         Shop
       </h1>

@@ -8,7 +8,9 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import NewsletterForm from '../src/components/NewsletterForm';
 import CurrencySelector from '../src/components/CurrencySelector';
-import { CurrencyProvider } from '@/context/CurrencyContext'; // ✅ import CurrencyProvider
+import { CurrencyProvider } from '@/context/CurrencyContext';
+import { CartProvider } from '@/context/CartContext';
+import CartSuccessPopup from '@/components/CartSuccessPopup'; // ✅ import Popup เข้ามาด้วย!
 
 const Navbar = dynamic(() => import('../src/components/Navbar'), { ssr: false });
 
@@ -30,10 +32,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head>
         <link rel="icon" href="/favicon.ico" />
         <meta name="theme-color" content="#160000" />
-        <meta
-          name="description"
-          content="Official Website of Unda Alunda | New album out May 1 2025"
-        />
+        <meta name="description" content="Official Website of Unda Alunda | New album out May 1 2025" />
         <title>Unda Alunda | Official Website & Merch Store</title>
         <link
           rel="stylesheet"
@@ -47,70 +46,71 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           overscrollBehaviorY: 'contain',
         }}
       >
-        <CurrencyProvider> {/* ✅ ครอบทุกอย่าง */}
-          <Navbar />
+        <CurrencyProvider>
+          <CartProvider>
+            <Navbar />
 
-          <div
-            id="__layout"
-            className={`min-h-screen w-full relative transition-opacity duration-500 ${
-              menuOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'
-            }`}
-          >
-            {children}
+            <div
+              id="__layout"
+              className={`min-h-screen w-full relative transition-opacity duration-500 ${
+                menuOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'
+              }`}
+            >
+              {/* ✅ children ก่อน */}
+              {children}
 
-            {/* ✅ Newsletter & Footer Section */}
-            <div className="global-newsletter-wrapper mt-10">
-              <section className="newsletter-section">
-                <div className="footer-logo-social">
-                  <Image
-                    src="/footer-logo-v7.png"
-                    alt="Unda Alunda Cat Logo"
-                    width={120}
-                    height={120}
-                    className="glow-logo mx-auto mb-6"
-                  />
+              {/* ✅ Popup สำเร็จ */}
+              <CartSuccessPopup />
 
-                  <div className="social-icons mb-6">
-                    <a href="https://www.facebook.com/UndaAlunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-facebook" /></a>
-                    <a href="https://www.youtube.com/@undaalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-youtube" /></a>
-                    <a href="https://www.instagram.com/undalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-instagram" /></a>
-                    <a href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0?si=JsdyQRqGRCGYfxU_nB_qvQ" target="_blank" rel="noopener noreferrer"><i className="fab fa-spotify" /></a>
-                    <a href="https://twitter.com/undaalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-x-twitter" /></a>
-                    <a href="https://www.threads.net/@undalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-threads" /></a>
+              {/* ✅ Footer & Newsletter Section */}
+              <div className="global-newsletter-wrapper mt-10">
+                <section className="newsletter-section">
+                  <div className="footer-logo-social">
+                    <Image
+                      src="/footer-logo-v7.png"
+                      alt="Unda Alunda Cat Logo"
+                      width={120}
+                      height={120}
+                      className="glow-logo mx-auto mb-6"
+                    />
+                    <div className="social-icons mb-6">
+                      <a href="https://www.facebook.com/UndaAlunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-facebook" /></a>
+                      <a href="https://www.youtube.com/@undaalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-youtube" /></a>
+                      <a href="https://www.instagram.com/undalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-instagram" /></a>
+                      <a href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0?si=JsdyQRqGRCGYfxU_nB_qvQ" target="_blank" rel="noopener noreferrer"><i className="fab fa-spotify" /></a>
+                      <a href="https://twitter.com/undaalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-x-twitter" /></a>
+                      <a href="https://www.threads.net/@undalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-threads" /></a>
+                    </div>
+
+                    <div className="newsletter-divider"></div>
                   </div>
 
-                  <div className="newsletter-divider"></div>
-                </div>
-
-                {/* Newsletter Form */}
-                <div className="newsletter-form-wrapper mb-0">
-                  <NewsletterForm />
-                </div>
-
-                {/* Footer Bottom */}
-                <div className="footer-bottom mt-6">
-                  <div className="footer-links">
-                    <a href="/shipping">SHIPPING & RETURNS</a>
-                    <span className="divider">|</span>
-                    <a href="/terms">TERMS & CONDITIONS</a>
-                    <span className="divider">|</span>
-                    <a href="/privacy">PRIVACY POLICY</a>
+                  <div className="newsletter-form-wrapper mb-0">
+                    <NewsletterForm />
                   </div>
 
-                  {/* ✅ CurrencySelector + Payment Icons */}
-                  <div className="mt-6 mb-4">
-                    <CurrencySelector />
+                  <div className="footer-bottom mt-6">
+                    <div className="footer-links">
+                      <a href="/shipping">SHIPPING & RETURNS</a>
+                      <span className="divider">|</span>
+                      <a href="/terms">TERMS & CONDITIONS</a>
+                      <span className="divider">|</span>
+                      <a href="/privacy">PRIVACY POLICY</a>
+                    </div>
+
+                    <div className="mt-6 mb-4">
+                      <CurrencySelector />
+                    </div>
+
+                    <p className="copyright text-xs text-[#f8fcdc] mb-0 tracking-wide">
+                      Copyright © 2025 UNDA ALUNDA
+                    </p>
                   </div>
+                </section>
+              </div>
 
-                  {/* Copyright */}
-                  <p className="copyright text-xs text-[#f8fcdc] mb-0 tracking-wide">
-                    Copyright © 2025 UNDA ALUNDA
-                  </p>
-                </div>
-
-              </section>
             </div>
-          </div>
+          </CartProvider>
         </CurrencyProvider>
       </body>
     </html>

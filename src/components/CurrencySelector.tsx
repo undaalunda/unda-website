@@ -1,3 +1,5 @@
+/* CurrencySelector.tsx */
+
 'use client';
 
 import { useCurrency } from '@/context/CurrencyContext';

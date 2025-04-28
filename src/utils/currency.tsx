@@ -1,3 +1,5 @@
+/* currency.tsx */
+
 'use client';
 
 import type { Product } from '@/components/allItems';

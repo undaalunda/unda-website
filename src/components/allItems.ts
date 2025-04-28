@@ -1,3 +1,5 @@
+/* allItems.ts */
+
 export type Product = {
   id: string;
   title: string;
@@ -19,7 +21,38 @@ export const allItems: Product[] = [
   { id: 'signed-keychain', title: 'UNDA ALUNDA', category: 'Merch', subtitle: 'SIGNED KEYCHAIN', price: 9.95, tags: ['keychain', 'signed'], image: '/unda-alunda-sign-keychain.png', url: '/shop/signed-keychain' },
 
   // Music
-  { id: 'audio-digipak', title: 'DARK WONDERFUL WORLD', subtitle: 'DIGIPAK CD', category: 'Music', price: 24.95, tags: ['audio', 'cd', 'album'], image: '/audio-digipak-dww.png', url: '/shop/audio-digipak' },
+  {
+    id: 'audio-digipak',
+    title: 'DARK WONDERFUL WORLD',
+    subtitle: 'DIGIPAK CD',
+    category: 'Music',
+    price: 24.95,
+    tags: ['audio', 'cd', 'album'],
+    image: '/audio-digipak-dww.png',
+    url: '/shop/audio-digipak',
+    description: `
+  Amidst the whispers of darkness and the cries of hope, 
+  Dark Wonderful World is a love letter to every broken piece inside you. 
+  The music wraps around your hidden wounds and unleashes the demons you never dared to name.
+  
+  Here, sorrow isn't an end—it's a brutal beginning, in a world that's devastatingly beautiful.
+  
+  Tracklist:
+  - The Dark
+  - Anomic
+  - Consonance
+  - JYY
+  - Out of the Dark
+  - Can’t Feel My Face
+  - Red Down
+  - Atlantic
+  - Feign
+  - Dark Wonderful World
+  - Quietness
+  
+  Please Note: The product image displayed is a mock-up; actual item may vary.
+    `.trim()
+  },
   { id: 'live-cd', title: 'DARK WONDERFUL WORLD', subtitle: 'LIVE CD', category: 'Music', price: 14.95, tags: ['live', 'cd', 'album'], image: '/live-cd-dww.png', url: '/shop/live-cd' },
   { id: 'guitars-book', title: 'FULL GUITARS TRANSCRIPTION', subtitle: 'PRINTED BOOK', category: 'Music', price: 49.95, tags: ['book', 'transcription', 'guitar'], image: '/full-guitars-transcription.png', url: '/shop/guitars-book' },
   { id: 'bass-book', title: 'FULL BASS TRANSCRIPTION', subtitle: 'PRINTED BOOK', category: 'Music', price: 49.95, tags: ['book', 'transcription', 'bass'], image: '/full-bass-transcription.png', url: '/shop/bass-book' },

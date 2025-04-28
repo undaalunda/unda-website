@@ -1,3 +1,5 @@
+/* Globals.css */
+
 @import "tailwindcss";
 
 :root {
@@ -56,13 +58,14 @@ main,
 
 .hero-wrapper {
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh; /* ✅ เปลี่ยนตรงนี้! */
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
+  padding-top: 6rem;
   padding-bottom: 6vh;
   z-index: 0;
   margin-top: 0;
@@ -100,7 +103,7 @@ main,
 
 .hero-text-image {
   position: absolute;
-  top: 12vh;
+  top: 10vh; /* น้อยลงนิดหน่อย ถ้าไม่อยากให้มันสูงเกิน */
   left: 50%;
   transform: translateX(-50%);
   width: 80%;
@@ -108,13 +111,8 @@ main,
   z-index: 10;
   pointer-events: none;
   opacity: 0;
+  margin-top: 1rem;
   animation: fadeInHero 1.3s ease-out 0.2s forwards;
-}
-
-.hero-text-image img {
-  width: 100%;
-  height: auto;
-  object-fit: contain;
 }
 
 @keyframes fadeInHero {
@@ -987,7 +985,7 @@ button svg,
 }
 
 .stems-subtitle-tiny {
-  font-size: 0.77rem; /* เดิม 0.65 → เพิ่มนิดให้บาลานซ์กับด้านบน */
+  font-size: 0.7rem; /* เดิม 0.65 → เพิ่มนิดให้บาลานซ์กับด้านบน */
   font-weight: 100;
   color: #f8fcdc;
   margin-top: 0.15rem;
@@ -1581,6 +1579,43 @@ button svg,
   letter-spacing: 0.1em;
 }
 
+/* ------------------------ */
+/* เฉพาะ Product Detail Page */
+/* ------------------------ */
+
+.product-title-detail {
+  font-size: 26px;
+  font-weight: 700;
+  color: #dc9e63;
+  margin-bottom: 0.2rem;
+}
+
+.product-subtitle-detail {
+  font-size: 13px;
+  color: #f8fcdc;
+  margin-bottom: 1rem;
+}
+
+.product-price-detail {
+  font-size: 15px;
+  font-weight: 600;
+  color: #cc3f33;
+  margin-bottom: 1rem;
+}
+
+/* มือถือให้มันเล็กลงอีก */
+@media (max-width: 767px) {
+  .product-title-detail {
+    font-size: 24px;
+  }
+  .product-subtitle-detail {
+    font-size: 12px;
+  }
+  .product-price-detail {
+    font-size: 14px;
+  }
+}
+
 /* === ✨ FADE IN ANIMATION === */
 
 .fade-in-section {
@@ -1605,4 +1640,62 @@ button svg,
 .fade-trigger.fade-in {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* === Cart Success Popup === */
+
+.cart-success-popup {
+  position: fixed;
+  top: 100px;
+  right: 20px;
+  background-color: #dc9e63;
+  color: #0d0d0d;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  z-index: 9999;
+  opacity: 0;
+  animation: fadeInPopup 0.5s ease forwards;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes fadeInPopup {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cart-error-popup {
+  position: absolute;
+  top: -2.5rem; /* ลอยขึ้นไปเหนือลูกพี่ add button */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ffcccc;
+  color: #cc0000;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  font-weight: bold;
+  z-index: 50;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
+  animation: fadeInPopup 0.5s ease forwards;
+}
+
+@keyframes fadeInPopup {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 }

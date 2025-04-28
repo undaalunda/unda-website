@@ -1,3 +1,5 @@
+/* Navbar.tsx */
+
 'use client';
 
 import { useEffect, useState, useMemo, useRef } from 'react';
@@ -7,6 +9,7 @@ import { usePathname } from 'next/navigation';
 import { Menu, X, User, ShoppingCart, Search } from 'lucide-react';
 import { useCurrency } from '@/context/CurrencyContext';
 import { convertPrice, isBundlePrice } from '@/utils/currency';
+import { useCart } from '@/context/CartContext'; // 🛒 เอาข้อมูลตะกร้ามาใช้
 
 // Product list for search functionality
 export const allItems = [
@@ -64,6 +67,8 @@ export default function Navbar() {
   const [delayedQuery, setDelayedQuery] = useState('');
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const { currency } = useCurrency();
+  const { cartItems } = useCart();
+  const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const pathname = usePathname();
   const searchOverlayRef = useRef<HTMLDivElement>(null);
   const scrollYRef = useRef(0);
@@ -215,27 +220,34 @@ export default function Navbar() {
   
         {/* ✅ ซ่อน icons ตอน menuOpen === true */}
         {!menuOpen && (
-          <div className="flex items-center gap-6 pr-1 z-40">
-            <Link
-              href="/account"
-              className="hidden md:block cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
-            >
-              <User size={23} strokeWidth={1.2} />
-            </Link>
-            <Link
-              href="/cart"
-              className="cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
-            >
-              <ShoppingCart size={23} strokeWidth={1.2} />
-            </Link>
-            <button
-              onClick={() => setSearchOpen(true)}
-              className="hidden md:block cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
-            >
-              <Search size={23} strokeWidth={1.2} />
-            </button>
-          </div>
-        )}
+  <div className="flex items-center gap-6 pr-1 z-40">
+    <Link
+      href="/account"
+      className="hidden md:block cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
+    >
+      <User size={23} strokeWidth={1.2} />
+    </Link>
+
+    <Link
+  href="/cart"
+  className="relative cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
+>
+  <ShoppingCart size={23} strokeWidth={1.2} />
+  {totalQuantity > 0 && (
+    <span className="absolute -top-2 -right-2 bg-[#dc9e63] text-[#160000] rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
+      {totalQuantity}
+    </span>
+  )}
+</Link>
+
+    <button
+      onClick={() => setSearchOpen(true)}
+      className="hidden md:block cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
+    >
+      <Search size={23} strokeWidth={1.2} />
+    </button>
+  </div>
+)}
   
         {/* Logo กลาง */}
         <div
