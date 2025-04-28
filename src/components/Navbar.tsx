@@ -229,11 +229,11 @@ export default function Navbar() {
               <ShoppingCart size={23} strokeWidth={1.2} />
             </Link>
             <button
-  onClick={() => setSearchOpen(true)}
-  className="cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
->
-  <Search size={23} strokeWidth={1.2} />
-</button>
+              onClick={() => setSearchOpen(true)}
+              className="hidden md:block cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
+            >
+              <Search size={23} strokeWidth={1.2} />
+            </button>
           </div>
         )}
   
