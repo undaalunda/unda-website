@@ -101,17 +101,8 @@ export default function ProductPage() {
             )}
           </div>
 
-          {/* Stock */}
-          {stockStatus && (
-            <div className="mt-2 text-sm font-semibold">
-              {stockStatus === 'in-stock' && <span className="text-green-300/70 italic">IN STOCK</span>}
-              {stockStatus === 'out-of-stock' && <span className="text-red-400/70 italic">OUT OF STOCK</span>}
-              {stockStatus === 'pre-order' && <span className="text-yellow-300/70 italic">PRE-ORDER</span>}
-            </div>
-          )}
-
           {/* Quantity */}
-          <div className="product-quantity-wrapper mt-8">
+          <div className="product-quantity-wrapper mt-2">
             <label className="text-sm font-medium">Quantity:</label>
             <input
               type="number"
@@ -122,9 +113,18 @@ export default function ProductPage() {
             />
           </div>
 
+          {/* Stock */}
+          {stockStatus && (
+            <div className="mt-0 text-sm font-semibold">
+              {stockStatus === 'in-stock' && <span className="text-green-300/70 italic">IN STOCK</span>}
+              {stockStatus === 'out-of-stock' && <span className="text-red-400/70 italic">OUT OF STOCK</span>}
+              {stockStatus === 'pre-order' && <span className="text-yellow-300/70 italic">PRE-ORDER</span>}
+            </div>
+          )}
+
           {/* Description */}
           {product.description && (
-            <div className="product-description mt-8 text-[#f8fcdc]/80 leading-relaxed text-sm whitespace-pre-line">
+            <div className="product-description mt-6 text-[#f8fcdc]/80 leading-relaxed text-sm whitespace-pre-line">
               {product.description.split('\n').map((line, idx) => {
                 const trimmedLine = line.trim();
                 if (trimmedLine === '') {

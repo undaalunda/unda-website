@@ -234,7 +234,7 @@ export default function Navbar() {
 >
   <ShoppingCart size={23} strokeWidth={1.2} />
   {totalQuantity > 0 && (
-    <span className="absolute -top-2 -right-2 bg-[#dc9e63] text-[#160000] rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
+    <span className="absolute -top-2 -right-2 bg-[#dc9e63] text-[#160000] rounded-full w-5 h-5 flex items-center justify-center text-xs font-light">
       {totalQuantity}
     </span>
   )}
