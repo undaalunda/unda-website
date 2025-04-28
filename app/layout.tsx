@@ -103,7 +103,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   </div>
 
                   {/* Copyright */}
-                  <p className="copyright text-xs text-[#f8fcdc] mb-4 tracking-wide">
+                  <p className="copyright text-xs text-[#f8fcdc] mb-0 tracking-wide">
                     Copyright © 2025 UNDA ALUNDA
                   </p>
                 </div>

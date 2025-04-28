@@ -161,9 +161,9 @@ export default function HomePage() {
                   <span className="backing-line always-on"></span>
                   <p className="stems-subtitle-tiny tracking-wide uppercase text-center backing-text">BACKING TRACK</p>
                   <p className="stems-price">
-                    {typeof item.price === 'object'
-                      ? convertPrice(parseFloat(item.price.sale.replace('$', '')), currency)
-                      : convertPrice(parseFloat(item.price.replace('$', '')), currency)}
+                  {typeof item.price === 'object'
+  ? convertPrice(item.price.sale, currency)
+  : convertPrice(item.price, currency)}
                   </p>
                 </div>
               </Link>
@@ -188,19 +188,19 @@ export default function HomePage() {
                   <p className="stems-title-text">{item.title}</p>
                   <p className="stems-subtitle-tiny">{item.subtitle.replace(' BACKING TRACK', '').replace(' STEM', '').replace(' TAB', '')}</p>
                   <p className="stems-price">
-                    {typeof item.price === 'object' && item.price !== null
-                      ? <>
-                          <span className="line-through mr-1 text-[#f8fcdc]">
-                            {convertPrice(parseFloat(item.price.original.replace('$', '')), currency)}
-                          </span>
-                          <span className="text-[#cc3f33]">
-                            {convertPrice(parseFloat(item.price.sale.replace('$', '')), currency)}
-                          </span>
-                        </>
-                      : typeof item.price === 'string'
-                        ? convertPrice(parseFloat(item.price.replace('$', '')), currency)
-                        : null
-                    }
+                  {typeof item.price === 'object' && item.price !== null
+  ? <>
+      <span className="line-through mr-1 text-[#f8fcdc]">
+        {convertPrice(item.price.original, currency)}
+      </span>
+      <span className="text-[#cc3f33]">
+        {convertPrice(item.price.sale, currency)}
+      </span>
+    </>
+  : typeof item.price === 'number'
+    ? convertPrice(item.price, currency)
+    : null
+}
                   </p>
                 </div>
               </Link>

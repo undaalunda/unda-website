@@ -81,21 +81,21 @@ export default function ShopPageContent({ tabParam }: Props) {
                   {isBackingTrack && <p className="stems-subtitle-tiny">BACKING TRACK</p>}
 
                   <p className="stems-price">
-                    {isBundlePrice(item.price) ? (
-                      <>
-                        <span className="line-through text-[#f8fcdc] mr-1">
-                          {convertPrice(parseFloat(item.price.original.replace('$', '')), currency)}
-                        </span>
-                        <span className="text-[#cc3f33]">
-                          {convertPrice(parseFloat(item.price.sale.replace('$', '')), currency)}
-                        </span>
-                      </>
-                    ) : (
-                      <span>
-                        {convertPrice(parseFloat(item.price.replace('$', '')), currency)}
-                      </span>
-                    )}
-                  </p>
+  {isBundlePrice(item.price) ? (
+    <>
+      <span className="line-through text-[#f8fcdc] mr-1">
+        {convertPrice(item.price.original, currency)}
+      </span>
+      <span className="text-[#cc3f33]">
+        {convertPrice(item.price.sale, currency)}
+      </span>
+    </>
+  ) : (
+    <span>
+      {convertPrice(item.price, currency)}
+    </span>
+  )}
+</p>
 
                 </div>
               </Link>

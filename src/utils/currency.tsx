@@ -109,6 +109,6 @@ export function convertPrice(basePrice: number, currency: string): string {
   }).format(converted);
 }
 
-export function isBundlePrice(price: Product['price']): price is { original: string; sale: string } {
+export function isBundlePrice(price: Product['price']): price is { original: number; sale: number } {
   return typeof price === 'object' && price !== null && 'original' in price && 'sale' in price;
 }

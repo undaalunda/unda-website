@@ -9,9 +9,7 @@ import { useState, useEffect } from 'react';
 import { useCurrency } from '@/context/CurrencyContext';
 import { convertPrice } from '@/utils/currency';
 
-function isBundle(
-  price: string | { original: string; sale: string }
-): price is { original: string; sale: string } {
+function isBundle(price: number | { original: number; sale: number }): price is { original: number; sale: number } {
   return typeof price === 'object' && price !== null && 'original' in price && 'sale' in price;
 }
 
@@ -102,21 +100,21 @@ export default function ProductPage() {
 
           {/* Product Price */}
           <div className="product-price mt-4">
-            {isBundle(product.price) ? (
-              <>
-                <span className="line-through text-[#f8fcdc]/40 mr-2">
-                  {convertPrice(parseFloat(product.price.original.replace('$', '')), currency)}
-                </span>
-                <span>
-                  {convertPrice(parseFloat(product.price.sale.replace('$', '')), currency)}
-                </span>
-              </>
-            ) : (
-              <span>
-                {convertPrice(parseFloat(product.price.replace('$', '')), currency)}
-              </span>
-            )}
-          </div>
+  {isBundle(product.price) ? (
+    <>
+      <span className="line-through text-[#f8fcdc]/40 mr-2">
+        {convertPrice(product.price.original, currency)}
+      </span>
+      <span>
+        {convertPrice(product.price.sale, currency)}
+      </span>
+    </>
+  ) : (
+    <span>
+      {convertPrice(product.price, currency)}
+    </span>
+  )}
+</div>
 
           {/* Stock Status */}
           {stockStatus && (
@@ -203,21 +201,21 @@ export default function ProductPage() {
 
                   {/* ราคาสินค้า */}
                   <p className="stems-price">
-                    {isBundle(item.price) ? (
-                      <>
-                        <span className="line-through text-[#f8fcdc] mr-1">
-                          {convertPrice(parseFloat(item.price.original.replace('$', '')), currency)}
-                        </span>
-                        <span>
-                          {convertPrice(parseFloat(item.price.sale.replace('$', '')), currency)}
-                        </span>
-                      </>
-                    ) : (
-                      <span>
-                        {convertPrice(parseFloat(item.price.replace('$', '')), currency)}
-                      </span>
-                    )}
-                  </p>
+  {isBundle(item.price) ? (
+    <>
+      <span className="line-through text-[#f8fcdc] mr-1">
+        {convertPrice(item.price.original, currency)}
+      </span>
+      <span>
+        {convertPrice(item.price.sale, currency)}
+      </span>
+    </>
+  ) : (
+    <span>
+      {convertPrice(item.price, currency)}
+    </span>
+  )}
+</p>
                 </div>
               </Link>
             ))}

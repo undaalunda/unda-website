@@ -5,42 +5,44 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X, User, ShoppingCart, Search } from 'lucide-react';
+import { useCurrency } from '@/context/CurrencyContext';
+import { convertPrice, isBundlePrice } from '@/utils/currency';
 
 // Product list for search functionality
 export const allItems = [
-    // Merch
-    { id: 'cat-scores-black', title: 'CAT SCORES T-SHIRT', category: 'Merch', subtitle: 'BLACK', price: '29.95', tags: ['t-shirt', 'black', 'shirt'], image: '/black-cats-scores-tee.png', url: '/shop/cat-scores-black' },
-    { id: 'cat-scores-white', title: 'CAT SCORES T-SHIRT', category: 'Merch', subtitle: 'WHITE', price: '29.95', tags: ['t-shirt', 'white', 'shirt'], image: '/white-cats-scores-tee.png', url: '/shop/cat-scores-white' },
-    { id: 'cat-to-the-moon', title: 'A CAT TO THE MOON', category: 'Merch', subtitle: 'STICKERS', price: '5.00', tags: ['sticker', 'cat'], image: '/a-cat-to-the-moon-stickers.png', url: '/shop/cat-to-the-moon' },
-    { id: 'musician-cats', title: 'A MUSICIAN CATS', category: 'Merch', subtitle: 'STICKERS', price: '5.00', tags: ['sticker', 'cat'], image: '/a-musician-cats.png', url: '/shop/musician-cats' },
-    { id: 'signed-keychain', title: 'UNDA ALUNDA', category: 'Merch', subtitle: 'SIGNED KEYCHAIN', price: '9.95', tags: ['keychain', 'signed'], image: '/unda-alunda-sign-keychain.png', url: '/shop/signed-keychain' },
-  
-    // Music
-    { id: 'audio-digipak', title: 'DARK WONDERFUL WORLD', subtitle: 'DIGIPAK CD', category: 'Music', price: '24.95', tags: ['audio', 'cd', 'album'], image: '/audio-digipak-dww.png', url: '/shop/audio-digipak' },
-    { id: 'live-cd', title: 'DARK WONDERFUL WORLD', subtitle: 'LIVE CD', category: 'Music', price: '14.95', tags: ['live', 'cd', 'album'], image: '/live-cd-dww.png', url: '/shop/live-cd' },
-    { id: 'guitars-book', title: 'FULL GUITARS TRANSCRIPTION', subtitle: 'PRINTED BOOK', category: 'Music', price: '49.95', tags: ['book', 'transcription', 'guitar'], image: '/full-guitars-transcription.png', url: '/shop/guitars-book' },
-    { id: 'bass-book', title: 'FULL BASS TRANSCRIPTION', subtitle: 'PRINTED BOOK', category: 'Music', price: '49.95', tags: ['book', 'transcription', 'bass'], image: '/full-bass-transcription.png', url: '/shop/bass-book' },
-    { id: 'keys-book', title: 'FULL KEYS TRANSCRIPTION', subtitle: 'PRINTED BOOK', category: 'Music', price: '49.95', tags: ['book', 'transcription', 'keys'], image: '/full-keys-transcription.png', url: '/shop/keys-book' },
-    { id: 'drums-book', title: 'FULL DRUMS TRANSCRIPTION', subtitle: 'PRINTED BOOK', category: 'Music', price: '49.95', tags: ['book', 'transcription', 'drums'], image: '/full-drums-transcription.png', url: '/shop/drums-book' },
-  
-    // Bundles
-    { id: 'album-merch-bundle', title: 'DARK WONDERFUL WORLD', subtitle: 'ALBUM MERCH BUNDLE', category: 'Bundles', price: { original: '64.90', sale: '51.92' }, tags: ['bundle', 'album', 'merch'], image: '/dark-wonderful-world-album-merch-bundle.png', url: '/shop/album-merch-bundle' },
-    { id: 'book-merch-bundle', title: 'DARK WONDERFUL WORLD', subtitle: 'BOOK & MERCH BUNDLE', category: 'Bundles', price: { original: '84.90', sale: '67.92' }, tags: ['bundle', 'book', 'merch'], image: '/dark-wonderful-world-book-&-merch-bundle.png', url: '/shop/book-merch-bundle' },
-    { id: 'book-bonus-bundle', title: 'DARK WONDERFUL WORLD', subtitle: 'BOOK & BONUS MERCH BUNDLE', category: 'Bundles', price: { original: '94.90', sale: '75.92' }, tags: ['bundle', 'book', 'bonus'], image: '/dark-wonderful-world-book-&-bonus-merch-bundle.png', url: '/shop/book-bonus-bundle' },
-    { id: 'dual-album-bundle', title: 'DARK WONDERFUL WORLD', subtitle: 'DUAL ALBUM MERCH BUNDLE', category: 'Bundles', price: { original: '109.85', sale: '87.88' }, tags: ['bundle', 'album', 'dual'], image: '/dark-wonderful-world-dual-album-merch-bundle.png', url: '/shop/dual-album-bundle' },
-    { id: 'book-bundle', title: 'DARK WONDERFUL WORLD', subtitle: 'BOOK BUNDLE', category: 'Bundles', price: '45.00', tags: ['bundle', 'book'], image: '/dark-wonderful-world-book-bundle.png', url: '/shop/book-bundle' },
-    { id: 'apparel-book-bundle', title: 'DARK WONDERFUL WORLD', subtitle: 'APPAREL & BOOK BUNDLE', category: 'Bundles', price: '59.95', tags: ['bundle', 'apparel', 'book'], image: '/dark-wonderful-world-apparel-&-book-bundle.png', url: '/shop/apparel-book-bundle' },
-    { id: 'sticker-book-bundle', title: 'DARK WONDERFUL WORLD', subtitle: 'STICKER & BOOK BUNDLE', category: 'Bundles', price: '39.95', tags: ['bundle', 'sticker', 'book'], image: '/dark-wonderful-world-sticker-&-book-bundle.png', url: '/shop/sticker-book-bundle' },
-  
-    // Backing Tracks
-    { id: 'anomic-drums', title: 'ANOMIC', subtitle: 'DRUMS BACKING TRACK', category: 'Backing Track', price: '8.00', tags: ['drums', 'track'], image: '/anomic-no-drums.jpg', url: '/shop/anomic-drums' },
-    { id: 'jyy-guitars', title: 'JYY', subtitle: 'LEAD GUITAR BACKING TRACK', category: 'Backing Track', price: '8.00', tags: ['guitars', 'track'], image: '/jyy-no-guitars.jpg', url: '/shop/jyy-guitars' },
-    { id: 'atlantic-guitar', title: 'ATLANTIC', subtitle: 'GUITARS BACKING TRACK', category: 'Backing Track', price: '9.00', tags: ['lead guitar', 'track'], image: '/atlantic-no-lead-guitar.jpg', url: '/shop/atlantic-guitar' },
-    { id: 'out-dark-drums', title: 'OUT OF THE DARK', subtitle: 'DRUMS BACKING TRACK', category: 'Backing Track', price: '12.00', tags: ['drums', 'track'], image: '/out-of-the-dark-no-drums.jpg', url: '/shop/out-dark-drums' },
-    { id: 'feign-guitars', title: 'FEIGN', subtitle: 'GUITARS BACKING TRACK', category: 'Backing Track', price: '12.00', tags: ['guitars', 'track'], image: '/feign-no-guitars.jpg', url: '/shop/feign-guitars' },
-    { id: 'dark-keys', title: 'THE DARK', subtitle: 'KEYS BACKING TRACK', category: 'Backing Track', price: '5.00', tags: ['keys', 'track'], image: '/the-dark-no-keys.jpg', url: '/shop/dark-keys' },
-    { id: 'reddown-bass', title: 'RED DOWN', subtitle: 'BASS BACKING TRACK', category: 'Backing Track', price: '8.00', tags: ['bass', 'track'], image: '/reddown-no-bass.jpg', url: '/shop/reddown-bass' },
-    { id: 'quietness-bass', title: 'QUIETNESS', subtitle: 'BASS BACKING TRACK', category: 'Backing Track', price: '8.00', tags: ['bass', 'track'], image: '/quietness-no-bass.jpg', url: '/shop/quietness-bass' }
+  // Merch
+  { id: 'cat-scores-black', title: 'CAT SCORES T-SHIRT', category: 'Merch', subtitle: 'BLACK', price: 29.95, tags: ['t-shirt', 'black', 'shirt'], image: '/black-cats-scores-tee.png', url: '/shop/cat-scores-black' },
+  { id: 'cat-scores-white', title: 'CAT SCORES T-SHIRT', category: 'Merch', subtitle: 'WHITE', price: 29.95, tags: ['t-shirt', 'white', 'shirt'], image: '/white-cats-scores-tee.png', url: '/shop/cat-scores-white' },
+  { id: 'cat-to-the-moon', title: 'A CAT TO THE MOON', category: 'Merch', subtitle: 'STICKERS', price: 4.95, tags: ['sticker', 'cat'], image: '/a-cat-to-the-moon-stickers.png', url: '/shop/cat-to-the-moon' },
+  { id: 'musician-cats', title: 'A MUSICIAN CATS', category: 'Merch', subtitle: 'STICKERS', price: 4.95, tags: ['sticker', 'cat'], image: '/a-musician-cats.png', url: '/shop/musician-cats' },
+  { id: 'signed-keychain', title: 'UNDA ALUNDA', category: 'Merch', subtitle: 'SIGNED KEYCHAIN', price: 9.95, tags: ['keychain', 'signed'], image: '/unda-alunda-sign-keychain.png', url: '/shop/signed-keychain' },
+
+  // Music
+  { id: 'audio-digipak', title: 'DARK WONDERFUL WORLD', subtitle: 'DIGIPAK CD', category: 'Music', price: 24.95, tags: ['audio', 'cd', 'album'], image: '/audio-digipak-dww.png', url: '/shop/audio-digipak' },
+  { id: 'live-cd', title: 'DARK WONDERFUL WORLD', subtitle: 'LIVE CD', category: 'Music', price: 14.95, tags: ['live', 'cd', 'album'], image: '/live-cd-dww.png', url: '/shop/live-cd' },
+  { id: 'guitars-book', title: 'FULL GUITARS TRANSCRIPTION', subtitle: 'PRINTED BOOK', category: 'Music', price: 49.95, tags: ['book', 'transcription', 'guitar'], image: '/full-guitars-transcription.png', url: '/shop/guitars-book' },
+  { id: 'bass-book', title: 'FULL BASS TRANSCRIPTION', subtitle: 'PRINTED BOOK', category: 'Music', price: 49.95, tags: ['book', 'transcription', 'bass'], image: '/full-bass-transcription.png', url: '/shop/bass-book' },
+  { id: 'keys-book', title: 'FULL KEYS TRANSCRIPTION', subtitle: 'PRINTED BOOK', category: 'Music', price: 49.95, tags: ['book', 'transcription', 'keys'], image: '/full-keys-transcription.png', url: '/shop/keys-book' },
+  { id: 'drums-book', title: 'FULL DRUMS TRANSCRIPTION', subtitle: 'PRINTED BOOK', category: 'Music', price: 49.95, tags: ['book', 'transcription', 'drums'], image: '/full-drums-transcription.png', url: '/shop/drums-book' },
+
+  // Bundles
+  { id: 'album-merch-bundle', title: 'DARK WONDERFUL WORLD', subtitle: 'ALBUM MERCH BUNDLE', category: 'Bundles', price: { original: 64.85, sale: 51.88 }, tags: ['bundle', 'album', 'merch'], image: '/dark-wonderful-world-album-merch-bundle.png', url: '/shop/album-merch-bundle' },
+  { id: 'book-merch-bundle', title: 'DARK WONDERFUL WORLD', subtitle: 'BOOK & MERCH BUNDLE', category: 'Bundles', price: { original: 84.85, sale: 67.88 }, tags: ['bundle', 'book', 'merch'], image: '/dark-wonderful-world-book-&-merch-bundle.png', url: '/shop/book-merch-bundle' },
+  { id: 'book-bonus-bundle', title: 'DARK WONDERFUL WORLD', subtitle: 'BOOK & BONUS MERCH BUNDLE', category: 'Bundles', price: { original: 94.75, sale: 75.80 }, tags: ['bundle', 'book', 'bonus'], image: '/dark-wonderful-world-book-&-bonus-merch-bundle.png', url: '/shop/book-bonus-bundle' },
+  { id: 'dual-album-bundle', title: 'DARK WONDERFUL WORLD', subtitle: 'DUAL ALBUM MERCH BUNDLE', category: 'Bundles', price: { original: 109.75, sale: 87.80 }, tags: ['bundle', 'album', 'dual'], image: '/dark-wonderful-world-dual-album-merch-bundle.png', url: '/shop/dual-album-bundle' },
+  { id: 'book-bundle', title: 'DARK WONDERFUL WORLD', subtitle: 'BOOK BUNDLE', category: 'Bundles', price: { original: 74.90, sale: 59.92 }, tags: ['bundle', 'book'], image: '/dark-wonderful-world-book-bundle.png', url: '/shop/book-bundle' },
+  { id: 'apparel-book-bundle', title: 'DARK WONDERFUL WORLD', subtitle: 'APPAREL & BOOK BUNDLE', category: 'Bundles', price: { original: 104.85, sale: 83.88 }, tags: ['bundle', 'apparel', 'book'], image: '/dark-wonderful-world-apparel-&-book-bundle.png', url: '/shop/apparel-book-bundle' },
+  { id: 'sticker-book-bundle', title: 'DARK WONDERFUL WORLD', subtitle: 'STICKER & BOOK BUNDLE', category: 'Bundles', price: { original: 84.80, sale: 67.84 }, tags: ['bundle', 'sticker', 'book'], image: '/dark-wonderful-world-sticker-&-book-bundle.png', url: '/shop/sticker-book-bundle' },
+
+  // Backing Tracks
+  { id: 'anomic-drums', title: 'ANOMIC', subtitle: 'DRUMS BACKING TRACK', category: 'Backing Track', price: 7.95, tags: ['drums', 'track'], image: '/anomic-no-drums.jpg', url: '/shop/anomic-drums' },
+  { id: 'jyy-guitars', title: 'JYY', subtitle: 'LEAD GUITAR BACKING TRACK', category: 'Backing Track', price: 7.95, tags: ['guitars', 'track'], image: '/jyy-no-guitars.jpg', url: '/shop/jyy-guitars' },
+  { id: 'atlantic-guitar', title: 'ATLANTIC', subtitle: 'GUITARS BACKING TRACK', category: 'Backing Track', price: 8.95, tags: ['lead guitar', 'track'], image: '/atlantic-no-lead-guitar.jpg', url: '/shop/atlantic-guitar' },
+  { id: 'out-dark-drums', title: 'OUT OF THE DARK', subtitle: 'DRUMS BACKING TRACK', category: 'Backing Track', price: 11.95, tags: ['drums', 'track'], image: '/out-of-the-dark-no-drums.jpg', url: '/shop/out-dark-drums' },
+  { id: 'feign-guitars', title: 'FEIGN', subtitle: 'GUITARS BACKING TRACK', category: 'Backing Track', price: 11.95, tags: ['guitars', 'track'], image: '/feign-no-guitars.jpg', url: '/shop/feign-guitars' },
+  { id: 'dark-keys', title: 'THE DARK', subtitle: 'KEYS BACKING TRACK', category: 'Backing Track', price: 4.95, tags: ['keys', 'track'], image: '/the-dark-no-keys.jpg', url: '/shop/dark-keys' },
+  { id: 'reddown-bass', title: 'RED DOWN', subtitle: 'BASS BACKING TRACK', category: 'Backing Track', price: 7.95, tags: ['bass', 'track'], image: '/reddown-no-bass.jpg', url: '/shop/reddown-bass' },
+  { id: 'quietness-bass', title: 'QUIETNESS', subtitle: 'BASS BACKING TRACK', category: 'Backing Track', price: 7.95, tags: ['bass', 'track'], image: '/quietness-no-bass.jpg', url: '/shop/quietness-bass' },
   ];
 
 const pageLinks = [
@@ -61,6 +63,7 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState('');
   const [delayedQuery, setDelayedQuery] = useState('');
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const { currency } = useCurrency();
   const pathname = usePathname();
   const searchOverlayRef = useRef<HTMLDivElement>(null);
   const scrollYRef = useRef(0);
@@ -226,11 +229,11 @@ export default function Navbar() {
               <ShoppingCart size={23} strokeWidth={1.2} />
             </Link>
             <button
-              onClick={() => setSearchOpen(true)}
-              className="hidden md:block cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
-            >
-              <Search size={23} strokeWidth={1.2} />
-            </button>
+  onClick={() => setSearchOpen(true)}
+  className="cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
+>
+  <Search size={23} strokeWidth={1.2} />
+</button>
           </div>
         )}
   
@@ -433,17 +436,21 @@ export default function Navbar() {
                       <span className="text-sm font-medium text-[#f8fcdc]">{item.title}</span>
                       <span className="text-xs text-[#f8fcdc]/70">{item.subtitle}</span>
                       {item.price && (
-                        <span className="text-xs text-[#dc9e63] mt-1">
-                          {typeof item.price === 'string'
-                            ? item.price
-                            : `${item.price.sale} `}
-                          {typeof item.price === 'object' && (
-                            <span className="line-through text-[#f8fcdc]/40 ml-2">
-                              {item.price.original}
-                            </span>
-                          )}
-                        </span>
-                      )}
+  typeof item.price === 'object' ? (
+    <div className="flex items-center gap-2 text-xs mt-1">
+      <span className="line-through text-[#f8fcdc]/40">
+        {convertPrice(item.price.original, currency)}
+      </span>
+      <span className="text-[#dc9e63]">
+        {convertPrice(item.price.sale, currency)}
+      </span>
+    </div>
+  ) : (
+    <div className="text-xs text-[#dc9e63] mt-1">
+      {convertPrice(item.price, currency)}
+    </div>
+  )
+)}
                     </div>
                   </Link>
                 ))
