@@ -1292,6 +1292,7 @@ button svg,
   cursor: pointer;
   transition: opacity 0.3s ease;
   margin-top: 1.5rem;
+  margin-bottom: 0rem;
   font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; 
 }
 
@@ -1313,7 +1314,7 @@ button svg,
   text-align: center;
   font-family: 'Cinzel', serif;
   color: #dc9e63;
-  padding-bottom: 2.5rem;
+  padding-bottom: 4rem;
 }
 
 /* 👉 ปรับขนาด + เว้นระยะของลิงก์ด้านบน */
@@ -1362,6 +1363,7 @@ button svg,
 .footer-bottom .copyright {
   font-size: 0.72rem;
   color: #f8fcdc;
+  margin-top: -1rem;
 }
 
 /* Tour/Page */

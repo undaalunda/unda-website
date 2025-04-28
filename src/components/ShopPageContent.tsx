@@ -1,14 +1,17 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { allItems } from '../components/allItems';
+import { allItems } from './allItems';
+import { useCurrency } from '@/context/CurrencyContext';
+import { convertPrice, isBundlePrice } from '@/utils/currency'; // ✅ ใช้ convertPrice และ isBundlePrice
 
 interface Props {
   tabParam: 'MERCH' | 'MUSIC' | 'BUNDLES' | 'DIGITAL' | null;
 }
 
 export default function ShopPageContent({ tabParam }: Props) {
+  const { currency } = useCurrency();
   const [activeTab, setActiveTab] = useState<'MERCH' | 'MUSIC' | 'BUNDLES' | 'DIGITAL'>('MERCH');
 
   useEffect(() => {
@@ -34,12 +37,12 @@ export default function ShopPageContent({ tabParam }: Props) {
       <div className="shop-tab-group mb-10">
         {['MERCH', 'MUSIC', 'BUNDLES', 'DIGITAL'].map((tab) => (
           <button
-          key={tab}
-          onClick={() => setActiveTab(tab as any)}
-          className={`info-button shop-tab-button ${activeTab === tab ? 'active-tab' : ''}`}
-        >
-          {tab}
-        </button>
+            key={tab}
+            onClick={() => setActiveTab(tab as any)}
+            className={`info-button shop-tab-button ${activeTab === tab ? 'active-tab' : ''}`}
+          >
+            {tab}
+          </button>
         ))}
       </div>
 
@@ -68,32 +71,32 @@ export default function ShopPageContent({ tabParam }: Props) {
                 <div className="stems-label-group">
                   <p className="stems-title-text">{item.title}</p>
 
-                  {/* subtitle */}
                   <p className="stems-subtitle">
                     {isBackingTrack
                       ? item.subtitle.replace(/BACKING TRACK/gi, '').trim()
                       : item.subtitle}
                   </p>
 
-                  {/* เส้นเฉพาะ Backing Track */}
                   {isBackingTrack && <span className="backing-line" />}
+                  {isBackingTrack && <p className="stems-subtitle-tiny">BACKING TRACK</p>}
 
-                  {/* BACKING TRACK label */}
-                  {isBackingTrack && (
-                    <p className="stems-subtitle-tiny">BACKING TRACK</p>
-                  )}
-
-                  {/* ราคาสินค้า */}
                   <p className="stems-price">
-                    {typeof item.price === 'object' ? (
+                    {isBundlePrice(item.price) ? (
                       <>
-                        <span className="line-through text-[#f8fcdc] mr-1">{item.price.original}</span>
-                        <span className="text-[#cc3f33]">{item.price.sale}</span>
+                        <span className="line-through text-[#f8fcdc] mr-1">
+                          {convertPrice(parseFloat(item.price.original.replace('$', '')), currency)}
+                        </span>
+                        <span className="text-[#cc3f33]">
+                          {convertPrice(parseFloat(item.price.sale.replace('$', '')), currency)}
+                        </span>
                       </>
                     ) : (
-                      item.price
+                      <span>
+                        {convertPrice(parseFloat(item.price.replace('$', '')), currency)}
+                      </span>
                     )}
                   </p>
+
                 </div>
               </Link>
             );

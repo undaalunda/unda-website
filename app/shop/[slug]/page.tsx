@@ -1,11 +1,13 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { allItems } from '@/components/allItems';
-import type { Product } from '@/components/allItems';
+import { allItems } from '../../../src/components/allItems';
+import type { Product } from '../../../src/components/allItems';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { useCurrency } from '@/context/CurrencyContext';
+import { convertPrice } from '@/utils/currency';
 
 function isBundle(
   price: string | { original: string; sale: string }
@@ -13,11 +15,9 @@ function isBundle(
   return typeof price === 'object' && price !== null && 'original' in price && 'sale' in price;
 }
 
-// สร้างฟังก์ชันดึง Stock Status
 function getStockStatus(product: Product): 'in-stock' | 'out-of-stock' | 'pre-order' | null {
   if (['Music', 'Merch', 'Bundles'].includes(product.category)) {
     if (product.id === 'signed-keychain') return 'out-of-stock';
-    // เพิ่ม logic pre-order ในอนาคตได้ตรงนี้
     return 'in-stock';
   }
   return null;
@@ -28,6 +28,7 @@ export default function ProductPage() {
   const slug = params.slug as string;
   const product = allItems.find((item) => item.id === slug) as Product | undefined;
 
+  const { currency } = useCurrency(); // ✅ ดึง currency มาใช้
   const [quantity, setQuantity] = useState<number>(1);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
 
@@ -99,42 +100,48 @@ export default function ProductPage() {
           <h1 className="text-3xl font-bold text-[#dc9e63]">{product.title}</h1>
           <p className="text-base mt-2">{product.subtitle}</p>
 
+          {/* Product Price */}
           <div className="product-price mt-4">
             {isBundle(product.price) ? (
               <>
-                <span className="line-through text-[#f8fcdc]/40 mr-2">{product.price.original}</span>
-                <span>{product.price.sale}</span>
+                <span className="line-through text-[#f8fcdc]/40 mr-2">
+                  {convertPrice(parseFloat(product.price.original.replace('$', '')), currency)}
+                </span>
+                <span>
+                  {convertPrice(parseFloat(product.price.sale.replace('$', '')), currency)}
+                </span>
               </>
             ) : (
-              <span>{product.price}</span>
+              <span>
+                {convertPrice(parseFloat(product.price.replace('$', '')), currency)}
+              </span>
             )}
           </div>
 
           {/* Stock Status */}
-{stockStatus && (
-  <div className="mt-2 text-sm font-semibold">
-    {stockStatus === 'in-stock' && <span className="text-green-300/70 italic">IN STOCK</span>}
-    {stockStatus === 'out-of-stock' && <span className="text-red-400/70 italic">OUT OF STOCK</span>}
-    {stockStatus === 'pre-order' && <span className="text-yellow-300/70 italic">PRE-ORDER</span>}
-  </div>
-)}
+          {stockStatus && (
+            <div className="mt-2 text-sm font-semibold">
+              {stockStatus === 'in-stock' && <span className="text-green-300/70 italic">IN STOCK</span>}
+              {stockStatus === 'out-of-stock' && <span className="text-red-400/70 italic">OUT OF STOCK</span>}
+              {stockStatus === 'pre-order' && <span className="text-yellow-300/70 italic">PRE-ORDER</span>}
+            </div>
+          )}
 
           {/* Description */}
-          {/* Description */}
           {product.description && (
-  <div className="product-description mt-6 text-[#f8fcdc]/80 leading-relaxed text-base whitespace-pre-line">
-    {product.description.split('\n').map((line, idx) => {
-      const trimmedLine = line.trim();
-      if (trimmedLine === '') {
-        return <div key={idx} className="h-4" />; // 👈 ช่องว่างถ้าเจอบรรทัดว่าง
-      } else if (trimmedLine.startsWith('Please Note:')) {
-        return <p key={idx} className="italic text-[#f8fcdc]/50 mt-4">{line}</p>;
-      } else {
-        return <p key={idx}>{line}</p>;
-      }
-    })}
-  </div>
-)}
+            <div className="product-description mt-6 text-[#f8fcdc]/80 leading-relaxed text-base whitespace-pre-line">
+              {product.description.split('\n').map((line: string, idx: number) => {
+                const trimmedLine = line.trim();
+                if (trimmedLine === '') {
+                  return <div key={idx} className="h-4" />;
+                } else if (trimmedLine.startsWith('Please Note:')) {
+                  return <p key={idx} className="italic text-[#f8fcdc]/50 mt-4">{line}</p>;
+                } else {
+                  return <p key={idx}>{line}</p>;
+                }
+              })}
+            </div>
+          )}
 
           {/* Quantity */}
           <div className="product-quantity-wrapper mt-8">
@@ -168,50 +175,52 @@ export default function ProductPage() {
         <div className="related-products-wrapper mt-20 w-full max-w-5xl">
           <h2 className="text-2xl font-bold text-[#dc9e63] mb-8">RELATED PRODUCTS</h2>
           <div className="stems-row grid grid-cols-2 md:grid-cols-4 gap-6">
-            {relatedProducts.map((item) => {
-              const isBackingTrack = item.category === 'Backing Track';
-              return (
-                <Link
-                  href={`/shop/${item.id}`}
-                  key={item.id}
-                  className={`stems-item ${isBackingTrack ? 'is-backing' : ''}`}
-                >
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    width={200}
-                    height={200}
-                    className="stems-image"
-                  />
-                  <div className="stems-label-group mt-2">
-                    <p className="stems-title-text">{item.title}</p>
-                    <p className="stems-subtitle">
-                      {isBackingTrack
-                        ? item.subtitle.replace(/BACKING TRACK/gi, '').trim()
-                        : item.subtitle}
-                    </p>
+            {relatedProducts.map((item) => (
+              <Link
+                href={`/shop/${item.id}`}
+                key={item.id}
+                className={`stems-item ${item.category === 'Backing Track' ? 'is-backing' : ''}`}
+              >
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  width={200}
+                  height={200}
+                  className="stems-image"
+                />
+                <div className="stems-label-group mt-2">
+                  <p className="stems-title-text">{item.title}</p>
+                  <p className="stems-subtitle">
+                    {item.subtitle.replace(/BACKING TRACK/gi, '').trim()}
+                  </p>
 
-                    {isBackingTrack && (
+                  {item.category === 'Backing Track' && (
+                    <>
+                      <span className="backing-line" />
+                      <p className="stems-subtitle-tiny">BACKING TRACK</p>
+                    </>
+                  )}
+
+                  {/* ราคาสินค้า */}
+                  <p className="stems-price">
+                    {isBundle(item.price) ? (
                       <>
-                        <span className="backing-line" />
-                        <p className="stems-subtitle-tiny">BACKING TRACK</p>
+                        <span className="line-through text-[#f8fcdc] mr-1">
+                          {convertPrice(parseFloat(item.price.original.replace('$', '')), currency)}
+                        </span>
+                        <span>
+                          {convertPrice(parseFloat(item.price.sale.replace('$', '')), currency)}
+                        </span>
                       </>
+                    ) : (
+                      <span>
+                        {convertPrice(parseFloat(item.price.replace('$', '')), currency)}
+                      </span>
                     )}
-
-                    <p className="stems-price">
-                      {isBundle(item.price) ? (
-                        <>
-                          <span className="line-through text-[#f8fcdc] mr-2">{item.price.original}</span>
-                          {item.price.sale}
-                        </>
-                      ) : (
-                        item.price
-                      )}
-                    </p>
-                  </div>
-                </Link>
-              );
-            })}
+                  </p>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       )}

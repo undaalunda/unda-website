@@ -6,8 +6,13 @@ const nextConfig: NextConfig = {
     "http://localhost:3000",
     "http://192.168.0.197:3000",
     "http://localhost:3001",
-    "http://192.168.0.197:3001"
+    "http://192.168.0.197:3001",
   ],
+  
+  // 🚀 เพิ่ม Scroll Restoration ตอน dev
+  experimental: {
+    scrollRestoration: true,
+  },
 };
 
 export default nextConfig;
