@@ -1,9 +1,7 @@
-/* currency.tsx */
-
 'use client';
 
 import type { Product } from '@/components/allItems';
-import React from 'react'; // ✅ จำเป็นเพราะมี JSX.Element ใน getConvertedPrice
+import React from 'react';
 
 const currencyRates: Record<string, number> = {
   USD: 1,
@@ -72,6 +70,73 @@ const currencyRates: Record<string, number> = {
   BYN: 3.2,
 };
 
+const currencyLocaleMap: Record<string, string> = {
+  USD: 'en-US',
+  THB: 'th-TH',
+  JPY: 'ja-JP',
+  EUR: 'de-DE',
+  GBP: 'en-GB',
+  AUD: 'en-AU',
+  CAD: 'en-CA',
+  CNY: 'zh-CN',
+  KRW: 'ko-KR',
+  SGD: 'en-SG',
+  NZD: 'en-NZ',
+  CHF: 'de-CH',
+  SEK: 'sv-SE',
+  NOK: 'no-NO',
+  DKK: 'da-DK',
+  PLN: 'pl-PL',
+  CZK: 'cs-CZ',
+  HUF: 'hu-HU',
+  BRL: 'pt-BR',
+  MXN: 'es-MX',
+  ARS: 'es-AR',
+  CLP: 'es-CL',
+  COP: 'es-CO',
+  PEN: 'es-PE',
+  ZAR: 'en-ZA',
+  INR: 'en-IN',
+  MYR: 'ms-MY',
+  PHP: 'en-PH',
+  VND: 'vi-VN',
+  IDR: 'id-ID',
+  SAR: 'ar-SA',
+  AED: 'ar-AE',
+  QAR: 'ar-QA',
+  KWD: 'ar-KW',
+  OMR: 'ar-OM',
+  BHD: 'ar-BH',
+  ILS: 'he-IL',
+  RUB: 'ru-RU',
+  UAH: 'uk-UA',
+  TRY: 'tr-TR',
+  PKR: 'en-PK',
+  BDT: 'en-BD',
+  LKR: 'en-LK',
+  NPR: 'en-NP',
+  KES: 'en-KE',
+  NGN: 'en-NG',
+  EGP: 'ar-EG',
+  MAD: 'ar-MA',
+  TND: 'ar-TN',
+  DZD: 'ar-DZ',
+  GHS: 'en-GH',
+  UGX: 'en-UG',
+  TZS: 'en-TZ',
+  RWF: 'en-RW',
+  ZMW: 'en-ZM',
+  ZWL: 'en-ZW',
+  MUR: 'en-MU',
+  ISK: 'is-IS',
+  KZT: 'kk-KZ',
+  UZS: 'uz-UZ',
+  GEL: 'ka-GE',
+  AMD: 'hy-AM',
+  AZN: 'az-AZ',
+  BYN: 'be-BY',
+};
+
 export async function getUserCurrency(): Promise<string> {
   try {
     const res = await fetch('https://ipapi.co/json/');
@@ -79,7 +144,7 @@ export async function getUserCurrency(): Promise<string> {
     const country = data.country_code;
 
     const countryToCurrency: { [key: string]: string } = {
-      US: 'USD', CA: 'CAD', AU: 'AUD', GB: 'GBP', EU: 'EUR', // EU = Europe
+      US: 'USD', CA: 'CAD', AU: 'AUD', GB: 'GBP', EU: 'EUR',
       JP: 'JPY', CN: 'CNY', KR: 'KRW', SG: 'SGD', TH: 'THB',
       DE: 'EUR', FR: 'EUR', IT: 'EUR', ES: 'EUR', NL: 'EUR', PT: 'EUR', IE: 'EUR', FI: 'EUR', AT: 'EUR', BE: 'EUR', LU: 'EUR', GR: 'EUR', CY: 'EUR', SK: 'EUR', SI: 'EUR', EE: 'EUR', LV: 'EUR', LT: 'EUR', MT: 'EUR',
       NZ: 'NZD', HK: 'HKD', CH: 'CHF', SE: 'SEK', NO: 'NOK', DK: 'DKK', PL: 'PLN', CZ: 'CZK', HU: 'HUF',
@@ -103,11 +168,14 @@ export async function getUserCurrency(): Promise<string> {
 export function convertPrice(basePrice: number, currency: string): string {
   const rate = currencyRates[currency] || 1;
   const converted = basePrice * rate;
+  const locale = currencyLocaleMap[currency] || 'en-US';
 
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
+    currencyDisplay: 'symbol',
     minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(converted);
 }
 

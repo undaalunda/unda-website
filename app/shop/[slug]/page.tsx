@@ -97,7 +97,7 @@ export default function ProductPage() {
                 <span>{convertPrice(product.price.sale, currency)}</span>
               </>
             ) : (
-              <span>{convertPrice(product.price, currency)}</span>
+              <span className="tracking-[0.15em]">{convertPrice(product.price, currency)}</span>
             )}
           </div>
 
@@ -105,22 +105,22 @@ export default function ProductPage() {
           <div className="product-quantity-wrapper mt-2">
             <label className="text-sm font-medium">Quantity:</label>
             <input
-              type="number"
-              min={1}
-              value={quantity}
-              onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-              className="product-quantity-input"
-            />
+  type="number"
+  min={1}
+  value={quantity}
+  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+  className="w-16 border border-[#f8fcdc] border-[0.5px] rounded-sm px-2 py-[6px] bg-transparent text-[#f8fcdc] text-sm font-light focus:outline-none focus:ring-1 focus:ring-[#dc9e63]"
+/>
           </div>
 
           {/* Stock */}
           {stockStatus && (
-            <div className="mt-0 text-sm font-semibold">
-              {stockStatus === 'in-stock' && <span className="text-green-300/70 italic">IN STOCK</span>}
-              {stockStatus === 'out-of-stock' && <span className="text-red-400/70 italic">OUT OF STOCK</span>}
-              {stockStatus === 'pre-order' && <span className="text-yellow-300/70 italic">PRE-ORDER</span>}
-            </div>
-          )}
+  <div className="mt-1 text-xs font-light tracking-wide">
+    {stockStatus === 'in-stock' && <span className="text-green-300/70 italic">IN STOCK</span>}
+    {stockStatus === 'out-of-stock' && <span className="text-red-400/70 italic">OUT OF STOCK</span>}
+    {stockStatus === 'pre-order' && <span className="text-yellow-300/70 italic">PRE-ORDER</span>}
+  </div>
+)}
 
           {/* Description */}
           {product.description && (
