@@ -6,12 +6,13 @@ import { convertPrice } from '@/utils/currency';
 import { useCurrency } from '@/context/CurrencyContext';
 import { Trash2 } from 'lucide-react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation'; // ✨ เพิ่มเข้ามา
+import { useRouter } from 'next/navigation';
+import { AnimatePresence, motion } from 'framer-motion';
 
 export default function CartPage() {
   const { cartItems, removeFromCart, updateQuantity, clearCart } = useCart();
   const { currency } = useCurrency();
-  const router = useRouter(); // ✨ เพิ่มตรงนี้ด้วย
+  const router = useRouter();
 
   const cartTotal = cartItems.reduce((acc, item) => {
     const price = typeof item.price === 'object' ? item.price.sale : item.price;
@@ -29,52 +30,82 @@ export default function CartPage() {
 
   return (
     <main className="min-h-screen flex flex-col justify-center items-center text-[#f8fcdc] font-[Cinzel] p-8">
-      <div className="w-full max-w-4xl pt-[120px]">
+      <div className="w-full max-w-4xl pt-[140px]">
         <h1 className="text-4xl mb-8 text-center text-[#dc9e63] tracking-wider uppercase font-extrabold">
           Basket
         </h1>
 
         <div className="flex flex-col gap-8">
-          {cartItems.map((item) => (
-            <div key={item.id} className="flex items-center gap-6 border-b border-[#dc9e63]/30 pb-6">
-              <Image src={item.image} alt={item.title} width={80} height={80} className="rounded" />
-              <div className="flex-1">
-                <h2 className="text-lg font-bold text-[#dc9e63]">{item.title}</h2>
-                <p className="text-xs font-light text-[#f8fcdc]">{item.subtitle}</p>
+          <AnimatePresence>
+            {cartItems.map((item) => (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.25 }}
+                className="flex items-center gap-6 border-b border-[#dc9e63]/30 pb-6"
+              >
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  width={80}
+                  height={80}
+                  className="rounded"
+                />
+                <div className="flex-1">
+                  <h2 className="text-[14px] md:text-lg font-bold text-[#dc9e63]">
+                    <Link href={`/shop/${item.id}`} className="cursor-pointer block w-fit">
+                      {item.title}
+                    </Link>
+                  </h2>
+                  <p className="text-[10px] md:text-xs font-light text-[#f8fcdc]">
+                    <Link href={`/shop/${item.id}`} className="cursor-pointer block w-fit">
+                      {item.subtitle}
+                    </Link>
+                  </p>
 
-                <div className="flex items-center gap-2 mt-2">
-                  <button
-                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                    className="w-7 h-7 border border-[#dc9e63]/50 border-[0.5px] rounded-[2px] text-sm font-light flex items-center justify-center cursor-pointer"
-                  >
-                    -
-                  </button>
-                  <span className="text-sm font-light">{item.quantity}</span>
-                  <button
-                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                    className="w-7 h-7 border border-[#dc9e63]/50 border-[0.5px] rounded-[2px] text-sm font-light flex items-center justify-center cursor-pointer"
-                  >
-                    +
-                  </button>
-                  <button
-                    onClick={() => removeFromCart(item.id)}
-                    className="ml-2 cursor-pointer"
-                  >
-                    <Trash2 size={16} strokeWidth={1} className="text-[#f8fcdc]" />
-                  </button>
+                  <div className="flex items-center gap-2 mt-2">
+                    <button
+                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      className="w-7 h-7 border border-[#dc9e63]/50 border-[0.5px] rounded-[2px] text-sm font-light flex items-center justify-center cursor-pointer"
+                    >
+                      -
+                    </button>
+                    <span className="text-[13px] md:text-sm font-light">{item.quantity}</span>
+                    <button
+                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      className="w-7 h-7 border border-[#dc9e63]/50 border-[0.5px] rounded-[2px] text-sm font-light flex items-center justify-center cursor-pointer"
+                    >
+                      +
+                    </button>
+                    <button
+                      onClick={() => removeFromCart(item.id)}
+                      className="ml-2 cursor-pointer"
+                    >
+                      <Trash2 size={16} strokeWidth={1} className="text-[#f8fcdc]" />
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <div className="text-right">
-                <p className="text-[#cc3f33] font-semibold text-sm tracking-[.08em]">
-                  {convertPrice((typeof item.price === 'object' ? item.price.sale : item.price) * item.quantity, currency)}
-                </p>
-              </div>
-            </div>
-          ))}
+                <div className="text-right">
+                  <p className="text-[#cc3f33] font-semibold text-[13px] md:text-sm tracking-[.08em]">
+                    {convertPrice(
+                      (typeof item.price === 'object'
+                        ? item.price.sale
+                        : item.price) * item.quantity,
+                      currency
+                    )}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
 
         <div className="mt-12 border-t border-[#dc9e63]/30 pt-6 text-right">
-          <h2 className="text-2xl mb-7 text-[#f8fcdc] text-right">Total: {convertPrice(cartTotal, currency)}</h2>
+          <h2 className="text-[18px] md:text-2xl mb-7 text-[#f8fcdc]">
+            Total: {convertPrice(cartTotal, currency)}
+          </h2>
 
           <div className="flex flex-col md:flex-row justify-end gap-4">
             <Link
@@ -84,7 +115,6 @@ export default function CartPage() {
               Continue Shopping
             </Link>
 
-            {/* เปลี่ยน Checkout เป็นปุ่มมี onClick */}
             <button
               onClick={() => router.push('/checkout')}
               className="px-6 py-3 bg-[#dc9e63] text-[#160000] font-bold hover:bg-[#f8cfa3] rounded-xl text-sm cursor-pointer"

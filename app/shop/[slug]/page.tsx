@@ -57,7 +57,6 @@ export default function ProductPage() {
 
   return (
     <div className="fade-in-section min-h-screen flex flex-col items-center justify-start text-[#f8fcdc] font-[Cinzel] px-4 md:px-6 pt-32 pb-24">
-      {/* Breadcrumb */}
       <div className="w-full max-w-5xl mb-10 text-sm text-[#f8fcdc]/70">
         <Link href="/" className="hover:text-[#dc9e63]">Home</Link>
         <span className="mx-2">/</span>
@@ -66,10 +65,7 @@ export default function ProductPage() {
         <span className="text-[#dc9e63]">{product.title}</span>
       </div>
 
-      {/* Product Detail */}
       <div className="flex flex-col md:flex-row gap-8 w-full max-w-5xl">
-
-        {/* รูปสินค้า */}
         <div className="w-full md:w-1/2 flex justify-center">
           <div className="sticky top-32 self-start w-full max-w-[500px]">
             <div className="relative aspect-square w-full fade-in-section">
@@ -85,7 +81,6 @@ export default function ProductPage() {
           </div>
         </div>
 
-        {/* ข้อมูลสินค้า */}
         <div className="w-full md:w-1/2 flex flex-col">
           <h1 className="product-title-detail">{product.title}</h1>
           <p className="product-subtitle-detail" style={{ color: '#f8fcdc' }}>{product.subtitle}</p>
@@ -101,28 +96,33 @@ export default function ProductPage() {
             )}
           </div>
 
-          {/* Quantity */}
           <div className="product-quantity-wrapper mt-2">
-            <label className="text-sm font-medium">Quantity:</label>
-            <input
-  type="number"
-  min={1}
-  value={quantity}
-  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-  className="w-16 border border-[#f8fcdc] border-[0.5px] rounded-sm px-2 py-[6px] bg-transparent text-[#f8fcdc] text-sm font-light focus:outline-none focus:ring-1 focus:ring-[#dc9e63]"
-/>
+            <label className="text-sm font-medium mb-1">Quantity:</label>
+            <div className="flex items-center gap-2 mt-1">
+              <button
+                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                className="w-7 h-7 border border-[#dc9e63]/50 border-[0.5px] rounded-[2px] text-sm font-light flex items-center justify-center cursor-pointer"
+              >
+                -
+              </button>
+              <span className="text-[13px] md:text-sm font-light">{quantity}</span>
+              <button
+                onClick={() => setQuantity((q) => q + 1)}
+                className="w-7 h-7 border border-[#dc9e63]/50 border-[0.5px] rounded-[2px] text-sm font-light flex items-center justify-center cursor-pointer"
+              >
+                +
+              </button>
+            </div>
           </div>
 
-          {/* Stock */}
           {stockStatus && (
-  <div className="mt-1 text-xs font-light tracking-wide">
-    {stockStatus === 'in-stock' && <span className="text-green-300/70 italic">IN STOCK</span>}
-    {stockStatus === 'out-of-stock' && <span className="text-red-400/70 italic">OUT OF STOCK</span>}
-    {stockStatus === 'pre-order' && <span className="text-yellow-300/70 italic">PRE-ORDER</span>}
-  </div>
-)}
+            <div className="mt-1 text-xs font-light tracking-wide">
+              {stockStatus === 'in-stock' && <span className="text-green-300/70 italic">IN STOCK</span>}
+              {stockStatus === 'out-of-stock' && <span className="text-red-400/70 italic">OUT OF STOCK</span>}
+              {stockStatus === 'pre-order' && <span className="text-yellow-300/70 italic">PRE-ORDER</span>}
+            </div>
+          )}
 
-          {/* Description */}
           {product.description && (
             <div className="product-description mt-6 text-[#f8fcdc]/80 leading-relaxed text-sm whitespace-pre-line">
               {product.description.split('\n').map((line, idx) => {
@@ -138,7 +138,6 @@ export default function ProductPage() {
             </div>
           )}
 
-          {/* Add to Cart */}
           <div className="relative mt-6">
             {errorMessage && <CartErrorPopup message={errorMessage} />}
             <button
@@ -161,7 +160,6 @@ export default function ProductPage() {
         </div>
       </div>
 
-      {/* Related Products */}
       {relatedProducts.length > 0 && (
         <div className="related-products-wrapper mt-20 w-full max-w-5xl">
           <h2 className="text-2xl font-bold text-[#dc9e63] mb-8">RELATED PRODUCTS</h2>

@@ -89,23 +89,29 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                     <NewsletterForm />
                   </div>
 
-                  <div className="footer-bottom mt-6">
-                    <div className="footer-links">
-                      <a href="/shipping">SHIPPING & RETURNS</a>
-                      <span className="divider">|</span>
-                      <a href="/terms">TERMS & CONDITIONS</a>
-                      <span className="divider">|</span>
-                      <a href="/privacy">PRIVACY POLICY</a>
-                    </div>
+                  <div className="footer-bottom mt-6 text-center">
+  <div className="footer-links flex flex-wrap justify-center items-center gap-2 text-sm text-[#f8fcdc]/80 tracking-wide">
+    <Link href="/shipping-and-returns" className="hover:text-[#dc9e63] transition-colors duration-200">
+      SHIPPING & RETURNS
+    </Link>
+    <span className="divider">|</span>
+    <Link href="/terms-and-conditions" className="hover:text-[#dc9e63] transition-colors duration-200">
+      TERMS & CONDITIONS
+    </Link>
+    <span className="divider">|</span>
+    <Link href="/privacy-policy" className="hover:text-[#dc9e63] transition-colors duration-200">
+      PRIVACY POLICY
+    </Link>
+  </div>
 
-                    <div className="mt-6 mb-4">
-                      <CurrencySelector />
-                    </div>
+  <div className="mt-6 mb-4">
+    <CurrencySelector />
+  </div>
 
-                    <p className="copyright text-xs text-[#f8fcdc] mb-0 tracking-wide">
-                      Copyright © 2025 UNDA ALUNDA
-                    </p>
-                  </div>
+  <p className="copyright text-xs text-[#f8fcdc] mb-0 tracking-wide">
+    Copyright © 2025 UNDA ALUNDA
+  </p>
+</div>
                 </section>
               </div>
 

@@ -58,7 +58,7 @@ main,
 
 .hero-wrapper {
   width: 100vw;
-  min-height: 100vh; /* ✅ เปลี่ยนตรงนี้! */
+  min-height: 100vh;
   position: relative;
   overflow: hidden;
   display: flex;
@@ -1620,7 +1620,7 @@ button svg,
 
 .fade-in-section {
   opacity: 0;
-  transform: translateY(30px);
+  transform: translateY(10px);
   animation: fadeInUp 0.8s ease-out forwards;
 }
 
@@ -1655,8 +1655,23 @@ button svg,
   }
 }
 
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
 .animate-fadeIn {
-  animation: fadeIn 0.5s ease-out;
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.animate-fadeOut {
+  animation: fadeOut 0.4s ease-in forwards;
 }
 
 /* === Cart Error Popup === */

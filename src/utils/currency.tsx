@@ -140,27 +140,34 @@ const currencyLocaleMap: Record<string, string> = {
 export async function getUserCurrency(): Promise<string> {
   try {
     const res = await fetch('https://ipapi.co/json/');
-    const data = await res.json();
-    const country = data.country_code;
+    if (!res.ok) throw new Error('Failed to fetch IP location data');
 
-    const countryToCurrency: { [key: string]: string } = {
+    const data = await res.json();
+    const country = data?.country_code?.toUpperCase?.() || '';
+
+    const countryToCurrency: Record<string, string> = {
       US: 'USD', CA: 'CAD', AU: 'AUD', GB: 'GBP', EU: 'EUR',
       JP: 'JPY', CN: 'CNY', KR: 'KRW', SG: 'SGD', TH: 'THB',
-      DE: 'EUR', FR: 'EUR', IT: 'EUR', ES: 'EUR', NL: 'EUR', PT: 'EUR', IE: 'EUR', FI: 'EUR', AT: 'EUR', BE: 'EUR', LU: 'EUR', GR: 'EUR', CY: 'EUR', SK: 'EUR', SI: 'EUR', EE: 'EUR', LV: 'EUR', LT: 'EUR', MT: 'EUR',
-      NZ: 'NZD', HK: 'HKD', CH: 'CHF', SE: 'SEK', NO: 'NOK', DK: 'DKK', PL: 'PLN', CZ: 'CZK', HU: 'HUF',
-      BR: 'BRL', MX: 'MXN', AR: 'ARS', CL: 'CLP', CO: 'COP', PE: 'PEN',
-      ZA: 'ZAR', IN: 'INR', MY: 'MYR', PH: 'PHP', VN: 'VND', ID: 'IDR',
-      SA: 'SAR', AE: 'AED', QA: 'QAR', KW: 'KWD', OM: 'OMR', BH: 'BHD',
-      IL: 'ILS', RU: 'RUB', UA: 'UAH', TR: 'TRY', PK: 'PKR', BD: 'BDT',
-      LK: 'LKR', NP: 'NPR', KE: 'KES', NG: 'NGN', EG: 'EGP', MA: 'MAD',
-      TN: 'TND', DZ: 'DZD', GH: 'GHS', UG: 'UGX', TZ: 'TZS', RW: 'RWF',
-      ZM: 'ZMW', ZW: 'ZWL', MU: 'MUR', IS: 'ISK', KZ: 'KZT', UZ: 'UZS',
-      GE: 'GEL', AM: 'AMD', AZ: 'AZN', BY: 'BYN'
+      DE: 'EUR', FR: 'EUR', IT: 'EUR', ES: 'EUR', NL: 'EUR',
+      PT: 'EUR', IE: 'EUR', FI: 'EUR', AT: 'EUR', BE: 'EUR',
+      LU: 'EUR', GR: 'EUR', CY: 'EUR', SK: 'EUR', SI: 'EUR',
+      EE: 'EUR', LV: 'EUR', LT: 'EUR', MT: 'EUR', NZ: 'NZD',
+      HK: 'HKD', CH: 'CHF', SE: 'SEK', NO: 'NOK', DK: 'DKK',
+      PL: 'PLN', CZ: 'CZK', HU: 'HUF', BR: 'BRL', MX: 'MXN',
+      AR: 'ARS', CL: 'CLP', CO: 'COP', PE: 'PEN', ZA: 'ZAR',
+      IN: 'INR', MY: 'MYR', PH: 'PHP', VN: 'VND', ID: 'IDR',
+      SA: 'SAR', AE: 'AED', QA: 'QAR', KW: 'KWD', OM: 'OMR',
+      BH: 'BHD', IL: 'ILS', RU: 'RUB', UA: 'UAH', TR: 'TRY',
+      PK: 'PKR', BD: 'BDT', LK: 'LKR', NP: 'NPR', KE: 'KES',
+      NG: 'NGN', EG: 'EGP', MA: 'MAD', TN: 'TND', DZ: 'DZD',
+      GH: 'GHS', UG: 'UGX', TZ: 'TZS', RW: 'RWF', ZM: 'ZMW',
+      ZW: 'ZWL', MU: 'MUR', IS: 'ISK', KZ: 'KZT', UZ: 'UZS',
+      GE: 'GEL', AM: 'AMD', AZ: 'AZN', BY: 'BYN',
     };
 
     return countryToCurrency[country] || 'USD';
   } catch (error) {
-    console.error('Error detecting user currency:', error);
+    console.error('[Currency] Failed to auto-detect currency. Falling back to USD.', error);
     return 'USD';
   }
 }

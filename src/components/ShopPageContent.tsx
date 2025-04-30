@@ -6,7 +6,8 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { allItems } from './allItems';
 import { useCurrency } from '@/context/CurrencyContext';
-import { convertPrice, isBundlePrice } from '@/utils/currency'; // ✅ ใช้ convertPrice และ isBundlePrice
+import { convertPrice, isBundlePrice } from '@/utils/currency';
+import { motion, AnimatePresence } from 'framer-motion'; // ✅ เพิ่ม framer-motion
 
 interface Props {
   tabParam: 'MERCH' | 'MUSIC' | 'BUNDLES' | 'DIGITAL' | null;
@@ -53,57 +54,65 @@ export default function ShopPageContent({ tabParam }: Props) {
           ไม่มีสินค้าในหมวดนี้ตอนนี้นะจ๊ะ 🥲
         </p>
       ) : (
-        <div className="stems-row">
-          {itemsToRender.map((item) => {
-            const isBackingTrack = item.category === 'Backing Track';
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab} // re-render on tab change
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="stems-row"
+          >
+            {itemsToRender.map((item) => {
+              const isBackingTrack = item.category === 'Backing Track';
 
-            return (
-              <Link
-                key={item.id}
-                href={`/shop/${item.id}`}
-                className={`stems-item product-label-link cursor-pointer ${isBackingTrack ? 'is-backing' : ''}`}
-              >
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="stems-image"
-                  width={200}
-                  height={200}
-                />
-                <div className="stems-label-group">
-                  <p className="stems-title-text">{item.title}</p>
+              return (
+                <Link
+                  key={item.id}
+                  href={`/shop/${item.id}`}
+                  className={`stems-item product-label-link cursor-pointer ${isBackingTrack ? 'is-backing' : ''}`}
+                >
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="stems-image"
+                    width={200}
+                    height={200}
+                  />
+                  <div className="stems-label-group">
+                    <p className="stems-title-text">{item.title}</p>
 
-                  <p className="stems-subtitle">
-                    {isBackingTrack
-                      ? item.subtitle.replace(/BACKING TRACK/gi, '').trim()
-                      : item.subtitle}
-                  </p>
+                    <p className="stems-subtitle">
+                      {isBackingTrack
+                        ? item.subtitle.replace(/BACKING TRACK/gi, '').trim()
+                        : item.subtitle}
+                    </p>
 
-                  {isBackingTrack && <span className="backing-line" />}
-                  {isBackingTrack && <p className="stems-subtitle-tiny">BACKING TRACK</p>}
+                    {isBackingTrack && <span className="backing-line" />}
+                    {isBackingTrack && <p className="stems-subtitle-tiny">BACKING TRACK</p>}
 
-                  <p className="stems-price">
-  {isBundlePrice(item.price) ? (
-    <>
-      <span className="line-through text-[#f8fcdc] mr-1">
-        {convertPrice(item.price.original, currency)}
-      </span>
-      <span className="text-[#cc3f33]">
-        {convertPrice(item.price.sale, currency)}
-      </span>
-    </>
-  ) : (
-    <span>
-      {convertPrice(item.price, currency)}
-    </span>
-  )}
-</p>
-
-                </div>
-              </Link>
-            );
-          })}
-        </div>
+                    <p className="stems-price">
+                      {isBundlePrice(item.price) ? (
+                        <>
+                          <span className="line-through text-[#f8fcdc] mr-1">
+                            {convertPrice(item.price.original, currency)}
+                          </span>
+                          <span className="text-[#cc3f33]">
+                            {convertPrice(item.price.sale, currency)}
+                          </span>
+                        </>
+                      ) : (
+                        <span>
+                          {convertPrice(item.price, currency)}
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
+          </motion.div>
+        </AnimatePresence>
       )}
     </main>
   );
