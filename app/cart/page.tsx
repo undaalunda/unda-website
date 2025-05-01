@@ -116,11 +116,45 @@ export default function CartPage() {
             </Link>
 
             <button
-              onClick={() => router.push('/checkout')}
-              className="px-6 py-3 bg-[#dc9e63] text-[#160000] font-bold hover:bg-[#f8cfa3] rounded-xl text-sm cursor-pointer"
-            >
-              Checkout
-            </button>
+  onClick={async () => {
+    try {
+      const response = await fetch('/api/create-checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: 'test@example.com', // เอาไว้ก่อน เดี๋ยวค่อยดึงจาก login หรือ form จริง
+          items: cartItems.map((item) => ({
+            variant_id: item.variantId, // 🔥 มึงต้องมีอันนี้จาก Shopify
+            quantity: item.quantity,
+          })),
+          shippingAddress: {
+            address1: '123 Main St',
+            city: 'Bangkok',
+            province: 'Bangkok',
+            country: 'Thailand',
+            zip: '10110',
+          },
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else {
+        alert('สร้างลิงก์ชำระเงินไม่สำเร็จ');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('เออเร่ออออออออออออ');
+    }
+  }}
+  className="px-6 py-3 bg-[#dc9e63] text-[#160000] font-bold hover:bg-[#f8cfa3] rounded-xl text-sm cursor-pointer"
+>
+  Checkout
+</button>
           </div>
 
           <button

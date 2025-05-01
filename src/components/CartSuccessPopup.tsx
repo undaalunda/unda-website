@@ -1,3 +1,5 @@
+/* CartSuccessPopup.tsx */
+
 'use client';
 
 import { useCart } from '@/context/CartContext';

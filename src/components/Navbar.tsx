@@ -58,6 +58,8 @@ const pageLinks = [
 ];
 
 export default function Navbar() {
+  const [highlightIndex, setHighlightIndex] = useState<number>(0);
+  const resultRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [scrolledDown, setScrolledDown] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -76,6 +78,18 @@ export default function Navbar() {
 
   useEffect(() => {
     setHasMounted(true);
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setHighlightIndex((prev) => Math.min(prev + 1, filtered.length - 1));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setHighlightIndex((prev) => Math.max(prev - 1, 0));
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        resultRefs.current[highlightIndex]?.click(); // click ไอเท็มที่กำลังชี้อยู่
+      }
+    };
     const handleScroll = () => setScrolledDown(window.scrollY > 10);
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setSearchOpen(false);

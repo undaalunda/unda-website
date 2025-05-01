@@ -1,4 +1,3 @@
-// 🛒 CartContext.tsx
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
@@ -11,6 +10,7 @@ type CartItem = {
   price: number | { original: number; sale: number };
   image: string;
   quantity: number;
+  variantId: string;
 };
 
 interface CartContextType {
@@ -40,14 +40,14 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.setItem('cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (id: string, quantity: number = 1) => {
+  const addToCart = (id: string, quantity: number = 1): void => {
     const item = allItems.find((i) => i.id === id);
-    if (!item) return;
+    if (!item || !item.variantId) return;
 
-    setCartItems((prev) => {
-      const existing = prev.find((cartItem) => cartItem.id === id);
+    setCartItems(prev => {
+      const existing = prev.find(cartItem => cartItem.id === id);
       if (existing) {
-        return prev.map((cartItem) =>
+        return prev.map(cartItem =>
           cartItem.id === id
             ? { ...cartItem, quantity: cartItem.quantity + quantity }
             : cartItem
@@ -61,20 +61,21 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
             subtitle: item.subtitle ?? '',
             price: item.price,
             image: item.image,
-            quantity: quantity,
+            quantity,
+            variantId: item.variantId,
           },
         ];
       }
     });
 
-    // 🎯 Set ข้อมูล item ล่าสุดที่ถูก add เข้าไป (จำ quantity จริง)
     setLastAddedItem({
       id: item.id,
       title: item.title,
       subtitle: item.subtitle ?? '',
       price: item.price,
       image: item.image,
-      quantity: quantity,
+      quantity,
+      variantId: item.variantId,
     });
   };
 
@@ -85,17 +86,27 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const updateQuantity = (id: string, quantity: number) => {
     setCartItems((prev) =>
       prev.map((item) =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, quantity) }
-          : item
+        item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
       )
     );
   };
 
-  const clearCart = () => setCartItems([]);
+  const clearCart = () => {
+    setCartItems([]);
+  };
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity, clearCart, lastAddedItem, setLastAddedItem }}>
+    <CartContext.Provider
+      value={{
+        cartItems,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        lastAddedItem,
+        setLastAddedItem,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
@@ -103,6 +114,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useCart = () => {
   const context = useContext(CartContext);
-  if (!context) throw new Error('useCart must be used within a CartProvider');
+  if (!context)
+    throw new Error('useCart must be used within a CartProvider');
   return context;
 };
