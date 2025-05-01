@@ -18,33 +18,34 @@ export async function POST(req: NextRequest) {
 
     console.log('🧪 lineItems:', lineItems);
 
+    const query = `
+      mutation checkoutCreate($input: CheckoutCreateInput!) {
+        checkoutCreate(input: $input) {
+          checkout {
+            id
+            webUrl
+          }
+          userErrors {
+            field
+            message
+          }
+        }
+      }
+    `;
+
+    const variables = {
+      input: {
+        lineItems,
+      },
+    };
+
     const shopifyRes = await fetch(`https://${SHOPIFY_STORE_DOMAIN}/api/2024-01/graphql.json`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-Shopify-Storefront-Access-Token': SHOPIFY_STOREFRONT_ACCESS_TOKEN,
       },
-      body: JSON.stringify({
-        query: `
-          mutation checkoutCreate($input: CheckoutCreateInput!) {
-            checkoutCreate(input: $input) {
-              checkout {
-                id
-                webUrl
-              }
-              userErrors {
-                field
-                message
-              }
-            }
-          }
-        `,
-        variables: {
-          input: {
-            lineItems,
-          },
-        },
-      }),
+      body: JSON.stringify({ query, variables }),
     });
 
     const result = await shopifyRes.json();
