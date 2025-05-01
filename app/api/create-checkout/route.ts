@@ -5,21 +5,20 @@ const SHOPIFY_STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN!;
 const SHOPIFY_STOREFRONT_ACCESS_TOKEN = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN!;
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
-
-  const { items } = body;
-
-  if (!items || !Array.isArray(items)) {
-    return NextResponse.json({ error: 'Invalid items' }, { status: 400 });
-  }
-
   try {
+    const body = await req.json();
+    const { items } = body;
+
+    console.log('🧪 items:', items);
+
     const lineItems = items.map((item: any) => ({
       variantId: `gid://shopify/ProductVariant/${item.variant_id}`,
       quantity: item.quantity,
     }));
 
-    const response = await fetch(`https://${SHOPIFY_STORE_DOMAIN}/api/2024-01/graphql.json`, {
+    console.log('🧪 lineItems:', lineItems);
+
+    const shopifyRes = await fetch(`https://${SHOPIFY_STORE_DOMAIN}/api/2024-01/graphql.json`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -48,28 +47,24 @@ export async function POST(req: NextRequest) {
       }),
     });
 
-    const text = await response.text();
+    const result = await shopifyRes.json();
 
-    try {
-      const result = JSON.parse(text);
+    console.log('🧪 Shopify raw response:', JSON.stringify(result, null, 2));
 
-      if (result.data?.checkoutCreate?.checkout?.webUrl) {
-        return NextResponse.json({ checkoutUrl: result.data.checkoutCreate.checkout.webUrl });
-      } else {
-        return NextResponse.json(
-          {
-            error: 'Checkout failed',
-            details: result.data?.checkoutCreate?.userErrors,
-          },
-          { status: 400 }
-        );
-      }
-    } catch (parseErr) {
-      console.error('Failed to parse response as JSON:', text);
-      return NextResponse.json({ error: 'Invalid JSON response from Shopify' }, { status: 500 });
+    if (result.data?.checkoutCreate?.checkout?.webUrl) {
+      return NextResponse.json({ checkoutUrl: result.data.checkoutCreate.checkout.webUrl });
+    } else {
+      console.error('🧨 userErrors:', result.data?.checkoutCreate?.userErrors);
+      return NextResponse.json(
+        {
+          error: 'Checkout failed',
+          details: result.data?.checkoutCreate?.userErrors,
+        },
+        { status: 400 }
+      );
     }
   } catch (err) {
-    console.error('Checkout creation error:', err);
+    console.error('🔥 Internal Error:', err);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
