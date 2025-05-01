@@ -1,18 +1,16 @@
-// /pages/api/create-checkout.ts
-import type { NextApiRequest, NextApiResponse } from 'next';
+// app/api/create-checkout/route.ts
+import { NextRequest, NextResponse } from 'next/server';
 
 const SHOPIFY_STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN!;
 const SHOPIFY_STOREFRONT_ACCESS_TOKEN = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN!;
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+export async function POST(req: NextRequest) {
+  const body = await req.json();
 
-  const { items } = req.body;
+  const { items } = body;
 
   if (!items || !Array.isArray(items)) {
-    return res.status(400).json({ error: 'Invalid items' });
+    return NextResponse.json({ error: 'Invalid items' }, { status: 400 });
   }
 
   try {
@@ -56,19 +54,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const result = JSON.parse(text);
 
       if (result.data?.checkoutCreate?.checkout?.webUrl) {
-        return res.status(200).json({ checkoutUrl: result.data.checkoutCreate.checkout.webUrl });
+        return NextResponse.json({ checkoutUrl: result.data.checkoutCreate.checkout.webUrl });
       } else {
-        return res.status(400).json({
-          error: 'Checkout failed',
-          details: result.data?.checkoutCreate?.userErrors,
-        });
+        return NextResponse.json(
+          {
+            error: 'Checkout failed',
+            details: result.data?.checkoutCreate?.userErrors,
+          },
+          { status: 400 }
+        );
       }
     } catch (parseErr) {
       console.error('Failed to parse response as JSON:', text);
-      return res.status(500).json({ error: 'Invalid JSON response from Shopify' });
+      return NextResponse.json({ error: 'Invalid JSON response from Shopify' }, { status: 500 });
     }
   } catch (err) {
     console.error('Checkout creation error:', err);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
