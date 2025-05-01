@@ -10,7 +10,7 @@ type CartItem = {
   price: number | { original: number; sale: number };
   image: string;
   quantity: number;
-  variantId: string;
+  variantId?: string;
 };
 
 interface CartContextType {
