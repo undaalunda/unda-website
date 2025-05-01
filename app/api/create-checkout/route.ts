@@ -1,38 +1,74 @@
-import { NextRequest, NextResponse } from 'next/server';
+// /pages/api/create-checkout.ts
+import type { NextApiRequest, NextApiResponse } from 'next';
 
-export async function POST(req: NextRequest) {
+const SHOPIFY_STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN!;
+const SHOPIFY_STOREFRONT_ACCESS_TOKEN = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN!;
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { items } = req.body;
+
+  if (!items || !Array.isArray(items)) {
+    return res.status(400).json({ error: 'Invalid items' });
+  }
+
   try {
-    const body = await req.json();
-    const { email, items, shippingAddress } = body;
+    const lineItems = items.map((item: any) => ({
+      variantId: `gid://shopify/ProductVariant/${item.variant_id}`,
+      quantity: item.quantity,
+    }));
 
-    const shop = 'undaalunda.myshopify.com'; // ใส่ชื่อร้านของมึง
-    const accessToken = 'a596922f1a2551cf50215f635f68e3ee'; // ใส่ token จาก Shopify
-    const endpoint = `https://${shop}/admin/api/2023-07/checkouts.json`;
-
-    const checkoutData = {
-      checkout: {
-        email,
-        line_items: items,
-        shipping_address: shippingAddress,
-      },
-    };
-
-    const response = await fetch(endpoint, {
+    const response = await fetch(`https://${SHOPIFY_STORE_DOMAIN}/api/2024-01/graphql.json`, {
       method: 'POST',
       headers: {
-        'X-Shopify-Access-Token': accessToken,
         'Content-Type': 'application/json',
+        'X-Shopify-Storefront-Access-Token': SHOPIFY_STOREFRONT_ACCESS_TOKEN,
       },
-      body: JSON.stringify(checkoutData),
+      body: JSON.stringify({
+        query: `
+          mutation checkoutCreate($input: CheckoutCreateInput!) {
+            checkoutCreate(input: $input) {
+              checkout {
+                id
+                webUrl
+              }
+              userErrors {
+                field
+                message
+              }
+            }
+          }
+        `,
+        variables: {
+          input: {
+            lineItems,
+          },
+        },
+      }),
     });
 
-    const data = await response.json();
+    const text = await response.text();
 
-    return NextResponse.json({ checkoutUrl: data.checkout?.web_url });
+    try {
+      const result = JSON.parse(text);
+
+      if (result.data?.checkoutCreate?.checkout?.webUrl) {
+        return res.status(200).json({ checkoutUrl: result.data.checkoutCreate.checkout.webUrl });
+      } else {
+        return res.status(400).json({
+          error: 'Checkout failed',
+          details: result.data?.checkoutCreate?.userErrors,
+        });
+      }
+    } catch (parseErr) {
+      console.error('Failed to parse response as JSON:', text);
+      return res.status(500).json({ error: 'Invalid JSON response from Shopify' });
+    }
   } catch (err) {
-    return NextResponse.json(
-      { error: 'Shopify checkout creation failed', detail: err },
-      { status: 500 }
-    );
+    console.error('Checkout creation error:', err);
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
 }
