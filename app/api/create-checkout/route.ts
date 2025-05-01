@@ -18,20 +18,18 @@ export async function POST(req: NextRequest) {
 
     console.log('🧪 lineItems:', lineItems);
 
-    const query = `
-      mutation checkoutCreate($input: CheckoutCreateInput!) {
-        checkoutCreate(input: $input) {
-          checkout {
-            id
-            webUrl
-          }
-          userErrors {
-            field
-            message
-          }
+    const query = `mutation checkoutCreate($input: CheckoutCreateInput!) {
+      checkoutCreate(input: $input) {
+        checkout {
+          id
+          webUrl
+        }
+        userErrors {
+          field
+          message
         }
       }
-    `;
+    }`;
 
     const variables = {
       input: {
@@ -52,20 +50,20 @@ export async function POST(req: NextRequest) {
 
     console.log('🧪 Shopify raw response:', JSON.stringify(result, null, 2));
 
-    if (result.data?.checkoutCreate?.checkout?.webUrl) {
+    if (result?.data?.checkoutCreate?.checkout?.webUrl) {
       return NextResponse.json({ checkoutUrl: result.data.checkoutCreate.checkout.webUrl });
     } else {
-      console.error('🧨 userErrors:', result.data?.checkoutCreate?.userErrors);
+      console.error('🧨 Shopify userErrors:', JSON.stringify(result?.data?.checkoutCreate?.userErrors ?? [], null, 2));
       return NextResponse.json(
         {
           error: 'Checkout failed',
-          details: result.data?.checkoutCreate?.userErrors,
+          details: result.data?.checkoutCreate?.userErrors ?? [],
         },
         { status: 400 }
       );
     }
-  } catch (err) {
-    console.error('🔥 Internal Error:', err);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  } catch (err: any) {
+    console.error('🔥 Internal Error:', err?.message ?? err);
+    return NextResponse.json({ error: 'Internal Server Error', message: err?.message ?? String(err) }, { status: 500 });
   }
 }
