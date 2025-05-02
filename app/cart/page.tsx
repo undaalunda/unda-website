@@ -1,4 +1,3 @@
-// app/cart/page.tsx
 'use client';
 
 import { useCart } from '@/context/CartContext';
@@ -120,53 +119,37 @@ export default function CartPage() {
               onClick={async () => {
                 try {
                   const lineItems = cartItems
-                    .filter((item) => item.variantId)
-                    .map((item) => ({
-                      variantId: item.variantId,
-                      quantity: item.quantity,
-                    }));
-
-                  console.log('🧾 lineItems payload:', lineItems);
+  .filter((item) => item.variantId)
+  .map((item) => ({
+    variantId: `gid://shopify/ProductVariant/${item.variantId}`,
+    quantity: item.quantity,
+  }));
 
                   if (lineItems.length === 0) {
                     alert('ไม่มีสินค้าที่สามารถชำระเงินได้ในตะกร้า');
                     return;
                   }
 
-                  const response = await fetch('/api/create-checkout', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ items: lineItems }),
-                  });
+                  const script = document.createElement('script');
+                  script.src = 'https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js';
+                  script.async = true;
+                  script.onload = async () => {
+                    const client = (window as any).ShopifyBuy.buildClient({
+                      domain: 'hp8tvk-qv.myshopify.com',
+                      storefrontAccessToken: '6c9ded11108f9040c496274da96fa6fa',
+                    });
 
-                  const text = await response.text();
-                  let json;
-                  try {
-                    json = JSON.parse(text);
-                  } catch (err) {
-                    console.error('⚠️ JSON parse error:', err);
-                    console.error('📦 Raw response text:', text);
-                    alert(`เกิดข้อผิดพลาด (Invalid JSON): ${response.status}`);
-                    return;
-                  }
+                    try {
+                      const checkout = await client.checkout.create();
+                      const newCheckout = await client.checkout.addLineItems(checkout.id, lineItems);
+                      window.location.href = newCheckout.webUrl;
+                    } catch (error) {
+                      console.error('💥 Shopify error:', error);
+                      alert('เกิดข้อผิดพลาดในการสร้าง checkout ลองใหม่อีกครั้งนะเพื่อน');
+                    }
+                  };
 
-                  if (!response.ok) {
-                    console.error('🚨 API error response:', json);
-                    const errorMessage =
-                      json?.details?.[0]?.message ||
-                      json?.error ||
-                      `เกิดข้อผิดพลาด: ${response.status}`;
-                    alert(errorMessage);
-                    return;
-                  }
-
-                  if (json.checkoutUrl) {
-                    window.location.href = json.checkoutUrl;
-                  } else {
-                    alert('สร้างลิงก์ชำระเงินไม่สำเร็จ');
-                  }
+                  document.body.appendChild(script);
                 } catch (err) {
                   console.error('🔥 Unexpected error:', err);
                   alert('ระบบพังแรงมาก ลองใหม่ทีหลังนะเพื่อน');
