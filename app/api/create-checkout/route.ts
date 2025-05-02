@@ -1,4 +1,3 @@
-// app/api/create-checkout/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 
 const SHOPIFY_STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN!;
@@ -9,33 +8,47 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { items } = body;
 
-    console.log('🧪 items:', items);
+    const lineItems = items.map((item: any) => {
+      const rawVariantId = item.variantId || item.variant_id;
 
-    const lineItems = items.map((item: any) => ({
-      variantId: `gid://shopify/ProductVariant/${item.variant_id}`,
-      quantity: item.quantity,
-    }));
+      if (!rawVariantId) {
+        console.warn('⚠️ Missing variantId on item:', item);
+        throw new Error('Missing variantId on one or more items.');
+      }
 
-    console.log('🧪 lineItems:', lineItems);
+      const isGID = rawVariantId.startsWith('gid://shopify/ProductVariant/');
+      const finalVariantId = isGID ? rawVariantId : `gid://shopify/ProductVariant/${rawVariantId}`;
 
-    const query = `mutation checkoutCreate($input: CheckoutCreateInput!) {
-      checkoutCreate(input: $input) {
-        checkout {
-          id
-          webUrl
-        }
-        userErrors {
-          field
-          message
+      return {
+        variantId: finalVariantId,
+        quantity: item.quantity,
+      };
+    });
+
+    const query = `
+      mutation checkoutCreate($input: CheckoutCreateInput!) {
+        checkoutCreate(input: $input) {
+          checkout {
+            id
+            webUrl
+          }
+          checkoutUserErrors {
+            field
+            message
+          }
         }
       }
-    }`;
+    `;
 
-    const variables = {
+    const variables: { input: { lineItems: { variantId: string; quantity: number }[] } } = {
       input: {
-        lineItems,
+        lineItems: lineItems,
       },
     };
+
+    const payload = JSON.stringify({ query, variables });
+
+    console.log('📦 Sending payload to Shopify:', payload);
 
     const shopifyRes = await fetch(`https://${SHOPIFY_STORE_DOMAIN}/api/2024-01/graphql.json`, {
       method: 'POST',
@@ -43,27 +56,27 @@ export async function POST(req: NextRequest) {
         'Content-Type': 'application/json',
         'X-Shopify-Storefront-Access-Token': SHOPIFY_STOREFRONT_ACCESS_TOKEN,
       },
-      body: JSON.stringify({ query, variables }),
+      body: payload,
     });
 
     const result = await shopifyRes.json();
 
-    console.log('🧪 Shopify raw response:', JSON.stringify(result, null, 2));
+    console.log('🧪 Shopify response:', JSON.stringify(result, null, 2));
 
-    if (result?.data?.checkoutCreate?.checkout?.webUrl) {
-      return NextResponse.json({ checkoutUrl: result.data.checkoutCreate.checkout.webUrl });
-    } else {
-      console.error('🧨 Shopify userErrors:', JSON.stringify(result?.data?.checkoutCreate?.userErrors ?? [], null, 2));
-      return NextResponse.json(
-        {
-          error: 'Checkout failed',
-          details: result.data?.checkoutCreate?.userErrors ?? [],
-        },
-        { status: 400 }
-      );
+    const checkout = result?.data?.checkoutCreate?.checkout;
+    const errors = result?.data?.checkoutCreate?.checkoutUserErrors;
+
+    if (checkout?.webUrl) {
+      return NextResponse.json({ checkoutUrl: checkout.webUrl });
     }
+
+    console.error('❌ Shopify checkoutUserErrors:', errors);
+    return NextResponse.json({ error: 'Checkout failed', details: errors ?? [] }, { status: 400 });
   } catch (err: any) {
     console.error('🔥 Internal Error:', err?.message ?? err);
-    return NextResponse.json({ error: 'Internal Server Error', message: err?.message ?? String(err) }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Internal Server Error', message: err?.message ?? String(err) },
+      { status: 500 }
+    );
   }
 }

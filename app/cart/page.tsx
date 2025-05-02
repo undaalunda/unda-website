@@ -119,44 +119,57 @@ export default function CartPage() {
             <button
               onClick={async () => {
                 try {
+                  const lineItems = cartItems
+                    .filter((item) => item.variantId)
+                    .map((item) => ({
+                      variantId: item.variantId,
+                      quantity: item.quantity,
+                    }));
+
+                  console.log('🧾 lineItems payload:', lineItems);
+
+                  if (lineItems.length === 0) {
+                    alert('ไม่มีสินค้าที่สามารถชำระเงินได้ในตะกร้า');
+                    return;
+                  }
+
                   const response = await fetch('/api/create-checkout', {
                     method: 'POST',
                     headers: {
                       'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                      email: 'test@example.com',
-                      items: cartItems.map((item) => ({
-                        variant_id: item.variantId,
-                        quantity: item.quantity,
-                      })),
-                      shippingAddress: {
-                        address1: '123 Main St',
-                        city: 'Bangkok',
-                        province: 'Bangkok',
-                        country: 'Thailand',
-                        zip: '10110',
-                      },
-                    }),
+                    body: JSON.stringify({ items: lineItems }),
                   });
 
-                  if (!response.ok) {
-                    const text = await response.text();
-                    console.error('API error response:', text);
-                    alert(`เกิดข้อผิดพลาด: ${response.status}`);
+                  const text = await response.text();
+                  let json;
+                  try {
+                    json = JSON.parse(text);
+                  } catch (err) {
+                    console.error('⚠️ JSON parse error:', err);
+                    console.error('📦 Raw response text:', text);
+                    alert(`เกิดข้อผิดพลาด (Invalid JSON): ${response.status}`);
                     return;
                   }
 
-                  const data = await response.json();
+                  if (!response.ok) {
+                    console.error('🚨 API error response:', json);
+                    const errorMessage =
+                      json?.details?.[0]?.message ||
+                      json?.error ||
+                      `เกิดข้อผิดพลาด: ${response.status}`;
+                    alert(errorMessage);
+                    return;
+                  }
 
-                  if (data.checkoutUrl) {
-                    window.location.href = data.checkoutUrl;
+                  if (json.checkoutUrl) {
+                    window.location.href = json.checkoutUrl;
                   } else {
                     alert('สร้างลิงก์ชำระเงินไม่สำเร็จ');
                   }
                 } catch (err) {
-                  console.error(err);
-                  alert('เออเร่ออออออออออออ');
+                  console.error('🔥 Unexpected error:', err);
+                  alert('ระบบพังแรงมาก ลองใหม่ทีหลังนะเพื่อน');
                 }
               }}
               className="px-6 py-3 bg-[#dc9e63] text-[#160000] font-bold hover:bg-[#f8cfa3] rounded-xl text-sm cursor-pointer"

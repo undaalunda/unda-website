@@ -31,7 +31,7 @@ export const allItems: Product[] = [
     tags: ['audio', 'cd', 'album'],
     image: '/audio-digipak-dww.png',
     url: '/shop/audio-digipak',
-    variantId: '44699255210181',
+    variantId: 'gid://shopify/ProductVariant/44699255210181',
     description: `
   Amidst the whispers of darkness and the cries of hope, 
   Dark Wonderful World is a love letter to every broken piece inside you. 
