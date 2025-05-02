@@ -70,8 +70,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ checkoutUrl: checkout.webUrl });
     }
 
-    console.error('❌ Shopify checkoutUserErrors:', errors);
-    return NextResponse.json({ error: 'Checkout failed', details: errors ?? [] }, { status: 400 });
+    console.log('📛 Shopify said:', JSON.stringify(errors, null, 2));
+return NextResponse.json(
+  {
+    error: 'Checkout failed',
+    details: errors ?? [],
+  },
+  { status: 400 }
+);
   } catch (err: any) {
     console.error('🔥 Internal Error:', err?.message ?? err);
     return NextResponse.json(
