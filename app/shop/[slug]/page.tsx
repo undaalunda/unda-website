@@ -1,3 +1,5 @@
+/* [Slug]Page.tsx */
+
 'use client';
 
 import { useParams } from 'next/navigation';
@@ -6,8 +8,6 @@ import type { Product } from '../../../src/components/allItems';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { useCurrency } from '@/context/CurrencyContext';
-import { convertPrice } from '@/utils/currency';
 import { useCart } from '@/context/CartContext';
 import CartErrorPopup from '@/components/CartErrorPopup';
 
@@ -28,7 +28,6 @@ export default function ProductPage() {
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
   const product = allItems.find((item) => item.id === slug) as Product | undefined;
 
-  const { currency } = useCurrency();
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState<number>(1);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -88,11 +87,11 @@ export default function ProductPage() {
           <div className="product-price-detail">
             {isBundle(product.price) ? (
               <>
-                <span className="line-through text-[#f8fcdc]/40 mr-2">{convertPrice(product.price.original, currency)}</span>
-                <span>{convertPrice(product.price.sale, currency)}</span>
+                <span className="line-through text-[#f8fcdc]/40 mr-2">${product.price.original}</span>
+                <span>${product.price.sale}</span>
               </>
             ) : (
-              <span className="tracking-[0.15em]">{convertPrice(product.price, currency)}</span>
+              <span className="tracking-[0.15em]">${product.price}</span>
             )}
           </div>
 
@@ -185,11 +184,11 @@ export default function ProductPage() {
                   <p className="stems-price">
                     {isBundle(item.price) ? (
                       <>
-                        <span className="line-through text-[#f8fcdc] mr-1">{convertPrice(item.price.original, currency)}</span>
-                        <span>{convertPrice(item.price.sale, currency)}</span>
+                        <span className="line-through text-[#f8fcdc] mr-1">${item.price.original}</span>
+                        <span>${item.price.sale}</span>
                       </>
                     ) : (
-                      <span>{convertPrice(item.price, currency)}</span>
+                      <span>${item.price}</span>
                     )}
                   </p>
                 </div>

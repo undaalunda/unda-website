@@ -1,11 +1,8 @@
-/* CurrencySelector.tsx */
-
 'use client';
 
-import { useCurrency } from '@/context/CurrencyContext';
+import { useState, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 
-// 🎯 ครบเกือบทั่วโลกที่ใช้เงินจริง
 const currencies = [
   { code: 'USD', label: 'USD ($)' },
   { code: 'THB', label: 'THB (฿)' },
@@ -58,17 +55,31 @@ const currencies = [
 ];
 
 export default function CurrencySelector() {
-  const { currency, setCurrency } = useCurrency();
+  const [currency, setCurrency] = useState('USD');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('beast_currency');
+      if (saved) setCurrency(saved);
+    }
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selected = e.target.value;
+    setCurrency(selected);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('beast_currency', selected);
+      window.location.reload(); // ให้ BEAST โหลดค่าใหม่
+    }
+  };
 
   return (
     <div className="flex flex-wrap justify-center items-center gap-3 mt-0 mb-10">
-      
-      {/* Currency Dropdown with Chevron */}
       <div className="relative group text-[#f8fcdc] transition-colors duration-300 hover:text-[#dcdcdc]">
         <select
           id="currency"
           value={currency}
-          onChange={(e) => setCurrency(e.target.value)}
+          onChange={handleChange}
           className="appearance-none bg-transparent text-inherit text-sm font-extralight focus:outline-none pr-5 cursor-pointer"
         >
           {currencies.map((cur) => (
@@ -81,11 +92,9 @@ export default function CurrencySelector() {
             </option>
           ))}
         </select>
-        {/* Chevron Icon */}
         <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-inherit w-3.5 h-3.5 pointer-events-none" />
       </div>
 
-      {/* Payment Icons */}
       <div className="flex items-center gap-3 text-[#dc9e63] text-sm">
         <i className="fab fa-cc-amex" />
         <i className="fab fa-apple-pay" />

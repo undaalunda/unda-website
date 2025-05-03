@@ -6,9 +6,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Script from 'next/script';
-import { allItems } from '@/components/allItems'; // ✅ แก้ path
-import { convertPrice } from '@/utils/currency'; // ✅
-import { useCurrency } from '@/context/CurrencyContext'; // ✅
+import { allItems } from '@/components/allItems';
 
 const blacklist = [
   'bass-book', 'keys-book', 'drums-book', 'cat-scores-white',
@@ -23,7 +21,6 @@ const homepageItems = allItems.filter(
 );
 
 export default function HomePage() {
-  const { currency } = useCurrency();
   const [isClient, setIsClient] = useState(false);
   const videoRef = useRef<HTMLDivElement>(null);
   const transcriptionRef = useRef<HTMLDivElement>(null);
@@ -163,9 +160,7 @@ export default function HomePage() {
                   <span className="backing-line always-on"></span>
                   <p className="stems-subtitle-tiny tracking-wide uppercase text-center backing-text">BACKING TRACK</p>
                   <p className="stems-price">
-                  {typeof item.price === 'object'
-  ? convertPrice(item.price.sale, currency)
-  : convertPrice(item.price, currency)}
+                    ${typeof item.price === 'object' ? item.price.sale.toFixed(2) : item.price.toFixed(2)}
                   </p>
                 </div>
               </Link>
@@ -190,19 +185,18 @@ export default function HomePage() {
                   <p className="stems-title-text">{item.title}</p>
                   <p className="stems-subtitle-tiny">{item.subtitle.replace(' BACKING TRACK', '').replace(' STEM', '').replace(' TAB', '')}</p>
                   <p className="stems-price">
-                  {typeof item.price === 'object' && item.price !== null
-  ? <>
-      <span className="line-through mr-1 text-[#f8fcdc]">
-        {convertPrice(item.price.original, currency)}
-      </span>
-      <span className="text-[#cc3f33]">
-        {convertPrice(item.price.sale, currency)}
-      </span>
-    </>
-  : typeof item.price === 'number'
-    ? convertPrice(item.price, currency)
-    : null
-}
+                    {typeof item.price === 'object' && item.price !== null
+                      ? <>
+                          <span className="line-through mr-1 text-[#f8fcdc]">
+                            ${item.price.original.toFixed(2)}
+                          </span>
+                          <span className="text-[#cc3f33]">
+                            ${item.price.sale.toFixed(2)}
+                          </span>
+                        </>
+                      : typeof item.price === 'number'
+                        ? `$${item.price.toFixed(2)}`
+                        : null}
                   </p>
                 </div>
               </Link>

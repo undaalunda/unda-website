@@ -1,17 +1,21 @@
+// app/cart/page.tsx
 'use client';
 
 import { useCart } from '@/context/CartContext';
 import Link from 'next/link';
-import { convertPrice } from '@/utils/currency';
-import { useCurrency } from '@/context/CurrencyContext';
 import { Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 
+const normalizeVariantId = (raw: string) => {
+  if (raw.startsWith('gid://')) return raw;
+  const justDigits = raw.replace(/\D/g, '');
+  return `gid://shopify/ProductVariant/${justDigits}`;
+};
+
 export default function CartPage() {
   const { cartItems, removeFromCart, updateQuantity, clearCart } = useCart();
-  const { currency } = useCurrency();
   const router = useRouter();
 
   const cartTotal = cartItems.reduce((acc, item) => {
@@ -89,12 +93,7 @@ export default function CartPage() {
                 </div>
                 <div className="text-right">
                   <p className="text-[#cc3f33] font-semibold text-[13px] md:text-sm tracking-[.08em]">
-                    {convertPrice(
-                      (typeof item.price === 'object'
-                        ? item.price.sale
-                        : item.price) * item.quantity,
-                      currency
-                    )}
+                    ${((typeof item.price === 'object' ? item.price.sale : item.price) * item.quantity).toFixed(2)}
                   </p>
                 </div>
               </motion.div>
@@ -104,7 +103,7 @@ export default function CartPage() {
 
         <div className="mt-12 border-t border-[#dc9e63]/30 pt-6 text-right">
           <h2 className="text-[18px] md:text-2xl mb-7 text-[#f8fcdc]">
-            Total: {convertPrice(cartTotal, currency)}
+            Total: ${cartTotal.toFixed(2)}
           </h2>
 
           <div className="flex flex-col md:flex-row justify-end gap-4">
@@ -119,11 +118,11 @@ export default function CartPage() {
               onClick={async () => {
                 try {
                   const lineItems = cartItems
-  .filter((item) => item.variantId)
-  .map((item) => ({
-    variantId: `gid://shopify/ProductVariant/${item.variantId}`,
-    quantity: item.quantity,
-  }));
+                    .filter((item) => item.variantId)
+                    .map((item) => ({
+                      variantId: normalizeVariantId(String(item.variantId)),
+                      quantity: item.quantity,
+                    }));
 
                   if (lineItems.length === 0) {
                     alert('ไม่มีสินค้าที่สามารถชำระเงินได้ในตะกร้า');

@@ -1,21 +1,24 @@
-/* ShopPageContext.tsx */
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { allItems } from './allItems';
-import { useCurrency } from '@/context/CurrencyContext';
-import { convertPrice, isBundlePrice } from '@/utils/currency';
-import { motion, AnimatePresence } from 'framer-motion'; // ✅ เพิ่ม framer-motion
+import { motion, AnimatePresence } from 'framer-motion';
+
+type TabType = 'MERCH' | 'MUSIC' | 'BUNDLES' | 'DIGITAL';
 
 interface Props {
-  tabParam: 'MERCH' | 'MUSIC' | 'BUNDLES' | 'DIGITAL' | null;
+  tabParam: TabType | null;
+}
+
+function isBundlePrice(
+  price: number | { original: number; sale: number }
+): price is { original: number; sale: number } {
+  return typeof price === 'object' && price !== null && 'original' in price && 'sale' in price;
 }
 
 export default function ShopPageContent({ tabParam }: Props) {
-  const { currency } = useCurrency();
-  const [activeTab, setActiveTab] = useState<'MERCH' | 'MUSIC' | 'BUNDLES' | 'DIGITAL'>('MERCH');
+  const [activeTab, setActiveTab] = useState<TabType>('MERCH');
 
   useEffect(() => {
     if (tabParam && ['MERCH', 'MUSIC', 'BUNDLES', 'DIGITAL'].includes(tabParam)) {
@@ -41,7 +44,7 @@ export default function ShopPageContent({ tabParam }: Props) {
         {['MERCH', 'MUSIC', 'BUNDLES', 'DIGITAL'].map((tab) => (
           <button
             key={tab}
-            onClick={() => setActiveTab(tab as any)}
+            onClick={() => setActiveTab(tab as TabType)}
             className={`info-button shop-tab-button ${activeTab === tab ? 'active-tab' : ''}`}
           >
             {tab}
@@ -56,7 +59,7 @@ export default function ShopPageContent({ tabParam }: Props) {
       ) : (
         <AnimatePresence mode="wait">
           <motion.div
-            key={activeTab} // re-render on tab change
+            key={activeTab}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
@@ -95,15 +98,15 @@ export default function ShopPageContent({ tabParam }: Props) {
                       {isBundlePrice(item.price) ? (
                         <>
                           <span className="line-through text-[#f8fcdc] mr-1">
-                            {convertPrice(item.price.original, currency)}
+                            ${item.price.original.toFixed(2)}
                           </span>
                           <span className="text-[#cc3f33]">
-                            {convertPrice(item.price.sale, currency)}
+                            ${item.price.sale.toFixed(2)}
                           </span>
                         </>
                       ) : (
                         <span>
-                          {convertPrice(item.price, currency)}
+                          ${typeof item.price === 'number' ? item.price.toFixed(2) : ''}
                         </span>
                       )}
                     </p>

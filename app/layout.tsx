@@ -8,9 +8,8 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import NewsletterForm from '../src/components/NewsletterForm';
 import CurrencySelector from '../src/components/CurrencySelector';
-import { CurrencyProvider } from '@/context/CurrencyContext';
 import { CartProvider } from '@/context/CartContext';
-import CartSuccessPopup from '@/components/CartSuccessPopup'; // ✅ import Popup เข้ามาด้วย!
+import CartSuccessPopup from '@/components/CartSuccessPopup';
 
 const Navbar = dynamic(() => import('../src/components/Navbar'), { ssr: false });
 
@@ -25,6 +24,26 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     };
     window.addEventListener('toggle-menu', handler);
     return () => window.removeEventListener('toggle-menu', handler);
+  }, []);
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.shopify.com/shopifycloud/shopify/assets/storefront/localization.js';
+    script.defer = true;
+    document.body.appendChild(script);
+
+    const localizationDiv = document.createElement('div');
+    localizationDiv.setAttribute('data-shopify', 'localization');
+    localizationDiv.setAttribute('id', 'shopify-localization');
+    const target = document.getElementById('localization-container');
+    if (target) {
+      target.appendChild(localizationDiv);
+    }
+
+    return () => {
+      document.body.removeChild(script);
+      localizationDiv.remove();
+    };
   }, []);
 
   return (
@@ -46,78 +65,70 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           overscrollBehaviorY: 'contain',
         }}
       >
-        <CurrencyProvider>
-          <CartProvider>
-            <Navbar />
+        <CartProvider>
+          <Navbar />
 
-            <div
-              id="__layout"
-              className={`min-h-screen w-full relative transition-opacity duration-500 ${
-                menuOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'
-              }`}
-            >
-              {/* ✅ children ก่อน */}
-              {children}
+          <div
+            id="__layout"
+            className={`min-h-screen w-full relative transition-opacity duration-500 ${
+              menuOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'
+            }`}
+          >
+            {children}
+            <CartSuccessPopup />
 
-              {/* ✅ Popup สำเร็จ */}
-              <CartSuccessPopup />
+            <div className="global-newsletter-wrapper mt-10">
+              <section className="newsletter-section">
+                <div className="footer-logo-social">
+                  <Image
+                    src="/footer-logo-v7.png"
+                    alt="Unda Alunda Cat Logo"
+                    width={120}
+                    height={120}
+                    className="glow-logo mx-auto mb-6"
+                  />
+                  <div className="social-icons mb-6">
+                    <a href="https://www.facebook.com/UndaAlunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-facebook" /></a>
+                    <a href="https://www.youtube.com/@undaalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-youtube" /></a>
+                    <a href="https://www.instagram.com/undalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-instagram" /></a>
+                    <a href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0?si=JsdyQRqGRCGYfxU_nB_qvQ" target="_blank" rel="noopener noreferrer"><i className="fab fa-spotify" /></a>
+                    <a href="https://twitter.com/undaalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-x-twitter" /></a>
+                    <a href="https://www.threads.net/@undalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-threads" /></a>
+                  </div>
+                  <div className="newsletter-divider"></div>
+                </div>
 
-              {/* ✅ Footer & Newsletter Section */}
-              <div className="global-newsletter-wrapper mt-10">
-                <section className="newsletter-section">
-                  <div className="footer-logo-social">
-                    <Image
-                      src="/footer-logo-v7.png"
-                      alt="Unda Alunda Cat Logo"
-                      width={120}
-                      height={120}
-                      className="glow-logo mx-auto mb-6"
-                    />
-                    <div className="social-icons mb-6">
-                      <a href="https://www.facebook.com/UndaAlunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-facebook" /></a>
-                      <a href="https://www.youtube.com/@undaalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-youtube" /></a>
-                      <a href="https://www.instagram.com/undalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-instagram" /></a>
-                      <a href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0?si=JsdyQRqGRCGYfxU_nB_qvQ" target="_blank" rel="noopener noreferrer"><i className="fab fa-spotify" /></a>
-                      <a href="https://twitter.com/undaalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-x-twitter" /></a>
-                      <a href="https://www.threads.net/@undalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-threads" /></a>
-                    </div>
+                <div className="newsletter-form-wrapper mb-0">
+                  <NewsletterForm />
+                </div>
 
-                    <div className="newsletter-divider"></div>
+                <div className="footer-bottom mt-6 text-center">
+                  <div className="footer-links flex flex-wrap justify-center items-center gap-2 text-sm text-[#f8fcdc]/80 tracking-wide">
+                    <Link href="/shipping-and-returns" className="hover:text-[#dc9e63] transition-colors duration-200">
+                      SHIPPING & RETURNS
+                    </Link>
+                    <span className="divider">|</span>
+                    <Link href="/terms-and-conditions" className="hover:text-[#dc9e63] transition-colors duration-200">
+                      TERMS & CONDITIONS
+                    </Link>
+                    <span className="divider">|</span>
+                    <Link href="/privacy-policy" className="hover:text-[#dc9e63] transition-colors duration-200">
+                      PRIVACY POLICY
+                    </Link>
                   </div>
 
-                  <div className="newsletter-form-wrapper mb-0">
-                    <NewsletterForm />
+                  <div id="localization-container" className="mt-6 mb-4">
+                    <CurrencySelector />
                   </div>
 
-                  <div className="footer-bottom mt-6 text-center">
-  <div className="footer-links flex flex-wrap justify-center items-center gap-2 text-sm text-[#f8fcdc]/80 tracking-wide">
-    <Link href="/shipping-and-returns" className="hover:text-[#dc9e63] transition-colors duration-200">
-      SHIPPING & RETURNS
-    </Link>
-    <span className="divider">|</span>
-    <Link href="/terms-and-conditions" className="hover:text-[#dc9e63] transition-colors duration-200">
-      TERMS & CONDITIONS
-    </Link>
-    <span className="divider">|</span>
-    <Link href="/privacy-policy" className="hover:text-[#dc9e63] transition-colors duration-200">
-      PRIVACY POLICY
-    </Link>
-  </div>
-
-  <div className="mt-6 mb-4">
-    <CurrencySelector />
-  </div>
-
-  <p className="copyright text-xs text-[#f8fcdc] mb-0 tracking-wide">
-    Copyright © 2025 UNDA ALUNDA
-  </p>
-</div>
-                </section>
-              </div>
-
+                  <p className="copyright text-xs text-[#f8fcdc] mb-0 tracking-wide">
+                    Copyright © 2025 UNDA ALUNDA
+                  </p>
+                </div>
+              </section>
             </div>
-          </CartProvider>
-        </CurrencyProvider>
+          </div>
+        </CartProvider>
       </body>
     </html>
   );

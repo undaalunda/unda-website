@@ -1,17 +1,18 @@
-/* SearchOverlay.tsx */
-
 'use client';
 
 import { useState, useMemo } from 'react';
 import { X } from 'lucide-react';
 import Link from 'next/link';
-import { useCurrency } from '@/context/CurrencyContext';
-import { convertPrice, isBundlePrice } from '@/utils/currency';
-import { allItems } from '@/components/allItems'; // ระวัง path ให้ตรงกับของจริงนะ
+import { allItems } from '@/components/allItems'; // ตรวจ path ให้ด้วยเด้อ
+
+function isBundlePrice(
+  price: number | { original: number; sale: number }
+): price is { original: number; sale: number } {
+  return typeof price === 'object' && price !== null && 'original' in price && 'sale' in price;
+}
 
 export default function SearchOverlay({ onClose }: { onClose: () => void }) {
   const [searchQuery, setSearchQuery] = useState('');
-  const { currency } = useCurrency();
 
   const filtered = useMemo(() => {
     const q = searchQuery.toLowerCase();
@@ -25,7 +26,6 @@ export default function SearchOverlay({ onClose }: { onClose: () => void }) {
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // ไม่ต้องทำอะไร
   };
 
   return (
@@ -56,43 +56,37 @@ export default function SearchOverlay({ onClose }: { onClose: () => void }) {
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {filtered.map((item) => (
-  <Link
-  href={`/shop/${item.id}`}
-  key={item.id}
-  onClick={onClose}
-  className="flex items-center gap-4 p-3 rounded-lg hover:bg-[#dc9e63]/10 transition-colors cursor-pointer"
->
-    <img
-      src={item.image}
-      alt={item.title}
-      className="w-12 h-12 object-cover rounded opacity-0 transition-opacity duration-500"
-      onLoad={(e) => e.currentTarget.classList.add('opacity-100')}
-    />
-    <div className="flex flex-col">
-      <span className="text-sm font-medium text-[#f8fcdc]">{item.title}</span>
-      <span className="text-xs text-[#f8fcdc]/70">{item.subtitle}</span>
-
-      {/* ✅ ราคาที่แปลงสกุลเงินแล้ว */}
-      {item.price && (
-  <div className="flex items-center gap-1 text-xs text-[#dc9e63] mt-1">
-    {isBundlePrice(item.price) ? (
-      <>
-        <span className="line-through text-[#f8fcdc]/40">
-          {convertPrice(item.price.original, currency)}
-        </span>
-        <span>
-          {convertPrice(item.price.sale, currency)}
-        </span>
-      </>
-    ) : (
-      <span>
-        {convertPrice(item.price, currency)}
-      </span>
-    )}
-  </div>
-)}
-    </div>
-  </Link>
+                  <Link
+                    href={`/shop/${item.id}`}
+                    key={item.id}
+                    onClick={onClose}
+                    className="flex items-center gap-4 p-3 rounded-lg hover:bg-[#dc9e63]/10 transition-colors cursor-pointer"
+                  >
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="w-12 h-12 object-cover rounded opacity-0 transition-opacity duration-500"
+                      onLoad={(e) => e.currentTarget.classList.add('opacity-100')}
+                    />
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-[#f8fcdc]">{item.title}</span>
+                      <span className="text-xs text-[#f8fcdc]/70">{item.subtitle}</span>
+                      {item.price && (
+                        <div className="flex items-center gap-1 text-xs text-[#dc9e63] mt-1">
+                          {isBundlePrice(item.price) ? (
+                            <>
+                              <span className="line-through text-[#f8fcdc]/40">
+                                ${item.price.original.toFixed(2)}
+                              </span>
+                              <span>${item.price.sale.toFixed(2)}</span>
+                            </>
+                          ) : (
+                            <span>${typeof item.price === 'number' ? item.price.toFixed(2) : ''}</span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </Link>
                 ))}
               </div>
             )}

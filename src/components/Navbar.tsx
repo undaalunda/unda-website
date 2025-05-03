@@ -7,8 +7,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X, User, ShoppingCart, Search } from 'lucide-react';
-import { useCurrency } from '@/context/CurrencyContext';
-import { convertPrice, isBundlePrice } from '@/utils/currency';
 import { useCart } from '@/context/CartContext'; // 🛒 เอาข้อมูลตะกร้ามาใช้
 
 // Product list for search functionality
@@ -68,7 +66,6 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState('');
   const [delayedQuery, setDelayedQuery] = useState('');
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
-  const { currency } = useCurrency();
   const { cartItems } = useCart();
   const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const pathname = usePathname();
@@ -465,15 +462,15 @@ export default function Navbar() {
   typeof item.price === 'object' ? (
     <div className="flex items-center gap-2 text-xs mt-1">
       <span className="line-through text-[#f8fcdc]/40">
-        {convertPrice(item.price.original, currency)}
+        ${item.price.original.toFixed(2)}
       </span>
       <span className="text-[#dc9e63]">
-        {convertPrice(item.price.sale, currency)}
+        ${item.price.sale.toFixed(2)}
       </span>
     </div>
   ) : (
     <div className="text-xs text-[#dc9e63] mt-1">
-      {convertPrice(item.price, currency)}
+      ${item.price.toFixed(2)}
     </div>
   )
 )}
