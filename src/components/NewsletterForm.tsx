@@ -3,7 +3,6 @@
 'use client';
 
 import React from 'react';
-import CurrencySelector from './CurrencySelector'; // ⬅️ เพิ่มอันนี้เข้ามา
 
 export default function NewsletterForm() {
   return (

@@ -5,14 +5,8 @@ import { useCart } from '@/context/CartContext';
 import Link from 'next/link';
 import { Trash2 } from 'lucide-react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
-
-const normalizeVariantId = (raw: string) => {
-  if (raw.startsWith('gid://')) return raw;
-  const justDigits = raw.replace(/\D/g, '');
-  return `gid://shopify/ProductVariant/${justDigits}`;
-};
+import { useRouter } from 'next/navigation';
 
 export default function CartPage() {
   const { cartItems, removeFromCart, updateQuantity, clearCart } = useCart();
@@ -22,6 +16,10 @@ export default function CartPage() {
     const price = typeof item.price === 'object' ? item.price.sale : item.price;
     return acc + price * item.quantity;
   }, 0);
+
+  const handleGoToCheckout = () => {
+    router.push('/checkout'); // ✅ ใช้ custom checkout page ของเราเอง
+  };
 
   if (cartItems.length === 0) {
     return (
@@ -115,45 +113,7 @@ export default function CartPage() {
             </Link>
 
             <button
-              onClick={async () => {
-                try {
-                  const lineItems = cartItems
-                    .filter((item) => item.variantId)
-                    .map((item) => ({
-                      variantId: normalizeVariantId(String(item.variantId)),
-                      quantity: item.quantity,
-                    }));
-
-                  if (lineItems.length === 0) {
-                    alert('ไม่มีสินค้าที่สามารถชำระเงินได้ในตะกร้า');
-                    return;
-                  }
-
-                  const script = document.createElement('script');
-                  script.src = 'https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js';
-                  script.async = true;
-                  script.onload = async () => {
-                    const client = (window as any).ShopifyBuy.buildClient({
-                      domain: 'hp8tvk-qv.myshopify.com',
-                      storefrontAccessToken: '6c9ded11108f9040c496274da96fa6fa',
-                    });
-
-                    try {
-                      const checkout = await client.checkout.create();
-                      const newCheckout = await client.checkout.addLineItems(checkout.id, lineItems);
-                      window.location.href = newCheckout.webUrl;
-                    } catch (error) {
-                      console.error('💥 Shopify error:', error);
-                      alert('เกิดข้อผิดพลาดในการสร้าง checkout ลองใหม่อีกครั้งนะเพื่อน');
-                    }
-                  };
-
-                  document.body.appendChild(script);
-                } catch (err) {
-                  console.error('🔥 Unexpected error:', err);
-                  alert('ระบบพังแรงมาก ลองใหม่ทีหลังนะเพื่อน');
-                }
-              }}
+              onClick={handleGoToCheckout}
               className="px-6 py-3 bg-[#dc9e63] text-[#160000] font-bold hover:bg-[#f8cfa3] rounded-xl text-sm cursor-pointer"
             >
               Checkout

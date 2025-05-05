@@ -7,9 +7,9 @@ import type { ReactNode } from 'react';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import NewsletterForm from '../src/components/NewsletterForm';
-import CurrencySelector from '../src/components/CurrencySelector';
 import { CartProvider } from '@/context/CartContext';
 import CartSuccessPopup from '@/components/CartSuccessPopup';
+import Script from 'next/script';
 
 const Navbar = dynamic(() => import('../src/components/Navbar'), { ssr: false });
 
@@ -26,26 +26,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('toggle-menu', handler);
   }, []);
 
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://cdn.shopify.com/shopifycloud/shopify/assets/storefront/localization.js';
-    script.defer = true;
-    document.body.appendChild(script);
-
-    const localizationDiv = document.createElement('div');
-    localizationDiv.setAttribute('data-shopify', 'localization');
-    localizationDiv.setAttribute('id', 'shopify-localization');
-    const target = document.getElementById('localization-container');
-    if (target) {
-      target.appendChild(localizationDiv);
-    }
-
-    return () => {
-      document.body.removeChild(script);
-      localizationDiv.remove();
-    };
-  }, []);
-
   return (
     <html lang="en">
       <head>
@@ -56,6 +36,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+        />
+        <Script
+          src={`https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID`}
+          strategy="beforeInteractive"
         />
       </head>
       <body
@@ -95,6 +79,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                     <a href="https://twitter.com/undaalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-x-twitter" /></a>
                     <a href="https://www.threads.net/@undalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-threads" /></a>
                   </div>
+
                   <div className="newsletter-divider"></div>
                 </div>
 
@@ -102,7 +87,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   <NewsletterForm />
                 </div>
 
-                <div className="footer-bottom mt-6 text-center">
+                <div className="footer-bottom mt-5 text-center">
                   <div className="footer-links flex flex-wrap justify-center items-center gap-2 text-sm text-[#f8fcdc]/80 tracking-wide">
                     <Link href="/shipping-and-returns" className="hover:text-[#dc9e63] transition-colors duration-200">
                       SHIPPING & RETURNS
@@ -117,11 +102,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                     </Link>
                   </div>
 
-                  <div id="localization-container" className="mt-6 mb-4">
-                    <CurrencySelector />
-                  </div>
-
-                  <p className="copyright text-xs text-[#f8fcdc] mb-0 tracking-wide">
+                  <p className="text-[#f8fcdc] mt-6 text-xs text-center">
                     Copyright © 2025 UNDA ALUNDA
                   </p>
                 </div>

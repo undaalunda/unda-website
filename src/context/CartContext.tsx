@@ -1,5 +1,3 @@
-/* CartContext.tsx */
-
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
@@ -12,7 +10,6 @@ type CartItem = {
   price: number | { original: number; sale: number };
   image: string;
   quantity: number;
-  variantId?: string;
 };
 
 interface CartContextType {
@@ -23,6 +20,8 @@ interface CartContextType {
   clearCart: () => void;
   lastAddedItem: CartItem | null;
   setLastAddedItem: (item: CartItem | null) => void;
+  cartError: string | null;
+  setCartError: (msg: string | null) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -30,6 +29,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [lastAddedItem, setLastAddedItem] = useState<CartItem | null>(null);
+  const [cartError, setCartError] = useState<string | null>(null);
 
   useEffect(() => {
     const storedCart = localStorage.getItem('cart');
@@ -44,14 +44,21 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
   const addToCart = (id: string, quantity: number = 1): void => {
     const item = allItems.find((i) => i.id === id);
-    if (!item || !item.variantId) return;
+    if (!item) return;
 
     setCartItems(prev => {
       const existing = prev.find(cartItem => cartItem.id === id);
+      const newQuantity = (existing?.quantity || 0) + quantity;
+
+      if (newQuantity > 20) {
+        setCartError('Cannot add more than 20 of this item.');
+        return prev;
+      }
+
       if (existing) {
         return prev.map(cartItem =>
           cartItem.id === id
-            ? { ...cartItem, quantity: cartItem.quantity + quantity }
+            ? { ...cartItem, quantity: newQuantity }
             : cartItem
         );
       } else {
@@ -64,7 +71,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
             price: item.price,
             image: item.image,
             quantity,
-            variantId: item.variantId,
           },
         ];
       }
@@ -77,7 +83,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       price: item.price,
       image: item.image,
       quantity,
-      variantId: item.variantId,
     });
   };
 
@@ -107,6 +112,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         clearCart,
         lastAddedItem,
         setLastAddedItem,
+        cartError,
+        setCartError,
       }}
     >
       {children}

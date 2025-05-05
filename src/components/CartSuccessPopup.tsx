@@ -54,7 +54,7 @@ export default function CartSuccessPopup() {
 
   return (
     <div
-      className={`fixed bottom-6 right-6 bg-[#160000]/30 text-[#f8fcdc] p-4 rounded-[4px] shadow-lg flex items-center gap-4 font-[Cinzel] z-50 transition-all duration-500 ${
+      className={`fixed bottom-6 right-6 bg-[#160000] text-[#f8fcdc] p-4 rounded-[4px] shadow-lg flex items-center gap-4 font-[Cinzel] z-50 transition-all duration-500 ${
         isVisible ? 'animate-fadeIn' : 'animate-fadeOut pointer-events-none'
       } cursor-default`} // ❌ default cursor สำหรับทั้ง popup
       onMouseEnter={() => setIsHovering(true)}
