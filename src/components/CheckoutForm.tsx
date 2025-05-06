@@ -391,9 +391,10 @@ export default function CheckoutForm() {
 {success && <div className="text-green-500 text-sm mb-4">Payment successful! ✅</div>}
 
 {paymentMethod === 'paypal' ? (
-  <div className="w-full">
+  <div className="w-full md:max-w-[450px] mt-6">
     <PayPalButtons
       style={{ layout: 'vertical', color: 'gold', shape: 'rect', label: 'paypal' }}
+      fundingSource="paypal"
       createOrder={(data, actions) => {
         const shipping = shippingMethod === 'dhl' ? 15 : 5;
         const total = cartItems.reduce((acc, item) => {
@@ -402,6 +403,7 @@ export default function CheckoutForm() {
         }, 0) + shipping;
 
         return actions.order.create({
+          intent: "CAPTURE",
           purchase_units: [
             {
               amount: {
@@ -428,7 +430,7 @@ export default function CheckoutForm() {
   <button
     type="submit"
     disabled={loading || !stripe || !consentTerms}
-    className="w-full bg-[#dc9e63] text-black py-2 rounded hover:bg-[#f8cfa3] transition-colors"
+    className="w-full md:max-w-[450px] mt-2 bg-[#dc9e63] text-black py-2 rounded hover:bg-[#f8cfa3] transition-colors"
   >
     {loading ? 'Processing...' : 'PLACE ORDER'}
   </button>
