@@ -29,6 +29,10 @@ export async function POST(req: NextRequest) {
       currency: 'usd',
       payment_method: paymentMethodId,
       confirm: true,
+      automatic_payment_methods: {
+        enabled: true,
+        allow_redirects: 'never',
+      },
     });
 
     return NextResponse.json({ success: true, clientSecret: paymentIntent.client_secret });

@@ -231,13 +231,8 @@ export default function Navbar() {
   
         {/* ✅ ซ่อน icons ตอน menuOpen === true */}
         {!menuOpen && (
-  <div className="flex items-center gap-6 pr-1 z-40">
-    <Link
-      href="/account"
-      className="hidden md:block cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
-    >
-      <User size={23} strokeWidth={1.2} />
-    </Link>
+  <div className="flex items-center gap-7 pr-3 z-40">
+
 
     <Link
   href="/cart"

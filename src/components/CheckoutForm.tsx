@@ -18,6 +18,10 @@ export default function CheckoutForm() {
   const [consentTerms, setConsentTerms] = useState(false);
   const [consentMarketing, setConsentMarketing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'paypal'>('card');
+  const [missingFields, setMissingFields] = useState<string[]>([]);
+
+  const [missingBillingFields, setMissingBillingFields] = useState<string[]>([]);
+const [missingShippingFields, setMissingShippingFields] = useState<string[]>([]);
 
   const [billingInfo, setBillingInfo] = useState({
     firstName: '', lastName: '', company: '', country: '', address: '', address2: '',
@@ -44,58 +48,82 @@ export default function CheckoutForm() {
     return acc + price * item.quantity;
   }, 0);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMessage('');
-    setLoading(true);
+  const billingRequired = ['firstName', 'lastName', 'address', 'city', 'postcode', 'phone', 'email', 'country'];
+const shippingRequired = ['firstName', 'lastName', 'address', 'city', 'postcode', 'country'];
 
-    if (paymentMethod === 'card') {
-      if (!stripe || !elements) {
-        setErrorMessage('Stripe.js ยังโหลดไม่เสร็จ');
-        setLoading(false);
-        return;
-      }
+const getMissing = (info: typeof billingInfo | typeof shippingInfo, required: string[]) =>
+  required.filter(field => !info[field as keyof typeof info]);
 
-      const card = elements.getElement(CardElement);
-      if (!card) {
-        setErrorMessage('Card Element ไม่เจอ');
-        setLoading(false);
-        return;
-      }
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setErrorMessage('');
+  setLoading(true);
 
-      const { error, paymentMethod: pm } = await stripe.createPaymentMethod({ type: 'card', card });
+  const missingBillingFields = getMissing(billingInfo, billingRequired);
+  const missingShippingFields = shipToDifferent ? getMissing(shippingInfo, shippingRequired) : [];
+  const allMissing = [...missingBillingFields, ...missingShippingFields];
 
-      if (error) {
-        console.error('[🔥 createPaymentMethod error]', error);
-        setErrorMessage(error.message || 'เกิดข้อผิดพลาดที่ไม่รู้จัก');
-        setLoading(false);
-        return;
-      }
+  setMissingBillingFields(missingBillingFields);
+  setMissingShippingFields(missingShippingFields);
 
-      try {
-        const shippingCost = shippingMethod === 'dhl' ? 15 : 5;
-        const amountToCharge = Math.round((cartTotal + shippingCost) * 100);
+  if (allMissing.length > 0) {
+    setMissingFields(allMissing);
+    setErrorMessage(`Please fill in: ${allMissing.join(', ')}`);
+    setLoading(false);
+    const firstErrorInput = document.querySelector(`[name="${allMissing[0]}"]`) as HTMLElement;
+    if (firstErrorInput) firstErrorInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  } else {
+    setMissingFields([]);
+  }
 
-        const res = await fetch('/api/create-payment-intent', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ paymentMethodId: pm.id, amount: amountToCharge }),
-        });
-
-        const result = await res.json();
-        if (result.error) setErrorMessage(result.error);
-        else {
-          setSuccess(true);
-          clearCart();
-        }
-      } catch (err: any) {
-        console.error('[🔥 API error]', err);
-        setErrorMessage('ระบบพัง กรุณาลองใหม่อีกครั้ง');
-      }
+  if (paymentMethod === 'card') {
+    if (!stripe || !elements) {
+      setErrorMessage('Stripe.js ยังโหลดไม่เสร็จ');
+      setLoading(false);
+      return;
     }
 
-    setLoading(false);
-  };
+    const card = elements.getElement(CardElement);
+    if (!card) {
+      setErrorMessage('Card Element ไม่เจอ');
+      setLoading(false);
+      return;
+    }
+
+    const { error, paymentMethod: pm } = await stripe.createPaymentMethod({ type: 'card', card });
+
+    if (error) {
+      console.error('[🔥 createPaymentMethod error]', error);
+      setErrorMessage(error.message || 'เกิดข้อผิดพลาดที่ไม่รู้จัก');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const shippingCost = shippingMethod === 'dhl' ? 15 : 5;
+      const amountToCharge = Math.round((cartTotal + shippingCost) * 100);
+
+      const res = await fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentMethodId: pm.id, amount: amountToCharge }),
+      });
+
+      const result = await res.json();
+      if (result.error) setErrorMessage(result.error);
+      else {
+        setSuccess(true);
+        clearCart();
+      }
+    } catch (err: any) {
+      console.error('[🔥 API error]', err);
+      setErrorMessage('ระบบพัง กรุณาลองใหม่อีกครั้ง');
+    }
+  }
+
+  setLoading(false);
+};
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center pt-[120px] text-[#f8fcdc] font-[Cinzel] px-6">
@@ -121,21 +149,256 @@ export default function CheckoutForm() {
         placeholder={placeholder}
         value={(billingInfo as any)[name]}
         onChange={handleChange}
-        className="bg-[#160000]/50 text-[#f8fcdc] placeholder-[#f8fcdc]/50 border border-transparent p-2 rounded w-full transition-colors duration-200 focus:outline-none focus:ring-0 focus:bg-[#2a0000]/70"
+        className={`bg-[#160000]/50 text-[#f8fcdc] placeholder-[#f8fcdc]/50 border ${
+          missingBillingFields.includes(name) ? 'border-red-500' : 'border-transparent'
+        } p-2 rounded w-full transition-colors duration-200 focus:outline-none focus:ring-0 focus:bg-[#2a0000]/70`}
         required={required}
       />
     ))}
 
     {/* Country Select */}
     <select
-    name="country"
-    value={billingInfo.country}
-    onChange={handleChange}
-    required
-    className="bg-[#160000]/50 text-[#f8fcdc] placeholder-[#f8fcdc]/50 border-none p-2 rounded w-full appearance-none focus:outline-none focus:ring-0 cursor-pointer"
-  >
+  name="country"
+  value={billingInfo.country}
+  onChange={handleChange}
+  required
+  className={`bg-[#160000]/50 text-[#f8fcdc] placeholder-[#f8fcdc]/50 border ${
+    missingBillingFields.includes('country') ? 'border-red-500' : 'border-transparent'
+  } p-2 rounded w-full appearance-none focus:outline-none focus:ring-0 cursor-pointer`}
+>
   <option value="">Select a country</option>
-
+  <option value="United States">United States</option>
+  <option value="United Kingdom">United Kingdom</option>
+  <option value="Canada">Canada</option>
+  <option value="Australia">Australia</option>
+  <option value="Germany">Germany</option>
+  <option value="France">France</option>
+  <option value="Italy">Italy</option>
+  <option value="Spain">Spain</option>
+  <option value="Netherlands">Netherlands</option>
+  <option value="Sweden">Sweden</option>
+  <option value="Norway">Norway</option>
+  <option value="Denmark">Denmark</option>
+  <option value="Finland">Finland</option>
+  <option value="Ireland">Ireland</option>
+  <option value="New Zealand">New Zealand</option>
+  <option value="Japan">Japan</option>
+  <option value="South Korea">South Korea</option>
+  <option value="China">China</option>
+  <option value="India">India</option>
+  <option value="Brazil">Brazil</option>
+  <option value="Mexico">Mexico</option>
+  <option value="Argentina">Argentina</option>
+  <option value="South Africa">South Africa</option>
+  <option value="Russia">Russia</option>
+  <option value="Ukraine">Ukraine</option>
+  <option value="Poland">Poland</option>
+  <option value="Austria">Austria</option>
+  <option value="Belgium">Belgium</option>
+  <option value="Switzerland">Switzerland</option>
+  <option value="Portugal">Portugal</option>
+  <option value="Greece">Greece</option>
+  <option value="Turkey">Turkey</option>
+  <option value="Thailand">Thailand</option>
+  <option value="Malaysia">Malaysia</option>
+  <option value="Singapore">Singapore</option>
+  <option value="Indonesia">Indonesia</option>
+  <option value="Philippines">Philippines</option>
+  <option value="Vietnam">Vietnam</option>
+  <option value="Saudi Arabia">Saudi Arabia</option>
+  <option value="United Arab Emirates">United Arab Emirates</option>
+  <option value="Egypt">Egypt</option>
+  <option value="Israel">Israel</option>
+  <option value="Chile">Chile</option>
+  <option value="Colombia">Colombia</option>
+  <option value="Peru">Peru</option>
+  <option value="Nigeria">Nigeria</option>
+  <option value="Kenya">Kenya</option>
+  <option value="Morocco">Morocco</option>
+  <option value="Czech Republic">Czech Republic</option>
+  <option value="Romania">Romania</option>
+  <option value="Hungary">Hungary</option>
+  <option value="Slovakia">Slovakia</option>
+  <option value="Slovenia">Slovenia</option>
+  <option value="Bulgaria">Bulgaria</option>
+  <option value="Croatia">Croatia</option>
+  <option value="Serbia">Serbia</option>
+  <option value="Estonia">Estonia</option>
+  <option value="Latvia">Latvia</option>
+  <option value="Lithuania">Lithuania</option>
+  <option value="Pakistan">Pakistan</option>
+  <option value="Bangladesh">Bangladesh</option>
+  <option value="Sri Lanka">Sri Lanka</option>
+  <option value="Nepal">Nepal</option>
+  <option value="Myanmar">Myanmar</option>
+  <option value="Cambodia">Cambodia</option>
+  <option value="Laos">Laos</option>
+  <option value="Mongolia">Mongolia</option>
+  <option value="Kazakhstan">Kazakhstan</option>
+  <option value="Uzbekistan">Uzbekistan</option>
+  <option value="Qatar">Qatar</option>
+  <option value="Kuwait">Kuwait</option>
+  <option value="Oman">Oman</option>
+  <option value="Bahrain">Bahrain</option>
+  <option value="Jordan">Jordan</option>
+  <option value="Lebanon">Lebanon</option>
+  <option value="Iceland">Iceland</option>
+  <option value="Luxembourg">Luxembourg</option>
+  <option value="Malta">Malta</option>
+  <option value="Cyprus">Cyprus</option>
+  <option value="Georgia">Georgia</option>
+  <option value="Armenia">Armenia</option>
+  <option value="Azerbaijan">Azerbaijan</option>
+  <option value="Panama">Panama</option>
+  <option value="Costa Rica">Costa Rica</option>
+  <option value="Uruguay">Uruguay</option>
+  <option value="Paraguay">Paraguay</option>
+  <option value="Bolivia">Bolivia</option>
+  <option value="Ecuador">Ecuador</option>
+  <option value="Guatemala">Guatemala</option>
+  <option value="Honduras">Honduras</option>
+  <option value="El Salvador">El Salvador</option>
+  <option value="Nicaragua">Nicaragua</option>
+  <option value="Jamaica">Jamaica</option>
+  <option value="Trinidad and Tobago">Trinidad and Tobago</option>
+  <option value="Barbados">Barbados</option>
+  <option value="Bahamas">Bahamas</option>
+  <option value="Dominican Republic">Dominican Republic</option>
+  <option value="Cuba">Cuba</option>
+  <option value="Zimbabwe">Zimbabwe</option>
+  <option value="Zambia">Zambia</option>
+  <option value="Ghana">Ghana</option>
+  <option value="Uganda">Uganda</option>
+  <option value="Tanzania">Tanzania</option>
+  <option value="Algeria">Algeria</option>
+  <option value="Tunisia">Tunisia</option>
+  <option value="Libya">Libya</option>
+  <option value="Sudan">Sudan</option>
+  <option value="Ethiopia">Ethiopia</option>
+  <option value="Cameroon">Cameroon</option>
+  <option value="Ivory Coast">Ivory Coast</option>
+  <option value="Senegal">Senegal</option>
+  <option value="Madagascar">Madagascar</option>
+  <option value="Mozambique">Mozambique</option>
+  <option value="Namibia">Namibia</option>
+  <option value="Botswana">Botswana</option>
+  <option value="Rwanda">Rwanda</option>
+  <option value="United States">United States</option>
+  <option value="United Kingdom">United Kingdom</option>
+  <option value="Canada">Canada</option>
+  <option value="Australia">Australia</option>
+  <option value="Germany">Germany</option>
+  <option value="France">France</option>
+  <option value="Italy">Italy</option>
+  <option value="Spain">Spain</option>
+  <option value="Netherlands">Netherlands</option>
+  <option value="Sweden">Sweden</option>
+  <option value="Norway">Norway</option>
+  <option value="Denmark">Denmark</option>
+  <option value="Finland">Finland</option>
+  <option value="Ireland">Ireland</option>
+  <option value="New Zealand">New Zealand</option>
+  <option value="Japan">Japan</option>
+  <option value="South Korea">South Korea</option>
+  <option value="China">China</option>
+  <option value="India">India</option>
+  <option value="Brazil">Brazil</option>
+  <option value="Mexico">Mexico</option>
+  <option value="Argentina">Argentina</option>
+  <option value="South Africa">South Africa</option>
+  <option value="Russia">Russia</option>
+  <option value="Ukraine">Ukraine</option>
+  <option value="Poland">Poland</option>
+  <option value="Austria">Austria</option>
+  <option value="Belgium">Belgium</option>
+  <option value="Switzerland">Switzerland</option>
+  <option value="Portugal">Portugal</option>
+  <option value="Greece">Greece</option>
+  <option value="Turkey">Turkey</option>
+  <option value="Thailand">Thailand</option>
+  <option value="Malaysia">Malaysia</option>
+  <option value="Singapore">Singapore</option>
+  <option value="Indonesia">Indonesia</option>
+  <option value="Philippines">Philippines</option>
+  <option value="Vietnam">Vietnam</option>
+  <option value="Saudi Arabia">Saudi Arabia</option>
+  <option value="United Arab Emirates">United Arab Emirates</option>
+  <option value="Egypt">Egypt</option>
+  <option value="Israel">Israel</option>
+  <option value="Chile">Chile</option>
+  <option value="Colombia">Colombia</option>
+  <option value="Peru">Peru</option>
+  <option value="Nigeria">Nigeria</option>
+  <option value="Kenya">Kenya</option>
+  <option value="Morocco">Morocco</option>
+  <option value="Czech Republic">Czech Republic</option>
+  <option value="Romania">Romania</option>
+  <option value="Hungary">Hungary</option>
+  <option value="Slovakia">Slovakia</option>
+  <option value="Slovenia">Slovenia</option>
+  <option value="Bulgaria">Bulgaria</option>
+  <option value="Croatia">Croatia</option>
+  <option value="Serbia">Serbia</option>
+  <option value="Estonia">Estonia</option>
+  <option value="Latvia">Latvia</option>
+  <option value="Lithuania">Lithuania</option>
+  <option value="Pakistan">Pakistan</option>
+  <option value="Bangladesh">Bangladesh</option>
+  <option value="Sri Lanka">Sri Lanka</option>
+  <option value="Nepal">Nepal</option>
+  <option value="Myanmar">Myanmar</option>
+  <option value="Cambodia">Cambodia</option>
+  <option value="Laos">Laos</option>
+  <option value="Mongolia">Mongolia</option>
+  <option value="Kazakhstan">Kazakhstan</option>
+  <option value="Uzbekistan">Uzbekistan</option>
+  <option value="Qatar">Qatar</option>
+  <option value="Kuwait">Kuwait</option>
+  <option value="Oman">Oman</option>
+  <option value="Bahrain">Bahrain</option>
+  <option value="Jordan">Jordan</option>
+  <option value="Lebanon">Lebanon</option>
+  <option value="Iceland">Iceland</option>
+  <option value="Luxembourg">Luxembourg</option>
+  <option value="Malta">Malta</option>
+  <option value="Cyprus">Cyprus</option>
+  <option value="Georgia">Georgia</option>
+  <option value="Armenia">Armenia</option>
+  <option value="Azerbaijan">Azerbaijan</option>
+  <option value="Panama">Panama</option>
+  <option value="Costa Rica">Costa Rica</option>
+  <option value="Uruguay">Uruguay</option>
+  <option value="Paraguay">Paraguay</option>
+  <option value="Bolivia">Bolivia</option>
+  <option value="Ecuador">Ecuador</option>
+  <option value="Guatemala">Guatemala</option>
+  <option value="Honduras">Honduras</option>
+  <option value="El Salvador">El Salvador</option>
+  <option value="Nicaragua">Nicaragua</option>
+  <option value="Jamaica">Jamaica</option>
+  <option value="Trinidad and Tobago">Trinidad and Tobago</option>
+  <option value="Barbados">Barbados</option>
+  <option value="Bahamas">Bahamas</option>
+  <option value="Dominican Republic">Dominican Republic</option>
+  <option value="Cuba">Cuba</option>
+  <option value="Zimbabwe">Zimbabwe</option>
+  <option value="Zambia">Zambia</option>
+  <option value="Ghana">Ghana</option>
+  <option value="Uganda">Uganda</option>
+  <option value="Tanzania">Tanzania</option>
+  <option value="Algeria">Algeria</option>
+  <option value="Tunisia">Tunisia</option>
+  <option value="Libya">Libya</option>
+  <option value="Sudan">Sudan</option>
+  <option value="Ethiopia">Ethiopia</option>
+  <option value="Cameroon">Cameroon</option>
+  <option value="Ivory Coast">Ivory Coast</option>
+  <option value="Senegal">Senegal</option>
+  <option value="Madagascar">Madagascar</option>
+  <option value="Mozambique">Mozambique</option>
+  <option value="Namibia">Namibia</option>
+  <option value="Botswana">Botswana</option>
+  <option value="Rwanda">Rwanda</option>
 </select>
 
     {/* Rest of inputs */}
@@ -154,7 +417,9 @@ export default function CheckoutForm() {
         placeholder={placeholder}
         value={(billingInfo as any)[name]}
         onChange={handleChange}
-        className="bg-[#160000]/50 text-[#f8fcdc] placeholder-[#f8fcdc]/50 border border-transparent p-2 rounded w-full transition-colors duration-200 focus:outline-none focus:ring-0 focus:bg-[#2a0000]/70"
+        className={`bg-[#160000]/50 text-[#f8fcdc] placeholder-[#f8fcdc]/50 border ${
+          missingBillingFields.includes(name) ? 'border-red-500' : 'border-transparent'
+        } p-2 rounded w-full transition-colors duration-200 focus:outline-none focus:ring-0 focus:bg-[#2a0000]/70`}
         required={required}
       />
     ))}
@@ -183,21 +448,140 @@ export default function CheckoutForm() {
           placeholder={placeholder}
           value={(shippingInfo as any)[name]}
           onChange={handleShippingChange}
-          className="bg-[#160000]/50 text-[#f8fcdc] placeholder-[#f8fcdc]/50 border border-transparent p-2 rounded w-full transition-colors duration-200 focus:outline-none focus:ring-0 focus:bg-[#2a0000]/70"
+          className={`bg-[#160000]/50 text-[#f8fcdc] placeholder-[#f8fcdc]/50 border ${
+            missingFields?.includes(name) ? 'border-red-500' : 'border-transparent'
+          } p-2 rounded w-full transition-colors duration-200 focus:outline-none focus:ring-0 focus:bg-[#2a0000]/70`}
           required={required}
         />
       ))}
 
       {/* Shipping Country Select */}
-  <select
-    name="country"
-    value={billingInfo.country}
-    onChange={handleChange}
-    required
-    className="bg-[#160000]/50 text-[#f8fcdc] placeholder-[#f8fcdc]/50 border-none p-2 rounded w-full appearance-none focus:outline-none focus:ring-0 cursor-pointer"
-  >
+      <select
+  name="country"
+  value={shippingInfo.country}
+onChange={handleShippingChange}
+  required
+  className={`bg-[#160000]/50 text-[#f8fcdc] placeholder-[#f8fcdc]/50 border ${
+    missingShippingFields.includes('country') ? 'border-red-500' : 'border-transparent'
+  } p-2 rounded w-full appearance-none focus:outline-none focus:ring-0 cursor-pointer`}
+>
   <option value="">Select a country</option>
-
+  <option value="United States">United States</option>
+  <option value="United Kingdom">United Kingdom</option>
+  <option value="Canada">Canada</option>
+  <option value="Australia">Australia</option>
+  <option value="Germany">Germany</option>
+  <option value="France">France</option>
+  <option value="Italy">Italy</option>
+  <option value="Spain">Spain</option>
+  <option value="Netherlands">Netherlands</option>
+  <option value="Sweden">Sweden</option>
+  <option value="Norway">Norway</option>
+  <option value="Denmark">Denmark</option>
+  <option value="Finland">Finland</option>
+  <option value="Ireland">Ireland</option>
+  <option value="New Zealand">New Zealand</option>
+  <option value="Japan">Japan</option>
+  <option value="South Korea">South Korea</option>
+  <option value="China">China</option>
+  <option value="India">India</option>
+  <option value="Brazil">Brazil</option>
+  <option value="Mexico">Mexico</option>
+  <option value="Argentina">Argentina</option>
+  <option value="South Africa">South Africa</option>
+  <option value="Russia">Russia</option>
+  <option value="Ukraine">Ukraine</option>
+  <option value="Poland">Poland</option>
+  <option value="Austria">Austria</option>
+  <option value="Belgium">Belgium</option>
+  <option value="Switzerland">Switzerland</option>
+  <option value="Portugal">Portugal</option>
+  <option value="Greece">Greece</option>
+  <option value="Turkey">Turkey</option>
+  <option value="Thailand">Thailand</option>
+  <option value="Malaysia">Malaysia</option>
+  <option value="Singapore">Singapore</option>
+  <option value="Indonesia">Indonesia</option>
+  <option value="Philippines">Philippines</option>
+  <option value="Vietnam">Vietnam</option>
+  <option value="Saudi Arabia">Saudi Arabia</option>
+  <option value="United Arab Emirates">United Arab Emirates</option>
+  <option value="Egypt">Egypt</option>
+  <option value="Israel">Israel</option>
+  <option value="Chile">Chile</option>
+  <option value="Colombia">Colombia</option>
+  <option value="Peru">Peru</option>
+  <option value="Nigeria">Nigeria</option>
+  <option value="Kenya">Kenya</option>
+  <option value="Morocco">Morocco</option>
+  <option value="Czech Republic">Czech Republic</option>
+  <option value="Romania">Romania</option>
+  <option value="Hungary">Hungary</option>
+  <option value="Slovakia">Slovakia</option>
+  <option value="Slovenia">Slovenia</option>
+  <option value="Bulgaria">Bulgaria</option>
+  <option value="Croatia">Croatia</option>
+  <option value="Serbia">Serbia</option>
+  <option value="Estonia">Estonia</option>
+  <option value="Latvia">Latvia</option>
+  <option value="Lithuania">Lithuania</option>
+  <option value="Pakistan">Pakistan</option>
+  <option value="Bangladesh">Bangladesh</option>
+  <option value="Sri Lanka">Sri Lanka</option>
+  <option value="Nepal">Nepal</option>
+  <option value="Myanmar">Myanmar</option>
+  <option value="Cambodia">Cambodia</option>
+  <option value="Laos">Laos</option>
+  <option value="Mongolia">Mongolia</option>
+  <option value="Kazakhstan">Kazakhstan</option>
+  <option value="Uzbekistan">Uzbekistan</option>
+  <option value="Qatar">Qatar</option>
+  <option value="Kuwait">Kuwait</option>
+  <option value="Oman">Oman</option>
+  <option value="Bahrain">Bahrain</option>
+  <option value="Jordan">Jordan</option>
+  <option value="Lebanon">Lebanon</option>
+  <option value="Iceland">Iceland</option>
+  <option value="Luxembourg">Luxembourg</option>
+  <option value="Malta">Malta</option>
+  <option value="Cyprus">Cyprus</option>
+  <option value="Georgia">Georgia</option>
+  <option value="Armenia">Armenia</option>
+  <option value="Azerbaijan">Azerbaijan</option>
+  <option value="Panama">Panama</option>
+  <option value="Costa Rica">Costa Rica</option>
+  <option value="Uruguay">Uruguay</option>
+  <option value="Paraguay">Paraguay</option>
+  <option value="Bolivia">Bolivia</option>
+  <option value="Ecuador">Ecuador</option>
+  <option value="Guatemala">Guatemala</option>
+  <option value="Honduras">Honduras</option>
+  <option value="El Salvador">El Salvador</option>
+  <option value="Nicaragua">Nicaragua</option>
+  <option value="Jamaica">Jamaica</option>
+  <option value="Trinidad and Tobago">Trinidad and Tobago</option>
+  <option value="Barbados">Barbados</option>
+  <option value="Bahamas">Bahamas</option>
+  <option value="Dominican Republic">Dominican Republic</option>
+  <option value="Cuba">Cuba</option>
+  <option value="Zimbabwe">Zimbabwe</option>
+  <option value="Zambia">Zambia</option>
+  <option value="Ghana">Ghana</option>
+  <option value="Uganda">Uganda</option>
+  <option value="Tanzania">Tanzania</option>
+  <option value="Algeria">Algeria</option>
+  <option value="Tunisia">Tunisia</option>
+  <option value="Libya">Libya</option>
+  <option value="Sudan">Sudan</option>
+  <option value="Ethiopia">Ethiopia</option>
+  <option value="Cameroon">Cameroon</option>
+  <option value="Ivory Coast">Ivory Coast</option>
+  <option value="Senegal">Senegal</option>
+  <option value="Madagascar">Madagascar</option>
+  <option value="Mozambique">Mozambique</option>
+  <option value="Namibia">Namibia</option>
+  <option value="Botswana">Botswana</option>
+  <option value="Rwanda">Rwanda</option>
 </select>
 
       {[
@@ -213,7 +597,9 @@ export default function CheckoutForm() {
           placeholder={placeholder}
           value={(shippingInfo as any)[name]}
           onChange={handleShippingChange}
-          className="bg-[#160000]/50 text-[#f8fcdc] placeholder-[#f8fcdc]/50 border border-transparent p-2 rounded w-full transition-colors duration-200 focus:outline-none focus:ring-0 focus:bg-[#2a0000]/70"
+          className={`bg-[#160000]/50 text-[#f8fcdc] placeholder-[#f8fcdc]/50 border ${
+  missingFields?.includes(name) ? 'border-red-500' : 'border-transparent'
+} p-2 rounded w-full transition-colors duration-200 focus:outline-none focus:ring-0 focus:bg-[#2a0000]/70`}
           required={required}
         />
       ))}
@@ -388,7 +774,7 @@ export default function CheckoutForm() {
         </label>
 
         {errorMessage && <div className="text-red-500 text-sm mb-4">{errorMessage}</div>}
-{success && <div className="text-green-500 text-sm mb-4">Payment successful! ✅</div>}
+{success && <div className="text-green-500 text-sm mb-4">Payment Successful!</div>}
 
 {paymentMethod === 'paypal' ? (
   <div className="w-full md:max-w-[450px] mt-6">
@@ -428,12 +814,12 @@ export default function CheckoutForm() {
   </div>
 ) : (
   <button
-    type="submit"
-    disabled={loading || !stripe || !consentTerms}
-    className="w-full md:max-w-[450px] mt-2 bg-[#dc9e63] text-black py-2 rounded hover:bg-[#f8cfa3] transition-colors"
-  >
-    {loading ? 'Processing...' : 'PLACE ORDER'}
-  </button>
+  type="submit"
+  disabled={false}
+  className="w-full bg-[#dc9e63] text-black py-3 rounded-xl text-lg font-extrabold tracking-wide hover:bg-[#f8cfa3] transition-colors shadow-lg cursor-pointer"
+>
+  {loading ? 'Processing...' : 'PLACE ORDER'}
+</button>
 )}
       </div>
     </form>
