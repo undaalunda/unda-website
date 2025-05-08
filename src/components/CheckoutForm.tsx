@@ -254,9 +254,12 @@ export default function CheckoutForm() {
     <main className="min-h-screen flex flex-col items-center justify-center pt-[120px] text-[#f8fcdc] font-[Cinzel] px-6">
       <h1 className="text-4xl font-extrabold tracking-wide mb-8 text-[#dc9e63]">CHECKOUT</h1>
       <Script
-        src={`https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`}
-        strategy="beforeInteractive"
-      />
+  src={`https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`}
+  onLoad={() => {
+    window.grecaptcha.ready(() => setCaptchaReady(true));
+  }}
+  strategy="beforeInteractive"
+/>
 
       <form
   onSubmit={handleSubmit}
