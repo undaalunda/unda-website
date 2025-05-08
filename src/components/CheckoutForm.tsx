@@ -23,6 +23,18 @@ export default function CheckoutForm() {
   const [shipToDifferent, setShipToDifferent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [captchaReady, setCaptchaReady] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.grecaptcha) {
+      window.grecaptcha.ready(() => setCaptchaReady(true));
+    }
+  }, []);
+
+  // ✅ ใส่ useEffect log ตรงนี้ เพื่อ debug ว่า ready หรือยัง
+  useEffect(() => {
+    console.log('✅ captchaReady:', captchaReady);
+  }, [captchaReady]);
+
   const [errorMessage, setErrorMessage] = useState('');
   const [success, setSuccess] = useState(false);
   const [consentTerms, setConsentTerms] = useState(false);
@@ -237,15 +249,7 @@ export default function CheckoutForm() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center pt-[120px] text-[#f8fcdc] font-[Cinzel] px-6">
       <h1 className="text-4xl font-extrabold tracking-wide mb-8 text-[#dc9e63]">CHECKOUT</h1>
-      <Script
-  src={`https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`}
-  strategy="afterInteractive"
-  onLoad={() => {
-    if (window.grecaptcha) {
-      window.grecaptcha.ready(() => setCaptchaReady(true));
-    }
-  }}
-/>
+      
       <form
         onSubmit={handleSubmit}
         className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto p-6"
