@@ -45,18 +45,11 @@ export default function CheckoutForm() {
     city: '', county: '', postcode: ''
   });
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (typeof window !== 'undefined' && window.grecaptcha) {
-        window.grecaptcha.ready(() => {
-          setCaptchaReady(true);
-          clearInterval(interval); // หยุดเช็กซ้ำ
-        });
-      }
-    }, 500); // เช็กทุกครึ่งวินาที
-  
-    return () => clearInterval(interval); // cleanup ตอน unmount
-  }, []);
+  const cartTotal: number = cartItems.reduce((acc, item) => {
+    const price = typeof item.price === 'object' ? item.price.sale : item.price;
+    return acc + price * item.quantity;
+  }, 0);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setBillingInfo(prev => ({ ...prev, [name]: value }));
@@ -66,11 +59,6 @@ export default function CheckoutForm() {
     const { name, value } = e.target;
     setShippingInfo(prev => ({ ...prev, [name]: value }));
   };
-
-  const cartTotal = cartItems.reduce((acc, item) => {
-    const price = typeof item.price === 'object' ? item.price.sale : item.price;
-    return acc + price * item.quantity;
-  }, 0);
 
   const billingRequired = ['firstName', 'lastName', 'address', 'city', 'postcode', 'phone', 'email', 'country'];
   const shippingRequired = ['firstName', 'lastName', 'address', 'city', 'postcode', 'country'];
@@ -83,6 +71,17 @@ export default function CheckoutForm() {
   const isValidPhone = (phone: string) => /^\+?\d{7,15}$/.test(phone.replace(/\s/g, ''));
   const isValidAddress = (addr: string) => /[a-zA-Z0-9]{5,}/.test(addr.trim());
   const isBlacklisted = (value: string) => blacklistWords.some(w => value.toLowerCase().includes(w));
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (window.grecaptcha && window.grecaptcha.ready) {
+        window.grecaptcha.ready(() => setCaptchaReady(true));
+        clearInterval(interval);
+      }
+    }, 500);
+  
+    return () => clearInterval(interval);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,16 +112,23 @@ export default function CheckoutForm() {
       setErrorMessage(`Please fill in: ${allMissing.join(', ')}`);
       setLoading(false);
       debounceRef.current = false;
-      const firstErrorInput = document.querySelector(`[name="${allMissing[0]}"]`) as HTMLElement;
-      if (firstErrorInput) {
-        firstErrorInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        firstErrorInput.focus();
-      }
       return;
     }
 
     if (!captchaReady || !window.grecaptcha) {
       setErrorMessage('reCAPTCHA not loaded. Please wait a moment and try again.');
+      setLoading(false);
+      debounceRef.current = false;
+      return;
+    }
+
+    let token = '';
+    try {
+      token = await window.grecaptcha.execute(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!, {
+        action: 'checkout',
+      });
+    } catch (captchaError) {
+      setErrorMessage('reCAPTCHA failed. Please refresh and try again.');
       setLoading(false);
       debounceRef.current = false;
       return;
@@ -175,25 +181,6 @@ export default function CheckoutForm() {
       return;
     }
 
-    let token = '';
-    if (typeof window !== 'undefined' && window.grecaptcha && captchaReady) {
-      try {
-        token = await window.grecaptcha.execute(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!, {
-          action: 'checkout',
-        });
-      } catch (captchaError) {
-        setErrorMessage('reCAPTCHA failed. Please refresh and try again.');
-        setLoading(false);
-        debounceRef.current = false;
-        return;
-      }
-    } else {
-      setErrorMessage('reCAPTCHA not loaded. Please refresh the page.');
-      setLoading(false);
-      debounceRef.current = false;
-      return;
-    }
-
     if (paymentMethod === 'card') {
       if (!stripe || !elements) {
         setErrorMessage('Stripe.js is not loaded yet.');
@@ -214,10 +201,7 @@ export default function CheckoutForm() {
 
       if (error) {
         console.error('[🔥 createPaymentMethod error]', error);
-        const message = error.message?.includes('expired')
-          ? 'Card appears to be expired. Use a valid future date.'
-          : error.message || 'An unknown error occurred';
-        setErrorMessage(message);
+        setErrorMessage(error.message || 'An unknown error occurred');
         setLoading(false);
         debounceRef.current = false;
         return;
@@ -255,16 +239,18 @@ export default function CheckoutForm() {
       <h1 className="text-4xl font-extrabold tracking-wide mb-8 text-[#dc9e63]">CHECKOUT</h1>
       <Script
   src={`https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`}
+  strategy="afterInteractive"
   onLoad={() => {
-    window.grecaptcha.ready(() => setCaptchaReady(true));
+    if (window.grecaptcha) {
+      window.grecaptcha.ready(() => setCaptchaReady(true));
+    }
   }}
-  strategy="beforeInteractive"
 />
-
       <form
-  onSubmit={handleSubmit}
-  className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto p-6"
->
+        onSubmit={handleSubmit}
+        className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto p-6"
+      >
+        
        {/* Billing Details */}
 <div>
   <h2 className="text-xl font-bold text-[#dc9e63] mb-4">BILLING DETAILS</h2>
