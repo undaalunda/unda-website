@@ -5,6 +5,7 @@ import { useCart } from '@/context/CartContext';
 import { useEffect, useState, useRef } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { PayPalButtons } from '@paypal/react-paypal-js';
+import { useRouter } from 'next/navigation';
 
 declare global {
   interface Window {
@@ -15,10 +16,10 @@ declare global {
 const blacklistWords = ['asdf', 'test', 'example'];
 
 export default function CheckoutForm() {
+  const router = useRouter();
   const stripe = useStripe();
   const elements = useElements();
   const { cartItems, clearCart } = useCart();
-
   const [shippingMethod, setShippingMethod] = useState<'evri' | 'dhl'>('evri');
   const [shipToDifferent, setShipToDifferent] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -234,6 +235,7 @@ export default function CheckoutForm() {
         } else {
           setSuccess(true);
           clearCart();
+          router.push('/thank-you'); 
         }
       } catch (err: any) {
         console.error('[🔥 API error]', err);
@@ -941,6 +943,7 @@ onChange={handleShippingChange}
         console.log('✅ PayPal Success:', details);
         setSuccess(true);
         clearCart();
+        router.push('/thank-you'); 
       }}
       onError={(err) => {
         console.error('❌ PayPal Error:', err);

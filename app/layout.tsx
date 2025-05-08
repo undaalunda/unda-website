@@ -1,5 +1,3 @@
-/* RootLayout.tsx */
-
 'use client';
 
 import Link from 'next/link';
@@ -12,11 +10,13 @@ import NewsletterForm from '../src/components/NewsletterForm';
 import { CartProvider } from '@/context/CartContext';
 import CartSuccessPopup from '@/components/CartSuccessPopup';
 import Script from 'next/script';
+import { usePathname } from 'next/navigation';
 
 const Navbar = dynamic(() => import('../src/components/Navbar'), { ssr: false });
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const handler = (e: any) => {
@@ -43,14 +43,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           src={`https://www.paypal.com/sdk/js?client-id=${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}`}
           strategy="beforeInteractive"
         />
-        
       </head>
       <body
         className="bg-[#190000] text-[#f8fcdc] m-0 p-0 overflow-x-hidden"
-        style={{
-          WebkitOverflowScrolling: 'touch',
-          overscrollBehaviorY: 'contain',
-        }}
+        style={{ WebkitOverflowScrolling: 'touch', overscrollBehaviorY: 'contain' }}
       >
         <CartProvider>
           <Navbar />
