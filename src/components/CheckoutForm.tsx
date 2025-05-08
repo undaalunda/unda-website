@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
+import Script from 'next/script';
 import { useCart } from '@/context/CartContext';
 import { useEffect, useState, useRef } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { PayPalButtons } from '@paypal/react-paypal-js';
-import Script from 'next/script';
 
 declare global {
   interface Window {
@@ -23,18 +23,6 @@ export default function CheckoutForm() {
   const [shipToDifferent, setShipToDifferent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [captchaReady, setCaptchaReady] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.grecaptcha) {
-      window.grecaptcha.ready(() => setCaptchaReady(true));
-    }
-  }, []);
-
-  // ✅ ใส่ useEffect log ตรงนี้ เพื่อ debug ว่า ready หรือยัง
-  useEffect(() => {
-    console.log('✅ captchaReady:', captchaReady);
-  }, [captchaReady]);
-
   const [errorMessage, setErrorMessage] = useState('');
   const [success, setSuccess] = useState(false);
   const [consentTerms, setConsentTerms] = useState(false);
@@ -57,20 +45,21 @@ export default function CheckoutForm() {
     city: '', county: '', postcode: ''
   });
 
-  const cartTotal: number = cartItems.reduce((acc, item) => {
-    const price = typeof item.price === 'object' ? item.price.sale : item.price;
-    return acc + price * item.quantity;
-  }, 0);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setBillingInfo(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleShippingChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setShippingInfo(prev => ({ ...prev, [name]: value }));
-  };
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = `https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      if (window.grecaptcha) {
+        window.grecaptcha.ready(() => {
+          console.log('✅ grecaptcha ready');
+          setCaptchaReady(true);
+        });
+      }
+    };
+    document.head.appendChild(script);
+  }, []);
 
   const billingRequired = ['firstName', 'lastName', 'address', 'city', 'postcode', 'phone', 'email', 'country'];
   const shippingRequired = ['firstName', 'lastName', 'address', 'city', 'postcode', 'country'];
@@ -84,16 +73,20 @@ export default function CheckoutForm() {
   const isValidAddress = (addr: string) => /[a-zA-Z0-9]{5,}/.test(addr.trim());
   const isBlacklisted = (value: string) => blacklistWords.some(w => value.toLowerCase().includes(w));
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (window.grecaptcha && window.grecaptcha.ready) {
-        window.grecaptcha.ready(() => setCaptchaReady(true));
-        clearInterval(interval);
-      }
-    }, 500);
-  
-    return () => clearInterval(interval);
-  }, []);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setBillingInfo(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleShippingChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setShippingInfo(prev => ({ ...prev, [name]: value }));
+  };
+
+  const cartTotal: number = cartItems.reduce((acc, item) => {
+    const price = typeof item.price === 'object' ? item.price.sale : item.price;
+    return acc + price * item.quantity;
+  }, 0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -226,7 +219,13 @@ export default function CheckoutForm() {
         const res = await fetch('/api/create-payment-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ paymentMethodId: pm.id, amount: amountToCharge, token }),
+          body: JSON.stringify({
+            paymentMethodId: pm.id,
+            amount: amountToCharge,
+            token,
+            email: trimmedBilling.email,
+            marketing: consentMarketing,
+          }),
         });
 
         const result = await res.json();
@@ -249,6 +248,22 @@ export default function CheckoutForm() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center pt-[120px] text-[#f8fcdc] font-[Cinzel] px-6">
       <h1 className="text-4xl font-extrabold tracking-wide mb-8 text-[#dc9e63]">CHECKOUT</h1>
+
+      <Script
+      src={`https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`}
+      strategy="afterInteractive"
+      onLoad={() => {
+        console.log('✅ reCAPTCHA script loaded');
+        if (window.grecaptcha) {
+          window.grecaptcha.ready(() => {
+            console.log('✅ grecaptcha.ready()');
+            setCaptchaReady(true);
+          });
+        } else {
+          console.warn('❌ grecaptcha not found on window');
+        }
+      }}
+    />
       
       <form
         onSubmit={handleSubmit}

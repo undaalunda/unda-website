@@ -40,13 +40,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
         />
         <Script
-          src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID"
+          src={`https://www.paypal.com/sdk/js?client-id=${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}`}
           strategy="beforeInteractive"
         />
-        <Script
-  src={`https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`}
-  strategy="beforeInteractive"
-/>
+        
       </head>
       <body
         className="bg-[#190000] text-[#f8fcdc] m-0 p-0 overflow-x-hidden"

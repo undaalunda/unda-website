@@ -1,4 +1,5 @@
 // app/api/create-payment-intent/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
@@ -42,7 +43,7 @@ async function verifyCaptcha(token: string, ip?: string) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { paymentMethodId, amount, token } = body;
+    const { paymentMethodId, amount, token, email = 'unknown@example.com', marketing = false } = body;
 
     if (!paymentMethodId || !amount || !token) {
       return NextResponse.json(
@@ -69,6 +70,7 @@ export async function POST(req: NextRequest) {
     const captchaResult = await verifyCaptcha(token, ip);
 
     if (!captchaResult.success || captchaResult.score < 0.5 || captchaResult.action !== 'checkout') {
+      console.warn('❌ CAPTCHA failed:', captchaResult);
       return NextResponse.json(
         { error: 'Captcha verification failed.' },
         { status: 403 }
@@ -84,11 +86,16 @@ export async function POST(req: NextRequest) {
         enabled: true,
         allow_redirects: 'never',
       },
+      metadata: {
+        email: email,
+        marketing_consent: marketing ? 'yes' : 'no',
+        source: 'UndaAlundaStore',
+      },
     });
 
     return NextResponse.json({ success: true, clientSecret: paymentIntent.client_secret });
   } catch (err: any) {
-    console.error('🔥 PaymentIntent error:', err.message);
+    console.error('🔥 PaymentIntent error:', err);
     return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
   }
 }
