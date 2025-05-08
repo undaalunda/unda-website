@@ -1,9 +1,18 @@
 'use client';
 
 import { useCart } from '@/context/CartContext';
-import { useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { PayPalButtons } from '@paypal/react-paypal-js';
+import Script from 'next/script';
+
+declare global {
+  interface Window {
+    grecaptcha: any;
+  }
+}
+
+const blacklistWords = ['asdf', 'test', 'example'];
 
 export default function CheckoutForm() {
   const stripe = useStripe();
@@ -13,15 +22,18 @@ export default function CheckoutForm() {
   const [shippingMethod, setShippingMethod] = useState<'evri' | 'dhl'>('evri');
   const [shipToDifferent, setShipToDifferent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [captchaReady, setCaptchaReady] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [success, setSuccess] = useState(false);
   const [consentTerms, setConsentTerms] = useState(false);
   const [consentMarketing, setConsentMarketing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'paypal'>('card');
   const [missingFields, setMissingFields] = useState<string[]>([]);
-
   const [missingBillingFields, setMissingBillingFields] = useState<string[]>([]);
-const [missingShippingFields, setMissingShippingFields] = useState<string[]>([]);
+  const [missingShippingFields, setMissingShippingFields] = useState<string[]>([]);
+  const [termsError, setTermsError] = useState(false);
+
+  const debounceRef = useRef(false);
 
   const [billingInfo, setBillingInfo] = useState({
     firstName: '', lastName: '', company: '', country: '', address: '', address2: '',
@@ -33,6 +45,18 @@ const [missingShippingFields, setMissingShippingFields] = useState<string[]>([])
     city: '', county: '', postcode: ''
   });
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (typeof window !== 'undefined' && window.grecaptcha) {
+        window.grecaptcha.ready(() => {
+          setCaptchaReady(true);
+          clearInterval(interval); // หยุดเช็กซ้ำ
+        });
+      }
+    }, 500); // เช็กทุกครึ่งวินาที
+  
+    return () => clearInterval(interval); // cleanup ตอน unmount
+  }, []);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setBillingInfo(prev => ({ ...prev, [name]: value }));
@@ -49,87 +73,191 @@ const [missingShippingFields, setMissingShippingFields] = useState<string[]>([])
   }, 0);
 
   const billingRequired = ['firstName', 'lastName', 'address', 'city', 'postcode', 'phone', 'email', 'country'];
-const shippingRequired = ['firstName', 'lastName', 'address', 'city', 'postcode', 'country'];
+  const shippingRequired = ['firstName', 'lastName', 'address', 'city', 'postcode', 'country'];
 
-const getMissing = (info: typeof billingInfo | typeof shippingInfo, required: string[]) =>
-  required.filter(field => !info[field as keyof typeof info]);
+  const getMissing = (info: Record<string, any>, required: string[]) =>
+    required.filter(field => !info[field]?.toString().trim());
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setErrorMessage('');
-  setLoading(true);
+  const isValidName = (name: string) => /^[a-zA-Z\s'-]{2,}$/.test(name.trim());
+  const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const isValidPhone = (phone: string) => /^\+?\d{7,15}$/.test(phone.replace(/\s/g, ''));
+  const isValidAddress = (addr: string) => /[a-zA-Z0-9]{5,}/.test(addr.trim());
+  const isBlacklisted = (value: string) => blacklistWords.some(w => value.toLowerCase().includes(w));
 
-  const missingBillingFields = getMissing(billingInfo, billingRequired);
-  const missingShippingFields = shipToDifferent ? getMissing(shippingInfo, shippingRequired) : [];
-  const allMissing = [...missingBillingFields, ...missingShippingFields];
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (debounceRef.current) return;
+    debounceRef.current = true;
 
-  setMissingBillingFields(missingBillingFields);
-  setMissingShippingFields(missingShippingFields);
+    setErrorMessage('');
+    setTermsError(false);
+    setLoading(true);
 
-  if (allMissing.length > 0) {
-    setMissingFields(allMissing);
-    setErrorMessage(`Please fill in: ${allMissing.join(', ')}`);
-    setLoading(false);
-    const firstErrorInput = document.querySelector(`[name="${allMissing[0]}"]`) as HTMLElement;
-    if (firstErrorInput) firstErrorInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    return;
-  } else {
-    setMissingFields([]);
-  }
+    const trimmedBilling = Object.fromEntries(
+      Object.entries(billingInfo).map(([key, val]) => [key, typeof val === 'string' ? val.trim() : val])
+    ) as typeof billingInfo;
 
-  if (paymentMethod === 'card') {
-    if (!stripe || !elements) {
-      setErrorMessage('Stripe.js ยังโหลดไม่เสร็จ');
+    const trimmedShipping = Object.fromEntries(
+      Object.entries(shippingInfo).map(([key, val]) => [key, typeof val === 'string' ? val.trim() : val])
+    ) as typeof shippingInfo;
+
+    const missingBillingFields = getMissing(trimmedBilling, billingRequired);
+    const missingShippingFields = shipToDifferent ? getMissing(trimmedShipping, shippingRequired) : [];
+    const allMissing = [...missingBillingFields, ...missingShippingFields];
+
+    setMissingBillingFields(missingBillingFields);
+    setMissingShippingFields(missingShippingFields);
+
+    if (allMissing.length > 0) {
+      setMissingFields(allMissing);
+      setErrorMessage(`Please fill in: ${allMissing.join(', ')}`);
       setLoading(false);
-      return;
-    }
-
-    const card = elements.getElement(CardElement);
-    if (!card) {
-      setErrorMessage('Card Element ไม่เจอ');
-      setLoading(false);
-      return;
-    }
-
-    const { error, paymentMethod: pm } = await stripe.createPaymentMethod({ type: 'card', card });
-
-    if (error) {
-      console.error('[🔥 createPaymentMethod error]', error);
-      setErrorMessage(error.message || 'เกิดข้อผิดพลาดที่ไม่รู้จัก');
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const shippingCost = shippingMethod === 'dhl' ? 15 : 5;
-      const amountToCharge = Math.round((cartTotal + shippingCost) * 100);
-
-      const res = await fetch('/api/create-payment-intent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentMethodId: pm.id, amount: amountToCharge }),
-      });
-
-      const result = await res.json();
-      if (result.error) setErrorMessage(result.error);
-      else {
-        setSuccess(true);
-        clearCart();
+      debounceRef.current = false;
+      const firstErrorInput = document.querySelector(`[name="${allMissing[0]}"]`) as HTMLElement;
+      if (firstErrorInput) {
+        firstErrorInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstErrorInput.focus();
       }
-    } catch (err: any) {
-      console.error('[🔥 API error]', err);
-      setErrorMessage('ระบบพัง กรุณาลองใหม่อีกครั้ง');
+      return;
     }
-  }
 
-  setLoading(false);
-};
+    if (!captchaReady || !window.grecaptcha) {
+      setErrorMessage('reCAPTCHA not loaded. Please wait a moment and try again.');
+      setLoading(false);
+      debounceRef.current = false;
+      return;
+    }
+
+    if (!isValidName(trimmedBilling.firstName) || isBlacklisted(trimmedBilling.firstName)) {
+      setErrorMessage('Please enter a valid first name.');
+      setMissingBillingFields(['firstName']);
+      setLoading(false);
+      debounceRef.current = false;
+      return;
+    }
+
+    if (!isValidEmail(trimmedBilling.email) || isBlacklisted(trimmedBilling.email)) {
+      setErrorMessage('Please enter a valid email address.');
+      setMissingBillingFields(['email']);
+      setLoading(false);
+      debounceRef.current = false;
+      return;
+    }
+
+    if (!isValidPhone(trimmedBilling.phone)) {
+      setErrorMessage('Please enter a valid phone number.');
+      setMissingBillingFields(['phone']);
+      setLoading(false);
+      debounceRef.current = false;
+      return;
+    }
+
+    if (!isValidAddress(trimmedBilling.address)) {
+      setErrorMessage('Please enter a valid address.');
+      setMissingBillingFields(['address']);
+      setLoading(false);
+      debounceRef.current = false;
+      return;
+    }
+
+    if (!consentTerms) {
+      setTermsError(true);
+      setErrorMessage('You must agree to the terms and conditions.');
+      setLoading(false);
+      debounceRef.current = false;
+      return;
+    }
+
+    if (cartItems.length === 0) {
+      setErrorMessage('Your cart is empty. Please add items before checking out.');
+      setLoading(false);
+      debounceRef.current = false;
+      return;
+    }
+
+    let token = '';
+    if (typeof window !== 'undefined' && window.grecaptcha && captchaReady) {
+      try {
+        token = await window.grecaptcha.execute(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!, {
+          action: 'checkout',
+        });
+      } catch (captchaError) {
+        setErrorMessage('reCAPTCHA failed. Please refresh and try again.');
+        setLoading(false);
+        debounceRef.current = false;
+        return;
+      }
+    } else {
+      setErrorMessage('reCAPTCHA not loaded. Please refresh the page.');
+      setLoading(false);
+      debounceRef.current = false;
+      return;
+    }
+
+    if (paymentMethod === 'card') {
+      if (!stripe || !elements) {
+        setErrorMessage('Stripe.js is not loaded yet.');
+        setLoading(false);
+        debounceRef.current = false;
+        return;
+      }
+
+      const card = elements.getElement(CardElement);
+      if (!card) {
+        setErrorMessage('Card Element not found.');
+        setLoading(false);
+        debounceRef.current = false;
+        return;
+      }
+
+      const { error, paymentMethod: pm } = await stripe.createPaymentMethod({ type: 'card', card });
+
+      if (error) {
+        console.error('[🔥 createPaymentMethod error]', error);
+        const message = error.message?.includes('expired')
+          ? 'Card appears to be expired. Use a valid future date.'
+          : error.message || 'An unknown error occurred';
+        setErrorMessage(message);
+        setLoading(false);
+        debounceRef.current = false;
+        return;
+      }
+
+      try {
+        const shippingCost = shippingMethod === 'dhl' ? 15 : 5;
+        const amountToCharge = Math.round((cartTotal + shippingCost) * 100);
+
+        const res = await fetch('/api/create-payment-intent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paymentMethodId: pm.id, amount: amountToCharge, token }),
+        });
+
+        const result = await res.json();
+        if (result.error) {
+          setErrorMessage(result.error);
+        } else {
+          setSuccess(true);
+          clearCart();
+        }
+      } catch (err: any) {
+        console.error('[🔥 API error]', err);
+        setErrorMessage('Something went wrong. Please try again.');
+      }
+    }
+
+    setLoading(false);
+    debounceRef.current = false;
+  };
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center pt-[120px] text-[#f8fcdc] font-[Cinzel] px-6">
-      <h1 className="text-4xl font-extrabold tracking-wide mb-8 text-[#dc9e63]">
-  CHECKOUT
-</h1>
+      <h1 className="text-4xl font-extrabold tracking-wide mb-8 text-[#dc9e63]">CHECKOUT</h1>
+      <Script
+        src={`https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`}
+        strategy="beforeInteractive"
+      />
+
       <form
   onSubmit={handleSubmit}
   className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto p-6"

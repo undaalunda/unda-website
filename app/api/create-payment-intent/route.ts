@@ -2,25 +2,76 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-// ป้องกัน build-time crash ถ้า STRIPE_SECRET_KEY หาย
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+const recaptchaSecretKey = process.env.RECAPTCHA_SECRET_KEY;
+
 if (!stripeSecretKey) {
-  throw new Error('🧨 STRIPE_SECRET_KEY is not defined in environment variables. Please set it in .env or deployment settings.');
+  throw new Error('🧨 STRIPE_SECRET_KEY is not defined.');
+}
+if (!recaptchaSecretKey) {
+  throw new Error('🧨 RECAPTCHA_SECRET_KEY is not defined.');
 }
 
 const stripe = new Stripe(stripeSecretKey, {
   apiVersion: '2024-04-10' as any,
 });
 
+function isValidAmount(amount: any): boolean {
+  return typeof amount === 'number' && amount > 0 && amount < 1000000;
+}
+
+function isValidPaymentMethodId(id: any): boolean {
+  return typeof id === 'string' && /^pm_/.test(id);
+}
+
+async function verifyCaptcha(token: string, ip?: string) {
+  const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      secret: recaptchaSecretKey!,
+      response: token,
+      ...(ip ? { remoteip: ip } : {}),
+    }),
+  });
+
+  const data = await response.json();
+  return data;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { paymentMethodId, amount } = body;
+    const { paymentMethodId, amount, token } = body;
 
-    if (!paymentMethodId || !amount) {
+    if (!paymentMethodId || !amount || !token) {
       return NextResponse.json(
-        { error: 'Missing paymentMethodId or amount in request body.' },
+        { error: 'Missing paymentMethodId, amount, or captcha token.' },
         { status: 400 }
+      );
+    }
+
+    if (!isValidPaymentMethodId(paymentMethodId)) {
+      return NextResponse.json(
+        { error: 'Invalid paymentMethodId format.' },
+        { status: 400 }
+      );
+    }
+
+    if (!isValidAmount(amount)) {
+      return NextResponse.json(
+        { error: 'Invalid amount. Must be a number greater than 0.' },
+        { status: 400 }
+      );
+    }
+
+    const ip = req.headers.get('x-forwarded-for') || undefined;
+    const captchaResult = await verifyCaptcha(token, ip);
+
+    if (!captchaResult.success || captchaResult.score < 0.5 || captchaResult.action !== 'checkout') {
+      return NextResponse.json(
+        { error: 'Captcha verification failed.' },
+        { status: 403 }
       );
     }
 
@@ -38,6 +89,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, clientSecret: paymentIntent.client_secret });
   } catch (err: any) {
     console.error('🔥 PaymentIntent error:', err.message);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
   }
 }

@@ -1,5 +1,3 @@
-//CartContext.tsx
-
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
@@ -33,23 +31,33 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [lastAddedItem, setLastAddedItem] = useState<CartItem | null>(null);
   const [cartError, setCartError] = useState<string | null>(null);
 
+  // Load cart from localStorage on first render
   useEffect(() => {
-    const storedCart = localStorage.getItem('cart');
-    if (storedCart) {
-      setCartItems(JSON.parse(storedCart));
+    try {
+      const storedCart = localStorage.getItem('cart');
+      if (storedCart) {
+        setCartItems(JSON.parse(storedCart));
+      }
+    } catch (err) {
+      console.error('💥 Failed to load cart from localStorage:', err);
     }
   }, []);
 
+  // Save cart to localStorage every time it changes
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cartItems));
+    try {
+      localStorage.setItem('cart', JSON.stringify(cartItems));
+    } catch (err) {
+      console.error('💥 Failed to save cart to localStorage:', err);
+    }
   }, [cartItems]);
 
   const addToCart = (id: string, quantity: number = 1): void => {
     const item = allItems.find((i) => i.id === id);
     if (!item) return;
 
-    setCartItems(prev => {
-      const existing = prev.find(cartItem => cartItem.id === id);
+    setCartItems((prev) => {
+      const existing = prev.find((cartItem) => cartItem.id === id);
       const newQuantity = (existing?.quantity || 0) + quantity;
 
       if (newQuantity > 20) {
@@ -58,7 +66,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       if (existing) {
-        return prev.map(cartItem =>
+        return prev.map((cartItem) =>
           cartItem.id === id
             ? { ...cartItem, quantity: newQuantity }
             : cartItem
@@ -95,13 +103,16 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const updateQuantity = (id: string, quantity: number) => {
     setCartItems((prev) =>
       prev.map((item) =>
-        item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
+        item.id === id
+          ? { ...item, quantity: Math.max(1, quantity) }
+          : item
       )
     );
   };
 
   const clearCart = () => {
     setCartItems([]);
+    localStorage.removeItem('cart'); // ← optional but cleaner
   };
 
   return (
@@ -125,7 +136,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useCart = () => {
   const context = useContext(CartContext);
-  if (!context)
+  if (!context) {
     throw new Error('useCart must be used within a CartProvider');
+  }
   return context;
 };

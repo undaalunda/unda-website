@@ -63,6 +63,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [wasSearchOpen, setWasSearchOpen] = useState(false);
+  const [musicDropdownOpen, setMusicDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [delayedQuery, setDelayedQuery] = useState('');
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
@@ -136,6 +137,7 @@ export default function Navbar() {
       body.style.position = '';
       body.style.top = '';
       window.scrollTo(0, scrollYMenuRef.current);
+      setMusicDropdownOpen(false);
     }
     const event = new CustomEvent('toggle-menu', { detail: menuOpen });
     window.dispatchEvent(event);
@@ -295,7 +297,29 @@ export default function Navbar() {
   <div className="fixed inset-0 bg-transparent flex flex-col items-center justify-center text-[#f8fcdc] text-lg font-semibold tracking-widest space-y-6 z-30 backdrop-blur-none font-[Cinzel]">
     <Link href="/" onClick={() => setMenuOpen(false)} className="hover:text-[#dc9e63]">HOME</Link>
     <Link href="/shop" onClick={() => setMenuOpen(false)} className="hover:text-[#dc9e63]">SHOP</Link>
-    <Link href="/music" onClick={() => setMenuOpen(false)} className="hover:text-[#dc9e63]">MUSIC</Link>
+    {/* MUSIC DROPDOWN MENU */}
+<div className="flex flex-col items-center z-30 font-[Cinzel] w-full">
+  <button
+    onClick={() => setMusicDropdownOpen(!musicDropdownOpen)}
+    className="hover:text-[#dc9e63] text-[#f8fcdc] text-lg font-semibold tracking-widest cursor-pointer"
+  >
+    MUSIC
+  </button>
+
+  <div
+    className={`
+      overflow-hidden transition-all duration-500 ease-in-out
+      flex flex-col items-center text-sm font-thin text-[#f8fcdc]/60 space-y-1
+      ${musicDropdownOpen ? 'max-h-60 mt-2' : 'max-h-0'}
+    `}
+  >
+    <a href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0" target="_blank" rel="noopener noreferrer" className="hover:text-[#dc9e63]">Spotify</a>
+    <a href="https://music.apple.com/us/artist/unda-alunda/1543677299" target="_blank" rel="noopener noreferrer" className="hover:text-[#dc9e63]">Apple</a>
+    <a href="https://www.deezer.com/en/artist/115903802" target="_blank" rel="noopener noreferrer" className="hover:text-[#dc9e63]">Deezer</a>
+    <a href="https://tidal.com/browse/artist/22524871" target="_blank" rel="noopener noreferrer" className="hover:text-[#dc9e63]">Tidal</a>
+    <a href="https://music.amazon.com/artists/B08PVKFZDZ/unda-alunda" target="_blank" rel="noopener noreferrer" className="hover:text-[#dc9e63]">Amazon</a>
+  </div>
+</div>
     <Link href="/about" onClick={() => setMenuOpen(false)} className="hover:text-[#dc9e63]">ABOUT</Link>
     <Link href="/tour" onClick={() => setMenuOpen(false)} className="hover:text-[#dc9e63]">TOUR</Link>
     <Link href="/contact" onClick={() => setMenuOpen(false)} className="hover:text-[#dc9e63]">CONTACT</Link>
