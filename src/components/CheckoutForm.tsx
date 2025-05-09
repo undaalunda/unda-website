@@ -235,6 +235,16 @@ export default function CheckoutForm() {
         } else {
           setSuccess(true);
           clearCart();
+
+          await fetch('/api/send-confirmation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: trimmedBilling.firstName,
+              email: trimmedBilling.email,
+            }),
+          });
+          
           router.push('/thank-you'); 
         }
       } catch (err: any) {
