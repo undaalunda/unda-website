@@ -1,0 +1,50 @@
+[
+  {
+    "id": "EVRI-522241235",
+    "email": "unda.alunda@gmail.com",
+    "billingInfo": {
+      "firstName": "Alunda",
+      "lastName": "Chantharattanachoke",
+      "company": "Unda Alunda",
+      "country": "Thailand",
+      "address": "434 Thanon Naphra",
+      "address2": "Intown Nakhon Pathom, Room 104",
+      "city": "Muang Nakhon Pathom",
+      "county": "นครปฐม",
+      "postcode": "73000",
+      "phone": "0800741120",
+      "email": "unda.alunda@gmail.com"
+    },
+    "shippingInfo": {
+      "firstName": "Alunda",
+      "lastName": "Chantharattanachoke",
+      "company": "Unda Alunda",
+      "country": "Thailand",
+      "address": "434 Thanon Naphra",
+      "address2": "Intown Nakhon Pathom, Room 104",
+      "city": "Muang Nakhon Pathom",
+      "county": "นครปฐม",
+      "postcode": "73000",
+      "phone": "0800741120",
+      "email": "unda.alunda@gmail.com"
+    },
+    "cartItems": [
+      {
+        "id": "cat-scores-black",
+        "title": "CAT SCORES T-SHIRT",
+        "subtitle": "BLACK",
+        "price": 29.95,
+        "image": "/black-cats-scores-tee.png",
+        "quantity": 1
+      }
+    ],
+    "shippingMethod": "evri",
+    "createdAt": "2025-05-11T13:36:45.608Z",
+    "shipmentDetails": {
+      "trackingNumber": "EVRI-522241235",
+      "trackingUrl": "https://www.evri.com/track/EVRI-522241235",
+      "estimatedDelivery": "Fri May 16 2025",
+      "labelUrl": "https://fake-labels.undaalunda.com/EVRI-522241235.pdf"
+    }
+  }
+]

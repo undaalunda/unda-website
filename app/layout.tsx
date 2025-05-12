@@ -1,3 +1,5 @@
+//RootLayout.tsx
+
 'use client';
 
 import Link from 'next/link';
@@ -102,7 +104,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   </div>
 
                   <p className="text-[#f8fcdc] mt-6 text-xs text-center">
-                    Copyright © 2025 UNDA ALUNDA
+                    Copyright © 2025 Unda Alunda
                   </p>
                 </div>
               </section>

@@ -16,8 +16,15 @@ export const allItems: Product[] = [
   // Merch
   { id: 'cat-scores-black', title: 'CAT SCORES T-SHIRT', category: 'Merch', subtitle: 'BLACK', price: 29.95, tags: ['t-shirt', 'black', 'shirt'], image: '/black-cats-scores-tee.png', url: '/shop/cat-scores-black' },
   { id: 'cat-scores-white', title: 'CAT SCORES T-SHIRT', category: 'Merch', subtitle: 'WHITE', price: 29.95, tags: ['t-shirt', 'white', 'shirt'], image: '/white-cats-scores-tee.png', url: '/shop/cat-scores-white' },
-  { id: 'cat-to-the-moon', title: 'A CAT TO THE MOON', category: 'Merch', subtitle: 'STICKERS', price: 4.95, tags: ['sticker', 'cat'], image: '/a-cat-to-the-moon-stickers.png', url: '/shop/cat-to-the-moon' },
-  { id: 'musician-cats', title: 'A MUSICIAN CATS', category: 'Merch', subtitle: 'STICKERS', price: 4.95, tags: ['sticker', 'cat'], image: '/a-musician-cats.png', url: '/shop/musician-cats' },
+  { id: 'cat-to-the-moon', title: 'A CAT TO THE MOON', category: 'Merch', subtitle: 'STICKERS', price: 4.95, tags: ['sticker', 'cat'], image: '/a-cat-to-the-moon-stickers.png', url: '/shop/cat-to-the-moon', description: `
+PVC Stickers (7x7cm. / piece)
+  Please Note: The product image displayed is a mock-up; actual item may vary.
+    `.trim()
+  },
+  { id: 'musician-cats', title: 'A MUSICIAN CATS', category: 'Merch', subtitle: 'STICKERS', price: 4.95, tags: ['sticker', 'cat'], image: '/a-musician-cats.png', url: '/shop/musician-cats', description: `
+PVC Stickers (7x7cm. / piece)
+  Please Note: The product image displayed is a mock-up; actual item may vary.
+    `.trim() },
   { id: 'signed-keychain', title: 'UNDA ALUNDA', category: 'Merch', subtitle: 'SIGNED KEYCHAIN', price: 9.95, tags: ['keychain', 'signed'], image: '/unda-alunda-sign-keychain.png', url: '/shop/signed-keychain' },
 
   // Music
@@ -38,22 +45,52 @@ export const allItems: Product[] = [
   Here, sorrow isn't an end—it's a brutal beginning, in a world that's devastatingly beautiful.
   
   Tracklist:
-  - The Dark
-  - Anomic
-  - Consonance
-  - JYY
-  - Out of the Dark
-  - Can’t Feel My Face
-  - Red Down
-  - Atlantic
-  - Feign
-  - Dark Wonderful World
-  - Quietness
+  1.The Dark
+  2.Anomic
+  3.Consonance
+  4.JYY
+  5.Out of the Dark
+  6.Can’t Feel My Face
+  7.Red Down
+  8.Atlantic
+  9.Feign
+  10.Dark Wonderful World
+  11.Quietness
   
   Please Note: The product image displayed is a mock-up; actual item may vary.
     `.trim()
   },
-  { id: 'live-cd', title: 'DARK WONDERFUL WORLD', subtitle: 'LIVE CD', category: 'Music', price: 14.95, tags: ['live', 'cd', 'album'], image: '/live-cd-dww.png', url: '/shop/live-cd' },
+
+  { id: 'live-cd', title: 'DARK WONDERFUL WORLD', subtitle: 'LIVE CD', category: 'Music', price: 14.95, tags: ['live', 'cd', 'album'], image: '/live-cd-dww.png', url: '/shop/live-cd', description: `
+  The first live performance under the name Unda Alunda,
+  recorded at the official album launch concert in Thailand on April 18, 2024.
+
+  Features 8 tracks from the Dark Wonderful World album, performed by the full live band.
+  
+  Tracklist:
+  1.The Dark
+  2.Anomic
+  3.Consonance
+  4.Out of the Dark
+  5.Can’t Feel My Face
+  6.Feign
+  7.Dark Wonderful World
+  8.Quietness
+
+  Unda Alunda – Guitars
+  Warit Techakanont – Keyboard & Synth
+  Thirakoon Matsri – Bass
+  TJ Trinidad – Drums
+
+  Audio Engineered, Mixed & Mastered by Atiruj Worakittichat
+  Filmed by Titikorn Poomanee, Sattawat Polpanna, Supanut Ditjaroen, Anon Preeyasaksakul
+  Camera Assisted by Thanathorn Ngamchaleaw
+  Edited by lukpee
+  Artwork by Zandy Niwattra
+  Please Note: The product image displayed is a mock-up; actual item may vary.
+    `.trim()
+  },
+
   { id: 'guitars-book', title: 'FULL GUITARS TRANSCRIPTION', subtitle: 'PRINTED BOOK', category: 'Music', price: 49.95, tags: ['book', 'transcription', 'guitar'], image: '/full-guitars-transcription.png', url: '/shop/guitars-book' },
   { id: 'bass-book', title: 'FULL BASS TRANSCRIPTION', subtitle: 'PRINTED BOOK', category: 'Music', price: 49.95, tags: ['book', 'transcription', 'bass'], image: '/full-bass-transcription.png', url: '/shop/bass-book' },
   { id: 'keys-book', title: 'FULL KEYS TRANSCRIPTION', subtitle: 'PRINTED BOOK', category: 'Music', price: 49.95, tags: ['book', 'transcription', 'keys'], image: '/full-keys-transcription.png', url: '/shop/keys-book' },

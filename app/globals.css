@@ -936,7 +936,7 @@ button svg,
 }
 
 .stems-image {
-  width: px;
+  width: 180px;
   height: auto;
   border-radius: 12px;
   object-fit: cover;
@@ -1615,9 +1615,6 @@ button svg,
     font-size: 14px;
   }
 }
-
-/* reCAPTCHA */
-
 
 /* === ✨ FADE IN ANIMATION === */
 
