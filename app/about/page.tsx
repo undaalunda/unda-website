@@ -150,7 +150,7 @@ useEffect(() => {
 }, []);
 
   return (
-    <main className="about-page-main font-[Cinzel] text-[#f8fcdc] px-4 sm:px-8 md:px-16 lg:px-32 py-13 max-w-5xl mx-auto leading-relaxed tracking-wide">
+    <main className="about-page-main font-[Cinzel] text-[#f8fcdc] px-4 sm:px-8 md:px-16 lg:px-32 py-5 max-w-5xl mx-auto leading-relaxed tracking-wide">
       <motion.section
         className="min-h-screen flex items-center justify-center text-center"
         initial="hidden"
