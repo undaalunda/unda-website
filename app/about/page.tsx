@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useState, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 40 },
@@ -25,6 +26,7 @@ const fadeInSection = {
     },
   },
 };
+
 
 const styledParagraphs = [
   {
@@ -77,7 +79,7 @@ const styledParagraphs = [
   },
   {
     text: `But that voice wouldn’t stay within Thailand for long.`,
-    className: 'italic text-left'
+    className: 'italic text-left mb-10'
   },
   {
     text: `In 2020, he submitted an entry to the international Abasi Neural Contest,\nheld by Neural DSP in collaboration with Tosin Abasi of Animals as Leaders.\nOut of over 600 submissions from around the world—he won.`,
@@ -131,6 +133,22 @@ const sectionRanges = [
 ];
 
 export default function AboutPage() {
+
+  const [showScrollHint, setShowScrollHint] = useState(true);
+  const scrollHintTriggerRef = useRef<HTMLDivElement | null>(null);
+
+useEffect(() => {
+  const handleScroll = () => {
+    const rect = scrollHintTriggerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    if (rect.top < window.innerHeight - 300) {
+      setShowScrollHint(false);
+    }
+  };
+  window.addEventListener('scroll', handleScroll);
+  return () => window.removeEventListener('scroll', handleScroll);
+}, []);
+
   return (
     <main className="about-page-main font-[Cinzel] text-[#f8fcdc] px-4 sm:px-8 md:px-16 lg:px-32 py-13 max-w-5xl mx-auto leading-relaxed tracking-wide">
       <motion.section
@@ -144,12 +162,13 @@ export default function AboutPage() {
           variants={fadeInUp}
           custom={0}
         >
-          Have you ever heard a song that seems to know you better than you know yourself?
+          Have you ever heard a song that seems to know you better than you know yourself..?
         </motion.h1>
       </motion.section>
 
       <motion.section
-        className="min-h-[60vh] flex items-center justify-center text-center"
+  ref={scrollHintTriggerRef}
+  className="min-h-[60vh] flex items-center justify-center text-center"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.6 }}
@@ -160,7 +179,7 @@ export default function AboutPage() {
           variants={fadeInUp}
           custom={1}
         >
-          When was the last time you truly felt like… yourself?
+          When was the last time you truly felt like… yourself..?
         </motion.h2>
       </motion.section>
 
@@ -209,6 +228,27 @@ export default function AboutPage() {
           ))}
         </motion.section>
       ))}
+
+            {/* Floating Scroll Hint */}
+     <AnimatePresence>
+  {showScrollHint && (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed bottom-10 left-1/2 -translate-x-1/2 pointer-events-none z-50"
+    >
+      <motion.p
+        className="text-sm sm:text-base italic text-[#f8fcdc]/50"
+        animate={{ y: [0, -5, 0] }}
+        transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+      >
+        scroll down slowly...
+      </motion.p>
+    </motion.div>
+  )}
+</AnimatePresence>
+      
     </main>
   );
 }
