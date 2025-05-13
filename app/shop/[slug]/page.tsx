@@ -95,24 +95,26 @@ export default function ProductPage() {
             )}
           </div>
 
-          <div className="product-quantity-wrapper mt-2">
-            <label className="text-sm font-medium mb-1">Quantity:</label>
-            <div className="flex items-center gap-2 mt-1">
-              <button
-                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                className="w-7 h-7 border border-[#dc9e63]/50 border-[0.5px] rounded-[2px] text-sm font-light flex items-center justify-center cursor-pointer"
-              >
-                -
-              </button>
-              <span className="text-[13px] md:text-sm font-light">{quantity}</span>
-              <button
-                onClick={() => setQuantity((q) => q + 1)}
-                className="w-7 h-7 border border-[#dc9e63]/50 border-[0.5px] rounded-[2px] text-sm font-light flex items-center justify-center cursor-pointer"
-              >
-                +
-              </button>
-            </div>
-          </div>
+          {product.type === 'physical' && (
+  <div className="product-quantity-wrapper mt-2">
+    <label className="text-sm font-medium mb-1">Quantity:</label>
+    <div className="flex items-center gap-2 mt-1">
+      <button
+        onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+        className="w-7 h-7 border border-[#dc9e63]/50 border-[0.5px] rounded-[2px] text-sm font-light flex items-center justify-center cursor-pointer"
+      >
+        -
+      </button>
+      <span className="text-[13px] md:text-sm font-light">{quantity}</span>
+      <button
+        onClick={() => setQuantity((q) => q + 1)}
+        className="w-7 h-7 border border-[#dc9e63]/50 border-[0.5px] rounded-[2px] text-sm font-light flex items-center justify-center cursor-pointer"
+      >
+        +
+      </button>
+    </div>
+  </div>
+)}
 
           {stockStatus && (
             <div className="mt-1 text-xs font-light tracking-wide">
@@ -143,13 +145,16 @@ export default function ProductPage() {
               className="add-to-cart-button cursor-pointer fade-in-section"
               disabled={stockStatus === 'out-of-stock'}
               onClick={() => {
-                if (quantity > 20) {
-                  setErrorMessage('You can only add up to 20 items per purchase.');
-                  return;
-                }
-                addToCart(product.id, quantity);
-                setErrorMessage(null);
-              }}
+  const qty = product.type === 'digital' ? 1 : quantity;
+
+  if (qty > 20) {
+    setErrorMessage('You can only add up to 20 items per purchase.');
+    return;
+  }
+
+  addToCart(product.id, qty);
+  setErrorMessage(null);
+}}
             >
               {stockStatus === 'out-of-stock' ? 'Unavailable' : `Add ${quantity} to Cart`}
             </button>

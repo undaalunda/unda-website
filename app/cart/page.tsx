@@ -18,7 +18,7 @@ export default function CartPage() {
   }, 0);
 
   const handleGoToCheckout = () => {
-    router.push('/checkout'); // ✅ ใช้ custom checkout page ของเราเอง
+    router.push('/checkout');
   };
 
   if (cartItems.length === 0) {
@@ -68,19 +68,26 @@ export default function CartPage() {
                   </p>
 
                   <div className="flex items-center gap-2 mt-2">
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      className="w-7 h-7 border border-[#dc9e63]/50 border-[0.5px] rounded-[2px] text-sm font-light flex items-center justify-center cursor-pointer"
-                    >
-                      -
-                    </button>
-                    <span className="text-[13px] md:text-sm font-light">{item.quantity}</span>
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="w-7 h-7 border border-[#dc9e63]/50 border-[0.5px] rounded-[2px] text-sm font-light flex items-center justify-center cursor-pointer"
-                    >
-                      +
-                    </button>
+                    {typeof item.price === 'object' || item.type !== 'digital' ? (
+                      <>
+                        <button
+                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          className="w-7 h-7 border border-[#dc9e63]/50 border-[0.5px] rounded-[2px] text-sm font-light flex items-center justify-center cursor-pointer"
+                        >
+                          -
+                        </button>
+                        <span className="text-[13px] md:text-sm font-light">{item.quantity}</span>
+                        <button
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          className="w-7 h-7 border border-[#dc9e63]/50 border-[0.5px] rounded-[2px] text-sm font-light flex items-center justify-center cursor-pointer"
+                        >
+                          +
+                        </button>
+                      </>
+                    ) : (
+                      <span className="text-sm text-[#f8fcdc]">x1</span>
+                    )}
+
                     <button
                       onClick={() => removeFromCart(item.id)}
                       className="ml-2 cursor-pointer"

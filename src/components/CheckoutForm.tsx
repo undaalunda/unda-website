@@ -21,6 +21,7 @@ export default function CheckoutForm() {
   const stripe = useStripe();
   const elements = useElements();
   const { cartItems, clearCart } = useCart();
+  const isDigitalOnly = cartItems.every(item => item.type === 'digital'); 
   const [shippingZone, setShippingZone] = useState<'UK' | 'EU' | 'ROW'>('ROW');
   const [shippingMethod, setShippingMethod] = useState<'evri' | 'dhl' | 'eu-tracked' | 'row-tracked'>('evri');
   const [shipToDifferent, setShipToDifferent] = useState(false);
@@ -119,7 +120,9 @@ export default function CheckoutForm() {
     ) as typeof shippingInfo;
 
     const missingBillingFields = getMissing(trimmedBilling, billingRequired);
-    const missingShippingFields = shipToDifferent ? getMissing(trimmedShipping, shippingRequired) : [];
+    const missingShippingFields = (!isDigitalOnly && shipToDifferent)
+  ? getMissing(trimmedShipping, shippingRequired)
+  : [];
     const allMissing = [...missingBillingFields, ...missingShippingFields];
 
     setMissingBillingFields(missingBillingFields);
@@ -254,13 +257,14 @@ export default function CheckoutForm() {
           clearCart();
 
           await fetch('/api/send-confirmation', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              name: trimmedBilling.firstName,
-              email: trimmedBilling.email,
-            }),
-          });
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    name: trimmedBilling.firstName,
+    email: trimmedBilling.email,
+    cartItems, // ✅ เพิ่มมานี่เลยเพื่อน!
+  }),
+});
 
           await fetch('/api/save-order', {
             method: 'POST',
@@ -486,15 +490,19 @@ export default function CheckoutForm() {
     ))}
   </div>
 
-  <label className="block mt-4">
-    <input
-      type="checkbox"
-      checked={shipToDifferent}
-      onChange={(e) => setShipToDifferent(e.target.checked)}
-      className="mr-2"
-    />
-    DELIVER TO A DIFFERENT ADDRESS?
-  </label>
+ {!isDigitalOnly && (
+  <>
+    <label className="block mt-4">
+      <input
+        type="checkbox"
+        checked={shipToDifferent}
+        onChange={(e) => setShipToDifferent(e.target.checked)}
+        className="mr-2"
+      />
+      DELIVER TO A DIFFERENT ADDRESS?
+    </label>
+  </>
+)}
 
   {shipToDifferent && (
     <div className="grid gap-4 mt-4">
@@ -674,110 +682,110 @@ onChange={handleShippingChange}
         <h2 className="text-xl font-bold text-[#dc9e63] mb-4 mt-0">YOUR ORDER</h2>
         <div className="bg-[#1e0000]/50 p-4 rounded-xl shadow-xl mb-6">
         <ul className="mb-4 text-sm space-y-2 leading-8">
-        <li className="flex justify-between text-base font-bold mb-1">
+  {/* 🧾 PRODUCT HEADER */}
+  <li className="flex justify-between text-base font-bold mb-1">
     <span>Product</span>
     <span>Subtotal</span>
   </li>
 
+  {/* 🧾 PRODUCT LIST */}
   {cartItems.map(item => (
-  <li key={item.id} className="flex gap-4 items-center mb-4">
-    <img src={item.image} alt={item.title} className="w-12 h-12 object-cover rounded" />
-    <div className="flex-1">
-      <p className="text-sm text-[#f8fcdc]/70 font-light">{item.title} x {item.quantity}</p>
-      <p className="text-xs text-[#f8fcdc]/40">{item.subtitle}</p>
-    </div>
-    <span className="text-sm text-[#f8fcdc]/70">
-    ${(typeof item.price === 'object' 
-  ? (item.price.sale * item.quantity) 
-  : item.price * item.quantity
-).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+    <li key={item.id} className="flex gap-4 items-center mb-4">
+      <img src={item.image} alt={item.title} className="w-12 h-12 object-cover rounded" />
+      <div className="flex-1">
+        <p className="text-sm text-[#f8fcdc]">{item.title} x {item.quantity}</p>
+        <p className="text-xs text-[#f8fcdc]/50">{item.subtitle}</p>
+      </div>
+      <span className="text-sm text-[#f8fcdc]/70">
+        ${(
+          (typeof item.price === 'object' ? item.price.sale : item.price) * item.quantity
+        ).toFixed(2)}
+      </span>
+    </li>
+  ))}
+
+  {/* 💵 SUBTOTAL (always show) */}
+  <li className="flex justify-between font-bold text-sm uppercase mb-3">
+    <span className="uppercase text-[#f8fcdc]">Subtotal</span>
+    <span className="text-[#f8fcdc]">
+      ${cartTotal.toFixed(2)}
     </span>
   </li>
-))}
 
-<li className="flex justify-between font-bold text-sm uppercase mb-3">
-  <span className="uppercase text-[#f8fcdc]">Subtotal</span>
-  <span className="text-[#f8fcdc]">
-  ${cartTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-</span>
-</li>
+  {/* 🚚 SHIPPING */}
+  {!isDigitalOnly && (
+    <li className="pt-2">
+      <span className="font-bold block mb-2">Shipping</span>
 
-            <li className="pt-2">
-  <span className="font-bold block mb-2">Shipping</span>
+      {shippingZone === 'UK' && (
+        <>
+          <label className="flex justify-between mb-1 text-[#f8fcdc]/70 font-extralight">
+            <div>
+              <input
+                type="radio"
+                name="shipping"
+                value="evri"
+                checked={shippingMethod === 'evri'}
+                onChange={() => setShippingMethod('evri')}
+                className="mr-2"
+              />
+              Evri Standard
+            </div>
+            <span>$5.00</span>
+          </label>
 
-  {shippingZone === 'UK' && (
-    <>
-      <label className="flex justify-between mb-1 text-[#f8fcdc]/70 font-extralight">
-        <div>
-          <input
-            type="radio"
-            name="shipping"
-            value="evri"
-            checked={shippingMethod === 'evri'}
-            onChange={() => setShippingMethod('evri')}
-            className="mr-2"
-          />
-          Evri Standard
+          <label className="flex justify-between text-[#f8fcdc]/70 font-extralight">
+            <div>
+              <input
+                type="radio"
+                name="shipping"
+                value="dhl"
+                checked={shippingMethod === 'dhl'}
+                onChange={() => setShippingMethod('dhl')}
+                className="mr-2"
+              />
+              DHL Priority
+            </div>
+            <span>$15.00</span>
+          </label>
+        </>
+      )}
+
+      {shippingZone === 'EU' && (
+        <div className="flex justify-between text-[#f8fcdc]/70 font-extralight">
+          <span>EU Tracked</span>
+          <span>$12.00</span>
         </div>
-        <span>$5.00</span>
-      </label>
+      )}
 
-      <label className="flex justify-between text-[#f8fcdc]/70 font-extralight">
-        <div>
-          <input
-            type="radio"
-            name="shipping"
-            value="dhl"
-            checked={shippingMethod === 'dhl'}
-            onChange={() => setShippingMethod('dhl')}
-            className="mr-2"
-          />
-          DHL Priority
+      {shippingZone === 'ROW' && (
+        <div className="flex justify-between text-[#f8fcdc]/70 font-extralight">
+          <span>ROW Tracked</span>
+          <span>$18.00</span>
         </div>
-        <span>$15.00</span>
-      </label>
-    </>
+      )}
+    </li>
   )}
 
-  {shippingZone === 'EU' && (
-    <>
-      <label className="flex justify-between mb-1 text-[#f8fcdc]/70 font-extralight">
-        <div>
-          <input
-            type="radio"
-            name="shipping"
-            value="eu-tracked"
-            checked={shippingMethod === 'eu-tracked'}
-            onChange={() => setShippingMethod('eu-tracked')}
-            className="mr-2"
-          />
-          EU Tracked
-        </div>
-        <span>$12.00</span>
-      </label>
-    </>
-  )}
-
-  {shippingZone === 'ROW' && (
-    <>
-      <label className="flex justify-between mb-1 text-[#f8fcdc]/70 font-extralight">
-        <div>
-          <input
-            type="radio"
-            name="shipping"
-            value="row-tracked"
-            checked={shippingMethod === 'row-tracked'}
-            onChange={() => setShippingMethod('row-tracked')}
-            className="mr-2"
-          />
-          ROW Tracked
-        </div>
-        <span>$18.00</span>
-      </label>
-    </>
-  )}
-</li>
-          </ul>
+  {/* 💰 TOTAL */}
+  <li className="flex justify-between font-bold text-2xl uppercase border-t border-[#f8fcdc]/10 pt-4 mt-4">
+    <span className="uppercase text-[#f8fcdc]">TOTAL</span>
+    <span className="text-[#f8fcdc]">
+      ${(
+        cartTotal +
+        (isDigitalOnly
+          ? 0
+          : shippingZone === 'UK'
+          ? (shippingMethod === 'dhl' ? 15 : 5)
+          : shippingZone === 'EU'
+          ? 12
+          : shippingZone === 'ROW'
+          ? 18
+          : 0)
+      ).toFixed(2)}
+    </span>
+  </li>
+</ul>
         </div>
 
         {/* Payment */}

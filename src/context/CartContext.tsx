@@ -12,6 +12,7 @@ type CartItem = {
   price: number | { original: number; sale: number };
   image: string;
   quantity: number;
+  type: 'digital' | 'physical'; // ✅ เพิ่มตรงนี้
 };
 
 interface CartContextType {
@@ -33,7 +34,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [lastAddedItem, setLastAddedItem] = useState<CartItem | null>(null);
   const [cartError, setCartError] = useState<string | null>(null);
 
-  // Load cart from localStorage on first render
   useEffect(() => {
     try {
       const storedCart = localStorage.getItem('cart');
@@ -45,7 +45,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, []);
 
-  // Save cart to localStorage every time it changes
   useEffect(() => {
     try {
       localStorage.setItem('cart', JSON.stringify(cartItems));
@@ -74,17 +73,17 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
             : cartItem
         );
       } else {
-        return [
-          ...prev,
-          {
-            id: item.id,
-            title: item.title,
-            subtitle: item.subtitle ?? '',
-            price: item.price,
-            image: item.image,
-            quantity,
-          },
-        ];
+        const newItem: CartItem = {
+          id: item.id,
+          title: item.title,
+          subtitle: item.subtitle ?? '',
+          price: item.price,
+          image: item.image,
+          quantity,
+          type: item.type, // ✅ ดึง type มาจาก allItems
+        };
+
+        return [...prev, newItem];
       }
     });
 
@@ -95,6 +94,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       price: item.price,
       image: item.image,
       quantity,
+      type: item.type, // ✅ เช่นกัน
     });
   };
 
@@ -114,7 +114,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
   const clearCart = () => {
     setCartItems([]);
-    localStorage.removeItem('cart'); // ← optional but cleaner
+    localStorage.removeItem('cart');
   };
 
   return (

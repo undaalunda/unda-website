@@ -49,7 +49,6 @@ export const allItems = [
 const pageLinks = [
   { title: 'Home', href: '/' },
   { title: 'Shop', href: '/shop' },
-  { title: 'Music', href: '/music' },
   { title: 'About', href: '/about' },
   { title: 'Tour', href: '/tour' },
   { title: 'Contact', href: '/contact' },
