@@ -9,14 +9,11 @@ interface DownloadEntry {
   expiresInMinutes: number;
 }
 
-// ✅ บอกให้ Next รู้ว่าใช้ dynamic
-export const dynamic = 'force-dynamic';
+interface Props {
+  params: { token: string }
+}
 
-export default async function Page({
-  params,
-}: {
-  params: { token: string };
-}) {
+export default async function Page({ params }: Props) {
   const DB_PATH = path.join(process.cwd(), 'data', 'downloads.json');
 
   let entries: DownloadEntry[] = [];
@@ -28,7 +25,7 @@ export default async function Page({
     return notFound();
   }
 
-  const entry = entries.find((e) => e.token === params.token);
+  const entry = entries.find(e => e.token === params.token);
   if (!entry) return notFound();
 
   const createdAt = new Date(entry.createdAt);
@@ -42,6 +39,7 @@ export default async function Page({
     <main className="min-h-screen flex flex-col justify-center items-center px-4 text-[#f8fcdc] font-[Cinzel] bg-black text-center">
       <h1 className="text-4xl font-bold mb-8 text-[#dc9e63]">Your Download is Ready</h1>
       <p className="mb-7">Click the button below to download your file:</p>
+
       <a
         href={entry.filePath}
         download={fileName}
@@ -49,9 +47,8 @@ export default async function Page({
       >
         Download {fileName}
       </a>
-      <p className="text-xs mt-6 opacity-50">
-        Link expires at: {expiresAt.toLocaleString()}
-      </p>
+
+      <p className="text-xs mt-6 opacity-50">Link expires at: {expiresAt.toLocaleString()}</p>
     </main>
   );
 }
