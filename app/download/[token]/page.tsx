@@ -9,14 +9,13 @@ interface DownloadEntry {
   expiresInMinutes: number;
 }
 
-// ✅ ประกาศชนิดให้ถูกต้องแบบเป็นทางการ ไม่ต้องให้ Next.js เดาเองจนหัวร้อน
-interface PageProps {
+type Props = {
   params: {
     token: string;
   };
-}
+};
 
-export default async function DownloadPage({ params }: PageProps) {
+export default async function DownloadPage({ params }: Props) {
   const DB_PATH = path.join(process.cwd(), 'data', 'downloads.json');
 
   let entries: DownloadEntry[] = [];
@@ -28,7 +27,8 @@ export default async function DownloadPage({ params }: PageProps) {
     return notFound();
   }
 
-  const entry = entries.find((e) => e.token === params.token);
+  const entry = entries.find(e => e.token === params.token);
+
   if (!entry) return notFound();
 
   const createdAt = new Date(entry.createdAt);
