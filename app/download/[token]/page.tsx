@@ -1,3 +1,5 @@
+// app/download/[token]/page.tsx
+
 import { notFound } from 'next/navigation';
 import fs from 'fs/promises';
 import path from 'path';
@@ -9,13 +11,7 @@ interface DownloadEntry {
   expiresInMinutes: number;
 }
 
-type Props = {
-  params: {
-    token: string;
-  };
-};
-
-export default async function DownloadPage({ params }: Props) {
+export default async function Page({ params }: { params: { token: string } }) {
   const DB_PATH = path.join(process.cwd(), 'data', 'downloads.json');
 
   let entries: DownloadEntry[] = [];
@@ -28,13 +24,11 @@ export default async function DownloadPage({ params }: Props) {
   }
 
   const entry = entries.find(e => e.token === params.token);
-
   if (!entry) return notFound();
 
   const createdAt = new Date(entry.createdAt);
   const expiresAt = new Date(createdAt.getTime() + entry.expiresInMinutes * 60000);
   const now = new Date();
-
   if (now > expiresAt) return notFound();
 
   const fileName = entry.filePath.split('/').pop();
