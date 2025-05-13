@@ -1,5 +1,3 @@
-// /app/download/[token]/page.tsx
-
 import { notFound } from 'next/navigation';
 import fs from 'fs/promises';
 import path from 'path';
@@ -11,7 +9,14 @@ interface DownloadEntry {
   expiresInMinutes: number;
 }
 
-export default async function DownloadPage({ params }: { params: { token: string } }) {
+// ✅ ประกาศชนิดให้ถูกต้องแบบเป็นทางการ ไม่ต้องให้ Next.js เดาเองจนหัวร้อน
+interface PageProps {
+  params: {
+    token: string;
+  };
+}
+
+export default async function DownloadPage({ params }: PageProps) {
   const DB_PATH = path.join(process.cwd(), 'data', 'downloads.json');
 
   let entries: DownloadEntry[] = [];
@@ -23,8 +28,7 @@ export default async function DownloadPage({ params }: { params: { token: string
     return notFound();
   }
 
-  const entry = entries.find(e => e.token === params.token);
-
+  const entry = entries.find((e) => e.token === params.token);
   if (!entry) return notFound();
 
   const createdAt = new Date(entry.createdAt);
