@@ -2,6 +2,13 @@ import { notFound } from 'next/navigation';
 import fs from 'fs/promises';
 import path from 'path';
 
+// 👇 Next.js expects this structure
+interface PageProps {
+  params: {
+    token: string;
+  };
+}
+
 interface DownloadEntry {
   token: string;
   filePath: string;
@@ -9,7 +16,9 @@ interface DownloadEntry {
   expiresInMinutes: number;
 }
 
-export default async function Page({ params }: { params: { token: string } }) {
+export const dynamic = 'force-dynamic';
+
+export default async function DownloadPage({ params }: PageProps) {
   const DB_PATH = path.join(process.cwd(), 'data', 'downloads.json');
 
   let entries: DownloadEntry[] = [];
@@ -35,7 +44,6 @@ export default async function Page({ params }: { params: { token: string } }) {
     <main className="min-h-screen flex flex-col justify-center items-center px-4 text-[#f8fcdc] font-[Cinzel] bg-black text-center">
       <h1 className="text-4xl font-bold mb-8 text-[#dc9e63]">Your Download is Ready</h1>
       <p className="mb-7">Click the button below to download your file:</p>
-
       <a
         href={entry.filePath}
         download={fileName}
@@ -43,11 +51,9 @@ export default async function Page({ params }: { params: { token: string } }) {
       >
         Download {fileName}
       </a>
-
-      <p className="text-xs mt-6 opacity-50">Link expires at: {expiresAt.toLocaleString()}</p>
+      <p className="text-xs mt-6 opacity-50">
+        Link expires at: {expiresAt.toLocaleString()}
+      </p>
     </main>
   );
 }
-
-// 👇 This line makes sure the dynamic route works during build
-export const dynamic = 'force-dynamic';
