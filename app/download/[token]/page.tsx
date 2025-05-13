@@ -2,13 +2,6 @@ import { notFound } from 'next/navigation';
 import fs from 'fs/promises';
 import path from 'path';
 
-// 👇 Next.js expects this structure
-interface PageProps {
-  params: {
-    token: string;
-  };
-}
-
 interface DownloadEntry {
   token: string;
   filePath: string;
@@ -16,9 +9,14 @@ interface DownloadEntry {
   expiresInMinutes: number;
 }
 
+// ✅ บอกให้ Next รู้ว่าใช้ dynamic
 export const dynamic = 'force-dynamic';
 
-export default async function DownloadPage({ params }: PageProps) {
+export default async function Page({
+  params,
+}: {
+  params: { token: string };
+}) {
   const DB_PATH = path.join(process.cwd(), 'data', 'downloads.json');
 
   let entries: DownloadEntry[] = [];
@@ -30,7 +28,7 @@ export default async function DownloadPage({ params }: PageProps) {
     return notFound();
   }
 
-  const entry = entries.find(e => e.token === params.token);
+  const entry = entries.find((e) => e.token === params.token);
   if (!entry) return notFound();
 
   const createdAt = new Date(entry.createdAt);
