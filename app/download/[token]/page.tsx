@@ -1,5 +1,3 @@
-// app/download/[token]/page.tsx
-
 import { notFound } from 'next/navigation';
 import fs from 'fs/promises';
 import path from 'path';
@@ -50,3 +48,6 @@ export default async function Page({ params }: { params: { token: string } }) {
     </main>
   );
 }
+
+// 👇 This line makes sure the dynamic route works during build
+export const dynamic = 'force-dynamic';
