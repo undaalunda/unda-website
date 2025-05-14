@@ -4,13 +4,13 @@ import { notFound } from 'next/navigation';
 import fs from 'fs/promises';
 import path from 'path';
 import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
 
-// ✅ แบบ built-in จาก next
-interface PageProps {
+type PageParams = {
   params: {
     token: string;
   };
-}
+};
 
 interface DownloadEntry {
   token: string;
@@ -19,13 +19,17 @@ interface DownloadEntry {
   expiresInMinutes: number;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: PageParams
+): Promise<Metadata> {
   return {
     title: 'Your Download is Ready',
   };
 }
 
-export default async function Page({ params }: PageProps) {
+export default async function Page(
+  { params }: PageParams
+): Promise<ReactNode> {
   const DB_PATH = path.join(process.cwd(), 'data', 'downloads.json');
 
   let entries: DownloadEntry[] = [];
@@ -34,7 +38,7 @@ export default async function Page({ params }: PageProps) {
     entries = JSON.parse(raw);
   } catch (err) {
     console.error('Failed to read downloads.json', err);
-    return notFound(); // ✅ อย่าลืม return
+    return notFound();
   }
 
   const entry = entries.find((e) => e.token === params.token);
@@ -60,7 +64,9 @@ export default async function Page({ params }: PageProps) {
         Download {fileName}
       </a>
 
-      <p className="text-xs mt-6 opacity-50">Link expires at: {expiresAt.toLocaleString()}</p>
+      <p className="text-xs mt-6 opacity-50">
+        Link expires at: {expiresAt.toLocaleString()}
+      </p>
     </main>
   );
 }
