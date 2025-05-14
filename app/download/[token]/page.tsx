@@ -5,6 +5,13 @@ import fs from 'fs/promises';
 import path from 'path';
 import type { Metadata } from 'next';
 
+// ✅ แบบ built-in จาก next
+interface PageProps {
+  params: {
+    token: string;
+  };
+}
+
 interface DownloadEntry {
   token: string;
   filePath: string;
@@ -12,31 +19,22 @@ interface DownloadEntry {
   expiresInMinutes: number;
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { token: string };
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   return {
     title: 'Your Download is Ready',
   };
 }
 
-export default async function Page({
-  params,
-}: {
-  params: { token: string };
-}) {
+export default async function Page({ params }: PageProps) {
   const DB_PATH = path.join(process.cwd(), 'data', 'downloads.json');
 
   let entries: DownloadEntry[] = [];
-
   try {
     const raw = await fs.readFile(DB_PATH, 'utf-8');
     entries = JSON.parse(raw);
   } catch (err) {
     console.error('Failed to read downloads.json', err);
-    return notFound(); // <-- ✅ ต้องใส่ return ตรงนี้
+    return notFound(); // ✅ อย่าลืม return
   }
 
   const entry = entries.find((e) => e.token === params.token);
@@ -45,7 +43,6 @@ export default async function Page({
   const createdAt = new Date(entry.createdAt);
   const expiresAt = new Date(createdAt.getTime() + entry.expiresInMinutes * 60000);
   const now = new Date();
-
   if (now > expiresAt) return notFound();
 
   const fileName = entry.filePath.split('/').pop();
@@ -63,9 +60,7 @@ export default async function Page({
         Download {fileName}
       </a>
 
-      <p className="text-xs mt-6 opacity-50">
-        Link expires at: {expiresAt.toLocaleString()}
-      </p>
+      <p className="text-xs mt-6 opacity-50">Link expires at: {expiresAt.toLocaleString()}</p>
     </main>
   );
 }
