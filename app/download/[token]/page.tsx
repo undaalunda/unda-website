@@ -3,7 +3,6 @@
 import { notFound } from 'next/navigation';
 import fs from 'fs/promises';
 import path from 'path';
-import type { Metadata } from 'next';
 
 interface DownloadEntry {
   token: string;
@@ -12,14 +11,7 @@ interface DownloadEntry {
   expiresInMinutes: number;
 }
 
-export async function generateMetadata({ params }: { params: { token: string } }): Promise<Metadata> {
-  return {
-    title: 'Your Download is Ready',
-  };
-}
-
-// ❗️ ไม่ต้องใส่ type ตรงนี้ เดี๋ยวมันจะหยุด error เอง
-export default async function Page({ params }: { params: { token: string } }) {
+export default async function Page({ params }: any) {
   const DB_PATH = path.join(process.cwd(), 'data', 'downloads.json');
 
   let entries: DownloadEntry[] = [];
