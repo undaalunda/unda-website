@@ -3,12 +3,23 @@
 import { notFound } from 'next/navigation';
 import fs from 'fs/promises';
 import path from 'path';
+import { Metadata } from 'next';
 
 interface DownloadEntry {
   token: string;
   filePath: string;
   createdAt: string;
   expiresInMinutes: number;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { token: string };
+}): Promise<Metadata> {
+  return {
+    title: 'Your Download is Ready',
+  };
 }
 
 export default async function Page({
@@ -24,7 +35,7 @@ export default async function Page({
     entries = JSON.parse(raw);
   } catch (err) {
     console.error('Failed to read downloads.json', err);
-    return notFound();
+    notFound();
   }
 
   const entry = entries.find((e) => e.token === params.token);
