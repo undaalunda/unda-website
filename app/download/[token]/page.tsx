@@ -3,7 +3,7 @@
 import { notFound } from 'next/navigation';
 import fs from 'fs/promises';
 import path from 'path';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 
 interface DownloadEntry {
   token: string;
@@ -30,12 +30,13 @@ export default async function Page({
   const DB_PATH = path.join(process.cwd(), 'data', 'downloads.json');
 
   let entries: DownloadEntry[] = [];
+
   try {
     const raw = await fs.readFile(DB_PATH, 'utf-8');
     entries = JSON.parse(raw);
   } catch (err) {
     console.error('Failed to read downloads.json', err);
-    notFound();
+    return notFound(); // <-- ✅ ต้องใส่ return ตรงนี้
   }
 
   const entry = entries.find((e) => e.token === params.token);
@@ -44,6 +45,7 @@ export default async function Page({
   const createdAt = new Date(entry.createdAt);
   const expiresAt = new Date(createdAt.getTime() + entry.expiresInMinutes * 60000);
   const now = new Date();
+
   if (now > expiresAt) return notFound();
 
   const fileName = entry.filePath.split('/').pop();
