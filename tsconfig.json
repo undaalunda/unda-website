@@ -1,3 +1,5 @@
+//tsconfig.json
+
 {
   "compilerOptions": {
     "target": "ES2017",
@@ -13,9 +15,9 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "baseUrl": "./src",              // 🛠️ แก้ตรงนี้ ให้ชี้ไปที่ ./src
+    "baseUrl": "./src",       
     "paths": {
-      "@/*": ["*"]                   // 🛠️ "@/something" จะมองว่าเริ่มต้นจาก src/
+      "@/*": ["*"]                 
     },
     "plugins": [
       {

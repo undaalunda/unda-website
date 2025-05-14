@@ -1,7 +1,8 @@
+//next.config.ts
+
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // 🛡️ อนุญาตให้เข้าถึงจากมือถือในวง Wi-Fi เดียวกัน
   allowedDevOrigins: [
     "http://localhost:3000",
     "http://192.168.0.197:3000",
@@ -9,7 +10,6 @@ const nextConfig: NextConfig = {
     "http://192.168.0.197:3001",
   ],
   
-  // 🚀 เพิ่ม Scroll Restoration ตอน dev
   experimental: {
     scrollRestoration: true,
   },

@@ -3,7 +3,6 @@
 import { notFound } from 'next/navigation';
 import fs from 'fs/promises';
 import path from 'path';
-import type { JSX } from 'react';
 
 interface DownloadEntry {
   token: string;
@@ -11,12 +10,11 @@ interface DownloadEntry {
   createdAt: string;
   expiresInMinutes: number;
 }
-
-type Props = {
+type PageProps = {
   params: { token: string };
 };
 
-export default async function Page({ params }: Props): Promise<JSX.Element> {
+export default async function Page({ params }: PageProps) {
   const DB_PATH = path.join(process.cwd(), 'data', 'downloads.json');
 
   let entries: DownloadEntry[] = [];
@@ -25,7 +23,7 @@ export default async function Page({ params }: Props): Promise<JSX.Element> {
     entries = JSON.parse(raw);
   } catch (err) {
     console.error('Failed to read downloads.json', err);
-    return notFound();
+    notFound();
   }
 
   const entry = entries.find(e => e.token === params.token);
