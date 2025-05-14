@@ -4,13 +4,6 @@ import { notFound } from 'next/navigation';
 import fs from 'fs/promises';
 import path from 'path';
 import type { Metadata } from 'next';
-import type { ReactNode } from 'react';
-
-type PageParams = {
-  params: {
-    token: string;
-  };
-};
 
 interface DownloadEntry {
   token: string;
@@ -19,17 +12,14 @@ interface DownloadEntry {
   expiresInMinutes: number;
 }
 
-export async function generateMetadata(
-  { params }: PageParams
-): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: { token: string } }): Promise<Metadata> {
   return {
     title: 'Your Download is Ready',
   };
 }
 
-export default async function Page(
-  { params }: PageParams
-): Promise<ReactNode> {
+// ❗️ ไม่ต้องใส่ type ตรงนี้ เดี๋ยวมันจะหยุด error เอง
+export default async function Page({ params }: { params: { token: string } }) {
   const DB_PATH = path.join(process.cwd(), 'data', 'downloads.json');
 
   let entries: DownloadEntry[] = [];
@@ -38,7 +28,7 @@ export default async function Page(
     entries = JSON.parse(raw);
   } catch (err) {
     console.error('Failed to read downloads.json', err);
-    return notFound();
+    notFound();
   }
 
   const entry = entries.find((e) => e.token === params.token);
