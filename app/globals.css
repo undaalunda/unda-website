@@ -260,12 +260,24 @@ button svg,
   margin-top: 0.5rem;
 }
 
+@media (min-width: 1280px) {
+  .hero-line1 {
+    letter-spacing: 0.5em;
+  }
+
+  .hero-line2 {
+    letter-spacing: 0.3em;
+  }
+}
+
 @media (max-width: 1279px) {
   .hero-line1 {
     font-size: 14px;
+    letter-spacing: 0.5em;
   }
   .hero-line2 {
     font-size: 11px;
+    letter-spacing: 0.3em;
   }
 }
 

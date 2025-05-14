@@ -4,7 +4,7 @@
 
 import { useCart } from '@/context/CartContext';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { CheckCircle } from 'lucide-react';
 import { usePathname } from 'next/navigation';
@@ -15,6 +15,26 @@ export default function CartSuccessPopup() {
   const [shouldRender, setShouldRender] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const pathname = usePathname();
+
+  const hideTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const clearHideTimer = () => {
+    if (hideTimerRef.current) {
+      clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
+    }
+  };
+
+  const startHideTimer = () => {
+    clearHideTimer();
+    hideTimerRef.current = setTimeout(() => {
+      setIsVisible(false);
+      setTimeout(() => {
+        setShouldRender(false);
+        setLastAddedItem(null);
+      }, 700);
+    }, 7000);
+  };
 
   useEffect(() => {
     if (pathname === '/cart') {
@@ -27,27 +47,20 @@ export default function CartSuccessPopup() {
     if (lastAddedItem) {
       setShouldRender(true);
       setTimeout(() => setIsVisible(true), 10);
-      const timer = setTimeout(() => {
-        if (!isHovering) {
-          setIsVisible(false);
-          setTimeout(() => {
-            setShouldRender(false);
-            setLastAddedItem(null);
-          }, 700);
-        }
-      }, 7000);
+      startHideTimer();
 
-      return () => clearTimeout(timer);
+      return () => clearHideTimer();
     }
   }, [lastAddedItem, pathname]);
 
+  const handleMouseEnter = () => {
+    setIsHovering(true);
+    clearHideTimer();
+  };
+
   const handleMouseLeave = () => {
     setIsHovering(false);
-    setIsVisible(false);
-    setTimeout(() => {
-      setShouldRender(false);
-      setLastAddedItem(null);
-    }, 700);
+    startHideTimer();
   };
 
   if (!shouldRender || !lastAddedItem) return null;
@@ -56,8 +69,8 @@ export default function CartSuccessPopup() {
     <div
       className={`fixed bottom-6 right-6 bg-[#160000] text-[#f8fcdc] p-4 rounded-[4px] shadow-lg flex items-center gap-4 font-[Cinzel] z-50 transition-all duration-500 ${
         isVisible ? 'animate-fadeIn' : 'animate-fadeOut pointer-events-none'
-      } cursor-default`} // ❌ default cursor สำหรับทั้ง popup
-      onMouseEnter={() => setIsHovering(true)}
+      } cursor-default`}
+      onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       <CheckCircle className="text-green-700" size={28} strokeWidth={1.2} />
@@ -68,7 +81,7 @@ export default function CartSuccessPopup() {
           alt={lastAddedItem.title || 'Item image'}
           width={50}
           height={50}
-          className="rounded pointer-events-none" // ✅ กัน interaction
+          className="rounded pointer-events-none"
         />
       )}
 
