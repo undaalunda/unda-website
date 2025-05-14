@@ -1,6 +1,9 @@
+// app/download/[token]/page.tsx
+
 import { notFound } from 'next/navigation';
 import fs from 'fs/promises';
 import path from 'path';
+import type { JSX } from 'react';
 
 interface DownloadEntry {
   token: string;
@@ -9,11 +12,11 @@ interface DownloadEntry {
   expiresInMinutes: number;
 }
 
-interface Props {
-  params: { token: string }
-}
+type Props = {
+  params: { token: string };
+};
 
-export default async function Page({ params }: Props) {
+export default async function Page({ params }: Props): Promise<JSX.Element> {
   const DB_PATH = path.join(process.cwd(), 'data', 'downloads.json');
 
   let entries: DownloadEntry[] = [];
