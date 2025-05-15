@@ -274,19 +274,22 @@ button svg,
   .hero-line1 {
     font-size: 14px;
     letter-spacing: 0.5em;
+    
   }
   .hero-line2 {
     font-size: 11px;
-    letter-spacing: 0.3em;
+   letter-spacing: 0.3em;
   }
 }
 
 @media (max-width: 768px) {
   .hero-line1 {
     font-size: 12px;
+    letter-spacing: 0.36em;
   }
   .hero-line2 {
-    font-size: 10px;
+    font-size: 9.5px;
+    letter-spacing: 0.25em;
   }
 
   .hero-line2:last-child {
