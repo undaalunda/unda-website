@@ -1,11 +1,7 @@
 //app/order-status/page.tsx
 
-import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
-
-const OrderStatusClient = dynamic(() => import('./OrderStatusClient'), {
-  ssr: false,
-});
+import OrderStatusClient from './OrderStatusClient';
 
 export default function OrderStatusPageWrapper() {
   return (
