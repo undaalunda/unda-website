@@ -87,34 +87,24 @@ export default function ProductPage() {
           <div className="product-price-detail">
             {isBundle(product.price) ? (
               <>
-                <span className="line-through text-[#f8fcdc]/40 mr-2">${product.price.original}</span>
-                <span>${product.price.sale}</span>
+                <span className="line-through text-[#f8fcdc]/40 mr-2">${product.price.original.toFixed(2)}</span>
+                <span>${product.price.sale.toFixed(2)}</span>
               </>
             ) : (
-              <span className="tracking-[0.15em]">${product.price}</span>
+              <span className="tracking-[0.15em]">${(product.price as number).toFixed(2)}</span>
             )}
           </div>
 
           {product.type === 'physical' && (
-  <div className="product-quantity-wrapper mt-2">
-    <label className="text-sm font-medium mb-1">Quantity:</label>
-    <div className="flex items-center gap-2 mt-1">
-      <button
-        onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-        className="w-7 h-7 border border-[#dc9e63]/50 border-[0.5px] rounded-[2px] text-sm font-light flex items-center justify-center cursor-pointer"
-      >
-        -
-      </button>
-      <span className="text-[13px] md:text-sm font-light">{quantity}</span>
-      <button
-        onClick={() => setQuantity((q) => q + 1)}
-        className="w-7 h-7 border border-[#dc9e63]/50 border-[0.5px] rounded-[2px] text-sm font-light flex items-center justify-center cursor-pointer"
-      >
-        +
-      </button>
-    </div>
-  </div>
-)}
+            <div className="product-quantity-wrapper mt-2">
+              <label className="text-sm font-medium mb-1">Quantity:</label>
+              <div className="flex items-center gap-2 mt-1">
+                <button onClick={() => setQuantity((q) => Math.max(1, q - 1))} className="w-7 h-7 border border-[#dc9e63]/50 border-[0.5px] rounded-[2px] text-sm font-light flex items-center justify-center cursor-pointer">-</button>
+                <span className="text-[13px] md:text-sm font-light">{quantity}</span>
+                <button onClick={() => setQuantity((q) => q + 1)} className="w-7 h-7 border border-[#dc9e63]/50 border-[0.5px] rounded-[2px] text-sm font-light flex items-center justify-center cursor-pointer">+</button>
+              </div>
+            </div>
+          )}
 
           {stockStatus && (
             <div className="mt-1 text-xs font-light tracking-wide">
@@ -128,13 +118,9 @@ export default function ProductPage() {
             <div className="product-description mt-6 text-[#f8fcdc]/80 leading-relaxed text-sm whitespace-pre-line">
               {product.description.split('\n').map((line, idx) => {
                 const trimmedLine = line.trim();
-                if (trimmedLine === '') {
-                  return <div key={idx} className="h-4" />;
-                } else if (trimmedLine.startsWith('Please Note:')) {
-                  return <p key={idx} className="italic text-[#f8fcdc]/50 mt-4">{line}</p>;
-                } else {
-                  return <p key={idx}>{line}</p>;
-                }
+                if (trimmedLine === '') return <div key={idx} className="h-4" />;
+                if (trimmedLine.startsWith('Please Note:')) return <p key={idx} className="italic text-[#f8fcdc]/50 mt-4">{line}</p>;
+                return <p key={idx}>{line}</p>;
               })}
             </div>
           )}
@@ -145,16 +131,14 @@ export default function ProductPage() {
               className="add-to-cart-button cursor-pointer fade-in-section"
               disabled={stockStatus === 'out-of-stock'}
               onClick={() => {
-  const qty = product.type === 'digital' ? 1 : quantity;
-
-  if (qty > 20) {
-    setErrorMessage('You can only add up to 20 items per purchase.');
-    return;
-  }
-
-  addToCart(product.id, qty);
-  setErrorMessage(null);
-}}
+                const qty = product.type === 'digital' ? 1 : quantity;
+                if (qty > 20) {
+                  setErrorMessage('You can only add up to 20 items per purchase.');
+                  return;
+                }
+                addToCart(product.id, qty);
+                setErrorMessage(null);
+              }}
             >
               {stockStatus === 'out-of-stock' ? 'Unavailable' : `Add ${quantity} to Cart`}
             </button>
@@ -165,43 +149,53 @@ export default function ProductPage() {
       </div>
 
       {relatedProducts.length > 0 && (
-        <div className="related-products-wrapper mt-20 w-full max-w-5xl">
-          <h2 className="text-2xl font-bold text-[#dc9e63] mb-8">RELATED PRODUCTS</h2>
-          <div className="stems-row grid grid-cols-2 md:grid-cols-4 gap-6">
-            {relatedProducts.map((item) => (
-              <Link href={`/shop/${item.id}`} key={item.id} className="stems-item fade-in-section">
-                <Image
-                  src={item.image}
-                  alt={item.title}
-                  width={200}
-                  height={200}
-                  className="stems-image"
-                />
-                <div className="stems-label-group mt-2">
-                  <p className="stems-title-text">{item.title}</p>
-                  <p className="stems-subtitle">{item.subtitle.replace(/BACKING TRACK/gi, '').trim()}</p>
-                  {item.category === 'Backing Track' && (
-                    <>
-                      <span className="backing-line" />
-                      <p className="stems-subtitle-tiny">BACKING TRACK</p>
-                    </>
-                  )}
-                  <p className="stems-price">
-                    {isBundle(item.price) ? (
-                      <>
-                        <span className="line-through text-[#f8fcdc] mr-1">${item.price.original}</span>
-                        <span>${item.price.sale}</span>
-                      </>
-                    ) : (
-                      <span>${item.price}</span>
-                    )}
-                  </p>
-                </div>
-              </Link>
-            ))}
+  <div className="related-products-wrapper mt-20 w-full max-w-5xl">
+    <h2 className="text-2xl font-bold text-[#dc9e63] mb-8">RELATED PRODUCTS</h2>
+    <div className="stems-row grid grid-cols-2 md:grid-cols-4 gap-6">
+      {relatedProducts.map((item) => (
+        <Link
+          href={`/shop/${item.id}`}
+          key={item.id}
+          className={`stems-item fade-in-section ${
+            item.category === 'Backing Track' ? 'is-backing' : ''
+          }`}
+        >
+          <Image
+            src={item.image}
+            alt={item.title}
+            width={200}
+            height={200}
+            className="stems-image"
+          />
+          <div className="stems-label-group mt-2">
+            <p className="stems-title-text">{item.title}</p>
+            <p className="stems-subtitle">
+              {item.subtitle.replace(/BACKING TRACK/gi, '').trim()}
+            </p>
+            {item.category === 'Backing Track' && (
+              <>
+                <span className="backing-line" />
+                <p className="stems-subtitle-tiny">BACKING TRACK</p>
+              </>
+            )}
+            <p className="stems-price">
+              {isBundle(item.price) ? (
+                <>
+                  <span className="line-through text-[#f8fcdc] mr-1">
+                    ${item.price.original.toFixed(2)}
+                  </span>
+                  <span>${item.price.sale.toFixed(2)}</span>
+                </>
+              ) : (
+                <span>${(item.price as number).toFixed(2)}</span>
+              )}
+            </p>
           </div>
-        </div>
-      )}
+        </Link>
+      ))}
+    </div>
+  </div>
+)}
     </div>
   );
 }

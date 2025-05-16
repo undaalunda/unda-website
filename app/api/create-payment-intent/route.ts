@@ -90,6 +90,7 @@ export async function POST(req: NextRequest) {
         email: email,
         marketing_consent: marketing ? 'yes' : 'no',
         source: 'UndaAlundaStore',
+        created_from: 'create-payment-intent-endpoint',
       },
     });
 

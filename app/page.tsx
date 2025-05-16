@@ -146,31 +146,55 @@ export default function HomePage() {
       </section>
 
       {/* STEMS SECTION */}
-      <section className="stems-section">
-        <div ref={stemsRef} className={`fade-trigger ${showStems ? 'fade-in' : ''}`}>
-          <h2 className="stems-sub">JAM THE TRACKS</h2>
-          <h3 className="stems-title">STEMS & BACKINGS</h3>
-          <div className="stems-row">
-            {allItems.filter((item) => item.category === 'Backing Track').map((item) => (
-              <Link href={`/shop/${item.id}`} key={item.id} className="stems-item product-label-link">
-                <Image src={item.image} alt={item.title} width={200} height={200} className="stems-image" />
-                <div className="stems-label-group">
-                  <p className="stems-title-text">{item.title}</p>
-                  <p className="stems-subtitle-tiny">{item.subtitle.replace(' BACKING TRACK', '').replace(' STEM', '').replace(' TAB', '')}</p>
-                  <span className="backing-line always-on"></span>
-                  <p className="stems-subtitle-tiny tracking-wide uppercase text-center backing-text">BACKING TRACK</p>
-                  <p className="stems-price">
-                    ${typeof item.price === 'object' ? item.price.sale.toFixed(2) : item.price.toFixed(2)}
-                  </p>
-                </div>
-              </Link>
-            ))}
-          </div>
-          <div className="shopall-button-wrapper">
-            <Link href="/shop?tab=DIGITAL" className="info-button">SHOP ALL</Link>
-          </div>
-        </div>
-      </section>
+<section className="stems-section">
+  <div ref={stemsRef} className={`fade-trigger ${showStems ? 'fade-in' : ''}`}>
+    <h2 className="stems-sub">JAM THE TRACKS</h2>
+    <h3 className="stems-title">STEMS & BACKINGS</h3>
+    <div className="stems-row">
+      {allItems
+        .filter((item) => item.category === 'Backing Track')
+        .map((item) => (
+          <Link
+            href={`/shop/${item.id}`}
+            key={item.id}
+            className="stems-item product-label-link is-backing"
+          >
+            <Image
+              src={item.image}
+              alt={item.title}
+              width={200}
+              height={200}
+              className="stems-image"
+            />
+            <div className="stems-label-group">
+              <p className="stems-title-text">{item.title}</p>
+              <p className="stems-subtitle-tiny">
+                {item.subtitle
+                  .replace(' BACKING TRACK', '')
+                  .replace(' STEM', '')
+                  .replace(' TAB', '')}
+              </p>
+              <span className="backing-line"></span>
+              <p className="stems-subtitle-tiny tracking-wide uppercase text-center backing-text">
+                BACKING TRACK
+              </p>
+              <p className="stems-price">
+                $
+                {typeof item.price === 'object'
+                  ? item.price.sale.toFixed(2)
+                  : item.price.toFixed(2)}
+              </p>
+            </div>
+          </Link>
+        ))}
+    </div>
+    <div className="shopall-button-wrapper">
+      <Link href="/shop?tab=DIGITAL" className="info-button">
+        SHOP ALL
+      </Link>
+    </div>
+  </div>
+</section>
 
       {/* MUSIC & MERCH */}
       <section className="stems-section">

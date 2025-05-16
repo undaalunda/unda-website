@@ -1,5 +1,8 @@
+///app/api/stripe/webhook/route.ts 
+
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import supabase from '../../../../lib/supabase';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-04-10' as Stripe.LatestApiVersion,
@@ -30,31 +33,28 @@ export async function POST(req: NextRequest) {
       const paymentIntent = event.data.object as Stripe.PaymentIntent;
       console.log('✅ PaymentIntent succeeded:', paymentIntent.id);
 
-      // 🔍 Extract metadata
       const email = paymentIntent.metadata?.email;
-      const marketing = paymentIntent.metadata?.marketing_consent;
 
       if (!email) {
-        console.warn('⚠️ Missing email in metadata. Skipping order save.');
+        console.warn('⚠️ Missing email in metadata. Skipping DB update.');
         break;
       }
 
-      // 🧠 Call internal API to save order (dummy payload for now)
       try {
-        await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/save-order`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email,
-            source: 'webhook',
-            stripePaymentIntentId: paymentIntent.id,
-            metadata: paymentIntent.metadata,
-            createdAt: new Date().toISOString(),
-          }),
-        });
-        console.log('✅ Order saved from webhook!');
-      } catch (saveErr) {
-        console.error('🔥 Failed to save order from webhook:', saveErr);
+        const { error } = await supabase
+          .from('Orders')
+          .update({ payment_status: 'succeeded' })
+          .eq('email', email)
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        if (error) {
+          console.error('❌ Failed to update payment status in Supabase:', error.message);
+        } else {
+          console.log('✅ Updated payment_status to succeeded in Supabase');
+        }
+      } catch (err) {
+        console.error('🔥 Unexpected DB error:', err);
       }
 
       break;
