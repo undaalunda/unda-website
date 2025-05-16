@@ -1,10 +1,9 @@
 // app/api/save-order/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
-import { v4 as uuidv4 } from 'uuid';
-import fs from 'fs/promises';
-import path from 'path';
 import { createMockShipment } from '../../../lib/shipping/mock-create-shipment';
+import { v4 as uuidv4 } from 'uuid';
+import supabase from '../../../lib/supabase';
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,7 +16,6 @@ export async function POST(req: NextRequest) {
 
     const finalShipping = shippingInfo || billingInfo;
 
-    // 🔧 MOCK จัดส่งของ
     const shipment = createMockShipment({
       orderId: `order-${uuidv4()}`,
       fullName: `${finalShipping.firstName} ${finalShipping.lastName}`,
@@ -26,32 +24,29 @@ export async function POST(req: NextRequest) {
       method: shippingMethod,
     });
 
-    const order = {
-      id: shipment.trackingNumber,
-      email,
-      billingInfo,
-      shippingInfo: finalShipping,
-      cartItems,
-      shippingMethod,
-      createdAt: new Date().toISOString(),
-      shipmentDetails: shipment,
-    };
+    const amount = cartItems.reduce(
+      (total: number, item: any) => total + item.price * item.quantity,
+      0
+    );
 
-    const ordersPath = path.join(process.cwd(), 'data/orders.json');
-    let existing = [];
-    try {
-      const file = await fs.readFile(ordersPath, 'utf-8');
-      existing = JSON.parse(file);
-    } catch {
-      existing = [];
+    const { error } = await supabase.from('Orders').insert([
+      {
+        email,
+        amount,
+        currency: 'usd',
+        items: cartItems,
+        payment_status: 'succeeded', // หรือจะเอาจาก Webhook ก็ได้
+      },
+    ]);
+
+    if (error) {
+      console.error('❌ Supabase insert error:', error.message);
+      return NextResponse.json({ error: 'Failed to save order to DB' }, { status: 500 });
     }
 
-    existing.push(order);
-    await fs.writeFile(ordersPath, JSON.stringify(existing, null, 2));
-
-    return NextResponse.json({ success: true, orderId: order.id, tracking: shipment });
-  } catch (err) {
-    console.error('🔥 Save Order Error:', err);
-    return NextResponse.json({ error: 'Failed to save order.' }, { status: 500 });
+    return NextResponse.json({ success: true, tracking: shipment });
+  } catch (err: any) {
+    console.error('🔥 Unexpected error in save-order:', err.message);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

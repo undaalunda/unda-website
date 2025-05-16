@@ -1,5 +1,3 @@
-// /app/api/stripe/webhook/route.ts
-
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
@@ -15,9 +13,8 @@ export async function POST(req: NextRequest) {
   }
 
   let event;
-
   try {
-    const rawBody = await req.text(); // ใช้แบบ web API
+    const rawBody = await req.text();
     event = stripe.webhooks.constructEvent(
       rawBody,
       sig,
@@ -28,21 +25,49 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 });
   }
 
-  // ✅ ตรวจจับ event ตามประเภท
   switch (event.type) {
-    case 'payment_intent.succeeded':
+    case 'payment_intent.succeeded': {
       const paymentIntent = event.data.object as Stripe.PaymentIntent;
       console.log('✅ PaymentIntent succeeded:', paymentIntent.id);
-      // 👉 ทำอะไรต่อ เช่น update สถานะ order, ส่งอีเมล, ฯลฯ
-      break;
 
-    case 'payment_intent.payment_failed':
+      // 🔍 Extract metadata
+      const email = paymentIntent.metadata?.email;
+      const marketing = paymentIntent.metadata?.marketing_consent;
+
+      if (!email) {
+        console.warn('⚠️ Missing email in metadata. Skipping order save.');
+        break;
+      }
+
+      // 🧠 Call internal API to save order (dummy payload for now)
+      try {
+        await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/save-order`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            source: 'webhook',
+            stripePaymentIntentId: paymentIntent.id,
+            metadata: paymentIntent.metadata,
+            createdAt: new Date().toISOString(),
+          }),
+        });
+        console.log('✅ Order saved from webhook!');
+      } catch (saveErr) {
+        console.error('🔥 Failed to save order from webhook:', saveErr);
+      }
+
+      break;
+    }
+
+    case 'payment_intent.payment_failed': {
       const failedIntent = event.data.object as Stripe.PaymentIntent;
       console.warn('❌ Payment failed:', failedIntent.id);
       break;
+    }
 
     default:
-      console.log(`🔔 Received unknown event: ${event.type}`);
+      console.log(`🔔 Unhandled event type: ${event.type}`);
   }
 
   return NextResponse.json({ received: true });
