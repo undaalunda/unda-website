@@ -15,21 +15,36 @@ type Order = {
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const basicAuth = btoa(prompt('🔒 Enter admin password:') || '');
+    const password = prompt('🔒 Enter admin password:');
+    if (!password) {
+      setError('No password provided');
+      setLoading(false);
+      return;
+    }
+
+    const basicAuth = btoa(`admin:${password.trim()}`);
+
     fetch('/api/admin/orders', {
       headers: {
         Authorization: `Basic ${basicAuth}`,
       },
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`❌ ${res.status}: ${res.statusText}`);
+        }
+        return res.json();
+      })
       .then((data) => {
         setOrders(data.orders || []);
         setLoading(false);
       })
       .catch((err) => {
-        console.error('Failed to fetch orders:', err);
+        console.error('❌ Failed to fetch orders:', err);
+        setError(err.message || 'Unknown error');
         setLoading(false);
       });
   }, []);
@@ -50,34 +65,40 @@ export default function AdminOrdersPage() {
   };
 
   return (
-    <main className="min-h-screen pt-28 pb-20 px-6 max-w-screen-md mx-auto">
-      <div className="flex justify-between items-center border-b border-white/20 pb-5 mb-8">
-        <h1 className="text-2xl font-bold tracking-wide">📦 All Orders</h1>
+    <main className="min-h-screen pt-28 pb-24 px-6 max-w-3xl mx-auto text-[#f8fcdc] font-[Cinzel]">
+      <div className="flex justify-between items-center border-b border-[#f8fcdc]/20 pb-4 mb-10">
+        <h1 className="text-2xl font-bold tracking-wider text-[#dc9e63]">📦 Admin Orders</h1>
         <button
           onClick={exportCSV}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition cursor-pointer"
+          className="bg-[#dc9e63] hover:bg-[#f8cfa3] text-black font-bold px-4 py-2 rounded-xl shadow transition-colors duration-200 cursor-pointer"
         >
           📤 Export CSV
         </button>
       </div>
 
       {loading ? (
-        <div className="text-center text-lg mt-20">Loading orders...</div>
+        <div className="text-center text-lg mt-20 text-[#f8fcdc]/80">Loading orders...</div>
+      ) : error ? (
+        <div className="text-red-400 text-center">⚠️ {error}</div>
       ) : orders.length === 0 ? (
-        <div className="text-gray-400 text-center">No orders found.</div>
+        <div className="text-[#f8fcdc]/60 text-center">No orders found.</div>
       ) : (
         <div className="space-y-6">
           {orders.map((order, index) => (
-            <div key={index} className="border border-gray-700 rounded-lg p-4 bg-[#1a1a1a]">
-              <div className="text-lg font-semibold">{order.email}</div>
-              <div>💰 Amount: ${order.amount.toFixed(2)}</div>
-              <div>📦 Status: {order.payment_status}</div>
-              <div className="text-sm text-gray-400">
-                🕒 Created: {new Date(order.created_at).toLocaleString()}
+            <div key={index} className="border border-[#f8fcdc]/10 rounded-xl p-4 bg-[#1a0000]/50 shadow-sm">
+              <div className="text-base font-semibold text-[#f8fcdc]">{order.email}</div>
+              <div className="text-sm">
+                💰 <span className="text-[#dc9e63]">${order.amount.toFixed(2)}</span>
+              </div>
+              <div className="text-sm">
+                📦 Status: <span className="uppercase">{order.payment_status}</span>
+              </div>
+              <div className="text-xs text-[#f8fcdc]/50">
+                🕒 {new Date(order.created_at).toLocaleString()}
               </div>
               <details className="mt-2">
-                <summary className="cursor-pointer text-blue-400">📄 View Items</summary>
-                <pre className="mt-2 bg-black text-green-400 p-3 rounded overflow-x-auto text-sm">
+                <summary className="cursor-pointer text-[#f8cfa3] underline underline-offset-4">📄 View Items</summary>
+                <pre className="mt-2 bg-[#2a0000] text-[#f8fcdc] p-3 rounded-xl overflow-x-auto text-sm">
                   {JSON.stringify(order.items, null, 2)}
                 </pre>
               </details>
