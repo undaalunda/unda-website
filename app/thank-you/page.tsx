@@ -1,13 +1,11 @@
 // /app/thank-you/page.tsx
 
-import dynamic from 'next/dynamic';
+'use client';
+
 import { Suspense } from 'react';
+import ThankYouClient from './ThankYouClient';
 
-const ThankYouClient = dynamic(() => import('./ThankYouClient'), {
-  ssr: false,
-});
-
-export default function ThankYouPageWrapper() {
+export default function ThankYouPage() {
   return (
     <Suspense fallback={<div className="pt-44 text-center">Loading...</div>}>
       <ThankYouClient />
