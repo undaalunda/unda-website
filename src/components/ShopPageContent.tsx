@@ -9,6 +9,7 @@ import { allItems } from './allItems';
 import { motion, AnimatePresence } from 'framer-motion';
 
 type TabType = 'MERCH' | 'MUSIC' | 'BUNDLES' | 'DIGITAL';
+const validTabs: TabType[] = ['MERCH', 'MUSIC', 'BUNDLES', 'DIGITAL'];
 
 function isBundlePrice(
   price: number | { original: number; sale: number }
@@ -20,30 +21,35 @@ export default function ShopPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const tabFromQuery = searchParams.get('tab')?.toUpperCase() as TabType | undefined;
-
+  const tabFromQuery = searchParams.get('tab')?.toUpperCase();
+  const isValidTab = validTabs.includes(tabFromQuery as TabType);
   const [activeTab, setActiveTab] = useState<TabType>('MERCH');
 
   useEffect(() => {
-    if (
-      tabFromQuery &&
-      ['MERCH', 'MUSIC', 'BUNDLES', 'DIGITAL'].includes(tabFromQuery)
-    ) {
-      setActiveTab(tabFromQuery);
+    if (isValidTab) {
+      setActiveTab(tabFromQuery as TabType);
     }
-  }, [tabFromQuery]);
+  }, [tabFromQuery, isValidTab]);
 
   const handleTabChange = (tab: TabType) => {
     setActiveTab(tab);
-    router.replace(`/shop?tab=${tab}`); // ใช้ replace แทน push เพื่อไม่ให้ซ้อน stack
+    router.replace(`/shop?tab=${tab}`);
   };
 
   const itemsToRender = allItems.filter((item) => {
-    if (activeTab === 'MERCH') return item.category === 'Merch';
-    if (activeTab === 'MUSIC') return item.category === 'Music';
-    if (activeTab === 'BUNDLES') return item.category === 'Bundles';
-    if (activeTab === 'DIGITAL') return item.category === 'Backing Track';
-    return false;
+    const category = item.category;
+    switch (activeTab) {
+      case 'MERCH':
+        return category === 'Merch';
+      case 'MUSIC':
+        return category === 'Music';
+      case 'BUNDLES':
+        return category === 'Bundles';
+      case 'DIGITAL':
+        return category === 'Backing Track';
+      default:
+        return false;
+    }
   });
 
   return (
@@ -53,10 +59,10 @@ export default function ShopPageContent() {
       </h1>
 
       <div className="shop-tab-group mb-10">
-        {['MERCH', 'MUSIC', 'BUNDLES', 'DIGITAL'].map((tab) => (
+        {validTabs.map((tab) => (
           <button
             key={tab}
-            onClick={() => handleTabChange(tab as TabType)}
+            onClick={() => handleTabChange(tab)}
             className={`info-button shop-tab-button ${activeTab === tab ? 'active-tab' : ''}`}
           >
             {tab}
@@ -80,11 +86,21 @@ export default function ShopPageContent() {
           >
             {itemsToRender.map((item) => {
               const isBackingTrack = item.category === 'Backing Track';
+              const displayPrice = isBundlePrice(item.price) ? (
+                <>
+                  <span className="line-through text-[#f8fcdc] mr-1">
+                    ${item.price.original.toFixed(2)}
+                  </span>
+                  <span className="text-[#cc3f33]">${item.price.sale.toFixed(2)}</span>
+                </>
+              ) : (
+                <span>${(item.price as number).toFixed(2)}</span>
+              );
 
               return (
                 <Link
                   key={item.id}
-                  href={`/shop/${item.id}?tab=${activeTab}`} // ส่ง tab ไปด้วย
+                  href={`/shop/${item.id}?tab=${activeTab}`}
                   className={`stems-item product-label-link cursor-pointer ${
                     isBackingTrack ? 'is-backing' : ''
                   }`}
@@ -105,21 +121,7 @@ export default function ShopPageContent() {
                     </p>
                     {isBackingTrack && <span className="backing-line" />}
                     {isBackingTrack && <p className="stems-subtitle-tiny">BACKING TRACK</p>}
-
-                    <p className="stems-price">
-                      {isBundlePrice(item.price) ? (
-                        <>
-                          <span className="line-through text-[#f8fcdc] mr-1">
-                            ${item.price.original.toFixed(2)}
-                          </span>
-                          <span className="text-[#cc3f33]">
-                            ${item.price.sale.toFixed(2)}
-                          </span>
-                        </>
-                      ) : (
-                        <span>${item.price.toFixed(2)}</span>
-                      )}
-                    </p>
+                    <p className="stems-price">{displayPrice}</p>
                   </div>
                 </Link>
               );
