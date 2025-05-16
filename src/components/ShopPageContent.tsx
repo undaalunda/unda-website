@@ -1,15 +1,14 @@
+//ShopPageConten.tsx
+
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { allItems } from './allItems';
 import { motion, AnimatePresence } from 'framer-motion';
 
 type TabType = 'MERCH' | 'MUSIC' | 'BUNDLES' | 'DIGITAL';
-
-interface Props {
-  tabParam: TabType | null;
-}
 
 function isBundlePrice(
   price: number | { original: number; sale: number }
@@ -17,14 +16,23 @@ function isBundlePrice(
   return typeof price === 'object' && price !== null && 'original' in price && 'sale' in price;
 }
 
-export default function ShopPageContent({ tabParam }: Props) {
-  const [activeTab, setActiveTab] = useState<TabType>('MERCH');
+export default function ShopPageContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const tabFromQuery = searchParams.get('tab')?.toUpperCase() as TabType | undefined;
+
+  const [activeTab, setActiveTab] = useState<TabType>(tabFromQuery || 'MERCH');
 
   useEffect(() => {
-    if (tabParam && ['MERCH', 'MUSIC', 'BUNDLES', 'DIGITAL'].includes(tabParam)) {
-      setActiveTab(tabParam);
+    if (tabFromQuery && ['MERCH', 'MUSIC', 'BUNDLES', 'DIGITAL'].includes(tabFromQuery)) {
+      setActiveTab(tabFromQuery);
     }
-  }, [tabParam]);
+  }, [tabFromQuery]);
+
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab);
+    router.push(`/shop?tab=${tab}`);
+  };
 
   const itemsToRender = allItems.filter((item) => {
     if (activeTab === 'MERCH') return item.category === 'Merch';
@@ -44,7 +52,7 @@ export default function ShopPageContent({ tabParam }: Props) {
         {['MERCH', 'MUSIC', 'BUNDLES', 'DIGITAL'].map((tab) => (
           <button
             key={tab}
-            onClick={() => setActiveTab(tab as TabType)}
+            onClick={() => handleTabChange(tab as TabType)}
             className={`info-button shop-tab-button ${activeTab === tab ? 'active-tab' : ''}`}
           >
             {tab}
@@ -72,7 +80,7 @@ export default function ShopPageContent({ tabParam }: Props) {
               return (
                 <Link
                   key={item.id}
-                  href={`/shop/${item.id}`}
+                  href={`/shop/${item.id}?tab=${activeTab}`} // ✅ ส่ง tab ไปด้วย (optional)
                   className={`stems-item product-label-link cursor-pointer ${isBackingTrack ? 'is-backing' : ''}`}
                 >
                   <img
@@ -84,13 +92,11 @@ export default function ShopPageContent({ tabParam }: Props) {
                   />
                   <div className="stems-label-group">
                     <p className="stems-title-text">{item.title}</p>
-
                     <p className="stems-subtitle">
                       {isBackingTrack
                         ? item.subtitle.replace(/BACKING TRACK/gi, '').trim()
                         : item.subtitle}
                     </p>
-
                     {isBackingTrack && <span className="backing-line" />}
                     {isBackingTrack && <p className="stems-subtitle-tiny">BACKING TRACK</p>}
 
@@ -105,9 +111,7 @@ export default function ShopPageContent({ tabParam }: Props) {
                           </span>
                         </>
                       ) : (
-                        <span>
-                          ${typeof item.price === 'number' ? item.price.toFixed(2) : ''}
-                        </span>
+                        <span>${typeof item.price === 'number' ? item.price.toFixed(2) : ''}</span>
                       )}
                     </p>
                   </div>

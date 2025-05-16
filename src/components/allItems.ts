@@ -40,17 +40,17 @@ export const allItems: Product[] = [
   Here, sorrow isn't an end—it's a brutal beginning, in a world that's devastatingly beautiful.
   
   Tracklist:
-  1.The Dark
-  2.Anomic
-  3.Consonance
-  4.JYY
-  5.Out of the Dark
-  6.Can’t Feel My Face
-  7.Red Down
-  8.Atlantic
-  9.Feign
-  10.Dark Wonderful World
-  11.Quietness
+  1.) The Dark
+  2.) Anomic
+  3.) Consonance
+  4.) JYY
+  5.) Out of the Dark
+  6.) Can’t Feel My Face
+  7.) Red Down
+  8.) Atlantic
+  9.) Feign
+  10.) Dark Wonderful World
+  11.) Quietness
   
   Please Note: The product image displayed is a mock-up; actual item may vary.
     `.trim()

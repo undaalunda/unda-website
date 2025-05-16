@@ -35,7 +35,8 @@ export async function POST(req: NextRequest) {
         amount,
         currency: 'usd',
         items: cartItems,
-        payment_status: 'succeeded', // หรือจะเอาจาก Webhook ก็ได้
+        payment_status: 'succeeded',
+        created_at: new Date().toISOString(), // 🧨 ใส่มันไปเหอะ จะได้ไม่พัง
       },
     ]);
 
