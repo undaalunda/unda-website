@@ -72,7 +72,7 @@ export default function ShopPageContent() {
 
       {itemsToRender.length === 0 ? (
         <p className="text-center text-lg text-[#dc9e63] opacity-60 mt-10">
-          ไม่มีสินค้าในหมวดนี้ตอนนี้นะจ๊ะ 🥲
+          There are currently no products available in this category.
         </p>
       ) : (
         <AnimatePresence mode="wait">
