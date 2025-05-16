@@ -19,19 +19,23 @@ function isBundlePrice(
 export default function ShopPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+
   const tabFromQuery = searchParams.get('tab')?.toUpperCase() as TabType | undefined;
 
-  const [activeTab, setActiveTab] = useState<TabType>(tabFromQuery || 'MERCH');
+  const [activeTab, setActiveTab] = useState<TabType>('MERCH');
 
   useEffect(() => {
-    if (tabFromQuery && ['MERCH', 'MUSIC', 'BUNDLES', 'DIGITAL'].includes(tabFromQuery)) {
+    if (
+      tabFromQuery &&
+      ['MERCH', 'MUSIC', 'BUNDLES', 'DIGITAL'].includes(tabFromQuery)
+    ) {
       setActiveTab(tabFromQuery);
     }
   }, [tabFromQuery]);
 
   const handleTabChange = (tab: TabType) => {
     setActiveTab(tab);
-    router.push(`/shop?tab=${tab}`);
+    router.replace(`/shop?tab=${tab}`); // ใช้ replace แทน push เพื่อไม่ให้ซ้อน stack
   };
 
   const itemsToRender = allItems.filter((item) => {
@@ -80,8 +84,10 @@ export default function ShopPageContent() {
               return (
                 <Link
                   key={item.id}
-                  href={`/shop/${item.id}?tab=${activeTab}`} // ✅ ส่ง tab ไปด้วย (optional)
-                  className={`stems-item product-label-link cursor-pointer ${isBackingTrack ? 'is-backing' : ''}`}
+                  href={`/shop/${item.id}?tab=${activeTab}`} // ส่ง tab ไปด้วย
+                  className={`stems-item product-label-link cursor-pointer ${
+                    isBackingTrack ? 'is-backing' : ''
+                  }`}
                 >
                   <img
                     src={item.image}
@@ -111,7 +117,7 @@ export default function ShopPageContent() {
                           </span>
                         </>
                       ) : (
-                        <span>${typeof item.price === 'number' ? item.price.toFixed(2) : ''}</span>
+                        <span>${item.price.toFixed(2)}</span>
                       )}
                     </p>
                   </div>
