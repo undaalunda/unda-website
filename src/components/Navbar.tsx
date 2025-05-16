@@ -225,7 +225,11 @@ export default function Navbar() {
                 menuOpen ? 'rotate-180 scale-100' : 'rotate-0 scale-100'
               }`}
             >
-              {menuOpen ? <X size={28} strokeWidth={1.2} /> : <Menu size={23} strokeWidth={1.2} />}
+              {menuOpen ? <X size={28} strokeWidth={1.2} /> : <Menu
+  size={23}
+  strokeWidth={1.2}
+  className="transition-opacity duration-300 opacity-70 hover:opacity-100"
+/>}
             </div>
           </button>
         )}
@@ -239,7 +243,11 @@ export default function Navbar() {
   href="/cart"
   className="relative cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
 >
-  <ShoppingCart size={23} strokeWidth={1.2} />
+  <ShoppingCart
+  size={23}
+  strokeWidth={1.2}
+  className="transition-opacity duration-300 opacity-70 hover:opacity-100"
+/>
   {totalQuantity > 0 && (
     <span className="absolute -top-2 -right-2 bg-[#dc9e63] text-[#160000] rounded-full w-5 h-5 flex items-center justify-center text-xs font-light">
       {totalQuantity}
@@ -251,7 +259,11 @@ export default function Navbar() {
       onClick={() => setSearchOpen(true)}
       className="hidden md:block cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
     >
-      <Search size={23} strokeWidth={1.2} />
+      <Search
+  size={23}
+  strokeWidth={1.2}
+  className="transition-opacity duration-300 opacity-70 hover:opacity-100"
+/>
     </button>
   </div>
 )}

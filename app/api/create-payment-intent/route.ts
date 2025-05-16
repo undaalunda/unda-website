@@ -13,8 +13,8 @@ if (!recaptchaSecretKey) {
   throw new Error('🧨 RECAPTCHA_SECRET_KEY is not defined.');
 }
 
-const stripe = new Stripe(stripeSecretKey, {
-  apiVersion: '2024-04-10' as any,
+const stripe = new Stripe(stripeSecretKey as string, {
+  apiVersion: '2024-04-10' as Stripe.LatestApiVersion,
 });
 
 function isValidAmount(amount: any): boolean {

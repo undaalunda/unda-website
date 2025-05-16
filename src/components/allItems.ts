@@ -32,7 +32,28 @@ export const allItems: Product[] = [
     tags: ['audio', 'cd', 'album'],
     image: '/audio-digipak-dww.png',
     url: '/shop/audio-digipak',
-    description: `Amidst the whispers of darkness and the cries of hope, Dark Wonderful World is a love letter to every broken piece inside you...`,
+    description: `
+  Amidst the whispers of darkness and the cries of hope, 
+  Dark Wonderful World is a love letter to every broken piece inside you. 
+  The music wraps around your hidden wounds and unleashes the demons you never dared to name.
+  
+  Here, sorrow isn't an end—it's a brutal beginning, in a world that's devastatingly beautiful.
+  
+  Tracklist:
+  1.The Dark
+  2.Anomic
+  3.Consonance
+  4.JYY
+  5.Out of the Dark
+  6.Can’t Feel My Face
+  7.Red Down
+  8.Atlantic
+  9.Feign
+  10.Dark Wonderful World
+  11.Quietness
+  
+  Please Note: The product image displayed is a mock-up; actual item may vary.
+    `.trim()
   },
   {
     id: 'live-cd',
@@ -44,8 +65,36 @@ export const allItems: Product[] = [
     tags: ['live', 'cd', 'album'],
     image: '/live-cd-dww.png',
     url: '/shop/live-cd',
-    description: `The first live performance under the name Unda Alunda, recorded at the official album launch concert in Thailand...`,
+    description: `
+  The first live performance under the name Unda Alunda,
+  recorded at the official album launch concert in Thailand on April 18, 2024.
+
+  Features 8 tracks from the Dark Wonderful World album, performed by the full live band.
+  
+  Tracklist:
+  1.The Dark
+  2.Anomic
+  3.Consonance
+  4.Out of the Dark
+  5.Can’t Feel My Face
+  6.Feign
+  7.Dark Wonderful World
+  8.Quietness
+
+  Unda Alunda – Guitars
+  Warit Techakanont – Keyboard & Synth
+  Thirakoon Matsri – Bass
+  TJ Trinidad – Drums
+
+  Audio Engineered, Mixed & Mastered by Atiruj Worakittichat
+  Filmed by Titikorn Poomanee, Sattawat Polpanna, Supanut Ditjaroen, Anon Preeyasaksakul
+  Camera Assisted by Thanathorn Ngamchaleaw
+  Edited by lukpee
+  Artwork by Zandy Niwattra
+  Please Note: The product image displayed is a mock-up; actual item may vary.
+    `.trim()
   },
+
   { id: 'guitars-book', title: 'FULL GUITARS TRANSCRIPTION', subtitle: 'PRINTED BOOK', category: 'Music', type: 'physical', price: 49.95, tags: ['book', 'transcription', 'guitar'], image: '/full-guitars-transcription.png', url: '/shop/guitars-book' },
   { id: 'bass-book', title: 'FULL BASS TRANSCRIPTION', subtitle: 'PRINTED BOOK', category: 'Music', type: 'physical', price: 49.95, tags: ['book', 'transcription', 'bass'], image: '/full-bass-transcription.png', url: '/shop/bass-book' },
   { id: 'keys-book', title: 'FULL KEYS TRANSCRIPTION', subtitle: 'PRINTED BOOK', category: 'Music', type: 'physical', price: 49.95, tags: ['book', 'transcription', 'keys'], image: '/full-keys-transcription.png', url: '/shop/keys-book' },

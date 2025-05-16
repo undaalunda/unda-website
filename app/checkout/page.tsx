@@ -46,11 +46,9 @@ export default function CheckoutPage() {
           `,
         }}
       />
-      <PayPalScriptProvider options={{ clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID! }}>
-        <Elements stripe={stripePromise}>
-          <CheckoutForm />
-        </Elements>
-      </PayPalScriptProvider>
+      <Elements stripe={stripePromise}>
+  <CheckoutForm />
+</Elements>
     </>
   );
 }

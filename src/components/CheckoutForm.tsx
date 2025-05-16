@@ -4,7 +4,6 @@ import Script from 'next/script';
 import { useCart } from '@/context/CartContext';
 import { useEffect, useState, useRef } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { PayPalButtons } from '@paypal/react-paypal-js';
 import { useRouter } from 'next/navigation';
 import { getShippingZone } from '../../lib/shipping/zone-checker';
 
@@ -262,7 +261,7 @@ export default function CheckoutForm() {
   body: JSON.stringify({
     name: trimmedBilling.firstName,
     email: trimmedBilling.email,
-    cartItems, // ✅ เพิ่มมานี่เลยเพื่อน!
+    cartItems,
   }),
 });
 
@@ -823,16 +822,6 @@ onChange={handleShippingChange}
             </div>
           )}
 
-          <label className="block mt-4 mb-2 text-sm">
-            <input
-              type="radio"
-              checked={paymentMethod === 'paypal'}
-              onChange={() => setPaymentMethod('paypal')}
-              className="mr-2"
-            />
-            PayPal
-          </label>
-
           {paymentMethod === 'paypal' && (
             <div className="relative mt-2">
               <div className="absolute -top-2 left-6 w-0 h-0 border-l-8 border-r-8 border-b-8 border-transparent border-b-[#f8fcdc]" />
@@ -883,44 +872,6 @@ onChange={handleShippingChange}
         {errorMessage && <div className="text-red-500 text-sm mb-4">{errorMessage}</div>}
 {success && <div className="text-green-500 text-sm mb-4">Payment Successful!</div>}
 
-{paymentMethod === 'paypal' ? (
-  <div className="w-full md:max-w-[450px] mt-6">
-    <PayPalButtons
-      style={{ layout: 'vertical', color: 'gold', shape: 'rect', label: 'paypal' }}
-      fundingSource="paypal"
-      createOrder={(data, actions) => {
-        const shipping = shippingMethod === 'dhl' ? 15 : 5;
-        const total = cartItems.reduce((acc, item) => {
-          const price = typeof item.price === 'object' ? item.price.sale : item.price;
-          return acc + price * item.quantity;
-        }, 0) + shipping;
-
-        return actions.order.create({
-          intent: "CAPTURE",
-          purchase_units: [
-            {
-              amount: {
-                value: total.toFixed(2),
-                currency_code: 'USD'
-              }
-            }
-          ]
-        });
-      }}
-      onApprove={async (data, actions) => {
-        const details = await actions.order?.capture();
-        console.log('✅ PayPal Success:', details);
-        setSuccess(true);
-        clearCart();
-        router.push('/thank-you'); 
-      }}
-      onError={(err) => {
-        console.error('❌ PayPal Error:', err);
-        setErrorMessage('PayPal error occurred.');
-      }}
-    />
-  </div>
-) : (
   <button
   type="submit"
   disabled={false}
@@ -928,7 +879,6 @@ onChange={handleShippingChange}
 >
   {loading ? 'Processing...' : 'PLACE ORDER'}
 </button>
-)}
       </div>
     </form>
   </main>
