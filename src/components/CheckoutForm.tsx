@@ -262,6 +262,7 @@ export default function CheckoutForm() {
     name: trimmedBilling.firstName,
     email: trimmedBilling.email,
     cartItems,
+    receiptUrl: result.receiptUrl,
   }),
 });
 

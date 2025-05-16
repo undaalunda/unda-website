@@ -24,10 +24,13 @@ export async function POST(req: NextRequest) {
       method: shippingMethod,
     });
 
-    const amount = cartItems.reduce(
-      (total: number, item: any) => total + item.price * item.quantity,
-      0
-    );
+    const amount = cartItems.reduce((total: number, item: any) => {
+  const price =
+    typeof item.price === 'object' && item.price?.sale
+      ? item.price.sale
+      : item.price;
+  return total + price * item.quantity;
+}, 0);
 
     const { data, error } = await supabase
       .from('Orders')

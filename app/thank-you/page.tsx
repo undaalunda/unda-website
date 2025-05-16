@@ -55,21 +55,20 @@ export default function ThankYouPage() {
       {error && <p className="text-red-500">{error}</p>}
 
       {order && (
-        <div className="text-left space-y-4 bg-[#1a0000]/50 p-6 rounded-xl border border-[#f8fcdc]/20 shadow-lg">
-          <p><strong>Email:</strong> {order.email}</p>
-          <p><strong>Order ID:</strong> {id}</p>
-          <p><strong>Date:</strong> {new Date(order.created_at).toLocaleString()}</p>
-          <p><strong>Status:</strong> {order.payment_status.toUpperCase()}</p>
-          <p><strong>Amount:</strong> ${order.amount.toFixed(2)}</p>
-
+        <div className="text-left space-y-4 bg-[#1a0000]/50 p-6 rounded-xl border border-[#f8fcdc]/10 shadow-sm">
+          <p><strong>Email:</strong> <span className="opacity-70">{order.email}</span></p>
+          <p><strong>Order ID:</strong> <span className="opacity-70">{id}</span></p>
+          <p><strong>Date:</strong> <span className="opacity-70">{new Date(order.created_at).toLocaleString()}</span></p>
+          <p><strong>Status:</strong> <span className="opacity-70">{order.payment_status.toUpperCase()}</span></p>
+          <p><strong>Amount:</strong> <span className="opacity-70">${order.amount.toFixed(2)}</span></p>
           <div>
-            <strong>Items:</strong>
-            <ul className="list-disc ml-5 mt-2 text-sm">
-              {order.items.map((item, i) => (
-                <li key={i}>{item.title} x {item.quantity}</li>
-              ))}
-            </ul>
-          </div>
+  <strong>Items:</strong>
+  <ul className="list-disc ml-5 mt-2 text-sm">
+    {order.items.map((item, i) => (
+      <li key={i} className="opacity-70">{item.title} x {item.quantity}</li>
+    ))}
+  </ul>
+</div>
 
           {order.tracking_number && (
             <div className="mt-4">

@@ -92,9 +92,16 @@ export async function POST(req: NextRequest) {
         source: 'UndaAlundaStore',
         created_from: 'create-payment-intent-endpoint',
       },
+      expand: ['latest_charge'],
     });
 
-    return NextResponse.json({ success: true, clientSecret: paymentIntent.client_secret });
+    const receiptUrl = (paymentIntent.latest_charge as Stripe.Charge)?.receipt_url || null;
+
+    return NextResponse.json({
+      success: true,
+      clientSecret: paymentIntent.client_secret,
+      receiptUrl,
+    });
   } catch (err: any) {
     console.error('🔥 PaymentIntent error:', err);
     return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });

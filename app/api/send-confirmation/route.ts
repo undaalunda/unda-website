@@ -30,9 +30,9 @@ const getDownloadFileForItem = (item: CartItem): string | null => {
 };
 
 export async function POST(req: NextRequest) {
-  const { name, email, cartItems } = await req.json();
+  const { name, email, cartItems, receiptUrl } = await req.json(); // 👈 เพิ่ม receiptUrl
 
-  console.log('🧾 cartItems received:', cartItems); // << สำหรับดีบัก!
+  console.log('🧾 cartItems received:', cartItems);
 
   try {
     let linksHtml = '';
@@ -67,26 +67,32 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    const receiptHtml = receiptUrl
+      ? `<p style="margin-top: 24px;">You can also view your payment receipt here:<br/>
+          <a href="${receiptUrl}" target="_blank" style="color: #dc9e63; text-decoration: underline;">Stripe Payment Receipt</a></p>`
+      : '';
+
     const html = `
       <body style="margin: 0; padding: 0; font-family: Cinzel, serif; background-color: #000;">
         <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" 
-          style="background-image: url('https://unda-website.vercel.app/catmoon-bg.jpeg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+          style="background-image: url('https://unda-website.vercel.app/catmoon-bg.jpeg'); background-size: cover; background-position: center;">
           <tr>
             <td align="center" style="background-color: rgba(0, 0, 0, 0.8); padding: 60px 20px;">
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" 
-                style="margin: 0 auto; background-image: url('https://unda-website.vercel.app/redsky-bg.jpeg'); background-size: cover; background-position: center; border-radius: 12px; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
+                style="margin: 0 auto; background-image: url('https://unda-website.vercel.app/redsky-bg.jpeg'); background-size: cover; border-radius: 12px; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
                 <tr>
                   <td style="padding: 40px; color: #f8fcdc !important;">
                     <h1 style="color: #dc9e63 !important; font-size: 28px; margin-bottom: 20px;">Thank you for your purchase!</h1>
-                    <p style="margin-bottom: 16px;">Hi <strong>${name}</strong>,</p>
-                    <p style="margin-bottom: 16px;">We're thrilled to let you know that your order has been successfully received and is now being processed.</p>
+                    <p style="color: #f8fcdc; margin-bottom: 16px;">Hi <strong>${name}</strong>,</p>
+<p style="color: #f8fcdc; margin-bottom: 16px;">We're thrilled to let you know that your order has been successfully received and is now being processed.</p>
                     ${
                       linksHtml
                         ? `<p style="margin-top: 30px;">Here are your download links (valid for 1 hour):</p><ul style="padding-left: 20px;">${linksHtml}</ul>`
                         : '<p style="margin-bottom: 30px;">You’ll receive another email once your items have shipped.</p>'
                     }
+                    ${receiptHtml}
                     <a href="https://www.undaalunda.com" 
-                      style="display: inline-block; background-color: #dc9e63; color: #000000 !important; text-decoration: none !important; padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 14px; margin-top: 20px;">
+                      style="display: inline-block; background-color: #dc9e63; color: #000000 !important; text-decoration: none !important; padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 14px; margin-top: 30px;">
                       Return to Store
                     </a>
                     <p style="font-size: 12px; color: #999 !important; margin-top: 30px; text-align: center;">
