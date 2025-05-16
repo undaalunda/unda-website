@@ -265,19 +265,26 @@ export default function CheckoutForm() {
   }),
 });
 
-          await fetch('/api/save-order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              billingInfo: trimmedBilling,
-              shippingInfo: shipToDifferent ? trimmedShipping : trimmedBilling,
-              cartItems,
-              shippingMethod,
-              email: trimmedBilling.email,
-            }),
-          });
+          const saveRes = await fetch('/api/save-order', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    billingInfo: trimmedBilling,
+    shippingInfo: shipToDifferent ? trimmedShipping : trimmedBilling,
+    cartItems,
+    shippingMethod,
+    email: trimmedBilling.email,
+  }),
+});
 
-          router.push('/thank-you');
+const saveData = await saveRes.json();
+
+if (!saveRes.ok || !saveData.orderId) {
+  throw new Error('Failed to save order or missing order ID');
+}
+
+// 🎯 Redirect พร้อม query
+router.push(`/thank-you?email=${encodeURIComponent(trimmedBilling.email)}&id=${saveData.orderId}`);
         }
       } catch (err: any) {
         console.error('[🔥 API error]', err);

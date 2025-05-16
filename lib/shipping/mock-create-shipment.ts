@@ -5,35 +5,29 @@ export interface ShipmentInput {
   fullName: string;
   address: string;
   country: string;
-  method: 'evri' | 'dhl';
+  method: 'dhl';
 }
 
 export interface ShipmentResult {
-  trackingNumber: string;
-  trackingUrl: string;
-  estimatedDelivery: string;
-  labelUrl: string;
+  tracking_number: string;
+  courier: string;
+  tracking_url: string;
+  estimated_delivery: string;
+  label_url: string;
 }
 
 export function createMockShipment(input: ShipmentInput): ShipmentResult {
   const randomNum = Math.floor(100000000 + Math.random() * 900000000);
-  const trackingNumber =
-    input.method === 'dhl'
-      ? `DHL-${randomNum}`
-      : `EVRI-${randomNum}`;
-
-  const trackingUrl =
-    input.method === 'dhl'
-      ? `https://track.dhl.com/${trackingNumber}`
-      : `https://www.evri.com/track/${trackingNumber}`;
-
-  const labelUrl = `https://fake-labels.undaalunda.com/${trackingNumber}.pdf`;
-  const estimatedDelivery = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toDateString();
+  const tracking_number = `DHL-${randomNum}`;
+  const tracking_url = `https://track.dhl.com/${tracking_number}`;
+  const label_url = `https://fake-labels.undaalunda.com/${tracking_number}.pdf`;
+  const estimated_delivery = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toDateString();
 
   return {
-    trackingNumber,
-    trackingUrl,
-    estimatedDelivery,
-    labelUrl,
+    tracking_number,
+    courier: 'dhl',
+    tracking_url,
+    estimated_delivery,
+    label_url,
   };
 }

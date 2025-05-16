@@ -29,23 +29,33 @@ export async function POST(req: NextRequest) {
       0
     );
 
-    const { error } = await supabase.from('Orders').insert([
-      {
-        email,
-        amount,
-        currency: 'usd',
-        items: cartItems,
-        payment_status: 'succeeded',
-        created_at: new Date().toISOString(), // 🧨 ใส่มันไปเหอะ จะได้ไม่พัง
-      },
-    ]);
+    const { data, error } = await supabase
+      .from('Orders')
+      .insert([
+        {
+          email,
+          amount,
+          currency: 'usd',
+          items: cartItems,
+          payment_status: 'succeeded',
+          created_at: new Date().toISOString(),
+          tracking_number: shipment.tracking_number || null,
+          courier: shipment.courier || null,
+        },
+      ])
+      .select()
+      .single();
 
     if (error) {
       console.error('❌ Supabase insert error:', error.message);
       return NextResponse.json({ error: 'Failed to save order to DB' }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, tracking: shipment });
+    return NextResponse.json({
+      success: true,
+      tracking: shipment,
+      orderId: data.id,
+    });
   } catch (err: any) {
     console.error('🔥 Unexpected error in save-order:', err.message);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
