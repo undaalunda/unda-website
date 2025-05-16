@@ -23,18 +23,22 @@ export default function ShopPageContent() {
 
   const tabFromQuery = searchParams.get('tab')?.toUpperCase();
   const isValidTab = validTabs.includes(tabFromQuery as TabType);
-  const [activeTab, setActiveTab] = useState<TabType>('MERCH');
+  const [activeTab, setActiveTab] = useState<TabType | null>(null);
 
   useEffect(() => {
     if (isValidTab) {
       setActiveTab(tabFromQuery as TabType);
+    } else {
+      setActiveTab('MERCH'); // fallback default
     }
-  }, [tabFromQuery, isValidTab]);
+  }, [tabFromQuery]);
 
   const handleTabChange = (tab: TabType) => {
     setActiveTab(tab);
     router.replace(`/shop?tab=${tab}`);
   };
+
+  if (!activeTab) return null; // ❗ ป้องกัน render ก่อนรู้ tab
 
   const itemsToRender = allItems.filter((item) => {
     const category = item.category;
