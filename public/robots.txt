@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://unda-website.vercel.app
+
+# Sitemaps
+Sitemap: https://unda-website.vercel.app/sitemap.xml
