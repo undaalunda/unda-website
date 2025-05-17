@@ -23,7 +23,11 @@ export default function ShopPageContent() {
 
   const tabFromQuery = searchParams.get('tab')?.toUpperCase();
   const isValidTab = validTabs.includes(tabFromQuery as TabType);
-  const [activeTab, setActiveTab] = useState<TabType | null>(null);
+  const [activeTab, setActiveTab] = useState<TabType>(
+  validTabs.includes((searchParams.get('tab')?.toUpperCase() ?? '') as TabType)
+    ? (searchParams.get('tab')!.toUpperCase() as TabType)
+    : 'MERCH'
+);
 
   useEffect(() => {
     if (isValidTab) {
@@ -33,34 +37,30 @@ export default function ShopPageContent() {
     }
   }, [tabFromQuery]);
 
-  const handleTabChange = (tab: TabType) => {
-    setActiveTab(tab);
-    router.replace(`/shop?tab=${tab}`);
-  };
-
-if (!activeTab) {
-  return (
-    <main className="shop-page-main min-h-screen text-[#f8fcdc] font-[Cinzel] px-4 pt-35 pb-4">
-      <h1 className="text-center text-4xl font-bold text-[#dc9e63] mb-10 uppercase tracking-wider">
-        Shop
-      </h1>
-      <div className="shop-tab-group mb-10">
-        {validTabs.map((tab) => (
-          <button
-            key={tab}
-            className="info-button shop-tab-button"
-            disabled
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
-      <p className="text-center text-lg text-[#dc9e63] opacity-60 mt-10">
-        Loading products...
-      </p>
-    </main>
-  );
-} 
+  // ✅ ใส่ fallback UI ป้องกันแว้บ footer
+  if (!activeTab) {
+    return (
+      <main className="shop-page-main min-h-screen text-[#f8fcdc] font-[Cinzel] px-4 pt-35 pb-4">
+        <h1 className="text-center text-4xl font-bold text-[#dc9e63] mb-10 uppercase tracking-wider">
+          Shop
+        </h1>
+        <div className="shop-tab-group mb-10">
+          {validTabs.map((tab) => (
+            <button
+              key={tab}
+              className="info-button shop-tab-button"
+              disabled
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+        <p className="text-center text-lg text-[#dc9e63] opacity-60 mt-10">
+          Loading products...
+        </p>
+      </main>
+    );
+  }
 
   const itemsToRender = allItems.filter((item) => {
     const category = item.category;
@@ -88,7 +88,10 @@ if (!activeTab) {
         {validTabs.map((tab) => (
           <button
             key={tab}
-            onClick={() => handleTabChange(tab)}
+            onClick={() => {
+              setActiveTab(tab);
+              router.replace(`/shop?tab=${tab}`);
+            }}
             className={`info-button shop-tab-button ${activeTab === tab ? 'active-tab' : ''}`}
           >
             {tab}

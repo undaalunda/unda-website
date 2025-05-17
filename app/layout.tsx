@@ -26,7 +26,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         setMenuOpen(e.detail);
       }
     };
+
     window.addEventListener('toggle-menu', handler);
+
+    // ✅ ให้จำตำแหน่ง scroll ตอน back/forward
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'auto';
+    }
+
     return () => window.removeEventListener('toggle-menu', handler);
   }, []);
 

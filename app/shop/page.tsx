@@ -1,5 +1,7 @@
+//ShopPage.tsx
+
 import { Suspense } from 'react';
-import ShopPageWrapper from '../../src/components/ShopPageWrapper';
+import ShopPageWrapper from '../../src/components/ShopPageWrapper'; // ใช้ตรงๆได้เลย
 
 export default function ShopPage() {
   return (
