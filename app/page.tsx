@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import Script from 'next/script';
 import { allItems } from '@/components/allItems';
+import AppClientWrapper from '@/components/AppClientWrapper';
 
 const blacklist = [
   'bass-book', 'keys-book', 'drums-book', 'cat-scores-white',
@@ -65,6 +66,7 @@ export default function HomePage() {
   }, []);
 
   return (
+    <AppClientWrapper>
     <main className="homepage-main" style={{ overflow: 'visible' }}>
       {isClient && (
         <Script
@@ -264,5 +266,6 @@ export default function HomePage() {
         </div>
       </section>
     </main>
+    </AppClientWrapper>
   );
 }

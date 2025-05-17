@@ -4,6 +4,7 @@
 
 import { useEffect, useState } from 'react';
 import AdminPasswordModal from '@/components/AdminPasswordModal';
+import AppClientWrapper from '@/components/AppClientWrapper';
 
 type Order = {
   email: string;
@@ -83,6 +84,7 @@ export default function AdminOrdersPage() {
   }
 
 return (
+  <AppClientWrapper>
   <main className={`min-h-screen pt-64 pb-24 px-6 max-w-3xl mx-auto text-[#f8fcdc] font-[Cinzel] ${showPasswordModal ? 'opacity-0 pointer-events-none select-none' : ''}`}>
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-[#f8fcdc]/20 pb-4 mb-6 gap-4">
         <h1 className="text-2xl font-bold tracking-wider text-[#dc9e63]">ADMIN ORDERS</h1>
@@ -148,5 +150,6 @@ return (
         </div>
       )}
     </main>
+    </AppClientWrapper>
   );
 }

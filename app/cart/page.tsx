@@ -7,8 +7,9 @@ import { Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import AppClientWrapper from '@/components/AppClientWrapper';
 
-export default function CartPage() {
+function CartPageContent() {
   const { cartItems, removeFromCart, updateQuantity, clearCart } = useCart();
   const router = useRouter();
 
@@ -136,5 +137,13 @@ export default function CartPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function CartPage() {
+  return (
+    <AppClientWrapper>
+      <CartPageContent />
+    </AppClientWrapper>
   );
 }

@@ -1,4 +1,4 @@
-//CheckoutPage.tsx
+// CheckoutPage.tsx
 
 'use client';
 
@@ -8,6 +8,7 @@ import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 import CheckoutForm from '@/components/CheckoutForm';
 import Script from 'next/script';
 import { useEffect } from 'react';
+import AppClientWrapper from '@/components/AppClientWrapper';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -27,7 +28,7 @@ export default function CheckoutPage() {
   }, []);
 
   return (
-    <>
+    <AppClientWrapper>
       <Script
         src={`https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`}
         strategy="beforeInteractive"
@@ -47,8 +48,8 @@ export default function CheckoutPage() {
         }}
       />
       <Elements stripe={stripePromise}>
-  <CheckoutForm />
-</Elements>
-    </>
+        <CheckoutForm />
+      </Elements>
+    </AppClientWrapper>
   );
 }
