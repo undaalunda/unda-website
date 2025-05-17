@@ -132,7 +132,7 @@ export default function HomePage() {
           <h3 className="transcription-title">TRANSCRIPTIONS</h3>
           <div className="product-row">
             {["guitar", "keys", "bass", "drums"].map((inst, i) => (
-              <Link href={`/${inst}`} key={i} className="product-item product-label-link">
+  <Link href="/shop?tab=DIGITAL" key={i} className="product-item product-label-link">
                 <Image src={`/product-${inst}.png`} alt={`${inst} Book`} width={200} height={200} className="product-image" />
                 <div className="product-label-group">
                   <p className="product-title">DARK WONDERFUL WORLD</p>
