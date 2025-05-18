@@ -68,6 +68,7 @@ export default function HomePage() {
   return (
     <AppClientWrapper>
     <main className="homepage-main" style={{ overflow: 'visible' }}>
+  <h1 className="sr-only">Unda Alunda | Official Website & Merch Store</h1>
       {isClient && (
         <Script
           src="https://widget.bandsintown.com/main.min.js"
