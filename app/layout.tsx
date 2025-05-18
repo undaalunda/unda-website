@@ -1,15 +1,17 @@
 // app/layout.tsx
 import './globals.css';
 import type { Metadata } from 'next';
+import { CartProvider } from '@/context/CartContext'; // ✅ เพิ่ม CartProvider กลางโลก
+import { ReactNode } from 'react';
 
 export const metadata: Metadata = {
   title: 'Unda Alunda | Official Website & Merch Store',
-  description: 'Official Website of Unda Alunda. New album coming May 1, 2025. Shop music, merch, and more.',
-  keywords: ['Unda Alunda', 'Dark Wonderful World', 'music', 'merch', 'thai band'],
+  description: 'Official Website of Unda Alunda. New album coming July 1, 2025. Shop music, merch, and more.',
+  keywords: ['Unda Alunda', 'Dark Wonderful World', 'music', 'merch', 'Stems', 'Transcription', 'Tour date'],
   metadataBase: new URL('https://unda-website.vercel.app'),
   openGraph: {
     title: 'Unda Alunda | Official Website & Merch Store',
-    description: 'New album out May 1, 2025 — Shop now!',
+    description: 'New album out July 1, 2025 — Shop now!',
     url: 'https://unda-website.vercel.app',
     siteName: 'Unda Alunda',
     images: [
@@ -36,7 +38,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
@@ -51,10 +53,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-title" content="Unda Alunda" />
         <link rel="canonical" href="https://unda-website.vercel.app" />
         <link rel="manifest" href="/site.webmanifest" />
-
       </head>
+
       <body className="bg-[#190000] text-[#f8fcdc] m-0 p-0 overflow-x-hidden">
-        {children}
+        <CartProvider>
+          {children}
+        </CartProvider>
       </body>
     </html>
   );

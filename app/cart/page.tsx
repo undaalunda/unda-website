@@ -3,10 +3,10 @@
 
 import { useCart } from '@/context/CartContext';
 import Link from 'next/link';
-import { Trash2 } from 'lucide-react';
 import Image from 'next/image';
-import { AnimatePresence, motion } from 'framer-motion';
+import { Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { AnimatePresence, motion } from 'framer-motion';
 import AppClientWrapper from '@/components/AppClientWrapper';
 
 function CartPageContent() {
@@ -26,7 +26,9 @@ function CartPageContent() {
     return (
       <main className="min-h-screen flex flex-col justify-center items-center text-[#f8fcdc] font-[Cinzel] p-8">
         <h1 className="text-2xl mb-6">Your cart is empty.</h1>
-        <Link href="/shop" className="text-[#dc9e63] hover:underline">Return to Shop</Link>
+        <Link href="/shop" className="text-[#dc9e63] hover:underline">
+          Return to Shop
+        </Link>
       </main>
     );
   }
@@ -56,12 +58,14 @@ function CartPageContent() {
                   height={80}
                   className="rounded"
                 />
+
                 <div className="flex-1">
                   <h2 className="text-[14px] md:text-lg font-bold text-[#dc9e63]">
                     <Link href={`/shop/${item.id}`} className="cursor-pointer block w-fit">
                       {item.title}
                     </Link>
                   </h2>
+
                   <p className="text-[10px] md:text-xs font-light text-[#f8fcdc]">
                     <Link href={`/shop/${item.id}`} className="cursor-pointer block w-fit">
                       {item.subtitle}
@@ -77,7 +81,11 @@ function CartPageContent() {
                         >
                           -
                         </button>
-                        <span className="text-[13px] md:text-sm font-light">{item.quantity}</span>
+
+                        <span className="text-[13px] md:text-sm font-light">
+                          {item.quantity}
+                        </span>
+
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
                           className="w-7 h-7 border border-[#dc9e63]/50 border-[0.5px] rounded-[2px] text-sm font-light flex items-center justify-center cursor-pointer"
@@ -97,9 +105,14 @@ function CartPageContent() {
                     </button>
                   </div>
                 </div>
+
                 <div className="text-right">
                   <p className="text-[#cc3f33] font-semibold text-[13px] md:text-sm tracking-[.08em]">
-                    ${((typeof item.price === 'object' ? item.price.sale : item.price) * item.quantity).toFixed(2)}
+                    $
+                    {(
+                      (typeof item.price === 'object' ? item.price.sale : item.price) *
+                      item.quantity
+                    ).toFixed(2)}
                   </p>
                 </div>
               </motion.div>

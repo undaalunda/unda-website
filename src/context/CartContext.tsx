@@ -12,7 +12,7 @@ type CartItem = {
   price: number | { original: number; sale: number };
   image: string;
   quantity: number;
-  type: 'digital' | 'physical'; // ✅ เพิ่มตรงนี้
+  type: 'digital' | 'physical';
 };
 
 interface CartContextType {
@@ -25,6 +25,7 @@ interface CartContextType {
   setLastAddedItem: (item: CartItem | null) => void;
   cartError: string | null;
   setCartError: (msg: string | null) => void;
+  isCartReady: boolean; // ✅ ใหม่
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -33,6 +34,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [lastAddedItem, setLastAddedItem] = useState<CartItem | null>(null);
   const [cartError, setCartError] = useState<string | null>(null);
+  const [isCartReady, setIsCartReady] = useState(false); // ✅ ใหม่
 
   useEffect(() => {
     try {
@@ -42,6 +44,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       }
     } catch (err) {
       console.error('💥 Failed to load cart from localStorage:', err);
+    } finally {
+      setIsCartReady(true); // ✅ ไม่ว่าจะสำเร็จหรือ fail ต้องให้รู้ว่าโหลดเสร็จแล้ว
     }
   }, []);
 
@@ -80,7 +84,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           price: item.price,
           image: item.image,
           quantity,
-          type: item.type, // ✅ ดึง type มาจาก allItems
+          type: item.type,
         };
 
         return [...prev, newItem];
@@ -94,7 +98,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       price: item.price,
       image: item.image,
       quantity,
-      type: item.type, // ✅ เช่นกัน
+      type: item.type,
     });
   };
 
@@ -129,6 +133,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         setLastAddedItem,
         cartError,
         setCartError,
+        isCartReady, // ✅ ให้ context ไปใช้ในหน้า checkout
       }}
     >
       {children}

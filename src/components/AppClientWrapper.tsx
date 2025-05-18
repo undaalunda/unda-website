@@ -1,4 +1,4 @@
-//AppClientWrapper.tsx
+// AppClientWrapper.tsx
 
 'use client';
 
@@ -7,7 +7,6 @@ import { usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import CartSuccessPopup from '@/components/CartSuccessPopup';
 import NewsletterForm from '@/components/NewsletterForm';
-import { CartProvider } from '@/context/CartContext';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -31,7 +30,7 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
   }, []);
 
   return (
-    <CartProvider>
+    <>
       <Navbar />
 
       <div
@@ -83,6 +82,6 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
           </section>
         </div>
       </div>
-    </CartProvider>
+    </>
   );
 }

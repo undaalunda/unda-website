@@ -83,7 +83,7 @@ export default function HomePage() {
         </div>
         <div className="hero-text desktop-only">
           <p className="hero-line1">
-            THE NEW ALBUM'S COMING <span className="highlight">MAY 1 2025</span>
+            THE NEW ALBUM'S COMING <span className="highlight">July 1 2025</span>
           </p>
           <p className="hero-line2">
             AVAILABLE NOW TO <Link href="/preorder" className="hero-cta-link">PRE-ORDER</Link> & <Link href="/presave" className="hero-cta-link">PRE-SAVE</Link>
@@ -91,7 +91,7 @@ export default function HomePage() {
         </div>
         <div className="hero-text mobile-only">
           <p className="hero-line1">THE NEW ALBUM'S COMING</p>
-          <p className="hero-line1"><span className="highlight">MAY 1 2025</span></p>
+          <p className="hero-line1"><span className="highlight">July 1 2025</span></p>
           <p className="hero-line2">AVAILABLE NOW TO</p>
           <p className="hero-line2">
             <Link href="/preorder" className="hero-cta-link">PRE-ORDER</Link> & <Link href="/presave" className="hero-cta-link">PRE-SAVE</Link>
@@ -128,8 +128,8 @@ export default function HomePage() {
       {/* TRANSCRIPTION SECTION */}
       <section className="transcription-section">
         <div ref={transcriptionRef} className={`fade-trigger ${showTranscriptions ? 'fade-in' : ''}`}>
-          <h2 className="transcription-sub">LEARN THE MUSIC</h2>
-          <h3 className="transcription-title">TRANSCRIPTIONS</h3>
+          <h3 className="transcription-sub">LEARN THE MUSIC</h3>
+          <h2 className="transcription-title">TRANSCRIPTIONS</h2>
           <div className="product-row">
             {["guitar", "keys", "bass", "drums"].map((inst, i) => (
   <Link href="/shop?tab=DIGITAL" key={i} className="product-item product-label-link">
@@ -150,8 +150,8 @@ export default function HomePage() {
       {/* STEMS SECTION */}
 <section className="stems-section">
   <div ref={stemsRef} className={`fade-trigger ${showStems ? 'fade-in' : ''}`}>
-    <h2 className="stems-sub">JAM THE TRACKS</h2>
-    <h3 className="stems-title">STEMS & BACKINGS</h3>
+    <h3 className="stems-sub">JAM THE TRACKS</h3>
+    <h2 className="stems-title">STEMS & BACKINGS</h2>
     <div className="stems-row">
       {allItems
         .filter((item) => item.category === 'Backing Track')
@@ -201,8 +201,8 @@ export default function HomePage() {
       {/* MUSIC & MERCH */}
       <section className="stems-section">
         <div ref={musicMerchRef} className={`fade-trigger ${showMerch ? 'fade-in' : ''}`}>
-          <h2 className="stems-sub">MUSIC IN YOUR HANDS</h2>
-          <h3 className="stems-title">MUSIC & MERCH</h3>
+          <h3 className="stems-sub">MUSIC IN YOUR HANDS</h3>
+          <h2 className="stems-title">MUSIC & MERCH</h2>
           <div className="stems-row">
             {homepageItems.map((item) => (
               <Link href={`/shop/${item.id}`} key={item.id} className="stems-item product-label-link">
@@ -237,8 +237,8 @@ export default function HomePage() {
       {/* TOUR SECTION */}
       <section ref={tourRef} className="tour-section">
         <div className={`fade-trigger ${showTour ? 'fade-in' : ''}`}>
-          <h2 className="stems-sub">SEE IT LIVE</h2>
-          <h3 className="stems-title">TOUR DATES</h3>
+          <h3 className="stems-sub">SEE IT LIVE</h3>
+          <h2 className="stems-title">TOUR DATES</h2>
         </div>
         <div className="tour-widget-container">
           <div style={{ textAlign: 'left' }}>

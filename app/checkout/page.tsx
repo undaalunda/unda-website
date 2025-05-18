@@ -2,30 +2,48 @@
 
 'use client';
 
+import { useEffect } from 'react';
+import Script from 'next/script';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
-import { PayPalScriptProvider } from '@paypal/react-paypal-js';
-import CheckoutForm from '@/components/CheckoutForm';
-import Script from 'next/script';
-import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useCart } from '@/context/CartContext';
+
 import AppClientWrapper from '@/components/AppClientWrapper';
+import CheckoutForm from '@/components/CheckoutForm';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 export default function CheckoutPage() {
+  const router = useRouter();
+  const { cartItems, isCartReady } = useCart(); // ✅ เอา isCartReady มาใช้ด้วย
+
+  // ✅ ให้ redirect เฉพาะเมื่อโหลด cart เสร็จแล้ว
+  useEffect(() => {
+    if (isCartReady && cartItems.length === 0) {
+      router.replace('/cart');
+    }
+  }, [isCartReady, cartItems, router]);
+
   useEffect(() => {
     const badge = document.querySelector('.grecaptcha-badge') as HTMLElement;
-    if (badge) {
-      badge.style.display = 'block';
-    }
+    if (badge) badge.style.display = 'block';
 
     return () => {
-      const badge = document.querySelector('.grecaptcha-badge') as HTMLElement;
-      if (badge) {
-        badge.style.display = 'none'; // ไม่ลบ แค่ซ่อนตอนออก
-      }
+      if (badge) badge.style.display = 'none';
     };
   }, []);
+
+  // ✅ ยังโหลด cart อยู่ — แสดงข้อความโหลดเบา ๆ ไปก่อน
+  if (!isCartReady) {
+    return (
+      <AppClientWrapper>
+        <div className="min-h-screen flex items-center justify-center text-[#f8fcdc] font-[Cinzel] text-lg">
+          Loading your basket...
+        </div>
+      </AppClientWrapper>
+    );
+  }
 
   return (
     <AppClientWrapper>
