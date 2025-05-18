@@ -84,7 +84,7 @@ export default function HomePage() {
         </div>
         <div className="hero-text desktop-only">
           <p className="hero-line1">
-            THE NEW ALBUM'S COMING <span className="highlight">July 1 2025</span>
+            THE NEW ALBUM'S COMING <span className="highlight">JULY 1 2025</span>
           </p>
           <p className="hero-line2">
             AVAILABLE NOW TO <Link href="/preorder" className="hero-cta-link">PRE-ORDER</Link> & <Link href="/presave" className="hero-cta-link">PRE-SAVE</Link>
@@ -92,7 +92,7 @@ export default function HomePage() {
         </div>
         <div className="hero-text mobile-only">
           <p className="hero-line1">THE NEW ALBUM'S COMING</p>
-          <p className="hero-line1"><span className="highlight">July 1 2025</span></p>
+          <p className="hero-line1"><span className="highlight">JULY 1 2025</span></p>
           <p className="hero-line2">AVAILABLE NOW TO</p>
           <p className="hero-line2">
             <Link href="/preorder" className="hero-cta-link">PRE-ORDER</Link> & <Link href="/presave" className="hero-cta-link">PRE-SAVE</Link>
@@ -101,6 +101,7 @@ export default function HomePage() {
       </div>
 
       <div className="after-hero-spacing" />
+      <h2 className="sr-only">Shop by Category</h2>
 
       {/* BUTTON GROUP */}
       <div ref={buttonGroupRef} className={`button-group ${showButtons ? 'fade-in' : ''}`}>
@@ -116,6 +117,7 @@ export default function HomePage() {
 
       {/* VIDEO SECTION */}
       <section ref={videoRef} className={`video-section ${showVideo ? 'fade-in' : ''}`}>
+        <h2 className="sr-only">Watch on YouTube</h2>
         <iframe
           className="youtube-frame"
           src="https://www.youtube.com/embed/ZwXeCx8cAIM"
@@ -127,31 +129,41 @@ export default function HomePage() {
       </section>
 
       {/* TRANSCRIPTION SECTION */}
-      <section className="transcription-section">
-        <div ref={transcriptionRef} className={`fade-trigger ${showTranscriptions ? 'fade-in' : ''}`}>
-          <h3 className="transcription-sub">LEARN THE MUSIC</h3>
-          <h2 className="transcription-title">TRANSCRIPTIONS</h2>
-          <div className="product-row">
-            {["guitar", "keys", "bass", "drums"].map((inst, i) => (
-  <Link href="/shop?tab=DIGITAL" key={i} className="product-item product-label-link">
-                <Image src={`/product-${inst}.png`} alt={`${inst} Book`} width={200} height={200} className="product-image" />
-                <div className="product-label-group">
-                  <p className="product-title">DARK WONDERFUL WORLD</p>
-                  <p className="product-subtitle">THE COMPLETE {inst.toUpperCase()} TRANSCRIPTION</p>
-                </div>
-              </Link>
-            ))}
+<section className="transcription-section">
+  <div ref={transcriptionRef} className={`fade-trigger ${showTranscriptions ? 'fade-in' : ''}`}>
+    <h3 className="transcription-sub">LEARN THE MUSIC</h3>
+    <h2 className="transcription-title">TRANSCRIPTIONS</h2>
+    <div className="product-row">
+      {["guitar", "keys", "bass", "drums"].map((inst, i) => (
+        <Link href="/shop?tab=DIGITAL" key={i} className="product-item product-label-link">
+          <Image
+            src={`/product-${inst}.png`}
+            alt={`${inst} Book`}
+            width={200}
+            height={200}
+            className="product-image"
+          />
+          <div className="product-label-group">
+            <h3 className="product-title">
+              DARK WONDERFUL WORLD
+              <span className="product-subtitle block">
+                THE COMPLETE {inst.toUpperCase()} TRANSCRIPTION
+              </span>
+            </h3>
           </div>
-          <div className="shopall-button-wrapper">
-            <Link href="/shop?tab=DIGITAL" className="info-button">SHOP ALL</Link>
-          </div>
-        </div>
-      </section>
+        </Link>
+      ))}
+    </div>
+    <div className="shopall-button-wrapper">
+      <Link href="/shop?tab=DIGITAL" className="info-button">SHOP ALL</Link>
+    </div>
+  </div>
+</section>
 
       {/* STEMS SECTION */}
 <section className="stems-section">
   <div ref={stemsRef} className={`fade-trigger ${showStems ? 'fade-in' : ''}`}>
-    <h3 className="stems-sub">JAM THE TRACKS</h3>
+    <p className="stems-sub">JAM THE TRACKS</p>
     <h2 className="stems-title">STEMS & BACKINGS</h2>
     <div className="stems-row">
       {allItems
@@ -170,6 +182,7 @@ export default function HomePage() {
               className="stems-image"
             />
             <div className="stems-label-group">
+              <h3 className="sr-only">{`${item.title} – ${item.subtitle}`}</h3>
               <p className="stems-title-text">{item.title}</p>
               <p className="stems-subtitle-tiny">
                 {item.subtitle
@@ -200,46 +213,53 @@ export default function HomePage() {
 </section>
 
       {/* MUSIC & MERCH */}
-      <section className="stems-section">
-        <div ref={musicMerchRef} className={`fade-trigger ${showMerch ? 'fade-in' : ''}`}>
-          <h3 className="stems-sub">MUSIC IN YOUR HANDS</h3>
-          <h2 className="stems-title">MUSIC & MERCH</h2>
-          <div className="stems-row">
-            {homepageItems.map((item) => (
-              <Link href={`/shop/${item.id}`} key={item.id} className="stems-item product-label-link">
-                <Image src={item.image} alt={item.title} width={200} height={200} className="stems-image" />
-                <div className="stems-label-group">
-                  <p className="stems-title-text">{item.title}</p>
-                  <p className="stems-subtitle-tiny">{item.subtitle.replace(' BACKING TRACK', '').replace(' STEM', '').replace(' TAB', '')}</p>
-                  <p className="stems-price">
-                    {typeof item.price === 'object' && item.price !== null
-                      ? <>
-                          <span className="line-through mr-1 text-[#f8fcdc]">
-                            ${item.price.original.toFixed(2)}
-                          </span>
-                          <span className="text-[#cc3f33]">
-                            ${item.price.sale.toFixed(2)}
-                          </span>
-                        </>
-                      : typeof item.price === 'number'
-                        ? `$${item.price.toFixed(2)}`
-                        : null}
-                  </p>
-                </div>
-              </Link>
-            ))}
+<section className="stems-section">
+  <div ref={musicMerchRef} className={`fade-trigger ${showMerch ? 'fade-in' : ''}`}>
+    <p className="stems-sub">MUSIC IN YOUR HANDS</p>
+    <h2 className="stems-title">MUSIC & MERCH</h2>
+    <div className="stems-row">
+      {homepageItems.map((item) => (
+        <Link href={`/shop/${item.id}`} key={item.id} className="stems-item product-label-link">
+          <Image src={item.image} alt={item.title} width={200} height={200} className="stems-image" />
+          <div className="stems-label-group">
+            <h3 className="sr-only">{`${item.title} – ${item.subtitle.replace(' BACKING TRACK', '').replace(' STEM', '').replace(' TAB', '')}`}</h3>
+            <p className="stems-title-text">{item.title}</p>
+            <p className="stems-subtitle-tiny">
+              {item.subtitle
+                .replace(' BACKING TRACK', '')
+                .replace(' STEM', '')
+                .replace(' TAB', '')}
+            </p>
+            <p className="stems-price">
+              {typeof item.price === 'object' && item.price !== null
+                ? <>
+                    <span className="line-through mr-1 text-[#f8fcdc]">
+                      ${item.price.original.toFixed(2)}
+                    </span>
+                    <span className="text-[#cc3f33]">
+                      ${item.price.sale.toFixed(2)}
+                    </span>
+                  </>
+                : typeof item.price === 'number'
+                  ? `$${item.price.toFixed(2)}`
+                  : null}
+            </p>
           </div>
-          <div className="shopall-button-wrapper">
-            <Link href="/shop?tab=MERCH" className="info-button">SHOP ALL</Link>
-          </div>
-        </div>
-      </section>
+        </Link>
+      ))}
+    </div>
+    <div className="shopall-button-wrapper">
+      <Link href="/shop?tab=MERCH" className="info-button">SHOP ALL</Link>
+    </div>
+  </div>
+</section>
 
       {/* TOUR SECTION */}
       <section ref={tourRef} className="tour-section">
         <div className={`fade-trigger ${showTour ? 'fade-in' : ''}`}>
-          <h3 className="stems-sub">SEE IT LIVE</h3>
+          <p className="stems-sub">SEE IT LIVE</p>
           <h2 className="stems-title">TOUR DATES</h2>
+          <h3 className="sr-only">Upcoming Tour dates from Bandsintown Widget</h3>
         </div>
         <div className="tour-widget-container">
           <div style={{ textAlign: 'left' }}>

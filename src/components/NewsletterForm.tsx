@@ -7,7 +7,7 @@ import React from 'react';
 export default function NewsletterForm() {
   return (
     <section className="newsletter-container">
-      <h3 className="newsletter-title">NEWSLETTER SIGN UP</h3>
+      <h2 className="newsletter-title">NEWSLETTER SIGN UP</h2>
 
       <form
         action="https://gmail.us1.list-manage.com/subscribe/post?u=3b4e88384cbe530945e9a9cfd&amp;id=835cafe901&amp;f_id=0070cce0f0"
