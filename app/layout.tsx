@@ -1,7 +1,6 @@
 // app/layout.tsx
 import './globals.css';
 import type { Metadata } from 'next';
-import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: 'Unda Alunda | Official Website & Merch Store',
@@ -41,15 +40,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
+        {/* ✅ SEO Enhancements */}
         <meta name="google-site-verification" content="l9-GepfNOG2FpwhTM3lKy6YjpQ0ifAmNbLsv1oqC2uo" />
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-        />
-        <Script
-          src={`https://www.paypal.com/sdk/js?client-id=${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}`}
-          strategy="beforeInteractive"
-        />
+        <meta name="robots" content="index, follow" />
+        <meta name="author" content="Unda Alunda" />
+        <meta name="publisher" content="Unda Alunda" />
+        <meta name="theme-color" content="#190000" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Unda Alunda" />
+        <link rel="canonical" href="https://unda-website.vercel.app" />
+        <link rel="manifest" href="/site.webmanifest" />
+
       </head>
       <body className="bg-[#190000] text-[#f8fcdc] m-0 p-0 overflow-x-hidden">
         {children}
