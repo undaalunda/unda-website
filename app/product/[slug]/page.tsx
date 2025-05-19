@@ -25,6 +25,12 @@ function smartTitleCase(str: string): string {
     .join(' ');
 }
 
+export async function generateStaticParams() {
+  return allItems.map((item) => ({
+    slug: item.id,
+  }));
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -53,7 +59,7 @@ export async function generateMetadata({
   };
 }
 
-// ✅ FIX: send slug as prop instead of relying on useParams()
-export default function Page({ params }: { params: { slug: string } }) {
+// 🛠 THIS IS THE FIX
+export default async function Page({ params }: { params: { slug: string } }) {
   return <ProductPageContent slug={params.slug} />;
 }
