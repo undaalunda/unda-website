@@ -25,11 +25,10 @@ function smartTitleCase(str: string): string {
     .join(' ');
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { slug: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: { params: { slug: string } }
+): Promise<Metadata> {
+  const { params } = props;
   const product = allItems.find((item) => item.id === params.slug);
 
   if (!product) {
@@ -53,7 +52,11 @@ export async function generateMetadata({
   };
 }
 
-// ✅ FIXED: Receive params even if not passed to child — to satisfy route context
-export default async function Page({ params }: { params: { slug: string } }) {
-  return <ProductPageContent />;
+// ✅ FIXED: ProductPageContent needs the slug — pass it as a prop from here
+export default async function Page({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  return <ProductPageContent slug={params.slug} />;
 }

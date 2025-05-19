@@ -2,7 +2,6 @@
 
 'use client';
 
-import { useParams } from 'next/navigation';
 import { allItems } from '@/components/allItems';
 import type { Product } from '@/components/allItems';
 import Image from 'next/image';
@@ -24,9 +23,7 @@ function getStockStatus(product: Product): 'in-stock' | 'out-of-stock' | 'pre-or
   return null;
 }
 
-export default function ProductPage() {
-  const params = useParams();
-  const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
+export default function ProductPageContent({ slug }: { slug: string }) {
   const product = allItems.find((item) => item.id === slug) as Product | undefined;
 
   const { addToCart } = useCart();
