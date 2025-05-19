@@ -2,8 +2,9 @@
 
 import { allItems } from '@/components/allItems';
 import ProductPageContent from '@/components/ProductPageContent';
-import type { Metadata } from 'next';
+import type { Metadata, ResolvingMetadata } from 'next';
 
+// 👕 Capitalize certain product keywords
 function smartTitleCase(str: string): string {
   const exceptions: Record<string, string> = {
     't-shirt': 'T-Shirt',
@@ -25,11 +26,16 @@ function smartTitleCase(str: string): string {
     .join(' ');
 }
 
-export async function generateMetadata({
-  params,
-}: {
+// ✅ Declare the prop types properly
+type Props = {
   params: { slug: string };
-}): Promise<Metadata> {
+};
+
+// 🧠 Generate dynamic metadata for SEO
+export async function generateMetadata(
+  { params }: Props,
+  _parent: ResolvingMetadata
+): Promise<Metadata> {
   const product = allItems.find((item) => item.id === params.slug);
 
   if (!product) {
@@ -39,7 +45,6 @@ export async function generateMetadata({
     };
   }
 
-  // 🧼 Format subtitle to be capitalized instead of SCREAMING
   const formattedSubtitle = product.subtitle
     ? product.subtitle.charAt(0).toUpperCase() + product.subtitle.slice(1).toLowerCase()
     : '';
@@ -54,6 +59,7 @@ export async function generateMetadata({
   };
 }
 
+// 🧩 Render product page component
 export default function Page() {
   return <ProductPageContent />;
 }
