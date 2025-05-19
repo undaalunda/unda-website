@@ -1,5 +1,3 @@
-// app/product/[slug]/page.tsx
-
 import { allItems } from '@/components/allItems';
 import ProductPageContent from '@/components/ProductPageContent';
 import type { Metadata } from 'next';
@@ -53,7 +51,7 @@ export async function generateMetadata({
   };
 }
 
-// ✅ FIXED: Don't pass `params` to client component wrapper
-export default function Page() {
+// ✅ async function even though we don’t use await — to satisfy dynamic route rule
+export default async function Page() {
   return <ProductPageContent />;
 }
