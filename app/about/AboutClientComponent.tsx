@@ -37,7 +37,7 @@ const styledParagraphs = [
     className: 'mt-24 text-left'
   },
   {
-    text: `At 15, he began formally studying jazz.\nHe went on to earn top honors in both Theory and Ear Training at the College of Music, Mahidol University, where he studied from high school through graduation.`,
+    text: `At 15, he began formally studying jazz music.\nHe went on to earn top honors in both Theory and Ear Training at the College of Music, Mahidol University, where he studied from high school through graduation.`,
     className: 'text-left'
   },
   {
@@ -183,7 +183,7 @@ useEffect(() => {
           variants={fadeInUp}
           custom={1}
         >
-          When was the last time you truly felt like… yourself..?
+          When was the last time you truly felt like yourself..?
         </motion.h2>
       </motion.section>
 
