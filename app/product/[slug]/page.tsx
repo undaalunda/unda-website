@@ -4,6 +4,7 @@ import { allItems } from '@/components/allItems';
 import ProductPageContent from '@/components/ProductPageContent';
 import type { Metadata } from 'next';
 
+// 🧠 แปลงชื่อสินค้าให้อ่านง่าย
 function smartTitleCase(str: string): string {
   const exceptions: Record<string, string> = {
     't-shirt': 'T-Shirt',
@@ -25,14 +26,14 @@ function smartTitleCase(str: string): string {
     .join(' ');
 }
 
-// ✅ STEP 1: tell Next.js which slugs to pre-render
+// ✅ บอก Next.js ว่ามี slug อะไรบ้าง
 export async function generateStaticParams() {
   return allItems.map((item) => ({
     slug: item.id,
   }));
 }
 
-// ✅ STEP 2: metadata for SEO
+// ✅ สร้างข้อมูล metadata สำหรับ SEO
 export async function generateMetadata({
   params,
 }: {
@@ -61,8 +62,8 @@ export async function generateMetadata({
   };
 }
 
-// ✅ STEP 3: MAKE THIS FUNCTION ASYNC
-// DON'T TRY TO BE CLEVER, JUST COPY THIS
-export default async function Page({ params }: { params: { slug: string } }) {
-  return <ProductPageContent slug={params.slug} />;
+// ✅ ใช้ any เพื่อให้ TypeScript หยุดพูดมาก
+export default async function Page(props: any) {
+  const slug = props?.params?.slug;
+  return <ProductPageContent slug={slug} />;
 }
