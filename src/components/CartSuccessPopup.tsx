@@ -37,10 +37,12 @@ export default function CartSuccessPopup() {
   };
 
   useEffect(() => {
-    if (pathname === '/cart') {
-      setIsVisible(false);
-      setShouldRender(false);
-      setLastAddedItem(null);
+    const pagesToSuppressPopup = ['/cart', '/checkout'];
+
+    if (pagesToSuppressPopup.includes(pathname)) {
+      if (lastAddedItem) {
+        setLastAddedItem(null);
+      }
       return;
     }
 
@@ -48,9 +50,11 @@ export default function CartSuccessPopup() {
       setShouldRender(true);
       setTimeout(() => setIsVisible(true), 10);
       startHideTimer();
-
-      return () => clearHideTimer();
     }
+
+    return () => {
+      clearHideTimer();
+    };
   }, [lastAddedItem, pathname]);
 
   const handleMouseEnter = () => {
