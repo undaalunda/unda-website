@@ -2,12 +2,13 @@
 
 'use client';
 
-import { useSearchParams } from 'next/navigation';
 import ShopPageContent from './ShopPageContent';
 
-export default function ShopPageWrapper() {
-  const searchParams = useSearchParams();
-  const tabParam = searchParams.get('tab') as 'MERCH' | 'MUSIC' | 'BUNDLES' | 'DIGITAL' | null;
+type Props = {
+  category?: string;
+};
 
-  return <ShopPageContent />
+export default function ShopPageWrapper({ category }: Props) {
+  const selectedTab = category?.toUpperCase() as 'MERCH' | 'MUSIC' | 'BUNDLES' | 'DIGITAL' | undefined;
+  return <ShopPageContent tab={selectedTab || 'MERCH'} />;
 }

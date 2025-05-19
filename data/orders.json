@@ -30,7 +30,7 @@
     },
     "cartItems": [
       {
-        "id": "cat-scores-black",
+        "id": "cat-scores-t-shirt-black",
         "title": "CAT SCORES T-SHIRT",
         "subtitle": "BLACK",
         "price": 29.95,
@@ -127,7 +127,7 @@
     },
     "cartItems": [
       {
-        "id": "cat-scores-black",
+        "id": "cat-scores-t-shirt-black",
         "title": "CAT SCORES T-SHIRT",
         "subtitle": "BLACK",
         "price": 29.95,
@@ -439,7 +439,7 @@
     },
     "cartItems": [
       {
-        "id": "cat-scores-white",
+        "id": "cat-scores-t-shirt-white",
         "title": "CAT SCORES T-SHIRT",
         "subtitle": "WHITE",
         "price": 29.95,

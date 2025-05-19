@@ -10,7 +10,7 @@ import { allItems } from '@/components/allItems';
 import AppClientWrapper from '@/components/AppClientWrapper';
 
 const blacklist = [
-  'bass-book', 'keys-book', 'drums-book', 'cat-scores-white',
+  'bass-book', 'keys-book', 'drums-book', 'cat-scores-t-shirt-white',
   'album-merch-bundle', 'book-merch-bundle', 'book-bonus-bundle',
   'book-bundle', 'apparel-book-bundle', 'sticker-book-bundle'
 ];
@@ -131,7 +131,7 @@ export default function HomePage() {
       {/* TRANSCRIPTION SECTION */}
 <section className="transcription-section">
   <div ref={transcriptionRef} className={`fade-trigger ${showTranscriptions ? 'fade-in' : ''}`}>
-    <h3 className="transcription-sub">LEARN THE MUSIC</h3>
+    <p className="transcription-sub">LEARN THE MUSIC</p>
     <h2 className="transcription-title">TRANSCRIPTIONS</h2>
     <div className="product-row">
       {["guitar", "keys", "bass", "drums"].map((inst, i) => (
@@ -170,7 +170,7 @@ export default function HomePage() {
         .filter((item) => item.category === 'Backing Track')
         .map((item) => (
           <Link
-            href={`/shop/${item.id}`}
+            href={`/product/${item.id}`}
             key={item.id}
             className="stems-item product-label-link is-backing"
           >
@@ -219,7 +219,7 @@ export default function HomePage() {
     <h2 className="stems-title">MUSIC & MERCH</h2>
     <div className="stems-row">
       {homepageItems.map((item) => (
-        <Link href={`/shop/${item.id}`} key={item.id} className="stems-item product-label-link">
+        <Link href={`/product/${item.id}`} key={item.id} className="stems-item product-label-link">
           <Image src={item.image} alt={item.title} width={200} height={200} className="stems-image" />
           <div className="stems-label-group">
             <h3 className="sr-only">{`${item.title} – ${item.subtitle.replace(' BACKING TRACK', '').replace(' STEM', '').replace(' TAB', '')}`}</h3>

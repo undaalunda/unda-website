@@ -57,7 +57,7 @@ export default function SearchOverlay({ onClose }: { onClose: () => void }) {
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {filtered.map((item) => (
                   <Link
-                    href={`/shop/${item.id}`}
+                    href={`/product/${item.id}`}
                     key={item.id}
                     onClick={onClose}
                     className="flex items-center gap-4 p-3 rounded-lg hover:bg-[#dc9e63]/10 transition-colors cursor-pointer"

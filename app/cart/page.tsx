@@ -61,13 +61,13 @@ function CartPageContent() {
 
                 <div className="flex-1">
                   <h2 className="text-[14px] md:text-lg font-bold text-[#dc9e63]">
-                    <Link href={`/shop/${item.id}`} className="cursor-pointer block w-fit">
+                    <Link href={`/product/${item.id}`} className="cursor-pointer block w-fit">
                       {item.title}
                     </Link>
                   </h2>
 
                   <p className="text-[10px] md:text-xs font-light text-[#f8fcdc]">
-                    <Link href={`/shop/${item.id}`} className="cursor-pointer block w-fit">
+                    <Link href={`/product/${item.id}`} className="cursor-pointer block w-fit">
                       {item.subtitle}
                     </Link>
                   </p>

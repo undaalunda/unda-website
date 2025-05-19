@@ -4,7 +4,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { allItems } from './allItems';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -17,50 +17,15 @@ function isBundlePrice(
   return typeof price === 'object' && price !== null && 'original' in price && 'sale' in price;
 }
 
-export default function ShopPageContent() {
-  const searchParams = useSearchParams();
+export default function ShopPageContent({ tab }: { tab?: TabType }) {
   const router = useRouter();
-
-  const tabFromQuery = searchParams.get('tab')?.toUpperCase();
-  const isValidTab = validTabs.includes(tabFromQuery as TabType);
-  const [activeTab, setActiveTab] = useState<TabType>(
-  validTabs.includes((searchParams.get('tab')?.toUpperCase() ?? '') as TabType)
-    ? (searchParams.get('tab')!.toUpperCase() as TabType)
-    : 'MERCH'
-);
+  const [activeTab, setActiveTab] = useState<TabType>(tab || 'MERCH');
 
   useEffect(() => {
-    if (isValidTab) {
-      setActiveTab(tabFromQuery as TabType);
-    } else {
-      setActiveTab('MERCH'); // fallback default
+    if (!validTabs.includes(activeTab)) {
+      setActiveTab('MERCH');
     }
-  }, [tabFromQuery]);
-
-  // ✅ ใส่ fallback UI ป้องกันแว้บ footer
-  if (!activeTab) {
-    return (
-      <main className="shop-page-main min-h-screen text-[#f8fcdc] font-[Cinzel] px-4 pt-35 pb-4">
-        <h1 className="text-center text-4xl font-bold text-[#dc9e63] mb-10 uppercase tracking-wider">
-          Shop
-        </h1>
-        <div className="shop-tab-group mb-10">
-          {validTabs.map((tab) => (
-            <button
-              key={tab}
-              className="info-button shop-tab-button"
-              disabled
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-        <p className="text-center text-lg text-[#dc9e63] opacity-60 mt-10">
-          Loading products...
-        </p>
-      </main>
-    );
-  }
+  }, [activeTab]);
 
   const itemsToRender = allItems.filter((item) => {
     const category = item.category;
@@ -85,16 +50,16 @@ export default function ShopPageContent() {
       </h1>
 
       <div className="shop-tab-group mb-10">
-        {validTabs.map((tab) => (
+        {validTabs.map((tabKey) => (
           <button
-            key={tab}
+            key={tabKey}
             onClick={() => {
-              setActiveTab(tab);
-              router.replace(`/shop?tab=${tab}`);
+              setActiveTab(tabKey);
+              router.push(`/shop/${tabKey.toLowerCase()}`);
             }}
-            className={`info-button shop-tab-button ${activeTab === tab ? 'active-tab' : ''}`}
+            className={`info-button shop-tab-button ${activeTab === tabKey ? 'active-tab' : ''}`}
           >
-            {tab}
+            {tabKey}
           </button>
         ))}
       </div>
@@ -129,7 +94,7 @@ export default function ShopPageContent() {
               return (
                 <Link
                   key={item.id}
-                  href={`/shop/${item.id}?tab=${activeTab}`}
+                  href={`/product/${item.id}`}
                   className={`stems-item product-label-link cursor-pointer ${
                     isBackingTrack ? 'is-backing' : ''
                   }`}

@@ -1,4 +1,4 @@
-/* ProducPageContent.tsx */
+/* ProductPageContent.tsx */
 
 'use client';
 
@@ -85,8 +85,8 @@ export default function ProductPage() {
           </div>
 
           <div className="w-full md:w-1/2 flex flex-col">
-            <h1 className="product-title-detail">{product.title}</h1>
-            <p className="product-subtitle-detail" style={{ color: '#f8fcdc' }}>{product.subtitle}</p>
+            <h1 className="product-title-detail capitalize">{product.title}</h1>
+            <p className="product-subtitle-detail capitalize" style={{ color: '#f8fcdc' }}>{product.subtitle}</p>
 
             <div className="product-price-detail">
               {isBundle(product.price) ? (
@@ -158,7 +158,7 @@ export default function ProductPage() {
             <div className="stems-row grid grid-cols-2 md:grid-cols-4 gap-6">
               {relatedProducts.map((item) => (
                 <Link
-                  href={`/shop/${item.id}`}
+                  href={`/product/${item.id}`}
                   key={item.id}
                   className={`stems-item ${item.category === 'Backing Track' ? 'is-backing' : ''}`}
                 >
@@ -170,8 +170,8 @@ export default function ProductPage() {
                     className="stems-image"
                   />
                   <div className="stems-label-group mt-2">
-                    <p className="stems-title-text">{item.title}</p>
-                    <p className="stems-subtitle">
+                    <p className="stems-title-text capitalize">{item.title}</p>
+                    <p className="stems-subtitle capitalize">
                       {item.subtitle.replace(/BACKING TRACK/gi, '').trim()}
                     </p>
                     {item.category === 'Backing Track' && (
