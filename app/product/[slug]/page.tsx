@@ -2,9 +2,8 @@
 
 import { allItems } from '@/components/allItems';
 import ProductPageContent from '@/components/ProductPageContent';
-import type { Metadata, ResolvingMetadata } from 'next';
+import type { Metadata } from 'next';
 
-// 👕 Capitalize certain product keywords
 function smartTitleCase(str: string): string {
   const exceptions: Record<string, string> = {
     't-shirt': 'T-Shirt',
@@ -26,15 +25,9 @@ function smartTitleCase(str: string): string {
     .join(' ');
 }
 
-// ✅ Declare the prop types properly
-type Props = {
-  params: { slug: string };
-};
-
-// 🧠 Generate dynamic metadata for SEO
+// ⛔️ นี่แหละตรงจุด นายใช้ async แล้วไม่บอก TypeScript ว่าฟังก์ชันมันจะ return เป็น Promise<Metadata>
 export async function generateMetadata(
-  { params }: Props,
-  _parent: ResolvingMetadata
+  { params }: { params: { slug: string } }
 ): Promise<Metadata> {
   const product = allItems.find((item) => item.id === params.slug);
 
@@ -59,7 +52,7 @@ export async function generateMetadata(
   };
 }
 
-// 🧩 Render product page component
+// 👇 และนี่คือตัวแสดงผล
 export default function Page() {
   return <ProductPageContent />;
 }
