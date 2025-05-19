@@ -23,7 +23,11 @@ function getStockStatus(product: Product): 'in-stock' | 'out-of-stock' | 'pre-or
   return null;
 }
 
-export default function ProductPageContent({ slug }: { slug: string }) {
+type ProductPageContentProps = {
+  slug: string;
+};
+
+export default function ProductPageContent({ slug }: ProductPageContentProps) {
   const product = allItems.find((item) => item.id === slug) as Product | undefined;
 
   const { addToCart } = useCart();
