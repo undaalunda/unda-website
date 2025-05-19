@@ -77,43 +77,54 @@ export default function HomePage() {
       )}
 
       {/* HERO SECTION */}
-      <div className="hero-wrapper">
-        <div className="catmoon-background" />
-        <div className="hero-text-image">
-          <Image src="/text-hero-section.png" alt="Dark Wonderful World on Moon" height={400} width={600} priority />
-        </div>
-        <div className="hero-text desktop-only">
-          <p className="hero-line1">
-            THE NEW ALBUM'S COMING <span className="highlight">JULY 1 2025</span>
-          </p>
-          <p className="hero-line2">
-            AVAILABLE NOW TO <Link href="/preorder" className="hero-cta-link">PRE-ORDER</Link> & <Link href="/presave" className="hero-cta-link">PRE-SAVE</Link>
-          </p>
-        </div>
-        <div className="hero-text mobile-only">
-          <p className="hero-line1">THE NEW ALBUM'S COMING</p>
-          <p className="hero-line1"><span className="highlight">JULY 1 2025</span></p>
-          <p className="hero-line2">AVAILABLE NOW TO</p>
-          <p className="hero-line2">
-            <Link href="/preorder" className="hero-cta-link">PRE-ORDER</Link> & <Link href="/presave" className="hero-cta-link">PRE-SAVE</Link>
-          </p>
-        </div>
-      </div>
+<div className="hero-wrapper">
+  <div className="catmoon-background" />
+  <div className="hero-text-image">
+    <Image src="/text-hero-section.png" alt="Dark Wonderful World on Moon" height={400} width={600} priority />
+  </div>
+  <div className="hero-text desktop-only">
+    <p className="hero-line1">
+      THE NEW ALBUM'S COMING <span className="highlight">JULY 1 2025</span>
+    </p>
+    <p className="hero-line2">
+      AVAILABLE NOW TO <Link href="/shop/merch" className="hero-cta-link">PRE-ORDER</Link> &{' '}
+      <a href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0" target="_blank" rel="noopener noreferrer" className="hero-cta-link">
+        PRE-SAVE
+      </a>
+    </p>
+  </div>
+  <div className="hero-text mobile-only">
+    <p className="hero-line1">THE NEW ALBUM'S COMING</p>
+    <p className="hero-line1"><span className="highlight">JULY 1 2025</span></p>
+    <p className="hero-line2">AVAILABLE NOW TO</p>
+    <p className="hero-line2">
+      <Link href="/shop/merch" className="hero-cta-link">PRE-ORDER</Link> &{' '}
+      <a href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0" target="_blank" rel="noopener noreferrer" className="hero-cta-link">
+        PRE-SAVE
+      </a>
+    </p>
+  </div>
+</div>
 
-      <div className="after-hero-spacing" />
-      <h2 className="sr-only">Shop by Category</h2>
+<div className="after-hero-spacing" />
+<h2 className="sr-only">Shop by Category</h2>
 
       {/* BUTTON GROUP */}
-      <div ref={buttonGroupRef} className={`button-group ${showButtons ? 'fade-in' : ''}`}>
-        <Link href="/shop?tab=DIGITAL" className="info-button">SCORES</Link>
-        <Link href="/shop?tab=DIGITAL" className="info-button">STEMS & SAMPLES</Link>
-        <Link href="/shop?tab=MERCH" className="info-button">MERCH</Link>
-        <Link href="/shop?tab=MUSIC" className="info-button">PHYSICAL ALBUMS</Link>
-        <a href="https://undaalunda.bandcamp.com/album/dark-wonderful-world-live-in-thailand" className="info-button" target="_blank" rel="noopener noreferrer">
-          DIGITAL ALBUMS
-        </a>
-      </div>
-      <p className="since-note">Delivering Worldwide Since 2025</p>
+<div ref={buttonGroupRef} className={`button-group ${showButtons ? 'fade-in' : ''}`}>
+  <Link href="/shop/digital" className="info-button">SCORES</Link>
+  <Link href="/shop/digital" className="info-button">STEMS & SAMPLES</Link>
+  <Link href="/shop/merch" className="info-button">MERCH</Link>
+  <Link href="/shop/music" className="info-button">PHYSICAL ALBUMS</Link>
+  <a
+    href="https://undaalunda.bandcamp.com/album/dark-wonderful-world-live-in-thailand"
+    className="info-button"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    DIGITAL ALBUMS
+  </a>
+</div>
+<p className="since-note">Delivering Worldwide Since 2025</p>
 
       {/* VIDEO SECTION */}
       <section ref={videoRef} className={`video-section ${showVideo ? 'fade-in' : ''}`}>
@@ -135,7 +146,7 @@ export default function HomePage() {
     <h2 className="transcription-title">TRANSCRIPTIONS</h2>
     <div className="product-row">
       {["guitar", "keys", "bass", "drums"].map((inst, i) => (
-        <Link href="/shop?tab=DIGITAL" key={i} className="product-item product-label-link">
+        <Link href="/shop/digital" key={i} className="product-item product-label-link">
           <Image
             src={`/product-${inst}.png`}
             alt={`${inst} Book`}
@@ -155,7 +166,7 @@ export default function HomePage() {
       ))}
     </div>
     <div className="shopall-button-wrapper">
-      <Link href="/shop?tab=DIGITAL" className="info-button">SHOP ALL</Link>
+      <Link href="/shop/digital" className="info-button">SHOP ALL</Link>
     </div>
   </div>
 </section>
