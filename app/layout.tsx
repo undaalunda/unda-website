@@ -47,7 +47,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <meta name="robots" content="index, follow" />
         <meta name="author" content="Unda Alunda" />
         <meta name="publisher" content="Unda Alunda" />
-        <meta name="theme-color" content="#190000" />
+        <meta name="theme-color" content="#140000" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Unda Alunda" />
