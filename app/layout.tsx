@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://unda-website.vercel.app'),
   openGraph: {
     title: 'Unda Alunda | Official Website & Merch Store',
-    description: 'Official Website of Unda Alunda. The New Album Dark Wonderful World out July 1, 2025 — Purchase now!',
+    description: 'The New Album Dark Wonderful World out July 1, 2025 — Purchase now!',
     url: 'https://unda-website.vercel.app',
     siteName: 'Unda Alunda',
     images: [
