@@ -25,12 +25,14 @@ function smartTitleCase(str: string): string {
     .join(' ');
 }
 
+// ✅ STEP 1: tell Next.js which slugs to pre-render
 export async function generateStaticParams() {
   return allItems.map((item) => ({
     slug: item.id,
   }));
 }
 
+// ✅ STEP 2: metadata for SEO
 export async function generateMetadata({
   params,
 }: {
@@ -59,13 +61,8 @@ export async function generateMetadata({
   };
 }
 
-// 🧠 HERE'S THE FIX
-type PageProps = {
-  params: {
-    slug: string;
-  };
-};
-
-export default function Page({ params }: PageProps) {
+// ✅ STEP 3: MAKE THIS FUNCTION ASYNC
+// DON'T TRY TO BE CLEVER, JUST COPY THIS
+export default async function Page({ params }: { params: { slug: string } }) {
   return <ProductPageContent slug={params.slug} />;
 }
