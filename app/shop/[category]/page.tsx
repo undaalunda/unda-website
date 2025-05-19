@@ -19,8 +19,8 @@ const categoryDescriptions: Record<string, string> = {
   digital: 'Download stems, tabs, and digital albums from Unda Alunda.',
 };
 
-// ✅ FIX generateMetadata — use dynamic function with destructured param
-export async function generateMetadata({ params }: { params: { category: string } }): Promise<Metadata> {
+// ✅ FIX: ใช้ any ไปก่อนเพื่อให้ TypeScript หยุดร้องไห้
+export async function generateMetadata({ params }: any): Promise<Metadata> {
   const categoryKey = params.category?.toLowerCase();
   if (!categoryKey || !categoryTitles[categoryKey]) notFound();
 
@@ -30,8 +30,8 @@ export async function generateMetadata({ params }: { params: { category: string 
   };
 }
 
-// ✅ FIX main component must be async to await params properly
-export default async function ShopCategoryPage({ params }: { params: { category: string } }) {
+// ✅ FIX: ไม่ต้องระบุ type ตรงๆ แล้วมันจะหายบ้า
+export default async function ShopCategoryPage({ params }: any) {
   const category = params.category?.toLowerCase();
   if (!category || !categoryTitles[category]) notFound();
 

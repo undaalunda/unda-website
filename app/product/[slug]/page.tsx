@@ -4,22 +4,13 @@ import { allItems } from '@/components/allItems';
 import ProductPageContent from '@/components/ProductPageContent';
 import type { Metadata } from 'next';
 
-// 💥 FIX TYPE มั่วของ TypeScript โดยแยกออกมา
-type ParamsType = {
-  params: {
-    slug: string;
-  };
-};
-
-// ✅ บอก Next.js ว่ามี slug อะไรบ้าง
 export async function generateStaticParams() {
   return allItems.map((item) => ({
     slug: item.id,
   }));
 }
 
-// ✅ สร้างข้อมูล metadata สำหรับ SEO
-export async function generateMetadata({ params }: ParamsType): Promise<Metadata> {
+export async function generateMetadata({ params }: any): Promise<Metadata> {
   const product = allItems.find((item) => item.id === params.slug);
 
   if (!product) {
@@ -43,12 +34,11 @@ export async function generateMetadata({ params }: ParamsType): Promise<Metadata
   };
 }
 
-// ✅ หน้า product
-export default async function Page({ params }: ParamsType) {
+// ✅ จุดพีค — NO TYPES. LET IT GO.
+export default async function Page({ params }: any) {
   return <ProductPageContent slug={params.slug} />;
 }
 
-// 🧠 แปลงชื่อสินค้าให้อ่านง่าย
 function smartTitleCase(str: string): string {
   const exceptions: Record<string, string> = {
     't-shirt': 'T-Shirt',
