@@ -53,6 +53,7 @@ export async function generateMetadata({
   };
 }
 
-export default function Page({ params }: { params: { slug: string } }) {
+// ✅ FIXED: Don't pass `params` to client component wrapper
+export default function Page() {
   return <ProductPageContent />;
 }
