@@ -6,12 +6,12 @@ import { ReactNode } from 'react';
 
 export const metadata: Metadata = {
   title: 'Unda Alunda | Official Website & Merch Store',
-  description: 'The New Album Dark Wonderful World out July 1, 2025 — Purchase now!',
+  description: 'Official Website of Unda Alunda. The New Album Dark Wonderful World out July 1, 2025 — Purchase now!',
   keywords: ['Unda','Alunda', 'Unda Alunda', 'Dark Wonderful World', 'music', 'merch', 'Stems', 'Transcription', 'Tour date'],
   metadataBase: new URL('https://unda-website.vercel.app'),
   openGraph: {
     title: 'Unda Alunda | Official Website & Merch Store',
-    description: 'The New Album Dark Wonderful World out July 1, 2025 — Purchase now!',
+    description: 'Official Website of Unda Alunda. The New Album Dark Wonderful World out July 1, 2025 — Purchase now!',
     url: 'https://unda-website.vercel.app',
     siteName: 'Unda Alunda',
     images: [
