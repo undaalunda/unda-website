@@ -59,7 +59,13 @@ export async function generateMetadata({
   };
 }
 
-// 🛠 THIS IS THE FIX
-export default async function Page({ params }: { params: { slug: string } }) {
+// 🧠 HERE'S THE FIX
+type PageProps = {
+  params: {
+    slug: string;
+  };
+};
+
+export default function Page({ params }: PageProps) {
   return <ProductPageContent slug={params.slug} />;
 }
