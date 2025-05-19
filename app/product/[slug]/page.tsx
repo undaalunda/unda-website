@@ -1,3 +1,5 @@
+// app/product/[slug]/page.tsx
+
 import { allItems } from '@/components/allItems';
 import ProductPageContent from '@/components/ProductPageContent';
 import type { Metadata } from 'next';
@@ -51,7 +53,7 @@ export async function generateMetadata({
   };
 }
 
-// ✅ async function even though we don’t use await — to satisfy dynamic route rule
-export default async function Page() {
+// ✅ FIXED: Receive params even if not passed to child — to satisfy route context
+export default async function Page({ params }: { params: { slug: string } }) {
   return <ProductPageContent />;
 }
