@@ -25,10 +25,11 @@ function smartTitleCase(str: string): string {
     .join(' ');
 }
 
-// ⛔️ นี่แหละตรงจุด นายใช้ async แล้วไม่บอก TypeScript ว่าฟังก์ชันมันจะ return เป็น Promise<Metadata>
-export async function generateMetadata(
-  { params }: { params: { slug: string } }
-): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
   const product = allItems.find((item) => item.id === params.slug);
 
   if (!product) {
@@ -52,7 +53,6 @@ export async function generateMetadata(
   };
 }
 
-// 👇 และนี่คือตัวแสดงผล
-export default function Page() {
+export default function Page({ params }: { params: { slug: string } }) {
   return <ProductPageContent />;
 }
