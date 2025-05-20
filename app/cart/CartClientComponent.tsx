@@ -136,7 +136,7 @@ export default function CartClientComponent() {
                   onClick={handleGoToCheckout}
                   className="px-6 py-3 bg-[#dc9e63] text-[#160000] font-bold hover:bg-[#f8cfa3] rounded-xl text-sm cursor-pointer"
                 >
-                  Checkout
+                  Proceed to Checkout
                 </button>
               </div>
 
