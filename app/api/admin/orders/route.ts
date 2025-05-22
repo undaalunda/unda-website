@@ -26,11 +26,21 @@ export async function GET(req: NextRequest) {
   console.log('✅ Password correct. Fetching orders...');
 
   const result = await supabase
-    .from('Orders') // <<<<<< ชื่อ table ต้องเป็น lowercase 'orders'
-    .select('*')
+    .from('Orders') // ถ้า Table ใช้ชื่อว่า Orders จริง ก็โอเค แต่ถ้าเป็น lowercase ล้วนต้องเปลี่ยนเป็น 'orders'
+    .select(`
+      id,
+      email,
+      amount,
+      currency,
+      items,
+      payment_status,
+      created_at,
+      tracking_number,
+      courier,
+      shipping_zone,
+      shipping_method
+    `)
     .order('created_at', { ascending: false });
-
-  console.log('📦 Supabase raw result:', result);
 
   const { data, error } = result;
 

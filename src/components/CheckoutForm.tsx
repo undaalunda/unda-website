@@ -1,3 +1,5 @@
+//CheckoutForm.tsx
+
 "use client";
 
 import Script from 'next/script';
@@ -6,6 +8,7 @@ import { useEffect, useState, useRef } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useRouter } from 'next/navigation';
 import { getShippingZone } from '../../lib/shipping/zone-checker';
+import { allItems } from './allItems';
 
 declare global {
   interface Window {
@@ -15,14 +18,33 @@ declare global {
 
 const blacklistWords = ['asdf', 'test', 'example'];
 
+const isBlacklisted = (value: string) =>
+  blacklistWords.some(w => value.toLowerCase().includes(w));
+
+const isValidName = (name: string) =>
+  /^[a-zA-Z\s'-]{2,}$/.test(name.trim());
+
+const isValidEmail = (email: string) =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+const isValidPhone = (phone: string) =>
+  /^\+?\d{7,15}$/.test(phone.replace(/\s/g, ''));
+
+const isValidAddress = (addr: string) =>
+  /[a-zA-Z0-9]{5,}/.test(addr.trim());
+
+const getMissing = (info: Record<string, any>, required: string[]) =>
+  required.filter(field => !info[field]?.toString().trim());
+
 export default function CheckoutForm() {
   const router = useRouter();
   const stripe = useStripe();
   const elements = useElements();
   const { cartItems, clearCart } = useCart();
   const isDigitalOnly = cartItems.every(item => item.type === 'digital'); 
-  const [shippingZone, setShippingZone] = useState<'UK' | 'EU' | 'ROW'>('ROW');
-  const [shippingMethod, setShippingMethod] = useState<'evri' | 'dhl' | 'eu-tracked' | 'row-tracked'>('evri');
+  const [shippingZone, setShippingZone] = useState<'TH' | 'ASIA' | 'ROW'>('TH');
+  const [shippingRate, setShippingRate] = useState(0);
+  const [shippingMethod, setShippingMethod] = useState<'asia-tracked' | 'row-tracked' | 'domestic'>('domestic');
   const [shipToDifferent, setShipToDifferent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [captchaReady, setCaptchaReady] = useState(false);
@@ -48,6 +70,97 @@ export default function CheckoutForm() {
     city: '', county: '', postcode: ''
   });
 
+  const billingRequired = ['firstName', 'lastName', 'address', 'city', 'postcode', 'phone', 'email', 'country'];
+  const shippingRequired = ['firstName', 'lastName', 'address', 'city', 'postcode', 'country'];
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const { name, value } = e.target;
+  setBillingInfo(prev => ({ ...prev, [name]: value }));
+
+  if (name === 'country') {
+    setShippingZone(getShippingZone(value));
+  }
+};
+
+const handleShippingChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const { name, value } = e.target;
+  setShippingInfo(prev => ({ ...prev, [name]: value }));
+
+  if (name === 'country') {
+    setShippingZone(getShippingZone(value));
+  }
+};
+
+   useEffect(() => {
+  console.log('[🧪 useEffect triggered]', billingInfo.country, billingInfo.postcode);
+
+  if (!billingInfo.country || !billingInfo.postcode || !billingInfo.city) return;
+  if (isDigitalOnly) return;
+
+  const newZone = getShippingZone(billingInfo.country);
+  setShippingZone(newZone); // ✅ ตั้ง shippingZone ทุกครั้งที่ billingInfo.country เปลี่ยน
+
+  async function fetchShippingRate() {
+    try {
+      const totalWeight = calculateCartWeight(cartItems);
+
+      function cleanCityName(city: string): string {
+        return city.replace(/^(Muang|Amphoe|Tambon)\s*/i, '').trim();
+      }
+
+      const payload = {
+        countryCode: billingInfo.country,
+        postalCode: billingInfo.postcode,
+        cityName: cleanCityName(billingInfo.city),
+        weight: totalWeight,
+      };
+
+      console.log('[📦 DHL Request Payload]', JSON.stringify(payload, null, 2));
+
+      const res = await fetch('/api/get-dhl-rate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      console.log('[💸 DHL API Response]', JSON.stringify(data, null, 2));
+
+      const price = data.products?.[0]?.totalPrice?.[0]?.price;
+      if (price) {
+        setShippingRate(Number(price));
+        console.log('✅ Shipping rate set to:', price);
+      } else {
+        setShippingRate(0);
+        console.warn('⚠️ No shipping rate returned');
+      }
+    } catch (err) {
+      console.error('❌ Shipping rate error', err);
+      setShippingRate(0);
+    }
+  }
+
+  fetchShippingRate();
+}, [billingInfo.country, billingInfo.postcode, billingInfo.city, cartItems]);
+
+useEffect(() => {
+  if (isDigitalOnly) return;
+
+  if (shippingZone === 'ASIA') {
+    setShippingMethod('asia-tracked');
+  } else if (shippingZone === 'ROW') {
+    setShippingMethod('row-tracked');
+  } else {
+    setShippingMethod('domestic');
+  }
+
+  console.log('[🚚 shippingZone changed]', shippingZone, '→ method:', {
+    TH: 'domestic',
+    ASIA: 'asia-tracked',
+    ROW: 'row-tracked',
+  }[shippingZone]);
+}, [shippingZone, isDigitalOnly]);
+
   useEffect(() => {
     const script = document.createElement('script');
     script.src = `https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`;
@@ -64,37 +177,22 @@ export default function CheckoutForm() {
     document.head.appendChild(script);
   }, []);
 
-  const billingRequired = ['firstName', 'lastName', 'address', 'city', 'postcode', 'phone', 'email', 'country'];
-  const shippingRequired = ['firstName', 'lastName', 'address', 'city', 'postcode', 'country'];
+  function calculateCartWeight(cartItems: any[]): number {
+    return cartItems.reduce((total, item) => {
+      const product = allItems.find(p => p.id === item.id);
+      if (!product) return total;
 
-  const getMissing = (info: Record<string, any>, required: string[]) =>
-    required.filter(field => !info[field]?.toString().trim());
+      if (product.bundleItems?.length) {
+        const bundleWeight = product.bundleItems.reduce((sum, subId) => {
+          const subItem = allItems.find(p => p.id === subId);
+          return sum + (subItem?.weight ?? 0);
+        }, 0);
+        return total + bundleWeight * item.quantity;
+      }
 
-  const isValidName = (name: string) => /^[a-zA-Z\s'-]{2,}$/.test(name.trim());
-  const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const isValidPhone = (phone: string) => /^\+?\d{7,15}$/.test(phone.replace(/\s/g, ''));
-  const isValidAddress = (addr: string) => /[a-zA-Z0-9]{5,}/.test(addr.trim());
-  const isBlacklisted = (value: string) => blacklistWords.some(w => value.toLowerCase().includes(w));
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setBillingInfo(prev => ({ ...prev, [name]: value }));
-
-    if (name === 'country') {
-      setShippingZone(getShippingZone(value));
-      console.log('📦 shippingZone:', getShippingZone(value));
-    }
-  };
-
-  const handleShippingChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setShippingInfo(prev => ({ ...prev, [name]: value }));
-
-    if (name === 'country') {
-      setShippingZone(getShippingZone(value));
-      console.log('📦 shippingZone (shipping):', getShippingZone(value));
-    }
-  };
+      return total + (product.weight ?? 0) * item.quantity;
+    }, 0);
+  }
 
   const cartTotal: number = cartItems.reduce((acc, item) => {
     const price = typeof item.price === 'object' ? item.price.sale : item.price;
@@ -201,11 +299,7 @@ export default function CheckoutForm() {
       return;
     }
 
-    const shippingCost =
-      shippingMethod === 'dhl' ? 15 :
-      shippingMethod === 'eu-tracked' ? 12 :
-      shippingMethod === 'row-tracked' ? 18 :
-      5;
+const shippingCost = isDigitalOnly ? 0 : shippingRate;
 
     if (paymentMethod === 'card') {
       if (!stripe || !elements) {
@@ -274,6 +368,8 @@ export default function CheckoutForm() {
     shippingInfo: shipToDifferent ? trimmedShipping : trimmedBilling,
     cartItems,
     shippingMethod,
+    shippingZone,
+    shippingRate, 
     email: trimmedBilling.email,
   }),
 });
@@ -719,79 +815,34 @@ onChange={handleShippingChange}
     </span>
   </li>
 
-  {/* 🚚 SHIPPING */}
-  {!isDigitalOnly && (
-    <li className="pt-2">
-      <span className="font-bold block mb-2">Shipping</span>
-
-      {shippingZone === 'UK' && (
-        <>
-          <label className="flex justify-between mb-1 text-[#f8fcdc]/70 font-extralight">
-            <div>
-              <input
-                type="radio"
-                name="shipping"
-                value="evri"
-                checked={shippingMethod === 'evri'}
-                onChange={() => setShippingMethod('evri')}
-                className="mr-2"
-              />
-              Evri Standard
-            </div>
-            <span>$5.00</span>
-          </label>
-
-          <label className="flex justify-between text-[#f8fcdc]/70 font-extralight">
-            <div>
-              <input
-                type="radio"
-                name="shipping"
-                value="dhl"
-                checked={shippingMethod === 'dhl'}
-                onChange={() => setShippingMethod('dhl')}
-                className="mr-2"
-              />
-              DHL Priority
-            </div>
-            <span>$15.00</span>
-          </label>
-        </>
-      )}
-
-      {shippingZone === 'EU' && (
-        <div className="flex justify-between text-[#f8fcdc]/70 font-extralight">
-          <span>EU Tracked</span>
-          <span>$12.00</span>
-        </div>
-      )}
-
-      {shippingZone === 'ROW' && (
-        <div className="flex justify-between text-[#f8fcdc]/70 font-extralight">
-          <span>ROW Tracked</span>
-          <span>$18.00</span>
-        </div>
-      )}
-    </li>
-  )}
-
-  {/* 💰 TOTAL */}
-  <li className="flex justify-between font-bold text-2xl uppercase border-t border-[#f8fcdc]/10 pt-4 mt-4">
-    <span className="uppercase text-[#f8fcdc]">TOTAL</span>
-    <span className="text-[#f8fcdc]">
-      ${(
-        cartTotal +
-        (isDigitalOnly
-          ? 0
-          : shippingZone === 'UK'
-          ? (shippingMethod === 'dhl' ? 15 : 5)
-          : shippingZone === 'EU'
-          ? 12
-          : shippingZone === 'ROW'
-          ? 18
-          : 0)
-      ).toFixed(2)}
-    </span>
+{/* 🚚 SHIPPING */}
+{!isDigitalOnly && (
+  <li className="pt-2">
+    <span className="font-bold block mb-2">Shipping</span>
+    <div className="flex justify-between text-[#f8fcdc]/70 font-extralight">
+     <span>
+  {shippingMethod === 'asia-tracked' && 'Asia Tracked'}
+  {shippingMethod === 'row-tracked' && 'ROW Tracked'}
+  {shippingMethod === 'domestic' && 'Domestic Delivery (TH)'}
+</span>
+      <span>
+        {shippingRate === null ? (
+          <em>Calculating...</em>
+        ) : (
+          `$${shippingRate.toFixed(2)}`
+        )}
+      </span>
+    </div>
   </li>
+)}
+
+{/* 💰 TOTAL */}
+<li className="flex justify-between font-bold text-2xl uppercase border-t border-[#f8fcdc]/10 pt-4 mt-4">
+  <span className="uppercase text-[#f8fcdc]">TOTAL</span>
+  <span className="text-[#f8fcdc]">
+  ${(cartTotal + (isDigitalOnly ? 0 : (shippingRate || 0))).toFixed(2)}
+</span>
+</li>
 </ul>
         </div>
 

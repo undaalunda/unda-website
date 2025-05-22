@@ -45,6 +45,9 @@ export default function ThankYouClient() {
         <p><strong>Date:</strong> <span className="text-[#f8fcdc]/50">{new Date(data.created_at).toLocaleString()}</span></p>
         <p><strong>Status:</strong> <span className="text-[#f8fcdc]/50">{data.payment_status}</span></p>
         <p><strong>Amount:</strong> <span className="text-[#f8fcdc]/50">${data.amount.toFixed(2)}</span></p>
+        <p><strong>Shipping Method:</strong> <span className="text-[#f8fcdc]/50">{data.shipping_method || 'N/A'}</span></p>
+        <p><strong>Shipping Zone:</strong> <span className="text-[#f8fcdc]/50">{data.shipping_zone || 'N/A'}</span></p>
+
         <div>
           <strong>Items:</strong>
           <ul className="list-disc ml-5 mt-2 text-sm text-[#f8fcdc]/50">
@@ -53,8 +56,18 @@ export default function ThankYouClient() {
             ))}
           </ul>
         </div>
+
         {data.tracking_number && (
-          <p><strong>Tracking:</strong> <a className="text-[#dc9e63] underline" href={`https://www.dhl.com/global-en/home/tracking.html?tracking-id=${data.tracking_number}`} target="_blank">View tracking on DHL</a></p>
+          <p>
+            <strong>Tracking:</strong>{' '}
+            <a
+              className="text-[#dc9e63] underline"
+              href={`https://www.dhl.com/global-en/home/tracking.html?tracking-id=${data.tracking_number}`}
+              target="_blank"
+            >
+              View tracking on DHL
+            </a>
+          </p>
         )}
       </div>
     </main>

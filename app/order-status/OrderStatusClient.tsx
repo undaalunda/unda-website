@@ -13,6 +13,8 @@ type Order = {
   items: any[];
   tracking_number?: string;
   courier?: string;
+  shipping_method?: string;
+  shipping_zone?: string;
 };
 
 export default function OrderStatusClient() {
@@ -46,14 +48,8 @@ export default function OrderStatusClient() {
       });
   }, [email, id]);
 
-  if (loading) {
-    return <div className="pt-44 text-center">Loading order...</div>;
-  }
-
-  if (error) {
-    return <div className="pt-44 text-center text-red-400">{error}</div>;
-  }
-
+  if (loading) return <div className="pt-44 text-center">Loading order...</div>;
+  if (error) return <div className="pt-44 text-center text-red-400">{error}</div>;
   if (!order) return null;
 
   return (
@@ -61,30 +57,23 @@ export default function OrderStatusClient() {
       <h1 className="text-2xl font-bold mb-6 text-[#dc9e63]">Order Details</h1>
 
       <div className="bg-[#1a0000]/60 border border-[#f8fcdc]/20 p-6 rounded-md space-y-3">
-        <p>
-          <strong>Email:</strong>{' '}
-          <span className="text-[#f8fcdc]/50">{order.email}</span>
-        </p>
-        <p>
-          <strong>Amount:</strong>{' '}
-          <span className="text-[#f8fcdc]/50">${order.amount.toFixed(2)}</span>
-        </p>
-        <p>
-          <strong>Status:</strong>{' '}
-          <span className="text-[#f8fcdc]/50">{order.payment_status.toUpperCase()}</span>
-        </p>
-        <p>
-          <strong>Created:</strong>{' '}
-          <span className="text-[#f8fcdc]/50">{new Date(order.created_at).toLocaleString()}</span>
-        </p>
+        <p><strong>Email:</strong> <span className="text-[#f8fcdc]/50">{order.email}</span></p>
+        <p><strong>Amount:</strong> <span className="text-[#f8fcdc]/50">${order.amount.toFixed(2)}</span></p>
+        <p><strong>Status:</strong> <span className="text-[#f8fcdc]/50">{order.payment_status.toUpperCase()}</span></p>
+        <p><strong>Created:</strong> <span className="text-[#f8fcdc]/50">{new Date(order.created_at).toLocaleString()}</span></p>
+
+        {order.shipping_method && (
+          <p><strong>Shipping Method:</strong> <span className="text-[#f8fcdc]/50">{order.shipping_method}</span></p>
+        )}
+        {order.shipping_zone && (
+          <p><strong>Shipping Zone:</strong> <span className="text-[#f8fcdc]/50">{order.shipping_zone}</span></p>
+        )}
 
         <div>
           <strong>Items:</strong>
           <ul className="list-disc list-inside mt-1 text-[#f8fcdc]/50">
             {order.items.map((item, i) => (
-              <li key={i}>
-                {item.title} x {item.quantity}
-              </li>
+              <li key={i}>{item.title} x {item.quantity}</li>
             ))}
           </ul>
         </div>

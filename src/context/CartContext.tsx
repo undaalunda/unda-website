@@ -13,6 +13,7 @@ type CartItem = {
   image: string;
   quantity: number;
   type: 'digital' | 'physical';
+  weight: number; // ✅ เพิ่มน้ำหนักเข้ามา
 };
 
 interface CartContextType {
@@ -25,7 +26,7 @@ interface CartContextType {
   setLastAddedItem: (item: CartItem | null) => void;
   cartError: string | null;
   setCartError: (msg: string | null) => void;
-  isCartReady: boolean; // ✅ ใหม่
+  isCartReady: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -34,7 +35,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [lastAddedItem, setLastAddedItem] = useState<CartItem | null>(null);
   const [cartError, setCartError] = useState<string | null>(null);
-  const [isCartReady, setIsCartReady] = useState(false); // ✅ ใหม่
+  const [isCartReady, setIsCartReady] = useState(false);
 
   useEffect(() => {
     try {
@@ -45,7 +46,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (err) {
       console.error('💥 Failed to load cart from localStorage:', err);
     } finally {
-      setIsCartReady(true); // ✅ ไม่ว่าจะสำเร็จหรือ fail ต้องให้รู้ว่าโหลดเสร็จแล้ว
+      setIsCartReady(true);
     }
   }, []);
 
@@ -60,6 +61,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const addToCart = (id: string, quantity: number = 1): void => {
     const item = allItems.find((i) => i.id === id);
     if (!item) return;
+
+    const itemWeight = item.weight ?? 0; // ✅ กำหนดน้ำหนักไว้ด้วย
 
     setCartItems((prev) => {
       const existing = prev.find((cartItem) => cartItem.id === id);
@@ -85,6 +88,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           image: item.image,
           quantity,
           type: item.type,
+          weight: itemWeight, // ✅ เพิ่มน้ำหนัก
         };
 
         return [...prev, newItem];
@@ -99,6 +103,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       image: item.image,
       quantity,
       type: item.type,
+      weight: itemWeight, // ✅ เพิ่มน้ำหนัก
     });
   };
 
@@ -133,7 +138,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         setLastAddedItem,
         cartError,
         setCartError,
-        isCartReady, // ✅ ให้ context ไปใช้ในหน้า checkout
+        isCartReady,
       }}
     >
       {children}

@@ -8,10 +8,21 @@ import supabase from '../../../lib/supabase';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { billingInfo, shippingInfo, cartItems, shippingMethod, email } = body;
+    const {
+      billingInfo,
+      shippingInfo,
+      cartItems,
+      shippingMethod,
+      shippingZone,
+      shippingRate, // ✅ เพิ่มตรงนี้
+      email,
+    } = body;
 
-    if (!billingInfo || !cartItems || !email || !shippingMethod) {
-      return NextResponse.json({ error: 'Missing required fields.' }, { status: 400 });
+    if (!billingInfo || !cartItems || !email || !shippingMethod || !shippingZone) {
+      return NextResponse.json(
+        { error: 'Missing required fields.' },
+        { status: 400 }
+      );
     }
 
     const finalShipping = shippingInfo || billingInfo;
@@ -24,13 +35,15 @@ export async function POST(req: NextRequest) {
       method: shippingMethod,
     });
 
-    const amount = cartItems.reduce((total: number, item: any) => {
-  const price =
-    typeof item.price === 'object' && item.price?.sale
-      ? item.price.sale
-      : item.price;
-  return total + price * item.quantity;
-}, 0);
+    const itemAmount = cartItems.reduce((total: number, item: any) => {
+      const price =
+        typeof item.price === 'object' && item.price?.sale
+          ? item.price.sale
+          : item.price;
+      return total + price * item.quantity;
+    }, 0);
+
+    const amount = itemAmount + (shippingRate || 0); // ✅ รวมค่าส่ง
 
     const { data, error } = await supabase
       .from('Orders')
@@ -44,6 +57,9 @@ export async function POST(req: NextRequest) {
           created_at: new Date().toISOString(),
           tracking_number: shipment.tracking_number || null,
           courier: shipment.courier || null,
+          shipping_zone: shippingZone,         
+          shipping_method: shippingMethod,     
+          shipping_rate: shippingRate || 0,     // ✅ บันทึกลงฐานข้อมูล
         },
       ])
       .select()
@@ -51,7 +67,10 @@ export async function POST(req: NextRequest) {
 
     if (error) {
       console.error('❌ Supabase insert error:', error.message);
-      return NextResponse.json({ error: 'Failed to save order to DB' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Failed to save order to DB' },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({
@@ -61,6 +80,9 @@ export async function POST(req: NextRequest) {
     });
   } catch (err: any) {
     console.error('🔥 Unexpected error in save-order:', err.message);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }
