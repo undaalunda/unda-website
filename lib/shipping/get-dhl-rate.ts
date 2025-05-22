@@ -15,13 +15,25 @@ export async function getDHLRate({
   const password = process.env.DHL_PASSWORD!;
   const accountNumber = process.env.DHL_ACCOUNT_NUMBER!;
   const endpoint = `${process.env.DHL_API_URL}/rates`;
-  const credentials = Buffer.from(`${username}:${password}`).toString('base64');
 
-  const payload = {
+  const credentials = Buffer.from(`${username}:${password}`).toString('base64');
+  console.log('[🧪 ENV CHECK]', {
+    username,
+    password: password?.slice(0, 4) + '***',
+    accountNumber,
+    endpoint,
+  });
+
+  const productCode = destinationCountry === 'TH' ? 'N' : undefined;
+  const plannedDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .replace('Z', '+07:00');
+
+  const payload: any = {
     customerDetails: {
       shipperDetails: {
-        postalCode: '73000',
-        cityName: 'Nakhon Pathom',
+        postalCode: '10200',
+        cityName: 'Bangkok',
         countryCode: 'TH',
       },
       receiverDetails: {
@@ -33,11 +45,10 @@ export async function getDHLRate({
     accounts: [
       {
         typeCode: 'shipper',
-        number: accountNumber, // 🛠 ใช้จาก env เพื่อให้ consistent
+        number: accountNumber,
       },
     ],
-    productCode: 'N',
-    plannedShippingDateAndTime: new Date().toISOString(),
+    plannedShippingDateAndTime: plannedDate,
     unitOfMeasurement: 'metric',
     isCustomsDeclarable: false,
     packages: [
@@ -51,6 +62,8 @@ export async function getDHLRate({
       },
     ],
   };
+
+  if (productCode) payload.productCode = productCode;
 
   console.log('[📦 DHL Request Payload]', JSON.stringify(payload, null, 2));
 
@@ -79,6 +92,33 @@ export async function getDHLRate({
     throw new Error(data?.detail || 'DHL API error');
   }
 
-  console.log('[💸 DHL API Response]', JSON.stringify(data, null, 2));
-  return data.products?.[0];
+  const selectedProduct = data.products?.find(
+    (p: any) => p.totalPrice?.some((t: any) => t.price > 0)
+  );
+
+  if (!selectedProduct) {
+    throw new Error('No suitable DHL rate found.');
+  }
+
+  const billcPrice = selectedProduct.totalPrice?.find(
+    (entry: any) => entry.currencyType === 'BILLC'
+  );
+
+  const thbPrice = billcPrice?.price ?? 0;
+  const exchangeRate = data.exchangeRates?.find(
+    (rate: any) => rate.currency === 'THB' && rate.baseCurrency === 'USD'
+  );
+
+  const usdRate = exchangeRate?.currentExchangeRate ?? 0.027;
+  const convertedPrice = +(thbPrice * usdRate).toFixed(2);
+
+  return {
+    productName: selectedProduct.productName,
+    productCode: selectedProduct.productCode,
+    priceTHB: thbPrice,
+    priceUSD: convertedPrice,
+    currency: 'USD',
+    estimatedDeliveryDate: selectedProduct.deliveryCapabilities?.estimatedDeliveryDateAndTime,
+    pricingDate: selectedProduct.pricingDate,
+  };
 }

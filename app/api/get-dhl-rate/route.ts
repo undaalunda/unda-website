@@ -1,6 +1,7 @@
 // app/api/get-dhl-rate/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
+import { format } from 'date-fns-tz';
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,38 +18,40 @@ export async function POST(req: NextRequest) {
     const password = process.env.DHL_PASSWORD!;
     const accountNumber = process.env.DHL_ACCOUNT_NUMBER!;
     const apiUrl = process.env.DHL_API_URL!;
-    const credentials = Buffer.from(`${username}:${password}`).toString('base64');
 
-    const payload = {
+    const credentials = Buffer.from(`${username}:${password}`).toString('base64');
+    const productCode = countryCode === 'TH' ? 'N' : undefined;
+
+    // Format pickup date in Thailand time zone (+07:00)
+    const plannedDate = format(
+      new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+      "yyyy-MM-dd'T'HH:mm:ssXXX",
+      { timeZone: 'Asia/Bangkok' }
+    );
+
+    const payload: any = {
       customerDetails: {
         shipperDetails: {
           postalCode: '10200',
           cityName: 'Bangkok',
           countryCode: 'TH',
-          addressLine1: 'Nakhon Pathom HQ',
-          addressLine2: 'Address 2',
-          addressLine3: 'Address 3',
         },
         receiverDetails: {
           postalCode,
           cityName,
           countryCode,
-          provinceCode: countryCode,
-          addressLine1: 'Customer Address 1',
-          addressLine2: 'Customer Address 2',
-          addressLine3: 'Customer Address 3',
         },
       },
-      plannedShippingDateAndTime: new Date().toISOString(),
+      plannedShippingDateAndTime: plannedDate,
       unitOfMeasurement: 'metric',
-      isCustomsDeclarable: true,
+      isCustomsDeclarable: false,
       packages: [
         {
           weight,
           dimensions: {
             length: 10,
             width: 10,
-            height: 10,
+            height: 5,
           },
         },
       ],
@@ -58,16 +61,11 @@ export async function POST(req: NextRequest) {
           number: accountNumber,
         },
       ],
-      productCode: 'P',
-      localProductCode: 'P',
-      payerCountryCode: 'TH',
-      requestAllValueAddedServices: false,
-      returnStandardProductsOnly: false,
-      nextBusinessDay: true,
-      productTypeCode: 'timeDefinite',
     };
 
-    console.log('[📨 DHL Request Input]', { countryCode, postalCode, cityName, weight });
+    if (productCode) payload.productCode = productCode;
+
+    console.log('[📅 DHL Planned Shipping Date]', plannedDate);
     console.log('[📦 DHL Payload]', JSON.stringify(payload, null, 2));
 
     const res = await fetch(`${apiUrl}/rates`, {

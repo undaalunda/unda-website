@@ -109,11 +109,13 @@ const handleShippingChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelect
       }
 
       const payload = {
-        countryCode: billingInfo.country,
-        postalCode: billingInfo.postcode,
-        cityName: cleanCityName(billingInfo.city),
-        weight: totalWeight,
-      };
+  countryCode: billingInfo.country,
+  postalCode: billingInfo.postcode,
+  cityName: cleanCityName(billingInfo.city),
+  weight: totalWeight,
+  declaredValue: 100,
+  declaredValueCurrency: 'THB',
+};
 
       console.log('[📦 DHL Request Payload]', JSON.stringify(payload, null, 2));
 
@@ -126,7 +128,16 @@ const handleShippingChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelect
       const data = await res.json();
       console.log('[💸 DHL API Response]', JSON.stringify(data, null, 2));
 
-      const price = data.products?.[0]?.totalPrice?.[0]?.price;
+      const product = data.products?.[0];
+const thbPrice =
+  product?.totalPrice?.find((p: any) => p.currencyType === 'BILLC')?.price ?? 0;
+
+const exchangeRate = data.exchangeRates?.find(
+  (rate: any) => rate.currency === 'THB' && rate.baseCurrency === 'USD'
+)?.currentExchangeRate ?? 0.027;
+
+const price = +(thbPrice * exchangeRate).toFixed(2);
+
       if (price) {
         setShippingRate(Number(price));
         console.log('✅ Shipping rate set to:', price);
@@ -848,16 +859,7 @@ onChange={handleShippingChange}
 
         {/* Payment */}
         <h2 className="text-xl text-[#dc9e63] font-bold mb-4">PAYMENT</h2>
-        <div className="bg-[#1e0000]/50 p-4 rounded-xl shadow-xl mb-6">
-          <label className="block mb-2 text-sm">
-            <input
-              type="radio"
-              checked={paymentMethod === 'card'}
-              onChange={() => setPaymentMethod('card')}
-              className="mr-2"
-            />
-            Credit / Debit Card
-          </label>
+        <div className="bg-[#1e0000]/50 p-4 rounded-xl shadow-xl mb-6">        
 
           {paymentMethod === 'card' && (
             <div className="relative mt-2">
@@ -877,15 +879,6 @@ onChange={handleShippingChange}
                     },
                   }}
                 />
-              </div>
-            </div>
-          )}
-
-          {paymentMethod === 'paypal' && (
-            <div className="relative mt-2">
-              <div className="absolute -top-2 left-6 w-0 h-0 border-l-8 border-r-8 border-b-8 border-transparent border-b-[#f8fcdc]" />
-              <div className="bg-[#f8fcdc] text-black p-4 rounded shadow text-sm">
-                Pay via PayPal.
               </div>
             </div>
           )}
