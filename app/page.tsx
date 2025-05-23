@@ -1,5 +1,7 @@
 /* HomePage.tsx */
 
+'use client';
+
 export const generateMetadata = () => {
   return {
     title: 'Unda Alunda | Dark Wonderful World – Official Website',
@@ -26,8 +28,6 @@ export const generateMetadata = () => {
     },
   };
 };
-
-'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';

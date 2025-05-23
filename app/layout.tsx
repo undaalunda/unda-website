@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   keywords: [
     'Unda', 'Alunda', 'Unda Alunda', 'Dark Wonderful World',
     'music', 'merch', 'Stems', 'Transcription', 'Tour date',
-    'Live in Thailand', 'Progressive Rock', 'Instrumental Band'
+    'Live in Thailand', 'jazz', 'Fusion', 'Progressive Rock', 'Progressive Metal', 'Instrumental Rock', 'Guitar Virtuoso'
   ],
   metadataBase: new URL('https://unda-website.vercel.app'),
   twitter: {
