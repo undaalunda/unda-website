@@ -276,13 +276,14 @@ export default function Navbar() {
 >
   <Link href="/" className="block">
     <Image
-      src="/unda-alunda-header.png"
-      alt="Unda Alunda Logo"
-      width={180}
-      height={50}
-      className="mx-auto logo-navbar-img cursor-pointer"
-      priority
-    />
+  src="/unda-alunda-header.png"
+  alt="Unda Alunda Logo"
+  width={180}
+  height={50}
+  quality={100} 
+  priority
+  unoptimized={true} 
+/>
   </Link>
 </div>
 
@@ -290,13 +291,14 @@ export default function Navbar() {
   <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[60]">
     <Link href="/" onClick={() => setMenuOpen(false)}>
       <Image
-        src="/unda-alunda-header.png"
-        alt="Unda Alunda Logo"
-        width={200}
-        height={60}
-        className="logo-navbar-img cursor-pointer"
-        priority
-      />
+  src="/unda-alunda-header.png"
+  alt="Unda Alunda Logo"
+  width={200}
+  height={50}
+  quality={100} 
+  priority
+  unoptimized={true} 
+/>
     </Link>
   </div>
 )}

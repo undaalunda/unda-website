@@ -82,7 +82,15 @@ export default function HomePage() {
 <div className="hero-wrapper">
   <div className="catmoon-background" />
   <div className="hero-text-image">
-    <Image src="/text-hero-section.png" alt="Dark Wonderful World on Moon" height={400} width={600} priority />
+    <Image
+  src="/text-hero-section.png"
+  alt="Dark Wonderful World on Moon"
+  height={400}
+  width={600}
+  quality={100}
+  priority
+  unoptimized={true} 
+/>
   </div>
   <div className="hero-text desktop-only">
     <p className="hero-line1">
