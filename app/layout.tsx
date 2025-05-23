@@ -26,7 +26,6 @@ export const metadata: Metadata = {
     shortcut: '/favicon-32x32.png',
     apple: '/apple-touch-icon.png',
   },
-  // 👇 Trick for OpenGraph (ใส่ผ่าน `other`)
   other: {
     'og:title': 'Unda Alunda | Official Website & Merch Store',
     'og:description': 'The New Album Dark Wonderful World out July 1, 2025 — Purchase now!',
@@ -62,13 +61,33 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <meta property="music:musician" content="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0" />
 
-        {/* ✅ Structured Data for Google Knowledge Panel */}
+        {/* ✅ Structured Data for WebSite */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "@id": "https://unda-website.vercel.app#website",
+              "name": "Unda Alunda",
+              "url": "https://unda-website.vercel.app",
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": "https://unda-website.vercel.app/search?q={search_term_string}",
+                "query-input": "required name=search_term_string"
+              }
+            })
+          }}
+        />
+
+        {/* ✅ Structured Data for MusicGroup */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "MusicGroup",
+              "@id": "https://unda-website.vercel.app#musicgroup",
               "name": "Unda Alunda",
               "description": "Thai guitarist and composer.",
               "url": "https://unda-website.vercel.app",
@@ -89,24 +108,50 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               "foundingLocation": {
                 "@type": "Place",
                 "name": "Thailand"
+              },
+              "mainEntityOfPage": {
+                "@id": "https://unda-website.vercel.app#website"
               }
-            }),
+            })
           }}
         />
-<script
-  type="application/ld+json"
-  dangerouslySetInnerHTML={{
-    __html: JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "VideoObject",
-      "name": "Unda Alunda – Anomic | Live in Thailand (2024)",
-      "description": "Live performance of 'Anomic' by Unda Alunda, recorded in Thailand during the Dark Wonderful World tour, 2024.",
-      "thumbnailUrl": "https://i.ytimg.com/vi/ZwXeCx8cAIM/hqdefault.jpg",
-      "uploadDate": "2024-10-01",
-      "embedUrl": "https://www.youtube.com/embed/ZwXeCx8cAIM"
-    }),
-  }}
-/>
+
+        {/* ✅ Structured Data for SiteNavigationElement */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "ItemList",
+              "itemListElement": [
+                { "@type": "SiteNavigationElement", "name": "Home", "url": "https://unda-website.vercel.app/" },
+                { "@type": "SiteNavigationElement", "name": "Shop", "url": "https://unda-website.vercel.app/shop" },
+                { "@type": "SiteNavigationElement", "name": "About", "url": "https://unda-website.vercel.app/about" },
+                { "@type": "SiteNavigationElement", "name": "Tour", "url": "https://unda-website.vercel.app/tour" },
+                { "@type": "SiteNavigationElement", "name": "Contact", "url": "https://unda-website.vercel.app/contact" }
+              ]
+            })
+          }}
+        />
+
+        {/* ✅ Structured Data for VideoObject */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "VideoObject",
+              "name": "Unda Alunda – Anomic | Live in Thailand (2024)",
+              "description": "Live performance of 'Anomic' by Unda Alunda, recorded in Thailand during the Dark Wonderful World tour, 2024.",
+              "thumbnailUrl": "https://i.ytimg.com/vi/ZwXeCx8cAIM/hqdefault.jpg",
+              "uploadDate": "2024-10-01",
+              "embedUrl": "https://www.youtube.com/embed/ZwXeCx8cAIM",
+              "mainEntityOfPage": {
+                "@id": "https://unda-website.vercel.app#website"
+              }
+            })
+          }}
+        />
       </head>
       <body className="bg-[#190000] text-[#f8fcdc] m-0 p-0 overflow-x-hidden">
         <CartProvider>

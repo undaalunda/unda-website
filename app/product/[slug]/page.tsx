@@ -4,6 +4,8 @@ import { allItems } from '@/components/allItems';
 import ProductPageContent from '@/components/ProductPageContent';
 import type { Metadata } from 'next';
 
+const BASE_URL = 'https://unda-website.vercel.app';
+
 export async function generateStaticParams() {
   return allItems.map((item) => ({
     slug: item.id,
@@ -31,6 +33,12 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
   return {
     title,
     description: formattedSubtitle || 'Official product page from Unda Alunda.',
+    other: {
+      'og:title': title,
+      'og:description': formattedSubtitle || 'Official product page from Unda Alunda.',
+      'og:type': 'product.item',
+      'og:url': `${BASE_URL}/product/${params.slug}`,
+    },
   };
 }
 
@@ -39,7 +47,35 @@ export default async function Page({ params }: any) {
 
   if (!product) return null;
 
-  return <ProductPageContent product={product} />;
+  return (
+    <>
+      {/* ✅ BreadcrumbList Schema (for SEO hierarchy) */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Shop",
+                "item": `${BASE_URL}/shop`
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": `${product.title} – ${product.subtitle}`,
+                "item": `${BASE_URL}/product/${product.id}`
+              }
+            ]
+          })
+        }}
+      />
+      <ProductPageContent product={product} />
+    </>
+  );
 }
 
 function smartTitleCase(str: string): string {
