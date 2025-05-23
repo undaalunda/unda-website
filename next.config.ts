@@ -1,4 +1,4 @@
-//next.config.ts
+// next.config.ts
 
 import type { NextConfig } from "next";
 
@@ -17,6 +17,7 @@ const nextConfig: NextConfig = {
     DHL_PASSWORD: process.env.DHL_PASSWORD,
     DHL_ACCOUNT_NUMBER: process.env.DHL_ACCOUNT_NUMBER,
     DHL_API_URL: process.env.DHL_API_URL,
+    DHL_TRACKING_AUTH: process.env.DHL_TRACKING_AUTH,
   },
 };
 

@@ -58,16 +58,18 @@ export default function ThankYouClient() {
         </div>
 
         {data.tracking_number && (
-          <p>
-            <strong>Tracking:</strong>{' '}
+          <div className="pt-2 text-sm">
+            <p><strong>Courier:</strong> <span className="text-[#f8fcdc]/50">{data.courier || 'DHL'}</span></p>
+            <p><strong>Tracking Number:</strong> <span className="text-[#f8fcdc]/50">{data.tracking_number}</span></p>
             <a
-              className="text-[#dc9e63] underline"
+              className="text-[#dc9e63] underline mt-1 inline-block"
               href={`https://www.dhl.com/global-en/home/tracking.html?tracking-id=${data.tracking_number}`}
               target="_blank"
+              rel="noopener noreferrer"
             >
-              View tracking on DHL
+              View tracking on DHL →
             </a>
-          </p>
+          </div>
         )}
       </div>
     </main>
