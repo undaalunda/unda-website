@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     'og:image:width': '1200',
     'og:image:height': '630',
     'og:image:alt': 'Unda Alunda Hero Image',
-    'og:type': 'music.group',
+    'og:type': 'profile',
     'og:locale': 'en_US',
   },
 };
@@ -71,7 +71,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               "name": "Unda Alunda",
               "url": "https://unda-website.vercel.app",
               "author": { "@id": "https://unda-website.vercel.app#person" },
-              "publisher": { "@id": "https://unda-website.vercel.app#musicgroup" },
+              "publisher": { "@id": "https://unda-website.vercel.app#person" },
               "potentialAction": {
                 "@type": "SearchAction",
                 "target": "https://unda-website.vercel.app/search?q={search_term_string}",
@@ -82,37 +82,50 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
 
         {/* ✅ Structured Data for Person */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Person",
-              "@id": "https://unda-website.vercel.app#person",
-              "name": "Alunda Chantharattanachoke",
-              "alternateName": "Unda Alunda",
-              "url": "https://unda-website.vercel.app",
-              "image": "https://unda-website.vercel.app/catmoon-bg.jpeg",
-              "sameAs": [
-                "https://www.instagram.com/undalunda",
-                "https://www.youtube.com/@undaalunda",
-                "https://www.facebook.com/undaalunda",
-                "https://www.threads.net/@undalunda",
-                "https://twitter.com/undaalunda",
-                "https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0",
-                "https://music.apple.com/us/artist/unda-alunda/1543677299",
-                "https://www.deezer.com/en/artist/115903802",
-                "https://tidal.com/browse/artist/22524871",
-                "https://music.amazon.com/artists/B08PVKFZDZ"
-              ],
-              "jobTitle": "Guitarist, Composer",
-              "nationality": "Thai",
-              "birthDate": "1999-10-11",
-              "gender": "Male",
-              "mainEntityOfPage": { "@type": "WebPage", "@id": "https://unda-website.vercel.app/about" }
-            })
-          }}
-        />
+<script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "@id": "https://unda-website.vercel.app#person",
+      "name": "Alunda Chantharattanachoke",
+      "alternateName": "Unda Alunda",
+      "url": "https://unda-website.vercel.app",
+      "image": "https://unda-website.vercel.app/catmoon-bg.jpeg",
+      "sameAs": [
+        "https://www.instagram.com/undalunda",
+        "https://www.youtube.com/@undaalunda",
+        "https://www.facebook.com/undaalunda",
+        "https://www.threads.net/@undalunda",
+        "https://twitter.com/undaalunda",
+        "https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0",
+        "https://music.apple.com/us/artist/unda-alunda/1543677299",
+        "https://www.deezer.com/en/artist/115903802",
+        "https://tidal.com/browse/artist/22524871",
+        "https://music.amazon.com/artists/B08PVKFZDZ"
+      ],
+      "jobTitle": "Guitarist, Composer",
+      "nationality": "Thai",
+      "birthDate": "1999-10-11",
+      "gender": "Male",
+      "brand": {
+        "@type": "Brand",
+        "name": "Abasi Concepts",
+        "url": "https://www.abasiconcepts.com"
+      },
+      "affiliation": {
+        "@type": "Organization",
+        "name": "Abasi Concepts",
+        "url": "https://www.abasiconcepts.com"
+      },
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://unda-website.vercel.app/about"
+      }
+    })
+  }}
+/>
 
         {/* ✅ Structured Data for Education & Awards */}
         <script
