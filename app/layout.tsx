@@ -60,6 +60,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <meta property="music:musician" content="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0" />
 
+        {/* ✅ Force preview images */}
+        <meta property="og:image" content="https://unda-website.vercel.app/catmoon-bg.jpeg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Unda Alunda Hero Image" />
+        <meta name="twitter:card" content="summary_large_image" />
+
         {/* ✅ Structured Data for WebSite */}
         <script
           type="application/ld+json"
