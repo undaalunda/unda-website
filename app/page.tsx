@@ -1,9 +1,35 @@
 /* HomePage.tsx */
 
+export const generateMetadata = () => {
+  return {
+    title: 'Unda Alunda | Dark Wonderful World – Official Website',
+    description: 'Explore music, merch, and live performances by Unda Alunda. Discover the new album Dark Wonderful World and learn with full transcriptions and stems.',
+    openGraph: {
+      title: 'Unda Alunda | Dark Wonderful World',
+      description: 'Explore the official Unda Alunda music store and live tour dates. Album releases, exclusive merch, and more.',
+      url: 'https://unda-website.vercel.app',
+      images: [
+        {
+          url: 'https://unda-website.vercel.app/catmoon-bg.jpeg',
+          width: 1200,
+          height: 630,
+          alt: 'Unda Alunda Hero Image',
+        },
+      ],
+      type: 'profile',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'Unda Alunda',
+      description: 'Official site and merch shop for Unda Alunda.',
+      images: ['https://unda-website.vercel.app/catmoon-bg.jpeg'],
+    },
+  };
+};
+
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import Head from 'next/head'; 
 import Link from 'next/link';
 import Image from 'next/image';
 import Script from 'next/script';
@@ -68,21 +94,6 @@ export default function HomePage() {
 
   return (
   <AppClientWrapper>
-
-      {/* ✅ SEO Tags with Head */}
-      <Head>
-        <title>Unda Alunda | Dark Wonderful World – Official Website</title>
-        <meta name="description" content="Explore music, merch, and live performances by Unda Alunda. Discover the new album Dark Wonderful World and learn with full transcriptions and stems." />
-        <meta property="og:title" content="Unda Alunda | Dark Wonderful World" />
-        <meta property="og:description" content="Explore the official Unda Alunda music store and live tour dates. Album releases, exclusive merch, and more." />
-        <meta property="og:url" content="https://unda-website.vercel.app" />
-        <meta property="og:image" content="https://unda-website.vercel.app/catmoon-bg.jpeg" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content="Unda Alunda Hero Image" />
-        <meta name="twitter:card" content="summary_large_image" />
-      </Head>
-
     <main className="homepage-main" style={{ overflow: 'visible' }}>
   <h1 className="sr-only">Unda Alunda | Official Website & Merch Store</h1>
       {isClient && (

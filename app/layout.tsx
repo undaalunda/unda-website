@@ -156,8 +156,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "MusicGroup",
-              "@id": "https://unda-website.vercel.app#musicgroup",
+              "@type": "WebSite",
+              "@id": "https://unda-website.vercel.app#website",
               "name": "Unda Alunda",
               "description": "Thai guitarist and composer.",
               "url": "https://unda-website.vercel.app",
