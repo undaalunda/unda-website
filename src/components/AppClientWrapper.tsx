@@ -50,6 +50,9 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
                 alt="Unda Alunda Cat Logo"
                 width={120}
                 height={120}
+                quality={100}
+                priority
+                unoptimized={true}
                 className="glow-logo mx-auto mb-6"
               />
               <div className="social-icons mb-6">
