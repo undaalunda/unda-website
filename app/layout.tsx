@@ -210,7 +210,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               "name": "Unda Alunda – Anomic | Live in Thailand (2024)",
               "description": "Live performance of 'Anomic' by Unda Alunda, recorded in Thailand during the Dark Wonderful World tour, 2024.",
               "thumbnailUrl": "https://i.ytimg.com/vi/ZwXeCx8cAIM/hqdefault.jpg",
-              "uploadDate": "2024-10-01",
+              "uploadDate": "2024-06-19T00:00:00+07:00",
               "embedUrl": "https://www.youtube.com/embed/ZwXeCx8cAIM",
               "mainEntityOfPage": { "@id": "https://unda-website.vercel.app#website" }
             })
