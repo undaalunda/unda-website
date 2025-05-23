@@ -77,6 +77,9 @@ export default function HomePage() {
         <meta property="og:description" content="Explore the official Unda Alunda music store and live tour dates. Album releases, exclusive merch, and more." />
         <meta property="og:url" content="https://unda-website.vercel.app" />
         <meta property="og:image" content="https://unda-website.vercel.app/catmoon-bg.jpeg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Unda Alunda Hero Image" />
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
 
