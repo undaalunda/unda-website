@@ -34,9 +34,12 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
   };
 }
 
-// ✅ จุดพีค — NO TYPES. LET IT GO.
 export default async function Page({ params }: any) {
-  return <ProductPageContent slug={params.slug} />;
+  const product = allItems.find((item) => item.id === params.slug);
+
+  if (!product) return null;
+
+  return <ProductPageContent product={product} />;
 }
 
 function smartTitleCase(str: string): string {

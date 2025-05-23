@@ -10,6 +10,8 @@ import { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import CartErrorPopup from '@/components/CartErrorPopup';
 import AppClientWrapper from '@/components/AppClientWrapper';
+import ProductSchema from '@/components/ProductSchema';
+
 
 function isBundle(price: number | { original: number; sale: number }): price is { original: number; sale: number } {
   return typeof price === 'object' && price !== null && 'original' in price && 'sale' in price;
@@ -24,11 +26,10 @@ function getStockStatus(product: Product): 'in-stock' | 'out-of-stock' | 'pre-or
 }
 
 type ProductPageContentProps = {
-  slug: string;
+  product: Product;
 };
 
-export default function ProductPageContent({ slug }: ProductPageContentProps) {
-  const product = allItems.find((item) => item.id === slug) as Product | undefined;
+export default function ProductPageContent({ product }: ProductPageContentProps) {
 
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState<number>(1);
@@ -60,6 +61,13 @@ export default function ProductPageContent({ slug }: ProductPageContentProps) {
 
   return (
     <AppClientWrapper>
+      <ProductSchema
+  name={`${product.title} – ${product.subtitle}`}
+  image={`https://undaalunda.com${product.image}`}
+  description={product.description || ''}
+  price={typeof product.price === 'object' ? product.price.sale : product.price}
+  url={`https://undaalunda.com${product.url}`}
+/>
       <div className="min-h-screen flex flex-col items-center justify-start text-[#f8fcdc] font-[Cinzel] px-4 md:px-6 pt-32 pb-24">
         <div className="w-full max-w-5xl mb-10 text-sm text-[#f8fcdc]/70">
           <Link href="/" className="hover:text-[#dc9e63]">Home</Link>

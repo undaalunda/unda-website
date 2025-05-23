@@ -93,6 +93,20 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             }),
           }}
         />
+<script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "VideoObject",
+      "name": "Unda Alunda – Anomic | Live in Thailand (2024)",
+      "description": "Live performance of 'Anomic' by Unda Alunda, recorded in Thailand during the Dark Wonderful World tour, 2024.",
+      "thumbnailUrl": "https://i.ytimg.com/vi/ZwXeCx8cAIM/hqdefault.jpg",
+      "uploadDate": "2024-10-01",
+      "embedUrl": "https://www.youtube.com/embed/ZwXeCx8cAIM"
+    }),
+  }}
+/>
       </head>
       <body className="bg-[#190000] text-[#f8fcdc] m-0 p-0 overflow-x-hidden">
         <CartProvider>
