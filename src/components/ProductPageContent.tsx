@@ -12,17 +12,14 @@ import CartErrorPopup from '@/components/CartErrorPopup';
 import AppClientWrapper from '@/components/AppClientWrapper';
 import ProductSchema from '@/components/ProductSchema';
 
-
 function isBundle(price: number | { original: number; sale: number }): price is { original: number; sale: number } {
   return typeof price === 'object' && price !== null && 'original' in price && 'sale' in price;
 }
 
-function getStockStatus(product: Product): 'in-stock' | 'out-of-stock' | 'pre-order' | null {
-  if (['Music', 'Merch', 'Bundles'].includes(product.category)) {
-    if (product.id === 'signed-keychain') return 'out-of-stock';
-    return 'in-stock';
-  }
-  return null;
+// 👇 ปรับให้สินค้าทุกชิ้นที่เป็น physical กลายเป็น "coming-soon"
+function getStockStatus(product: Product): 'in-stock' | 'out-of-stock' | 'pre-order' | 'coming-soon' | null {
+  if (product.type === 'physical') return 'coming-soon';
+  return 'in-stock';
 }
 
 type ProductPageContentProps = {
@@ -30,7 +27,6 @@ type ProductPageContentProps = {
 };
 
 export default function ProductPageContent({ product }: ProductPageContentProps) {
-
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState<number>(1);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -62,12 +58,13 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
   return (
     <AppClientWrapper>
       <ProductSchema
-  name={`${product.title} – ${product.subtitle}`}
-  image={`https://undaalunda.com${product.image}`}
-  description={product.description || ''}
-  price={typeof product.price === 'object' ? product.price.sale : product.price}
-  url={`https://undaalunda.com${product.url}`}
-/>
+        name={`${product.title} – ${product.subtitle}`}
+        image={`https://undaalunda.com${product.image}`}
+        description={product.description || ''}
+        price={typeof product.price === 'object' ? product.price.sale : product.price}
+        url={`https://undaalunda.com${product.url}`}
+      />
+
       <div className="min-h-screen flex flex-col items-center justify-start text-[#f8fcdc] font-[Cinzel] px-4 md:px-6 pt-32 pb-24">
         <div className="w-full max-w-5xl mb-10 text-sm text-[#f8fcdc]/70">
           <Link href="/" className="hover:text-[#dc9e63]">Home</Link>
@@ -119,13 +116,14 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
               </div>
             )}
 
-            {stockStatus && (
-              <div className="mt-1 text-xs font-light tracking-wide">
-                {stockStatus === 'in-stock' && <span className="text-green-300/70 italic">IN STOCK</span>}
-                {stockStatus === 'out-of-stock' && <span className="text-red-400/70 italic">OUT OF STOCK</span>}
-                {stockStatus === 'pre-order' && <span className="text-yellow-300/70 italic">PRE-ORDER</span>}
-              </div>
-            )}
+            {product.type === 'physical' && stockStatus && (
+  <div className="mt-1 text-xs font-light tracking-wide">
+    {stockStatus === 'in-stock' && <span className="text-green-300/70 italic">IN STOCK</span>}
+    {stockStatus === 'out-of-stock' && <span className="text-red-400/70 italic">OUT OF STOCK</span>}
+    {stockStatus === 'coming-soon' && <span className="text-orange-300/80 italic">COMING SOON</span>}
+    {stockStatus === 'pre-order' && <span className="text-sky-300/80 italic">PRE-ORDER</span>}
+  </div>
+)}
 
             {product.description && (
               <div className="product-description mt-6 text-[#f8fcdc]/80 leading-relaxed text-sm whitespace-pre-line">
@@ -140,21 +138,25 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
 
             <div className="relative mt-6">
               {errorMessage && <CartErrorPopup message={errorMessage} />}
-              <button
-                className="add-to-cart-button cursor-pointer"
-                disabled={stockStatus === 'out-of-stock'}
-                onClick={() => {
-                  const qty = product.type === 'digital' ? 1 : quantity;
-                  if (qty > 20) {
-                    setErrorMessage('You can only add up to 20 items per purchase.');
-                    return;
-                  }
-                  addToCart(product.id, qty);
-                  setErrorMessage(null);
-                }}
-              >
-                {stockStatus === 'out-of-stock' ? 'Unavailable' : `Add ${quantity} to Cart`}
-              </button>
+              {stockStatus === 'coming-soon' ? (
+                <button
+                  disabled
+                  className="add-to-cart-button cursor-not-allowed opacity-50 bg-[#888] text-white"
+                >
+                  Coming Soon
+                </button>
+              ) : (
+                <button
+                  className="add-to-cart-button cursor-pointer"
+                  onClick={() => {
+                    const qty = product.type === 'digital' ? 1 : quantity;
+                    addToCart(product.id, qty);
+                    setErrorMessage(null);
+                  }}
+                >
+                  Add {quantity} to Cart
+                </button>
+              )}
             </div>
 
             <Link href="/shop" className="back-to-shop-link mt-4 cursor-pointer">← Back to Shop</Link>
