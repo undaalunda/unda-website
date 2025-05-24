@@ -8,43 +8,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X, User, ShoppingCart, Search } from 'lucide-react';
 import { useCart } from '@/context/CartContext'; // 🛒 เอาข้อมูลตะกร้ามาใช้
-
-// Product list for search functionality
-export const allItems = [
-  // Merch
-  { id: 'cat-scores-t-shirt-black', title: 'CAT SCORES T-SHIRT', category: 'Merch', subtitle: 'BLACK', price: 29.95, tags: ['t-shirt', 'black', 'shirt'], image: '/black-cats-scores-tee.png', url: '/product/cat-scores-t-shirt-black' },
-  { id: 'cat-scores-t-shirt-white', title: 'CAT SCORES T-SHIRT', category: 'Merch', subtitle: 'WHITE', price: 29.95, tags: ['t-shirt', 'white', 'shirt'], image: '/white-cats-scores-tee.png', url: '/product/cat-scores-t-shirt-white' },
-  { id: 'cat-to-the-moon', title: 'A CAT TO THE MOON', category: 'Merch', subtitle: 'STICKERS', price: 4.95, tags: ['sticker', 'cat'], image: '/a-cat-to-the-moon-stickers.png', url: '/product/cat-to-the-moon' },
-  { id: 'musician-cats', title: 'A MUSICIAN CATS', category: 'Merch', subtitle: 'STICKERS', price: 4.95, tags: ['sticker', 'cat'], image: '/a-musician-cats.png', url: '/product/musician-cats' },
-  { id: 'signed-keychain', title: 'UNDA ALUNDA', category: 'Merch', subtitle: 'SIGNED KEYCHAIN', price: 9.95, tags: ['keychain', 'signed'], image: '/unda-alunda-sign-keychain.png', url: '/product/signed-keychain' },
-
-  // Music
-  { id: 'audio-digipak', title: 'DARK WONDERFUL WORLD', subtitle: 'DIGIPAK CD', category: 'Music', price: 24.95, tags: ['audio', 'cd', 'album'], image: '/audio-digipak-dww.png', url: '/product/audio-digipak' },
-  { id: 'live-cd', title: 'DARK WONDERFUL WORLD', subtitle: 'LIVE CD', category: 'Music', price: 14.95, tags: ['live', 'cd', 'album'], image: '/live-cd-dww.png', url: '/product/live-cd' },
-  { id: 'guitars-book', title: 'FULL GUITARS TRANSCRIPTION', subtitle: 'PRINTED BOOK', category: 'Music', price: 49.95, tags: ['book', 'transcription', 'guitar'], image: '/full-guitars-transcription.png', url: '/product/guitars-book' },
-  { id: 'bass-book', title: 'FULL BASS TRANSCRIPTION', subtitle: 'PRINTED BOOK', category: 'Music', price: 49.95, tags: ['book', 'transcription', 'bass'], image: '/full-bass-transcription.png', url: '/product/bass-book' },
-  { id: 'keys-book', title: 'FULL KEYS TRANSCRIPTION', subtitle: 'PRINTED BOOK', category: 'Music', price: 49.95, tags: ['book', 'transcription', 'keys'], image: '/full-keys-transcription.png', url: '/product/keys-book' },
-  { id: 'drums-book', title: 'FULL DRUMS TRANSCRIPTION', subtitle: 'PRINTED BOOK', category: 'Music', price: 49.95, tags: ['book', 'transcription', 'drums'], image: '/full-drums-transcription.png', url: '/product/drums-book' },
-
-  // Bundles
-  { id: 'album-merch-bundle', title: 'DARK WONDERFUL WORLD', subtitle: 'ALBUM MERCH BUNDLE', category: 'Bundles', price: { original: 64.85, sale: 51.88 }, tags: ['bundle', 'album', 'merch'], image: '/dark-wonderful-world-album-merch-bundle.png', url: '/product/album-merch-bundle' },
-  { id: 'book-merch-bundle', title: 'DARK WONDERFUL WORLD', subtitle: 'BOOK & MERCH BUNDLE', category: 'Bundles', price: { original: 84.85, sale: 67.88 }, tags: ['bundle', 'book', 'merch'], image: '/dark-wonderful-world-book-&-merch-bundle.png', url: '/product/book-merch-bundle' },
-  { id: 'book-bonus-bundle', title: 'DARK WONDERFUL WORLD', subtitle: 'BOOK & BONUS MERCH BUNDLE', category: 'Bundles', price: { original: 94.75, sale: 75.80 }, tags: ['bundle', 'book', 'bonus'], image: '/dark-wonderful-world-book-&-bonus-merch-bundle.png', url: '/product/book-bonus-bundle' },
-  { id: 'dual-album-bundle', title: 'DARK WONDERFUL WORLD', subtitle: 'DUAL ALBUM MERCH BUNDLE', category: 'Bundles', price: { original: 109.75, sale: 87.80 }, tags: ['bundle', 'album', 'dual'], image: '/dark-wonderful-world-dual-album-merch-bundle.png', url: '/product/dual-album-bundle' },
-  { id: 'book-bundle', title: 'DARK WONDERFUL WORLD', subtitle: 'BOOK BUNDLE', category: 'Bundles', price: { original: 74.90, sale: 59.92 }, tags: ['bundle', 'book'], image: '/dark-wonderful-world-book-bundle.png', url: '/product/book-bundle' },
-  { id: 'apparel-book-bundle', title: 'DARK WONDERFUL WORLD', subtitle: 'APPAREL & BOOK BUNDLE', category: 'Bundles', price: { original: 104.85, sale: 83.88 }, tags: ['bundle', 'apparel', 'book'], image: '/dark-wonderful-world-apparel-&-book-bundle.png', url: '/product/apparel-book-bundle' },
-  { id: 'sticker-book-bundle', title: 'DARK WONDERFUL WORLD', subtitle: 'STICKER & BOOK BUNDLE', category: 'Bundles', price: { original: 84.80, sale: 67.84 }, tags: ['bundle', 'sticker', 'book'], image: '/dark-wonderful-world-sticker-&-book-bundle.png', url: '/product/sticker-book-bundle' },
-
-  // Backing Tracks
-  { id: 'anomic-drums', title: 'ANOMIC', subtitle: 'DRUMS BACKING TRACK', category: 'Backing Track', price: 7.95, tags: ['drums', 'track'], image: '/anomic-no-drums.jpg', url: '/product/anomic-drums' },
-  { id: 'jyy-guitars', title: 'JYY', subtitle: 'LEAD GUITAR BACKING TRACK', category: 'Backing Track', price: 7.95, tags: ['guitars', 'track'], image: '/jyy-no-guitars.jpg', url: '/product/jyy-guitars' },
-  { id: 'atlantic-guitar', title: 'ATLANTIC', subtitle: 'GUITARS BACKING TRACK', category: 'Backing Track', price: 8.95, tags: ['lead guitar', 'track'], image: '/atlantic-no-lead-guitar.jpg', url: '/product/atlantic-guitar' },
-  { id: 'out-dark-drums', title: 'OUT OF THE DARK', subtitle: 'DRUMS BACKING TRACK', category: 'Backing Track', price: 11.95, tags: ['drums', 'track'], image: '/out-of-the-dark-no-drums.jpg', url: '/product/out-dark-drums' },
-  { id: 'feign-guitars', title: 'FEIGN', subtitle: 'GUITARS BACKING TRACK', category: 'Backing Track', price: 11.95, tags: ['guitars', 'track'], image: '/feign-no-guitars.jpg', url: '/product/feign-guitars' },
-  { id: 'dark-keys', title: 'THE DARK', subtitle: 'KEYS BACKING TRACK', category: 'Backing Track', price: 4.95, tags: ['keys', 'track'], image: '/the-dark-no-keys.jpg', url: '/product/dark-keys' },
-  { id: 'reddown-bass', title: 'RED DOWN', subtitle: 'BASS BACKING TRACK', category: 'Backing Track', price: 7.95, tags: ['bass', 'track'], image: '/reddown-no-bass.jpg', url: '/product/reddown-bass' },
-  { id: 'quietness-bass', title: 'QUIETNESS', subtitle: 'BASS BACKING TRACK', category: 'Backing Track', price: 7.95, tags: ['bass', 'track'], image: '/quietness-no-bass.jpg', url: '/product/quietness-bass' },
-  ];
+import { allItems } from '@/components/allItems';
 
 const pageLinks = [
   { title: 'Home', href: '/' },
@@ -55,8 +19,8 @@ const pageLinks = [
 ];
 
 export default function Navbar() {
-  const [highlightIndex, setHighlightIndex] = useState<number>(0);
-  const resultRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [highlightIndex, setHighlightIndex] = useState<number>(-1);
+  const resultRefs = useRef<(HTMLElement | null)[]>([]);
   const [scrolledDown, setScrolledDown] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -75,18 +39,6 @@ export default function Navbar() {
 
   useEffect(() => {
     setHasMounted(true);
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        setHighlightIndex((prev) => Math.min(prev + 1, filtered.length - 1));
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        setHighlightIndex((prev) => Math.max(prev - 1, 0));
-      } else if (e.key === 'Enter') {
-        e.preventDefault();
-        resultRefs.current[highlightIndex]?.click(); // click ไอเท็มที่กำลังชี้อยู่
-      }
-    };
     const handleScroll = () => setScrolledDown(window.scrollY > 10);
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setSearchOpen(false);
@@ -108,6 +60,12 @@ export default function Navbar() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+  if (searchOpen && resultRefs.current[highlightIndex]) {
+    resultRefs.current[highlightIndex]?.scrollIntoView({ block: 'nearest' });
+  }
+}, [highlightIndex, searchOpen]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -147,6 +105,12 @@ export default function Navbar() {
   }, [menuOpen]);
 
   useEffect(() => {
+  if (searchOpen) {
+    setHighlightIndex(0);
+  }
+}, [searchOpen]);
+
+  useEffect(() => {
     const body = document.body;
     if (searchOpen) {
       scrollYRef.current = window.scrollY;
@@ -165,13 +129,16 @@ export default function Navbar() {
   }, [searchOpen]);
 
   useEffect(() => {
-    if (searchQuery === '') {
-      setDelayedQuery('');
-    } else {
-      const handler = setTimeout(() => setDelayedQuery(searchQuery), 300);
-      return () => clearTimeout(handler);
-    }
-  }, [searchQuery]);
+  if (searchQuery === '') {
+    setDelayedQuery('');
+  } else {
+    const handler = setTimeout(() => {
+      setDelayedQuery(searchQuery);
+      setHighlightIndex(0); // ✅ reset index ทุกครั้งที่ค้นหาใหม่
+    }, 300);
+    return () => clearTimeout(handler);
+  }
+}, [searchQuery]);
 
   const filtered = useMemo(() => {
     const q = delayedQuery.toLowerCase();
@@ -209,6 +176,57 @@ export default function Navbar() {
   if (!hasMounted) return null;
   const isHomepage = pathname === '/';
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const hasQuery = delayedQuery.length > 0;
+  const productCount = filtered.length;
+  const suggestionCount = suggestions.length;
+  const pageCount = pageMatches.length;
+  const recentCount = recentSearches.length;
+  const menuCount = pageLinks.length;
+
+  const totalCount = hasQuery
+    ? 1 + productCount + suggestionCount + pageCount + recentCount
+    : 1 + menuCount;
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    setHighlightIndex((prev) => {
+      const next = prev + 1;
+      if (next >= totalCount) {
+        return 1; // ไม่กลับไปช่อง search (index 0)
+      }
+      return next;
+    });
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    setHighlightIndex((prev) => {
+      const next = prev - 1;
+      if (next < 1) {
+        return totalCount - 1; // ไม่กลับไปช่อง search (index 0)
+      }
+      return next;
+    });
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    const el = resultRefs.current[highlightIndex];
+    if (el) {
+      const q = searchQuery.trim();
+      if (q.length > 0) {
+        setRecentSearches((prev) => {
+          const withoutDupes = prev.filter((t) => t !== q);
+          return [q, ...withoutDupes].slice(0, 5);
+        });
+      }
+      const link = el.querySelector('a');
+      if (link) {
+        (link as HTMLElement).click();
+      } else {
+        el.click();
+      }
+    }
+  }
+};
+
   return (
     <header className="fixed top-0 left-0 w-full z-50 h-[96px]">
       <div className={`absolute inset-0 bg-[#160000] transition-opacity duration-[1200ms] pointer-events-none ${scrolledDown ? 'opacity-100' : 'opacity-0'}`} />
@@ -235,7 +253,7 @@ export default function Navbar() {
         )}
   
         {/* ✅ ซ่อน icons ตอน menuOpen === true */}
-        {!menuOpen && (
+        {!menuOpen && !searchOpen && (
   <div className="flex items-center gap-7 pr-3 z-40">
 
 
@@ -302,8 +320,7 @@ export default function Navbar() {
     </Link>
   </div>
 )}
-
-</div> {/* ปิด container หลัก */}
+</div>
 
 {/* MENU OPEN OVERLAY */}
 {menuOpen && (
@@ -341,8 +358,13 @@ export default function Navbar() {
 
 {/* SEARCH OPEN OVERLAY */}
 {searchOpen && (
-  <div className="fixed inset-0 z-40 bg-[#0d0d0dea] flex items-start justify-center px-4 pt-40">
-    <div ref={searchOverlayRef} className="w-full max-w-5xl flex flex-col items-center">
+  <div className="fixed inset-0 z-40 bg-[#0d0d0dea] flex items-start justify-center px-4 pt-40 animate-fadeIn">
+    <div
+  ref={searchOverlayRef}
+  className="w-full max-w-5xl flex flex-col items-center fade-in-section"
+>
+
+      
       
       {/* SEARCH INPUT */}
       <form
@@ -367,6 +389,7 @@ export default function Navbar() {
             placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => handleKeyDown(e)} 
             autoFocus
             className="w-full pl-12 pr-12 py-2 text-base text-[#f8fcdc] caret-[#dc9e63] bg-transparent border border-[#dc9e63] rounded-md placeholder:text-[#777] outline-none"
           />
@@ -383,17 +406,35 @@ export default function Navbar() {
       {/* SEARCH RESULTS */}
       {delayedQuery.length === 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mt-6 w-full max-w-5xl mx-auto">
+          
           {/* LEFT - MAIN MENU */}
           <div>
             <h4 className="text-sm mb-2 font-semibold text-[#f8fcdc]">Main Menu</h4>
             <ul className="space-y-1 text-sm">
-              {pageLinks.map((page, i) => (
-                <li key={i}>
-                  <Link href={page.href} onClick={() => setSearchOpen(false)} className="hover:text-[#dc9e63] text-[#f8fcdc]/70">
-                    {page.title}
-                  </Link>
-                </li>
-              ))}
+              {pageLinks.map((page, i) => {
+  const offsetIndex = 1 + i;
+  return (
+    <li
+      key={i}
+      ref={(el) => {
+        resultRefs.current[offsetIndex] = el;
+      }}
+      className={`transition-colors ${
+        highlightIndex === offsetIndex
+          ? 'text-[#dc9e63]'
+          : 'text-[#f8fcdc]/70 hover:text-[#dc9e63]'
+      }`}
+    >
+      <Link
+        href={page.href}
+        onClick={() => setSearchOpen(false)}
+        className="block w-full"
+      >
+        {page.title}
+      </Link>
+    </li>
+  );
+})}
             </ul>
           </div>
 
@@ -422,15 +463,25 @@ export default function Navbar() {
             <div className="text-[#f8fcdc]">
               <h4 className="text-sm mb-2 font-semibold">Suggestions</h4>
               <ul className="space-y-1 text-sm">
-                {suggestions.map((term, i) => (
-                  <li
-                    key={i}
-                    className="cursor-pointer hover:text-[#dc9e63] text-[#f8fcdc]/70"
-                    onClick={() => setSearchQuery(term)}
-                  >
-                    {term}
-                  </li>
-                ))}
+                {suggestions.map((term, i) => {
+  const offsetIndex = 1 + filtered.length + i;
+  return (
+    <li
+      key={i}
+      ref={(el) => {
+        resultRefs.current[offsetIndex] = el;
+      }}
+      onClick={() => setSearchQuery(term)}
+      className={`cursor-pointer transition-colors ${
+        highlightIndex === offsetIndex
+          ? 'text-[#dc9e63]'
+          : 'text-[#f8fcdc]/70 hover:text-[#dc9e63]'
+      }`}
+    >
+      {term}
+    </li>
+  );
+})}
               </ul>
 
               {/* Pages */}
@@ -438,85 +489,115 @@ export default function Navbar() {
                 <div className="text-[#f8fcdc] mt-6">
                   <h4 className="text-sm mb-2 font-semibold">Pages</h4>
                   <ul className="space-y-1 text-sm">
-                    {pageMatches.map((page, i) => (
-                      <li key={i}>
-                        <Link
-                          href={page.href}
-                          onClick={() => setSearchOpen(false)}
-                          className="hover:text-[#dc9e63] text-[#f8fcdc]/70"
-                        >
-                          {page.title}
-                        </Link>
-                      </li>
-                    ))}
+                    {pageMatches.map((page, i) => {
+  const offsetIndex = 1 + filtered.length + suggestions.length + i;
+  return (
+    <li
+      key={i}
+      ref={(el) => {
+        resultRefs.current[offsetIndex] = el;
+      }}
+      className={`transition-colors ${
+        highlightIndex === offsetIndex
+          ? 'text-[#dc9e63]'
+          : 'text-[#f8fcdc]/70 hover:text-[#dc9e63]'
+      }`}
+    >
+      <Link
+        href={page.href}
+        onClick={() => setSearchOpen(false)}
+        className="block w-full"
+      >
+        {page.title}
+      </Link>
+    </li>
+  );
+})}
                   </ul>
                 </div>
               )}
             </div>
 
             {/* RIGHT - Products */}
-            <div className="flex flex-col gap-3 max-h-[400px] overflow-y-auto pr-2">
-              <h4 className="text-sm mb-2 font-semibold text-[#f8fcdc]">Products</h4>
-              {filtered.length === 0 ? (
-                <div className="mt-1">
-                  <p className="text-sm font-medium text-[#f8fcdc]/60">No results found...</p>
-                  <p className="text-xs text-[#f8fcdc]/40 mt-[2px]">
-                    Try searching with different keywords.
-                  </p>
-                </div>
-              ) : (
-                filtered.map((item) => (
-                  <Link
-                    href={item.url}
-                    key={item.id}
-                    onClick={() => {
-                      setSearchOpen(false);
-                      const q = searchQuery.trim();
-                      if (q.length > 0) {
-                        setRecentSearches((prev) => {
-                          const withoutDupes = prev.filter((t) => t !== q);
-                          return [q, ...withoutDupes].slice(0, 5);
-                        });
-                      }
-                    }}
-                    className="flex items-center gap-4 p-3 rounded-lg hover:bg-[#dc9e63]/10 transition-colors cursor-pointer"
-                  >
-                    <img
-                      src={item.image}
-                      alt={item.title}
-                      className="w-12 h-12 object-cover rounded opacity-0 transition-opacity duration-500"
-                      onLoad={(e) => e.currentTarget.classList.add('opacity-100')}
-                    />
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium text-[#f8fcdc]">{item.title}</span>
-                      <span className="text-xs text-[#f8fcdc]/70">{item.subtitle}</span>
-                      {item.price && (
-  typeof item.price === 'object' ? (
-    <div className="flex items-center gap-2 text-xs mt-1">
-      <span className="line-through text-[#f8fcdc]/40">
-        ${item.price.original.toFixed(2)}
-      </span>
-      <span className="text-[#dc9e63]">
-        ${item.price.sale.toFixed(2)}
-      </span>
+<div className="flex flex-col gap-3 max-h-[400px] overflow-y-auto pr-2">
+  <h4 className="text-sm mb-2 font-semibold text-[#f8fcdc]">Products</h4>
+  {filtered.length === 0 ? (
+    <div className="mt-1">
+      <p className="text-sm font-medium text-[#f8fcdc]/60">No results found...</p>
+      <p className="text-xs text-[#f8fcdc]/40 mt-[2px]">
+        Try searching with different keywords.
+      </p>
     </div>
   ) : (
-    <div className="text-xs text-[#dc9e63] mt-1">
-      ${item.price.toFixed(2)}
-    </div>
-  )
-)}
-                    </div>
-                  </Link>
-                ))
+    filtered.map((item, i) => {
+      // เพิ่ม offsetIndex เพื่อให้ index 0 = item แรก, index -1 = ช่อง search
+      const offsetIndex = i + 1;
+      return (
+        <div
+          key={item.id}
+          ref={(el: HTMLDivElement | null) => {
+            resultRefs.current[offsetIndex] = el;
+          }}
+          className={`flex items-center gap-4 p-3 rounded-lg transition-colors cursor-pointer ${
+            highlightIndex === offsetIndex
+              ? 'bg-[#dc9e63]/10'
+              : 'hover:bg-[#dc9e63]/10'
+          }`}
+        >
+          <Link
+            href={item.url}
+            onClick={() => {
+              setSearchOpen(false);
+              const q = searchQuery.trim();
+              if (q.length > 0) {
+                setRecentSearches((prev) => {
+                  const withoutDupes = prev.filter((t) => t !== q);
+                  return [q, ...withoutDupes].slice(0, 5);
+                });
+              }
+            }}
+            className="flex items-center gap-4 w-full"
+          >
+            <img
+              src={item.image}
+              alt={item.title}
+              className="w-12 h-12 object-cover rounded opacity-0 transition-opacity duration-500"
+              onLoad={(e) => e.currentTarget.classList.add('opacity-100')}
+            />
+            <div className="flex flex-col">
+              <span className="text-sm font-medium text-[#f8fcdc]">
+                {item.title}
+              </span>
+              <span className="text-xs text-[#f8fcdc]/70">{item.subtitle}</span>
+              {item.price && (
+                typeof item.price === 'object' ? (
+                  <div className="flex items-center gap-2 text-xs mt-1">
+                    <span className="line-through text-[#f8fcdc]/40">
+                      ${item.price.original.toFixed(2)}
+                    </span>
+                    <span className="text-[#dc9e63]">
+                      ${item.price.sale.toFixed(2)}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="text-xs text-[#dc9e63] mt-1">
+                    ${item.price.toFixed(2)}
+                  </div>
+                )
               )}
             </div>
+          </Link>
+        </div>
+      );
+    })
+  )}
+</div>
           </div>
         </div>
       )}
     </div>
   </div>
 )}
-   </header>
+</header>
   );
 }
