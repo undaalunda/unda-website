@@ -2,10 +2,11 @@
 
 'use client';
 
-import { useCart } from '@/context/CartContext';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { useCart } from '@/context/CartContext';
+import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
@@ -58,6 +59,18 @@ export default function CartSuccessPopup() {
       clearHideTimer();
     };
   }, [lastActionItem, pathname]);
+
+  // 👇 เคลียร์ popup ถ้าผู้ใช้กด back ของ browser
+  useEffect(() => {
+    const onPopState = () => {
+      setLastActionItem(null);
+    };
+
+    window.addEventListener('popstate', onPopState);
+    return () => {
+      window.removeEventListener('popstate', onPopState);
+    };
+  }, [setLastActionItem]);
 
   const handleMouseEnter = () => {
     setIsHovering(true);
@@ -114,7 +127,7 @@ export default function CartSuccessPopup() {
           View Cart
         </Link>
       ) : (
-        <div className="ml-4 w-[50px] pointer-events-none" /> // 👈 เพิ่มพื้นที่ให้ popup ตอน remove
+        <div className="ml-4 w-[50px] pointer-events-none" /> // 👈 ให้พื้นที่ว่างตอน remove
       )}
     </div>
   );

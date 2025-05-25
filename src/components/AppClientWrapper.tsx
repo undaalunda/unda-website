@@ -9,12 +9,14 @@ import CartSuccessPopup from '@/components/CartSuccessPopup';
 import NewsletterForm from '@/components/NewsletterForm';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useCart } from '@/context/CartContext'; // ✅ import มาใช้งานเลย
 
 const Navbar = dynamic(() => import('@/components/Navbar'), { ssr: false });
 
 export default function AppClientWrapper({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { setLastActionItem } = useCart(); // ✅ เคลียร์ popup ตอน path เปลี่ยน
 
   useEffect(() => {
     const handler = (e: any) => {
@@ -28,6 +30,10 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
     }
     return () => window.removeEventListener('toggle-menu', handler);
   }, []);
+
+  useEffect(() => {
+    setLastActionItem(null); // ✅ เคลียร์ popup ตอน path เปลี่ยนทุกหน้า
+  }, [pathname]);
 
   return (
     <>

@@ -15,6 +15,7 @@ import AppClientWrapper from '@/components/AppClientWrapper';
 import ProductSchema from '@/components/ProductSchema';
 
 
+
 function isBundle(price: number | { original: number; sale: number }): price is { original: number; sale: number } {
   return typeof price === 'object' && price !== null && 'original' in price && 'sale' in price;
 }
