@@ -5,7 +5,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { allItems } from '@/components/allItems';
 
-type CartItem = {
+export type CartItem = {
   id: string;
   title: string;
   subtitle: string;
@@ -13,7 +13,12 @@ type CartItem = {
   image: string;
   quantity: number;
   type: 'digital' | 'physical';
-  weight: number; // ✅ เพิ่มน้ำหนักเข้ามา
+  weight: number;
+};
+
+export type LastActionItem = {
+  item: CartItem;
+  action: 'add' | 'remove';
 };
 
 interface CartContextType {
@@ -22,8 +27,8 @@ interface CartContextType {
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
-  lastAddedItem: CartItem | null;
-  setLastAddedItem: (item: CartItem | null) => void;
+  lastActionItem: LastActionItem | null;
+  setLastActionItem: (item: LastActionItem | null) => void;
   cartError: string | null;
   setCartError: (msg: string | null) => void;
   isCartReady: boolean;
@@ -33,7 +38,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [lastAddedItem, setLastAddedItem] = useState<CartItem | null>(null);
+  const [lastActionItem, setLastActionItem] = useState<LastActionItem | null>(null);
   const [cartError, setCartError] = useState<string | null>(null);
   const [isCartReady, setIsCartReady] = useState(false);
 
@@ -62,7 +67,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     const item = allItems.find((i) => i.id === id);
     if (!item) return;
 
-    const itemWeight = item.weight ?? 0; // ✅ กำหนดน้ำหนักไว้ด้วย
+    const itemWeight = item.weight ?? 0;
 
     setCartItems((prev) => {
       const existing = prev.find((cartItem) => cartItem.id === id);
@@ -73,8 +78,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         return prev;
       }
 
+      let updatedCart: CartItem[];
+
       if (existing) {
-        return prev.map((cartItem) =>
+        updatedCart = prev.map((cartItem) =>
           cartItem.id === id
             ? { ...cartItem, quantity: newQuantity }
             : cartItem
@@ -88,26 +95,34 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           image: item.image,
           quantity,
           type: item.type,
-          weight: itemWeight, // ✅ เพิ่มน้ำหนัก
+          weight: itemWeight,
         };
-
-        return [...prev, newItem];
+        updatedCart = [...prev, newItem];
       }
-    });
 
-    setLastAddedItem({
-      id: item.id,
-      title: item.title,
-      subtitle: item.subtitle ?? '',
-      price: item.price,
-      image: item.image,
-      quantity,
-      type: item.type,
-      weight: itemWeight, // ✅ เพิ่มน้ำหนัก
+      setLastActionItem({
+        item: {
+          id: item.id,
+          title: item.title,
+          subtitle: item.subtitle ?? '',
+          price: item.price,
+          image: item.image,
+          quantity,
+          type: item.type,
+          weight: itemWeight,
+        },
+        action: 'add',
+      });
+
+      return updatedCart;
     });
   };
 
   const removeFromCart = (id: string) => {
+    const item = cartItems.find((item) => item.id === id);
+    if (item) {
+      setLastActionItem({ item, action: 'remove' });
+    }
     setCartItems((prev) => prev.filter((item) => item.id !== id));
   };
 
@@ -134,8 +149,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         removeFromCart,
         updateQuantity,
         clearCart,
-        lastAddedItem,
-        setLastAddedItem,
+        lastActionItem,
+        setLastActionItem,
         cartError,
         setCartError,
         isCartReady,

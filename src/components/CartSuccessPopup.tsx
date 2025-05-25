@@ -6,11 +6,11 @@ import { useCart } from '@/context/CartContext';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, XCircle } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 export default function CartSuccessPopup() {
-  const { lastAddedItem, setLastAddedItem } = useCart();
+  const { lastActionItem, setLastActionItem } = useCart();
   const [isVisible, setIsVisible] = useState(false);
   const [shouldRender, setShouldRender] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
@@ -25,37 +25,39 @@ export default function CartSuccessPopup() {
     }
   };
 
-  const startHideTimer = () => {
+  const startHideTimer = (duration: number = 7000) => {
     clearHideTimer();
     hideTimerRef.current = setTimeout(() => {
       setIsVisible(false);
       setTimeout(() => {
         setShouldRender(false);
-        setLastAddedItem(null);
-      }, 700);
-    }, 7000);
+        setLastActionItem(null);
+      }, 400); // match .4s fadeOut
+    }, duration);
   };
 
   useEffect(() => {
-    const pagesToSuppressPopup = ['/cart', '/checkout'];
+    const pagesToSuppressPopup = ['/cart', '/checkout', '/shop'];
 
     if (pagesToSuppressPopup.includes(pathname)) {
-      if (lastAddedItem) {
-        setLastAddedItem(null);
+      if (lastActionItem) {
+        setLastActionItem(null);
       }
       return;
     }
 
-    if (lastAddedItem) {
+    if (lastActionItem) {
       setShouldRender(true);
       setTimeout(() => setIsVisible(true), 10);
-      startHideTimer();
+
+      // Show for less time if it's a removal
+      startHideTimer(lastActionItem.action === 'remove' ? 2500 : 7000);
     }
 
     return () => {
       clearHideTimer();
     };
-  }, [lastAddedItem, pathname]);
+  }, [lastActionItem, pathname]);
 
   const handleMouseEnter = () => {
     setIsHovering(true);
@@ -64,10 +66,13 @@ export default function CartSuccessPopup() {
 
   const handleMouseLeave = () => {
     setIsHovering(false);
-    startHideTimer();
+    startHideTimer(lastActionItem?.action === 'remove' ? 2500 : 7000);
   };
 
-  if (!shouldRender || !lastAddedItem) return null;
+  if (!shouldRender || !lastActionItem) return null;
+
+  const isAdd = lastActionItem.action === 'add';
+  const { image, title, subtitle } = lastActionItem.item;
 
   return (
     <div
@@ -77,12 +82,16 @@ export default function CartSuccessPopup() {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <CheckCircle className="text-green-700" size={28} strokeWidth={1.2} />
+      {isAdd ? (
+        <CheckCircle className="text-green-700" size={28} strokeWidth={1.2} />
+      ) : (
+        <XCircle className="text-[#cc3f33]" size={28} strokeWidth={1.2} />
+      )}
 
-      {lastAddedItem.image && (
+      {image && (
         <Image
-          src={lastAddedItem.image}
-          alt={lastAddedItem.title || 'Item image'}
+          src={image}
+          alt={title || 'Item image'}
           width={50}
           height={50}
           className="rounded pointer-events-none"
@@ -90,19 +99,23 @@ export default function CartSuccessPopup() {
       )}
 
       <div className="flex flex-col text-xs pointer-events-none">
-        <span className="text-sm font-bold text-[#dc9e63] leading-tight">
-          Added to Cart!
+        <span className="text-sm font-bold leading-tight" style={{ color: isAdd ? '#dc9e63' : '#cc3f33' }}>
+          {isAdd ? 'Added to Cart!' : 'Removed from Cart'}
         </span>
-        <span className="font-semibold text-[#f8fcdc]">{lastAddedItem.title}</span>
-        <span className="text-[#f8fcdc]/60">{lastAddedItem.subtitle}</span>
+        <span className="font-semibold text-[#f8fcdc]">{title}</span>
+        <span className="text-[#f8fcdc]/60">{subtitle}</span>
       </div>
 
-      <Link
-        href="/cart"
-        className="ml-4 text-xs text-[#dc9e63] hover:underline whitespace-nowrap cursor-pointer pointer-events-auto"
-      >
-        View Cart
-      </Link>
+      {isAdd ? (
+        <Link
+          href="/cart"
+          className="ml-4 text-xs text-[#dc9e63] hover:underline whitespace-nowrap cursor-pointer pointer-events-auto"
+        >
+          View Cart
+        </Link>
+      ) : (
+        <div className="ml-4 w-[50px] pointer-events-none" /> // 👈 เพิ่มพื้นที่ให้ popup ตอน remove
+      )}
     </div>
   );
 }

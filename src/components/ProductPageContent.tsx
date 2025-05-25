@@ -3,7 +3,9 @@
 'use client';
 
 import { allItems } from '@/components/allItems';
+import type { LastActionItem } from '@/context/CartContext';
 import type { Product } from '@/components/allItems';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
@@ -12,14 +14,30 @@ import CartErrorPopup from '@/components/CartErrorPopup';
 import AppClientWrapper from '@/components/AppClientWrapper';
 import ProductSchema from '@/components/ProductSchema';
 
+
 function isBundle(price: number | { original: number; sale: number }): price is { original: number; sale: number } {
   return typeof price === 'object' && price !== null && 'original' in price && 'sale' in price;
 }
 
-// 👇 ปรับให้สินค้าทุกชิ้นที่เป็น physical กลายเป็น "coming-soon"
 function getStockStatus(product: Product): 'in-stock' | 'out-of-stock' | 'pre-order' | 'coming-soon' | null {
   if (product.type === 'physical') return 'coming-soon';
   return 'in-stock';
+}
+
+// ✨ NEW: map category to path
+function getTabPathFromCategory(category: string): string {
+  switch (category) {
+    case 'Merch':
+      return 'merch';
+    case 'Music':
+      return 'music';
+    case 'Bundles':
+      return 'bundles';
+    case 'Backing Track':
+      return 'digital';
+    default:
+      return 'merch';
+  }
 }
 
 type ProductPageContentProps = {
@@ -27,10 +45,13 @@ type ProductPageContentProps = {
 };
 
 export default function ProductPageContent({ product }: ProductPageContentProps) {
-  const { addToCart } = useCart();
+  const { addToCart, removeFromCart, cartItems, setLastActionItem } = useCart();
   const [quantity, setQuantity] = useState<number>(1);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const isAlreadyInCart = cartItems.some((item) => item.id === product.id);
+  const stockStatus = getStockStatus(product);
+  const router = useRouter();
 
   useEffect(() => {
     if (product) {
@@ -52,8 +73,6 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
       </AppClientWrapper>
     );
   }
-
-  const stockStatus = getStockStatus(product);
 
   return (
     <AppClientWrapper>
@@ -106,24 +125,21 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
             </div>
 
             {product.type === 'physical' && (
-              <div className="product-quantity-wrapper mt-2">
-                <label className="text-sm font-medium mb-1">Quantity:</label>
-                <div className="flex items-center gap-2 mt-1">
-                  <button onClick={() => setQuantity((q) => Math.max(1, q - 1))} className="w-7 h-7 border border-[#dc9e63]/50 border-[0.5px] rounded-[2px] text-sm font-light flex items-center justify-center cursor-pointer">-</button>
-                  <span className="text-[13px] md:text-sm font-light">{quantity}</span>
-                  <button onClick={() => setQuantity((q) => q + 1)} className="w-7 h-7 border border-[#dc9e63]/50 border-[0.5px] rounded-[2px] text-sm font-light flex items-center justify-center cursor-pointer">+</button>
+              <>
+                <div className="product-quantity-wrapper mt-2">
+                  <label className="text-sm font-medium mb-1">Quantity:</label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <button onClick={() => setQuantity((q) => Math.max(1, q - 1))} className="w-7 h-7 border border-[#dc9e63]/50 rounded-[2px] text-sm font-light flex items-center justify-center cursor-pointer">-</button>
+                    <span className="text-[13px] md:text-sm font-light">{quantity}</span>
+                    <button onClick={() => setQuantity((q) => q + 1)} className="w-7 h-7 border border-[#dc9e63]/50 rounded-[2px] text-sm font-light flex items-center justify-center cursor-pointer">+</button>
+                  </div>
                 </div>
-              </div>
-            )}
 
-            {product.type === 'physical' && stockStatus && (
-  <div className="mt-1 text-xs font-light tracking-wide">
-    {stockStatus === 'in-stock' && <span className="text-green-300/70 italic">IN STOCK</span>}
-    {stockStatus === 'out-of-stock' && <span className="text-red-400/70 italic">OUT OF STOCK</span>}
-    {stockStatus === 'coming-soon' && <span className="text-orange-300/80 italic">COMING SOON</span>}
-    {stockStatus === 'pre-order' && <span className="text-sky-300/80 italic">PRE-ORDER</span>}
-  </div>
-)}
+                <div className="mt-1 text-xs font-light tracking-wide">
+                  <span className="text-orange-300/80 italic">COMING SOON</span>
+                </div>
+              </>
+            )}
 
             {product.description && (
               <div className="product-description mt-6 text-[#f8fcdc]/80 leading-relaxed text-sm whitespace-pre-line">
@@ -138,7 +154,8 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
 
             <div className="relative mt-6">
               {errorMessage && <CartErrorPopup message={errorMessage} />}
-              {stockStatus === 'coming-soon' ? (
+
+              {product.type === 'physical' ? (
                 <button
                   disabled
                   className="add-to-cart-button cursor-not-allowed opacity-50 bg-[#888] text-white"
@@ -146,20 +163,57 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                   Coming Soon
                 </button>
               ) : (
-                <button
-                  className="add-to-cart-button cursor-pointer"
-                  onClick={() => {
-                    const qty = product.type === 'digital' ? 1 : quantity;
-                    addToCart(product.id, qty);
-                    setErrorMessage(null);
-                  }}
-                >
-                  Add {quantity} to Cart
-                </button>
+               <button
+  className={`add-to-cart-button ${
+    isAlreadyInCart
+      ? 'bg-green-700/80 text-[#f8fcdc] cursor-pointer'
+      : 'cursor-pointer'
+  }`}
+  onClick={() => {
+    const cartActionItem: LastActionItem = {
+      item: {
+        id: product.id,
+        title: product.title,
+        subtitle: product.subtitle ?? '',
+        price: product.price,
+        image: product.image,
+        quantity: 1,
+        type: product.type,
+        weight: product.weight ?? 0,
+      },
+      action: isAlreadyInCart ? 'remove' : 'add',
+    };
+
+    // เคลียร์ popup เดิม เพื่อให้ re-render ทันทีแบบมี animation
+    setLastActionItem(null);
+
+    // หน่วงเบาๆ ให้ React มีเวลาหายใจ ก่อนเรา set ใหม่
+    setTimeout(() => {
+      if (isAlreadyInCart) {
+        removeFromCart(product.id);
+      } else {
+        addToCart(product.id, 1);
+        setErrorMessage(null);
+      }
+      setLastActionItem(cartActionItem);
+    }, 10); // 10ms คือความอดทนของ animation ต่อโลกใบนี้
+  }}
+>
+  {isAlreadyInCart ? '✔ Added to Cart' : 'Add to Cart'}
+</button>
               )}
             </div>
 
-            <Link href="/shop" className="back-to-shop-link mt-4 cursor-pointer">← Back to Shop</Link>
+            <button
+              className="back-to-shop-link mt-4 cursor-pointer text-left"
+              onClick={() => {
+                setLastActionItem(null);
+                const path = getTabPathFromCategory(product.category);
+                router.push(`/shop/${path}`);
+              }}
+            >
+              ← Back to Shop
+            </button>
           </div>
         </div>
 

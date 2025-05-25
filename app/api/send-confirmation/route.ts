@@ -18,15 +18,18 @@ interface CartItem {
 }
 
 const getDownloadFileForItem = (item: CartItem): string | null => {
-  const demoMap: Record<string, string> = {
-    'anomic-drums': '/demo/anomic-drums.pdf',
-    'jyy-guitars': '/demo/jyy-guitars.pdf',
-    'atlantic-guitar': '/demo/atlantic-guitar.wav',
-    'out-dark-drums': '/demo/out-dark-drums.wav',
-    'reddown-bass': '/demo/reddown-bass.wav',
-    // 👉 เพิ่มตามที่ต้องการ
+  const downloadMap: Record<string, string> = {
+    'anomic-drums': '/download/anomic-drums.wav',
+    'jyy-guitars': '/download/jyy-guitars.pdf',
+    'atlantic-guitar': '/download/atlantic-guitar.wav',
+    'out-dark-drums': '/download/out-dark-drums.wav',
+    'feign-guitars': '/download/feign-guitars.wav',
+    'dark-keys': '/download/dark-keys.wav',
+    'reddown-bass': '/download/reddown-bass.wav',
+    'quietness-bass': '/download/quietness-bass.wav',
   };
-  return demoMap[item.id] || null;
+
+  return downloadMap[item.id] || null;
 };
 
 export async function POST(req: NextRequest) {

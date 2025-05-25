@@ -9,6 +9,7 @@ import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useRouter } from 'next/navigation';
 import { getShippingZone } from '../../lib/shipping/zone-checker';
 import { allItems } from './allItems';
+import { subscribeToNewsletter } from '../../utils/newsletter';
 
 declare global {
   interface Window {
@@ -354,46 +355,60 @@ const shippingCost = isDigitalOnly ? 0 : shippingRate;
         });
 
         const result = await res.json();
-        if (result.error) {
-          setErrorMessage(result.error);
-        } else {
-          setSuccess(true);
-          clearCart();
+if (result.error) {
+  setErrorMessage(result.error);
+} else {
+  setSuccess(true);
+  clearCart();
 
-          await fetch('/api/send-confirmation', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    name: trimmedBilling.firstName,
-    email: trimmedBilling.email,
-    cartItems,
-    receiptUrl: result.receiptUrl,
-  }),
-});
+  await fetch('/api/send-confirmation', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: trimmedBilling.firstName,
+      email: trimmedBilling.email,
+      cartItems,
+      receiptUrl: result.receiptUrl,
+    }),
+  });
 
-          const saveRes = await fetch('/api/save-order', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    billingInfo: trimmedBilling,
-    shippingInfo: shipToDifferent ? trimmedShipping : trimmedBilling,
-    cartItems,
-    shippingMethod,
-    shippingZone,
-    shippingRate, 
-    email: trimmedBilling.email,
-  }),
-});
+  const saveRes = await fetch('/api/save-order', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      billingInfo: trimmedBilling,
+      shippingInfo: shipToDifferent ? trimmedShipping : trimmedBilling,
+      cartItems,
+      shippingMethod,
+      shippingZone,
+      shippingRate,
+      email: trimmedBilling.email,
+    }),
+  });
 
-const saveData = await saveRes.json();
+  const saveData = await saveRes.json();
 
-if (!saveRes.ok || !saveData.orderId) {
-  throw new Error('Failed to save order or missing order ID');
+  if (!saveRes.ok || !saveData.orderId) {
+    throw new Error('Failed to save order or missing order ID');
+  }
+
+  // ✅ เช็คว่าผู้ใช้ยินยอมรับอีเมลก่อน subscribe
+  if (consentMarketing) {
+    try {
+      await subscribeToNewsletter({
+        email: trimmedBilling.email,
+        firstName: trimmedBilling.firstName,
+        lastName: trimmedBilling.lastName,
+        country: trimmedBilling.country,
+      });
+    } catch (error) {
+      console.error('Subscription failed:', error);
+    }
+  }
+
+  // 🎯 Redirect พร้อม query
+  router.push(`/thank-you?email=${encodeURIComponent(trimmedBilling.email)}&id=${saveData.orderId}`);
 }
-
-// 🎯 Redirect พร้อม query
-router.push(`/thank-you?email=${encodeURIComponent(trimmedBilling.email)}&id=${saveData.orderId}`);
-        }
       } catch (err: any) {
         console.error('[🔥 API error]', err);
         setErrorMessage('Something went wrong. Please try again.');
