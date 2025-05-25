@@ -143,15 +143,73 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
             )}
 
             {product.description && (
-              <div className="product-description mt-6 text-[#f8fcdc]/80 leading-relaxed text-sm whitespace-pre-line">
-                {product.description.split('\n').map((line, idx) => {
-                  const trimmedLine = line.trim();
-                  if (trimmedLine === '') return <div key={idx} className="h-4" />;
-                  if (trimmedLine.startsWith('Please Note:')) return <p key={idx} className="italic text-[#f8fcdc]/50 mt-4">{line}</p>;
-                  return <p key={idx}>{line}</p>;
-                })}
-              </div>
-            )}
+  <div className="product-description mt-6 text-[#f8fcdc]/80 leading-relaxed text-sm whitespace-pre-line">
+    {product.description.split('\n').map((line, idx) => {
+      let trimmed = line.trim();
+
+      if (trimmed === '') return <div key={idx} className="h-4" />;
+
+      // For personal use only.
+      if (trimmed === 'For personal use only.') {
+        return (
+          <p key={idx}>
+            <em>For personal use only.</em>
+          </p>
+        );
+      }
+
+      // Terms & Conditions with <em> around entire line
+      if (trimmed.includes('Terms & Conditions')) {
+        const parts = trimmed.split('Terms & Conditions');
+        return (
+          <p key={idx}>
+            <em>
+              {parts[0]}
+              <a
+                href="/terms-and-conditions"
+                className="text-s text-[#dc9e63] hover:text-[#f8fcdc] cursor-pointer no-underline transition-colors duration-300"
+              >
+                Terms & Conditions
+              </a>
+              {parts[1]}
+            </em>
+          </p>
+        );
+      }
+
+      // auto-uppercase instruments
+      const instruments = ['drums', 'guitars', 'bass', 'keys', 'lead guitar'];
+      instruments.forEach((inst) => {
+        const regex = new RegExp(`\\b${inst}\\b`, 'gi');
+        trimmed = trimmed.replace(regex, inst.toUpperCase());
+      });
+
+      // bold inline
+      const parts = [];
+      let remaining = trimmed;
+      let match;
+      const boldRegex = /\*\*(.+?)\*\*/;
+
+      while ((match = boldRegex.exec(remaining)) !== null) {
+        const index = match.index;
+        if (index > 0) parts.push(remaining.slice(0, index));
+        parts.push(
+          <strong key={parts.length} className="text-[#f8fcdc]">
+            {match[1]}
+          </strong>
+        );
+        remaining = remaining.slice(index + match[0].length);
+      }
+
+      if (parts.length > 0) {
+        if (remaining) parts.push(remaining);
+        return <p key={idx}>{parts}</p>;
+      }
+
+      return <p key={idx}>{trimmed}</p>;
+    })}
+  </div>
+)}
 
             <div className="relative mt-6">
               {errorMessage && <CartErrorPopup message={errorMessage} />}

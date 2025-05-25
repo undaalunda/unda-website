@@ -1,4 +1,4 @@
-//TermsClientComponen.tsx
+//TermsClientComponents.tsx
 
 'use client';
 

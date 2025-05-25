@@ -296,7 +296,7 @@ export default function Navbar() {
     <Image
   src="/unda-alunda-header.png"
   alt="Unda Alunda Logo"
-  width={180}
+  width={200}
   height={50}
   quality={100} 
   priority

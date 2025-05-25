@@ -114,12 +114,115 @@ export const allItems: Product[] = [
   { id: 'sticker-book-bundle', title: 'DARK WONDERFUL WORLD', subtitle: 'STICKER & BOOK BUNDLE', category: 'Bundles', type: 'physical', price: { original: 84.80, sale: 67.84 }, tags: ['bundle', 'sticker', 'book'], image: '/dark-wonderful-world-sticker-&-book-bundle.png', url: '/product/sticker-book-bundle', bundleItems: ['cat-to-the-moon', 'musician-cats', 'audio-digipak', 'guitars-book'] },
 
   // Backing Tracks (digital = no weight)
-  { id: 'anomic-drums', title: 'ANOMIC', subtitle: 'DRUMS BACKING TRACK', category: 'Backing Track', type: 'digital', price: 7.95, tags: ['drums', 'track'], image: '/anomic-no-drums.jpg', url: '/product/anomic-drums' },
-  { id: 'jyy-guitars', title: 'JYY', subtitle: 'LEAD GUITAR BACKING TRACK', category: 'Backing Track', type: 'digital', price: 7.95, tags: ['guitars', 'track'], image: '/jyy-no-guitars.jpg', url: '/product/jyy-guitars' },
-  { id: 'atlantic-guitar', title: 'ATLANTIC', subtitle: 'GUITARS BACKING TRACK', category: 'Backing Track', type: 'digital', price: 8.95, tags: ['lead guitar', 'track'], image: '/atlantic-no-lead-guitar.jpg', url: '/product/atlantic-guitar' },
-  { id: 'out-dark-drums', title: 'OUT OF THE DARK', subtitle: 'DRUMS BACKING TRACK', category: 'Backing Track', type: 'digital', price: 11.95, tags: ['drums', 'track'], image: '/out-of-the-dark-no-drums.jpg', url: '/product/out-dark-drums' },
-  { id: 'feign-guitars', title: 'FEIGN', subtitle: 'GUITARS BACKING TRACK', category: 'Backing Track', type: 'digital', price: 11.95, tags: ['guitars', 'track'], image: '/feign-no-guitars.jpg', url: '/product/feign-guitars' },
-  { id: 'dark-keys', title: 'THE DARK', subtitle: 'KEYS BACKING TRACK', category: 'Backing Track', type: 'digital', price: 4.95, tags: ['keys', 'track'], image: '/the-dark-no-keys.jpg', url: '/product/dark-keys' },
-  { id: 'reddown-bass', title: 'RED DOWN', subtitle: 'BASS BACKING TRACK', category: 'Backing Track', type: 'digital', price: 7.95, tags: ['bass', 'track'], image: '/reddown-no-bass.jpg', url: '/product/reddown-bass' },
-  { id: 'quietness-bass', title: 'QUIETNESS', subtitle: 'BASS BACKING TRACK', category: 'Backing Track', type: 'digital', price: 7.95, tags: ['bass', 'track'], image: '/quietness-no-bass.jpg', url: '/product/quietness-bass' },
+{ id: 'anomic-drums', title: 'ANOMIC', subtitle: 'DRUMS BACKING TRACK', category: 'Backing Track', type: 'digital', price: 7.95, tags: ['drums', 'track'], image: '/anomic-no-drums.jpg', url: '/product/anomic-drums', description: `**ANOMIC – Drums Backing Track**
+High-resolution backing track without **drums**, perfect for practice, covers, or performances.
+
+• **Format:** WAV, 48 kHz / 24-bit
+• **Full-length**, professionally mixed
+• Compatible with all major DAWs
+
+**Mixed & Mastered by Atipoung Wanlua**
+
+For personal use only.
+See our Terms & Conditions for license details.
+
+**Copyright © 2025 Unda Alunda**` },
+
+{ id: 'jyy-guitars', title: 'JYY', subtitle: 'LEAD GUITAR BACKING TRACK', category: 'Backing Track', type: 'digital', price: 7.95, tags: ['guitars', 'track'], image: '/jyy-no-guitars.jpg', url: '/product/jyy-guitars', description: `**JYY – Lead Guitar Backing Track**
+High-resolution backing track without **lead guitar**, perfect for practice, covers, or performances.
+
+• **Format:** WAV, 48 kHz / 24-bit
+• **Full-length**, professionally mixed
+• Compatible with all major DAWs
+
+**Mixed & Mastered by Atipoung Wanlua**
+
+For personal use only.
+See our Terms & Conditions for license details.
+
+**Copyright © 2025 Unda Alunda**` },
+
+{ id: 'atlantic-guitar', title: 'ATLANTIC', subtitle: 'GUITARS BACKING TRACK', category: 'Backing Track', type: 'digital', price: 8.95, tags: ['lead guitar', 'track'], image: '/atlantic-no-lead-guitar.jpg', url: '/product/atlantic-guitar', description: `**ATLANTIC – Guitars Backing Track**
+High-resolution backing track without **guitars**, perfect for practice, covers, or performances.
+
+• **Format:** WAV, 48 kHz / 24-bit
+• **Full-length**, professionally mixed
+• Compatible with all major DAWs
+
+**Mixed & Mastered by Atipoung Wanlua**
+
+For personal use only.
+See our Terms & Conditions for license details.
+
+**Copyright © 2025 Unda Alunda**` },
+
+{ id: 'out-dark-drums', title: 'OUT OF THE DARK', subtitle: 'DRUMS BACKING TRACK', category: 'Backing Track', type: 'digital', price: 11.95, tags: ['drums', 'track'], image: '/out-of-the-dark-no-drums.jpg', url: '/product/out-dark-drums', description: `**OUT OF THE DARK – Drums Backing Track**
+High-resolution backing track without **drums**, perfect for practice, covers, or performances.
+
+• **Format:** WAV, 48 kHz / 24-bit
+• **Full-length**, professionally mixed
+• Compatible with all major DAWs
+
+**Mixed & Mastered by Atipoung Wanlua**
+
+For personal use only.
+See our Terms & Conditions for license details.
+
+**Copyright © 2025 Unda Alunda**` },
+
+{ id: 'feign-guitars', title: 'FEIGN', subtitle: 'GUITARS BACKING TRACK', category: 'Backing Track', type: 'digital', price: 11.95, tags: ['guitars', 'track'], image: '/feign-no-guitars.jpg', url: '/product/feign-guitars', description: `**FEIGN – Guitars Backing Track**
+High-resolution backing track without **guitars**, perfect for practice, covers, or performances.
+
+• **Format:** WAV, 48 kHz / 24-bit
+• **Full-length**, professionally mixed
+• Compatible with all major DAWs
+
+**Mixed & Mastered by Atipoung Wanlua**
+
+For personal use only.
+See our Terms & Conditions for license details.
+
+**Copyright © 2025 Unda Alunda**` },
+
+{ id: 'dark-keys', title: 'THE DARK', subtitle: 'KEYS BACKING TRACK', category: 'Backing Track', type: 'digital', price: 4.95, tags: ['keys', 'track'], image: '/the-dark-no-keys.jpg', url: '/product/dark-keys', description: `**THE DARK – Keys Backing Track**
+High-resolution backing track without **keys**, perfect for practice, covers, or performances.
+
+• **Format:** WAV, 48 kHz / 24-bit
+• **Full-length**, professionally mixed
+• Compatible with all major DAWs
+
+**Mixed & Mastered by Atipoung Wanlua**
+
+For personal use only.
+See our Terms & Conditions for license details.
+
+**Copyright © 2025 Unda Alunda**` },
+
+{ id: 'reddown-bass', title: 'RED DOWN', subtitle: 'BASS BACKING TRACK', category: 'Backing Track', type: 'digital', price: 7.95, tags: ['bass', 'track'], image: '/reddown-no-bass.jpg', url: '/product/reddown-bass', description: `**RED DOWN – Bass Backing Track**
+High-resolution backing track without **bass**, perfect for practice, covers, or performances.
+
+• **Format:** WAV, 48 kHz / 24-bit
+• **Full-length**, professionally mixed
+• Compatible with all major DAWs
+
+**Mixed & Mastered by Atipoung Wanlua**
+
+For personal use only.
+See our Terms & Conditions for license details.
+
+**Copyright © 2025 Unda Alunda**` },
+
+{ id: 'quietness-bass', title: 'QUIETNESS', subtitle: 'BASS BACKING TRACK', category: 'Backing Track', type: 'digital', price: 7.95, tags: ['bass', 'track'], image: '/quietness-no-bass.jpg', url: '/product/quietness-bass', description: `**QUIETNESS – Bass Backing Track**
+High-resolution backing track without **bass**, perfect for practice, covers, or performances.
+
+• **Format:** WAV, 48 kHz / 24-bit
+• **Full-length**, professionally mixed
+• Compatible with all major DAWs
+
+**Mixed & Mastered by Atipoung Wanlua**
+
+For personal use only.
+See our Terms & Conditions for license details.
+
+**Copyright © 2025 Unda Alunda**` }
 ];
