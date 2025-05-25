@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
 
 // ✅ FIX: ไม่ต้องระบุ type ตรงๆ แล้วมันจะหายบ้า
 export default async function ShopCategoryPage({ params }: any) {
-  const category = params.category?.toLowerCase();
+  const { category } = await params;
   if (!category || !categoryTitles[category]) notFound();
 
   return (

@@ -3,9 +3,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 import supabase from '../../../lib/supabase';
-import { createRealShipment } from '../../../lib/shipping/create-real-shipment';
 
-// 👇 ฟังก์ชันสร้าง shipment จริงจาก DHL (ใช้ test credentials)
+// 📦 ฟังก์ชัน DHL ใช้กับ physical เท่านั้น
 async function createDHLShipment({
   orderId,
   fullName,
@@ -18,7 +17,6 @@ async function createDHLShipment({
   country: string;
 }) {
   const endpoint = `https://express.api.dhl.com/mydhlapi/test/shipments`;
-
   const credentials = process.env.DHL_TRACKING_AUTH!;
   const plannedDate = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
     .toISOString()
@@ -55,11 +53,7 @@ async function createDHLShipment({
     packages: [
       {
         weight: 1,
-        dimensions: {
-          length: 10,
-          width: 10,
-          height: 5,
-        },
+        dimensions: { length: 10, width: 10, height: 5 },
       },
     ],
   };
@@ -75,9 +69,11 @@ async function createDHLShipment({
 
   const raw = await res.text();
   console.log('[📬 RAW DHL Shipment Response]', raw);
+
   try {
     const data = JSON.parse(raw);
     const tracking = data?.shipmentTrackingNumber;
+
     return {
       tracking_number: tracking,
       courier: 'dhl',
@@ -89,7 +85,7 @@ async function createDHLShipment({
     console.error('[🧨 JSON Parse Fail]', raw);
     return {
       tracking_number: null,
-      courier: 'dhl',
+      courier: null,
       tracking_url: '',
       estimated_delivery: '',
       label_url: '',
@@ -110,22 +106,46 @@ export async function POST(req: NextRequest) {
       email,
     } = body;
 
-    if (!billingInfo || !cartItems || !email || !shippingMethod || !shippingZone) {
+    if (!billingInfo || !cartItems || !email) {
       return NextResponse.json({ error: 'Missing required fields.' }, { status: 400 });
     }
 
     const finalShipping = shippingInfo || billingInfo;
-
-    // 👇 เปลี่ยนมาใช้ DHL จริง
+    const isDigitalOnly = cartItems.every((item: any) => item.type === 'digital');
     const orderId = `order-${uuidv4()}`;
-    const shipment = await createDHLShipment({
-      orderId,
-      fullName: `${finalShipping.firstName} ${finalShipping.lastName}`,
-      address: finalShipping.address,
-      country: finalShipping.country,
-    });
 
-    console.log('[🚚 DHL Shipment Result]', shipment);
+     // 🧠 ให้ TypeScript หายเหวี่ยง
+    let shipment: {
+      tracking_number: string | null;
+      courier: string | null;
+      tracking_url: string;
+      estimated_delivery: string;
+      label_url: string;
+    } = {
+      tracking_number: null,
+      courier: null,
+      tracking_url: '',
+      estimated_delivery: '',
+      label_url: '',
+    };
+    
+    if (!isDigitalOnly) {
+      if (!shippingMethod || !shippingZone) {
+        return NextResponse.json(
+          { error: 'Missing shipping info for physical items.' },
+          { status: 400 }
+        );
+      }
+
+      shipment = await createDHLShipment({
+        orderId,
+        fullName: `${finalShipping.firstName} ${finalShipping.lastName}`,
+        address: finalShipping.address,
+        country: finalShipping.country,
+      });
+
+      console.log('[🚚 DHL Shipment Result]', shipment);
+    }
 
     const itemAmount = cartItems.reduce((total: number, item: any) => {
       const price =
@@ -135,7 +155,7 @@ export async function POST(req: NextRequest) {
       return total + price * item.quantity;
     }, 0);
 
-    const amount = itemAmount + (shippingRate || 0);
+    const amount = itemAmount + (isDigitalOnly ? 0 : shippingRate || 0);
 
     const { data, error } = await supabase
       .from('Orders')
@@ -145,13 +165,13 @@ export async function POST(req: NextRequest) {
           amount,
           currency: 'usd',
           items: cartItems,
-          payment_status: 'succeeded',
+          payment_status: 'pending', // ✅ ให้ webhook มาอัปเดตทีหลัง
           created_at: new Date().toISOString(),
           tracking_number: shipment.tracking_number,
           courier: shipment.courier,
-          shipping_zone: shippingZone,
-          shipping_method: shippingMethod,
-          shipping_rate: shippingRate || 0,
+          shipping_zone: isDigitalOnly ? null : shippingZone,
+          shipping_method: isDigitalOnly ? null : shippingMethod,
+          shipping_rate: isDigitalOnly ? null : shippingRate || 0,
         },
       ])
       .select()

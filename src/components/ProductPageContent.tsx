@@ -3,6 +3,7 @@
 'use client';
 
 import { allItems } from '@/components/allItems';
+import React from 'react';
 import type { LastActionItem } from '@/context/CartContext';
 import type { Product } from '@/components/allItems';
 import { useRouter } from 'next/navigation';
@@ -12,6 +13,7 @@ import { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import CartErrorPopup from '@/components/CartErrorPopup';
 import AppClientWrapper from '@/components/AppClientWrapper';
+
 import ProductSchema from '@/components/ProductSchema';
 
 
@@ -147,9 +149,22 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
     {product.description.split('\n').map((line, idx) => {
       let trimmed = line.trim();
 
+      // spacing
       if (trimmed === '') return <div key={idx} className="h-4" />;
 
-      // For personal use only.
+      // PHYSICAL products
+      if (product.type === 'physical') {
+        if (trimmed.startsWith('Please Note:')) {
+          return (
+            <p key={idx} className="italic text-[#f8fcdc]/50 mt-4">
+              {line}
+            </p>
+          );
+        }
+        return <p key={idx}>{line}</p>;
+      }
+
+      // DIGITAL products
       if (trimmed === 'For personal use only.') {
         return (
           <p key={idx}>
@@ -158,7 +173,6 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
         );
       }
 
-      // Terms & Conditions with <em> around entire line
       if (trimmed.includes('Terms & Conditions')) {
         const parts = trimmed.split('Terms & Conditions');
         return (
@@ -177,32 +191,52 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
         );
       }
 
-      // auto-uppercase instruments
+      if (trimmed.startsWith('Copyright')) {
+        return (
+          <p key={idx} className="text-xs text-[#f8fcdc]/70 mt-2">
+            <strong>{trimmed}</strong>
+          </p>
+        );
+      }
+
+      // UPPERCASE instruments
       const instruments = ['drums', 'guitars', 'bass', 'keys', 'lead guitar'];
       instruments.forEach((inst) => {
         const regex = new RegExp(`\\b${inst}\\b`, 'gi');
         trimmed = trimmed.replace(regex, inst.toUpperCase());
       });
 
-      // bold inline
-      const parts = [];
-      let remaining = trimmed;
+      // inline BOLD logic (skip "Full-length")
+      const parts: Array<string | React.ReactNode> = [];
+      const boldRegex = /\*\*(.+?)\*\*/g;
+      let lastIndex = 0;
       let match;
-      const boldRegex = /\*\*(.+?)\*\*/;
 
-      while ((match = boldRegex.exec(remaining)) !== null) {
-        const index = match.index;
-        if (index > 0) parts.push(remaining.slice(0, index));
+      while ((match = boldRegex.exec(trimmed)) !== null) {
+        const start = match.index;
+        const end = boldRegex.lastIndex;
+        if (start > lastIndex) {
+          parts.push(trimmed.slice(lastIndex, start));
+        }
+
+        const boldText = match[1];
         parts.push(
-          <strong key={parts.length} className="text-[#f8fcdc]">
-            {match[1]}
-          </strong>
+          boldText.toLowerCase().includes('full-length') ? (
+            boldText
+          ) : (
+            <strong key={parts.length} className="text-[#f8fcdc]">
+              {boldText}
+            </strong>
+          )
         );
-        remaining = remaining.slice(index + match[0].length);
+
+        lastIndex = end;
       }
 
       if (parts.length > 0) {
-        if (remaining) parts.push(remaining);
+        if (lastIndex < trimmed.length) {
+          parts.push(trimmed.slice(lastIndex));
+        }
         return <p key={idx}>{parts}</p>;
       }
 

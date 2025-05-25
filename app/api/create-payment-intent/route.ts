@@ -3,7 +3,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+const isLive = process.env.NODE_ENV === 'production';
+
+const stripeSecretKey = isLive
+  ? process.env.STRIPE_SECRET_KEY_LIVE
+  : process.env.STRIPE_SECRET_KEY_TEST;
+
 const recaptchaSecretKey = process.env.RECAPTCHA_SECRET_KEY;
 
 if (!stripeSecretKey) {
