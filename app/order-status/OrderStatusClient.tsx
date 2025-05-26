@@ -18,9 +18,10 @@ type Order = {
 };
 
 export default function OrderStatusClient() {
-  const params = useSearchParams();
-  const email = params.get('email');
-  const id = params.get('id');
+  const searchParams = useSearchParams();
+
+  const email = searchParams?.get('email') || '';
+  const id = searchParams?.get('id') || '';
 
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);

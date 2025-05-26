@@ -7,8 +7,9 @@ import { useEffect, useState } from 'react';
 
 export default function ThankYouClient() {
   const params = useSearchParams();
-  const email = params.get('email');
-  const id = params.get('id');
+
+  const email = params?.get('email') || '';
+  const id = params?.get('id') || '';
 
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -22,7 +23,10 @@ export default function ThankYouClient() {
     }
 
     fetch(`/api/order-status?email=${email}&id=${id}`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error('Order not found');
+        return res.json();
+      })
       .then((data) => {
         setData(data.order);
         setLoading(false);

@@ -40,7 +40,7 @@ export default function CartSuccessPopup() {
   useEffect(() => {
     const pagesToSuppressPopup = ['/cart', '/checkout', '/shop'];
 
-    if (pagesToSuppressPopup.includes(pathname)) {
+    if (pagesToSuppressPopup.includes(pathname as string)) {
       if (lastActionItem) {
         setLastActionItem(null);
       }
