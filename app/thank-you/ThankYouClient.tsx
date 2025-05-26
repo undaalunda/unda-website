@@ -7,37 +7,62 @@ import { useEffect, useState } from 'react';
 
 export default function ThankYouClient() {
   const params = useSearchParams();
-
   const email = params?.get('email') || '';
-  const id = params?.get('id') || '';
+  const orderId = params?.get('orderId') || '';
 
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!email || !id) {
+    if (!email || !orderId) {
       setError('Missing email or order ID.');
       setLoading(false);
       return;
     }
 
-    fetch(`/api/order-status?email=${email}&id=${id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error('Order not found');
-        return res.json();
-      })
-      .then((data) => {
-        setData(data.order);
-        setLoading(false);
-      })
-      .catch(() => {
+    let attempts = 0;
+    const maxAttempts = 12;
+
+    const pollOrderStatus = async () => {
+      try {
+        console.log(`🔁 Attempt ${attempts + 1}: Fetching order for`, { email, orderId });
+
+        const res = await fetch(`/api/order-status?email=${email}&id=${orderId}`);
+        const json = await res.json();
+
+        console.log('📦 Response:', json);
+
+        const status = json.order?.payment_status;
+
+        if (!status) throw new Error('No payment_status in response');
+
+        if (status === 'succeeded') {
+          console.log('✅ Order is succeeded!');
+          setData(json.order);
+          setLoading(false);
+        } else {
+          console.warn(`⏳ Still pending (status = ${status})`);
+          if (attempts < maxAttempts) {
+            attempts++;
+            setTimeout(pollOrderStatus, 1500);
+          } else {
+            console.warn('⚠️ Max retry attempts reached. Showing current order.');
+            setData(json.order);
+            setLoading(false);
+          }
+        }
+      } catch (err: any) {
+        console.error('💥 Fetch error:', err);
         setError('Failed to fetch order.');
         setLoading(false);
-      });
-  }, [email, id]);
+      }
+    };
 
-  if (loading) return <div className="pt-44 text-center">Loading...</div>;
+    pollOrderStatus();
+  }, [email, orderId]);
+
+  if (loading) return <div className="pt-44 text-center">Processing your order...</div>;
   if (error || !data) return <div className="pt-44 text-center text-red-400">{error}</div>;
 
   return (
@@ -45,7 +70,7 @@ export default function ThankYouClient() {
       <h1 className="text-3xl font-bold mb-6 text-[#dc9e63]">Thank you for your order!</h1>
       <div className="bg-[#1a0000]/60 border border-[#f8fcdc]/20 p-6 rounded-md space-y-3">
         <p><strong>Email:</strong> <span className="text-[#f8fcdc]/50">{data.email}</span></p>
-        <p><strong>Order ID:</strong> <span className="text-[#f8fcdc]/50">{id}</span></p>
+        <p><strong>Order ID:</strong> <span className="text-[#f8fcdc]/50">{orderId}</span></p>
         <p><strong>Date:</strong> <span className="text-[#f8fcdc]/50">{new Date(data.created_at).toLocaleString()}</span></p>
         <p><strong>Status:</strong> <span className="text-[#f8fcdc]/50">{data.payment_status}</span></p>
         <p><strong>Amount:</strong> <span className="text-[#f8fcdc]/50">${data.amount.toFixed(2)}</span></p>

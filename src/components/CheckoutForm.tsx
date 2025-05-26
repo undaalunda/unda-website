@@ -342,19 +342,44 @@ const shippingCost = isDigitalOnly ? 0 : shippingRate;
       try {
         const amountToCharge = Math.round((cartTotal + shippingCost) * 100);
 
-        const res = await fetch('/api/create-payment-intent', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            paymentMethodId: pm.id,
-            amount: amountToCharge,
-            token,
-            email: trimmedBilling.email,
-            marketing: consentMarketing,
-          }),
-        });
+        // ✅ 1. สร้าง order โดยเรียก API ฝั่ง server
+  const orderRes = await fetch('/api/create-order', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email: trimmedBilling.email,
+      amount: amountToCharge,
+      cartItems,
+      shippingMethod,
+      shippingZone,
+    }),
+  });
 
-        const result = await res.json();
+  const orderJson = await orderRes.json();
+  const orderId = orderJson.orderId;
+
+  if (!orderId) {
+    setErrorMessage('❌ Failed to create order.');
+    setLoading(false);
+    return;
+  }
+
+  // ✅ 2. ส่ง orderId เข้า Stripe Payment Intent
+  const res = await fetch('/api/create-payment-intent', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      paymentMethodId: pm.id,
+      amount: amountToCharge,
+      token,
+      email: trimmedBilling.email,
+      marketing: consentMarketing,
+      orderId, // ✅ แนบ orderId
+    }),
+  });
+
+const result = await res.json(); // ✅ ไม่มีขีดแดงแล้ว
+
 if (result.error) {
   setErrorMessage(result.error);
 } else {
@@ -407,7 +432,7 @@ if (result.error) {
   }
 
   // 🎯 Redirect พร้อม query
-  router.push(`/thank-you?email=${encodeURIComponent(trimmedBilling.email)}&id=${saveData.orderId}`);
+  router.push(`/thank-you?email=${encodeURIComponent(trimmedBilling.email)}&orderId=${orderId}`);
 }
       } catch (err: any) {
         console.error('[🔥 API error]', err);

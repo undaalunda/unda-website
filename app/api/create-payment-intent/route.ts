@@ -48,11 +48,18 @@ async function verifyCaptcha(token: string, ip?: string) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { paymentMethodId, amount, token, email = 'unknown@example.com', marketing = false } = body;
+    const {
+      paymentMethodId,
+      amount,
+      token,
+      email = 'unknown@example.com',
+      marketing = false,
+      orderId,
+    } = body;
 
-    if (!paymentMethodId || !amount || !token) {
+    if (!paymentMethodId || !amount || !token || !orderId) {
       return NextResponse.json(
-        { error: 'Missing paymentMethodId, amount, or captcha token.' },
+        { error: 'Missing required fields: paymentMethodId, amount, token, or orderId.' },
         { status: 400 }
       );
     }
@@ -96,6 +103,7 @@ export async function POST(req: NextRequest) {
         marketing_consent: marketing ? 'yes' : 'no',
         source: 'UndaAlundaStore',
         created_from: 'create-payment-intent-endpoint',
+        id: orderId, // 🧨 THE MISSING PIECE
       },
       expand: ['latest_charge'],
     });

@@ -5,7 +5,6 @@ import Stripe from 'stripe'
 import { Readable } from 'stream'
 import supabase from '../../../../lib/supabase'
 
-// 🧽 แปลง Readable stream เป็น Buffer
 async function readStreamToBuffer(stream: Readable): Promise<Buffer> {
   const chunks: Uint8Array[] = []
   for await (const chunk of stream) {
@@ -14,12 +13,10 @@ async function readStreamToBuffer(stream: Readable): Promise<Buffer> {
   return Buffer.concat(chunks)
 }
 
-// 🐍 สร้าง Stripe instance
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_TEST!, {
   apiVersion: '2024-04-10' as Stripe.LatestApiVersion,
 })
 
-// 🎯 Secret สำหรับตรวจ webhook
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET_TEST!
 
 export async function POST(req: NextRequest) {
@@ -34,48 +31,64 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: err.message }, { status: 400 })
   }
 
-  console.log('📬 Event received:', event.type)
+  console.log('📬 Received event:', event.type)
+  console.log('🧠 Full payload:', JSON.stringify(event, null, 2))
 
-  if (event.type === 'payment_intent.succeeded') {
-    const paymentIntent = event.data.object as Stripe.PaymentIntent
-    const email = paymentIntent.metadata?.email
+  // 🎯 Handle payment success events
+  if (event.type === 'payment_intent.succeeded' || event.type === 'charge.succeeded') {
+    const object = event.data.object as any
+    const metadata = object.metadata
+
+    const email = metadata?.email
+    const orderId = metadata?.id
 
     console.log('📩 Email from metadata:', email)
+    console.log('🧾 Order ID from metadata:', orderId)
 
-    if (!email) {
-      console.warn('⚠️ No email in metadata')
+    if (!email || !orderId) {
+      console.warn('⚠️ Missing email or order ID in metadata')
       return NextResponse.json({ received: true })
     }
 
+    // 🧘 Delay a bit for consistency
+    await new Promise((r) => setTimeout(r, 1000))
+
+    console.log('🔍 Looking for order with:', { email, orderId })
+
     const { data: orders, error: fetchError } = await supabase
       .from('Orders')
-      .select('id')
+      .select('id, payment_status')
       .eq('email', email)
-      .eq('payment_status', 'pending')
-      .order('created_at', { ascending: false })
+      .eq('id', orderId)
       .limit(1)
 
     if (fetchError) {
-      console.error('❌ Error fetching orders:', fetchError.message)
+      console.error('❌ Error fetching order:', fetchError.message)
+      return NextResponse.json({ received: true })
     }
 
-    console.log('🧾 Orders fetched:', orders?.length, orders)
-
     const order = orders?.[0]
-    if (order) {
+
+    if (!order) {
+      console.warn('🚫 Order not found with matching email + id')
+    } else if (order.payment_status === 'succeeded') {
+      console.log('🟢 Order already marked as succeeded. Skipping update.')
+    } else {
+      console.log('✏️ Attempting to update order status to succeeded...')
+
       const { error: updateError } = await supabase
         .from('Orders')
         .update({ payment_status: 'succeeded' })
         .eq('id', order.id)
 
       if (updateError) {
-        console.error('❌ Error updating order status:', updateError.message)
+        console.error('❌ Error updating order:', updateError.message)
       } else {
-        console.log(`✅ Updated order ${order.id} to succeeded`)
+        console.log(`✅ Successfully updated order ${order.id} to succeeded`)
       }
-    } else {
-      console.warn('⚠️ No pending order found for email:', email)
     }
+  } else {
+    console.log(`ℹ️ Ignoring event type: ${event.type}`)
   }
 
   return NextResponse.json({ received: true })
