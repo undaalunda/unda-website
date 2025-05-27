@@ -1,4 +1,4 @@
-//pages/api/stripe/webhook.ts
+// /pages/api/stripe/webhook.ts
 
 import { buffer } from 'micro';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -11,13 +11,14 @@ export const config = {
   },
 };
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_TEST!, {
-  apiVersion: '2024-04-10' as Stripe.LatestApiVersion,
-});
-
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET_TEST!;
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  // ✅ ใส่ new Stripe ใน handler เพื่อไม่ให้มันรันตอน build
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: '2024-04-10' as Stripe.LatestApiVersion,
+  });
+
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET_TEST!;
+
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).end('Method Not Allowed');
@@ -52,7 +53,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.json({ received: true });
     }
 
-    await new Promise((r) => setTimeout(r, 3000)); // just in case data propagation lags
+    // เผื่อข้อมูลยัง propagate ไม่ทัน
+    await new Promise((r) => setTimeout(r, 3000));
 
     const { data: orders, error: fetchError } = await supabase
       .from('Orders')
