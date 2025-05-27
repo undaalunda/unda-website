@@ -39,34 +39,48 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (event.type === 'payment_intent.succeeded' || event.type === 'charge.succeeded') {
     const object = event.data.object as any;
-    const metadata = object.metadata;
+    const metadata = object.metadata || {};
 
     const email = metadata?.email;
     const orderId = metadata?.id;
+
+    console.log('🔍 Metadata:', metadata);
+    console.log('📨 email:', email, '| 🧾 orderId:', orderId);
 
     if (!email || !orderId) {
       console.warn('⚠️ Missing email or order ID in metadata');
       return res.json({ received: true });
     }
 
-    await new Promise((r) => setTimeout(r, 3000));
+    await new Promise((r) => setTimeout(r, 3000)); // just in case data propagation lags
 
-    const { data: orders } = await supabase
+    const { data: orders, error: fetchError } = await supabase
       .from('Orders')
       .select()
       .eq('email', email)
       .eq('id', orderId)
       .limit(1);
 
+    if (fetchError) {
+      console.error('❌ Supabase fetch error:', fetchError.message);
+      return res.json({ received: true });
+    }
+
     const order = orders?.[0];
+    console.log('📦 Fetched order from Supabase:', order);
 
     if (!order) {
-      console.warn('🚫 Order not found');
+      console.warn('🚫 Order not found in Supabase');
     } else if (order.payment_status === 'succeeded') {
-      console.log('🟢 Already succeeded.');
+      console.log('🟢 Already marked as succeeded.');
     } else {
       const updateData: any = { payment_status: 'succeeded' };
-      if (!order.shipping_method && !order.tracking_number) updateData.status = 'paid';
+
+      if (!order.shipping_method && !order.tracking_number) {
+        updateData.status = 'paid';
+      }
+
+      console.log('🧠 Will update with:', updateData);
 
       const { error: updateError } = await supabase
         .from('Orders')
@@ -76,9 +90,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (updateError) {
         console.error('❌ Failed to update order:', updateError.message);
       } else {
-        console.log(`✅ Order ${order.id} updated`);
+        console.log(`✅ Order ${order.id} updated with`, updateData);
       }
     }
+  } else {
+    console.log('🙅‍♀️ Ignored event type:', event.type);
   }
 
   res.json({ received: true });
