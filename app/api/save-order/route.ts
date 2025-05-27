@@ -67,7 +67,7 @@ async function createDHLShipment({
   });
 
   const raw = await res.text();
-  console.log('[\ud83d\udce8 RAW DHL Shipment Response]', raw);
+  console.log('[📨 RAW DHL Shipment Response]', raw);
 
   try {
     const data = JSON.parse(raw);
@@ -85,7 +85,7 @@ async function createDHLShipment({
         : null,
     };
   } catch (err) {
-    console.error('[\ud83e\udde8 JSON Parse Fail]', raw);
+    console.error('[🪨 JSON Parse Fail]', raw);
     return {
       tracking_number: null,
       courier: null,
@@ -116,36 +116,37 @@ export async function POST(req: NextRequest) {
 
     const finalShipping = shippingInfo || billingInfo;
     const isDigitalOnly = cartItems.every((cartItem: any) => {
-  const product = allItems.find(p => p.id === cartItem.id);
-  if (!product) {
-    console.warn('[⚠️ NOT FOUND IN allItems]', cartItem.id);
-    return false;
-  }
-  return product.type === 'digital';
-});
+      const product = allItems.find(p => p.id === cartItem.id);
+      if (!product) {
+        console.warn('[⚠️ NOT FOUND IN allItems]', cartItem.id);
+        return false;
+      }
+      return product.type === 'digital';
+    });
 
-    const amount = cartItems.reduce((total: number, cartItem: any) => {
-      const product = allItems.find((p) => p.id === cartItem.id);
-      if (!product) return total;
-      const price =
-        typeof product.price === 'number' ? product.price : product.price.sale;
-      return total + price;
-    }, 0);
+    const amount = Math.round(
+      cartItems.reduce((total: number, cartItem: any) => {
+        const product = allItems.find((p) => p.id === cartItem.id);
+        if (!product) return total;
+        const price =
+          typeof product.price === 'number' ? product.price : product.price.sale;
+        return total + price;
+      }, 0) * 100
+    );
 
     let shipmentResult: {
-  tracking_number: string | null;
-  courier: string | null;
-  tracking_url: string | null;
-  estimated_delivery: string | null;
-  label_url: string | null;
-} = {
-  tracking_number: null,
-  courier: null,
-  tracking_url: null,
-  estimated_delivery: null,
-  label_url: null,
-};
-
+      tracking_number: string | null;
+      courier: string | null;
+      tracking_url: string | null;
+      estimated_delivery: string | null;
+      label_url: string | null;
+    } = {
+      tracking_number: null,
+      courier: null,
+      tracking_url: null,
+      estimated_delivery: null,
+      label_url: null,
+    };
 
     if (!isDigitalOnly) {
       if (!shippingMethod || !shippingZone) {
@@ -162,7 +163,7 @@ export async function POST(req: NextRequest) {
         country: finalShipping.country,
       });
 
-      console.log('[\ud83d\ude9a DHL Shipment Result]', shipmentResult);
+      console.log('[🚚 DHL Shipment Result]', shipmentResult);
     }
 
     const updateData = {
@@ -180,7 +181,7 @@ export async function POST(req: NextRequest) {
       status: isDigitalOnly ? 'paid' : 'pending',
     };
 
-    console.log('[\ud83d\udce6 Updating order in Supabase]', updateData);
+    console.log('[📦 Updating order in Supabase]', updateData);
 
     const { error } = await supabase
       .from('Orders')
@@ -188,7 +189,7 @@ export async function POST(req: NextRequest) {
       .eq('id', orderId);
 
     if (error) {
-      console.error('\u274c Supabase update error:', error.message);
+      console.error('❌ Supabase update error:', error.message);
       return NextResponse.json({ error: 'Failed to update order in DB' }, { status: 500 });
     }
 
@@ -198,7 +199,7 @@ export async function POST(req: NextRequest) {
       orderId,
     });
   } catch (err: any) {
-    console.error('\ud83d\udd25 Unexpected error in save-order:', err.message);
+    console.error('🔥 Unexpected error in save-order:', err.message);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

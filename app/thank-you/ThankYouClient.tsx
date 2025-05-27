@@ -78,7 +78,7 @@ export default function ThankYouClient() {
         <p><strong>Order ID:</strong> <span className="text-[#f8fcdc]/50">{orderId}</span></p>
         <p><strong>Date:</strong> <span className="text-[#f8fcdc]/50">{new Date(data.created_at).toLocaleString()}</span></p>
         <p><strong>Status:</strong> <span className="text-[#f8fcdc]/50">{data.payment_status}</span></p>
-        <p><strong>Amount:</strong> <span>${data.amount.toFixed(2)}</span></p>
+        <p><strong>Amount:</strong> ${(data.amount / 100).toFixed(2)}</p>
         <p><strong>Shipping Method:</strong> <span className="text-[#f8fcdc]/50">{data.shipping_method || 'N/A'}</span></p>
         <p><strong>Shipping Zone:</strong> <span className="text-[#f8fcdc]/50">{data.shipping_zone || 'N/A'}</span></p>
 

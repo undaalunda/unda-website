@@ -1,38 +1,24 @@
-// pages/api/stripe/webhook.ts
-
-import { buffer } from 'micro';
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest } from 'next/server';
 import Stripe from 'stripe';
-import supabase from '../../../lib/supabase';
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+import supabase from '../../../../lib/supabase';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_TEST!, {
-   apiVersion: '2024-04-10' as Stripe.LatestApiVersion,
+  apiVersion: '2024-04-10' as Stripe.LatestApiVersion,
 });
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET_TEST!;
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
-    return res.status(405).end('Method Not Allowed');
-  }
-
-  const buf = await buffer(req);
-  const sig = req.headers['stripe-signature'] as string;
+export async function POST(req: NextRequest) {
+  const rawBody = await req.text();
+  const signature = req.headers.get('stripe-signature') as string;
 
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(buf, sig, webhookSecret);
+    event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
   } catch (err: any) {
     console.error('❌ Webhook signature verification failed:', err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
+    return new Response(`Webhook Error: ${err.message}`, { status: 400 });
   }
 
   console.log('📬 Received event:', event.type);
@@ -46,10 +32,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (!email || !orderId) {
       console.warn('⚠️ Missing email or order ID in metadata');
-      return res.json({ received: true });
+      return new Response(JSON.stringify({ received: true }), { status: 200 });
     }
 
-    await new Promise((r) => setTimeout(r, 2000)); // wait for Supabase consistency
+    await new Promise((r) => setTimeout(r, 3000)); // wait for Supabase consistency
 
     const { data: orders, error: fetchError } = await supabase
       .from('Orders')
@@ -83,5 +69,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   }
 
-  res.json({ received: true });
+  return new Response(JSON.stringify({ received: true }), { status: 200 });
 }
