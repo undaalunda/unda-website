@@ -81,7 +81,7 @@ export const allItems: Product[] = [
   3) Consonance
   4) Out of the Dark
   5) Can’t Feel My Face
-  6) eign
+  6) Feign
   7) Dark Wonderful World
   8) Quietness
 

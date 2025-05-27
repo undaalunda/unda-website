@@ -13,6 +13,7 @@ export default function ThankYouClient() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [attempts, setAttempts] = useState(0);
 
   useEffect(() => {
     if (!email || !orderId) {
@@ -21,33 +22,35 @@ export default function ThankYouClient() {
       return;
     }
 
-    let attempts = 0;
     const maxAttempts = 12;
+    const delay = 1500;
 
-    const pollOrderStatus = async () => {
+    const poll = async () => {
       try {
-        console.log(`🔁 Attempt ${attempts + 1}: Fetching order for`, { email, orderId });
+        console.log(`🔁 Polling Attempt ${attempts + 1} for order:`, { email, orderId });
 
-        const res = await fetch(`/api/order-status?email=${email}&id=${orderId}`);
+        const res = await fetch(`/api/order-status?email=${email}&id=${orderId}`, {
+          cache: 'no-store',
+        });
+
         const json = await res.json();
-
-        console.log('📦 Response:', json);
-
         const status = json.order?.payment_status;
 
         if (!status) throw new Error('No payment_status in response');
 
         if (status === 'succeeded') {
-          console.log('✅ Order is succeeded!');
+          console.log('✅ Order succeeded.');
           setData(json.order);
           setLoading(false);
         } else {
-          console.warn(`⏳ Still pending (status = ${status})`);
-          if (attempts < maxAttempts) {
-            attempts++;
-            setTimeout(pollOrderStatus, 1500);
+          console.log(`⏳ Still pending (status = ${status})`);
+
+          if (attempts < maxAttempts - 1) {
+            setTimeout(() => {
+              setAttempts((a) => a + 1);
+            }, delay);
           } else {
-            console.warn('⚠️ Max retry attempts reached. Showing current order.');
+            console.warn('⚠️ Max retry attempts reached. Showing latest data.');
             setData(json.order);
             setLoading(false);
           }
@@ -59,8 +62,10 @@ export default function ThankYouClient() {
       }
     };
 
-    pollOrderStatus();
-  }, [email, orderId]);
+    const timeout = setTimeout(poll, delay);
+
+    return () => clearTimeout(timeout);
+  }, [attempts, email, orderId]);
 
   if (loading) return <div className="pt-44 text-center">Processing your order...</div>;
   if (error || !data) return <div className="pt-44 text-center text-red-400">{error}</div>;
@@ -73,7 +78,7 @@ export default function ThankYouClient() {
         <p><strong>Order ID:</strong> <span className="text-[#f8fcdc]/50">{orderId}</span></p>
         <p><strong>Date:</strong> <span className="text-[#f8fcdc]/50">{new Date(data.created_at).toLocaleString()}</span></p>
         <p><strong>Status:</strong> <span className="text-[#f8fcdc]/50">{data.payment_status}</span></p>
-        <p><strong>Amount:</strong> <span className="text-[#f8fcdc]/50">${data.amount.toFixed(2)}</span></p>
+        <p><strong>Amount:</strong> <span>${data.amount.toFixed(2)}</span></p>
         <p><strong>Shipping Method:</strong> <span className="text-[#f8fcdc]/50">{data.shipping_method || 'N/A'}</span></p>
         <p><strong>Shipping Zone:</strong> <span className="text-[#f8fcdc]/50">{data.shipping_zone || 'N/A'}</span></p>
 

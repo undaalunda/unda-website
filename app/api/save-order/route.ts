@@ -1,10 +1,9 @@
 // app/api/save-order/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
-import { v4 as uuidv4 } from 'uuid';
 import supabase from '../../../lib/supabase';
+import { allItems } from '../../../src/components/allItems'; // 🧠 ใช้คำนวณราคาและเช็ค digital
 
-// 📦 ฟังก์ชัน DHL ใช้กับ physical เท่านั้น
 async function createDHLShipment({
   orderId,
   fullName,
@@ -68,27 +67,31 @@ async function createDHLShipment({
   });
 
   const raw = await res.text();
-  console.log('[📬 RAW DHL Shipment Response]', raw);
+  console.log('[\ud83d\udce8 RAW DHL Shipment Response]', raw);
 
   try {
     const data = JSON.parse(raw);
     const tracking = data?.shipmentTrackingNumber;
 
     return {
-      tracking_number: tracking,
-      courier: 'dhl',
-      tracking_url: `https://track.dhl.com/${tracking}`,
-      estimated_delivery: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toDateString(),
-      label_url: 'https://fake-labels.undaalunda.com/' + tracking + '.pdf',
+      tracking_number: tracking || null,
+      courier: tracking ? 'dhl' : null,
+      tracking_url: tracking ? `https://track.dhl.com/${tracking}` : null,
+      estimated_delivery: tracking
+        ? new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toDateString()
+        : null,
+      label_url: tracking
+        ? `https://fake-labels.undaalunda.com/${tracking}.pdf`
+        : null,
     };
   } catch (err) {
-    console.error('[🧨 JSON Parse Fail]', raw);
+    console.error('[\ud83e\udde8 JSON Parse Fail]', raw);
     return {
       tracking_number: null,
       courier: null,
-      tracking_url: '',
-      estimated_delivery: '',
-      label_url: '',
+      tracking_url: null,
+      estimated_delivery: null,
+      label_url: null,
     };
   }
 }
@@ -104,31 +107,46 @@ export async function POST(req: NextRequest) {
       shippingZone,
       shippingRate,
       email,
+      orderId,
     } = body;
 
-    if (!billingInfo || !cartItems || !email) {
+    if (!billingInfo || !cartItems || !email || !orderId) {
       return NextResponse.json({ error: 'Missing required fields.' }, { status: 400 });
     }
 
     const finalShipping = shippingInfo || billingInfo;
-    const isDigitalOnly = cartItems.every((item: any) => item.type === 'digital');
-    const orderId = `order-${uuidv4()}`;
+    const isDigitalOnly = cartItems.every((cartItem: any) => {
+  const product = allItems.find(p => p.id === cartItem.id);
+  if (!product) {
+    console.warn('[⚠️ NOT FOUND IN allItems]', cartItem.id);
+    return false;
+  }
+  return product.type === 'digital';
+});
 
-     // 🧠 ให้ TypeScript หายเหวี่ยง
-    let shipment: {
-      tracking_number: string | null;
-      courier: string | null;
-      tracking_url: string;
-      estimated_delivery: string;
-      label_url: string;
-    } = {
-      tracking_number: null,
-      courier: null,
-      tracking_url: '',
-      estimated_delivery: '',
-      label_url: '',
-    };
-    
+    const amount = cartItems.reduce((total: number, cartItem: any) => {
+      const product = allItems.find((p) => p.id === cartItem.id);
+      if (!product) return total;
+      const price =
+        typeof product.price === 'number' ? product.price : product.price.sale;
+      return total + price;
+    }, 0);
+
+    let shipmentResult: {
+  tracking_number: string | null;
+  courier: string | null;
+  tracking_url: string | null;
+  estimated_delivery: string | null;
+  label_url: string | null;
+} = {
+  tracking_number: null,
+  courier: null,
+  tracking_url: null,
+  estimated_delivery: null,
+  label_url: null,
+};
+
+
     if (!isDigitalOnly) {
       if (!shippingMethod || !shippingZone) {
         return NextResponse.json(
@@ -137,58 +155,50 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      shipment = await createDHLShipment({
+      shipmentResult = await createDHLShipment({
         orderId,
         fullName: `${finalShipping.firstName} ${finalShipping.lastName}`,
         address: finalShipping.address,
         country: finalShipping.country,
       });
 
-      console.log('[🚚 DHL Shipment Result]', shipment);
+      console.log('[\ud83d\ude9a DHL Shipment Result]', shipmentResult);
     }
 
-    const itemAmount = cartItems.reduce((total: number, item: any) => {
-      const price =
-        typeof item.price === 'object' && item.price?.sale
-          ? item.price.sale
-          : item.price;
-      return total + price * item.quantity;
-    }, 0);
+    const updateData = {
+      billing_info: billingInfo,
+      shipping_info: shippingInfo || null,
+      shipping_method: isDigitalOnly ? null : shippingMethod,
+      shipping_zone: isDigitalOnly ? null : shippingZone,
+      shipping_rate: isDigitalOnly ? null : shippingRate || 0,
+      tracking_number: shipmentResult.tracking_number,
+      courier: shipmentResult.courier,
+      tracking_url: shipmentResult.tracking_url,
+      estimated_delivery: shipmentResult.estimated_delivery,
+      label_url: shipmentResult.label_url,
+      amount,
+      status: isDigitalOnly ? 'paid' : 'pending',
+    };
 
-    const amount = itemAmount + (isDigitalOnly ? 0 : shippingRate || 0);
+    console.log('[\ud83d\udce6 Updating order in Supabase]', updateData);
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('Orders')
-      .insert([
-        {
-          email,
-          amount,
-          currency: 'usd',
-          items: cartItems,
-          payment_status: 'pending', // ✅ ให้ webhook มาอัปเดตทีหลัง
-          created_at: new Date().toISOString(),
-          tracking_number: shipment.tracking_number,
-          courier: shipment.courier,
-          shipping_zone: isDigitalOnly ? null : shippingZone,
-          shipping_method: isDigitalOnly ? null : shippingMethod,
-          shipping_rate: isDigitalOnly ? null : shippingRate || 0,
-        },
-      ])
-      .select()
-      .single();
+      .update(updateData)
+      .eq('id', orderId);
 
     if (error) {
-      console.error('❌ Supabase insert error:', error.message);
-      return NextResponse.json({ error: 'Failed to save order to DB' }, { status: 500 });
+      console.error('\u274c Supabase update error:', error.message);
+      return NextResponse.json({ error: 'Failed to update order in DB' }, { status: 500 });
     }
 
     return NextResponse.json({
       success: true,
-      tracking: shipment,
-      orderId: data.id,
+      tracking: shipmentResult,
+      orderId,
     });
   } catch (err: any) {
-    console.error('🔥 Unexpected error in save-order:', err.message);
+    console.error('\ud83d\udd25 Unexpected error in save-order:', err.message);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

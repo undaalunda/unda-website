@@ -18,11 +18,20 @@ export async function GET(req: NextRequest) {
       .eq('id', id)
       .single();
 
+      console.log('🕵🏻 Order status after update:', data);
+
     if (error || !data) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ order: data });
+    return NextResponse.json(
+      { order: data },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        },
+      }
+    );
   } catch (err) {
     console.error('❌ Failed to fetch order status:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

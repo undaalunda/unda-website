@@ -7,7 +7,11 @@ export async function POST(req: NextRequest) {
   const { email, amount, cartItems, shippingMethod, shippingZone } = body;
 
   console.log('📦 Incoming order:', {
-    email, amount, cartItems, shippingMethod, shippingZone
+    email,
+    amount,
+    cartItems,
+    shippingMethod,
+    shippingZone,
   });
 
   const { data: order, error } = await supabase
@@ -30,5 +34,8 @@ export async function POST(req: NextRequest) {
   }
 
   console.log('✅ Order created:', order.id);
-  return NextResponse.json({ orderId: order.id });
+  return NextResponse.json({
+    orderId: order.id,
+    order, // 🧠 ส่ง full object เผื่อจะได้ใช้ฝั่ง client
+  });
 }

@@ -398,18 +398,19 @@ if (result.error) {
   });
 
   const saveRes = await fetch('/api/save-order', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      billingInfo: trimmedBilling,
-      shippingInfo: shipToDifferent ? trimmedShipping : trimmedBilling,
-      cartItems,
-      shippingMethod,
-      shippingZone,
-      shippingRate,
-      email: trimmedBilling.email,
-    }),
-  });
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    billingInfo: trimmedBilling,
+    shippingInfo: shipToDifferent ? trimmedShipping : trimmedBilling,
+    cartItems,
+    shippingMethod,
+    shippingZone,
+    shippingRate,
+    email: trimmedBilling.email,
+    orderId, // ❗️เพิ่มตรงนี้เพื่อส่งเข้า save-order ด้วย
+  }),
+});
 
   const saveData = await saveRes.json();
 
