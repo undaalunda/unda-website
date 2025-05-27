@@ -1,6 +1,15 @@
-import { NextRequest } from 'next/server';
+//pages/api/stripe/webhook.ts
+
+import { buffer } from 'micro';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import Stripe from 'stripe';
-import supabase from '../../../../lib/supabase';
+import supabase from '../../../lib/supabase';
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_TEST!, {
   apiVersion: '2024-04-10' as Stripe.LatestApiVersion,
@@ -8,17 +17,22 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_TEST!, {
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET_TEST!;
 
-export async function POST(req: NextRequest) {
-  const rawBody = await req.text();
-  const signature = req.headers.get('stripe-signature') as string;
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST');
+    return res.status(405).end('Method Not Allowed');
+  }
+
+  const buf = await buffer(req);
+  const sig = req.headers['stripe-signature'] as string;
 
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
+    event = stripe.webhooks.constructEvent(buf, sig, webhookSecret);
   } catch (err: any) {
     console.error('❌ Webhook signature verification failed:', err.message);
-    return new Response(`Webhook Error: ${err.message}`, { status: 400 });
+    return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
   console.log('📬 Received event:', event.type);
@@ -32,14 +46,14 @@ export async function POST(req: NextRequest) {
 
     if (!email || !orderId) {
       console.warn('⚠️ Missing email or order ID in metadata');
-      return new Response(JSON.stringify({ received: true }), { status: 200 });
+      return res.json({ received: true });
     }
 
-    await new Promise((r) => setTimeout(r, 3000)); // wait for Supabase consistency
+    await new Promise((r) => setTimeout(r, 3000));
 
-    const { data: orders, error: fetchError } = await supabase
+    const { data: orders } = await supabase
       .from('Orders')
-      .select('id, payment_status, shipping_method, tracking_number')
+      .select()
       .eq('email', email)
       .eq('id', orderId)
       .limit(1);
@@ -52,9 +66,7 @@ export async function POST(req: NextRequest) {
       console.log('🟢 Already succeeded.');
     } else {
       const updateData: any = { payment_status: 'succeeded' };
-      if (!order.shipping_method && !order.tracking_number) {
-        updateData.status = 'paid';
-      }
+      if (!order.shipping_method && !order.tracking_number) updateData.status = 'paid';
 
       const { error: updateError } = await supabase
         .from('Orders')
@@ -69,5 +81,5 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  return new Response(JSON.stringify({ received: true }), { status: 200 });
+  res.json({ received: true });
 }
