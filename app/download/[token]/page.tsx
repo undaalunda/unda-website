@@ -1,45 +1,37 @@
 // app/download/[token]/page.tsx
 
 import { notFound } from 'next/navigation';
-import supabase from '../../../lib/supabase';
-
-interface PageProps {
-  params: {
-    token: string;
-  };
-}
+import fs from 'fs/promises';
+import path from 'path';
 
 interface DownloadEntry {
-  id: string;
-  file_path: string;
-  created_at: string;
-  expires_in_minutes: number;
+  token: string;
+  filePath: string;
+  createdAt: string;
+  expiresInMinutes: number;
 }
 
-export default async function Page({ params }: PageProps) {
-  const token = params.token;
+export default async function Page({ params }: any) {
+  const DB_PATH = path.join(process.cwd(), 'data', 'downloads.json');
 
-  const { data: entry, error } = await supabase
-    .from('DownloadTokens')
-    .select('*')
-    .eq('id', token)
-    .single();
-
-  if (error || !entry) {
-    console.error('❌ Supabase error or token not found:', error ?? 'Not found');
-    return notFound();
+  let entries: DownloadEntry[] = [];
+  try {
+    const raw = await fs.readFile(DB_PATH, 'utf-8');
+    entries = JSON.parse(raw);
+  } catch (err) {
+    console.error('Failed to read downloads.json', err);
+    notFound();
   }
 
-  const createdAt = new Date(entry.created_at);
-  const expiresAt = new Date(createdAt.getTime() + entry.expires_in_minutes * 60000);
+  const entry = entries.find((e) => e.token === params.token);
+  if (!entry) return notFound();
+
+  const createdAt = new Date(entry.createdAt);
+  const expiresAt = new Date(createdAt.getTime() + entry.expiresInMinutes * 60000);
   const now = new Date();
+  if (now > expiresAt) return notFound();
 
-  if (now > expiresAt) {
-    console.warn(`⚠️ Token expired at ${expiresAt.toISOString()}`);
-    return notFound();
-  }
-
-  const fileName = entry.file_path.split('/').pop() || 'download';
+  const fileName = entry.filePath.split('/').pop();
 
   return (
     <main className="min-h-screen flex flex-col justify-center items-center px-4 text-[#f8fcdc] font-[Cinzel] bg-black text-center">
@@ -47,7 +39,7 @@ export default async function Page({ params }: PageProps) {
       <p className="mb-7">Click the button below to download your file:</p>
 
       <a
-        href={entry.file_path}
+        href={entry.filePath}
         download={fileName}
         className="bg-[#dc9e63] hover:bg-[#f8cfa3] text-black px-6 py-3 rounded-xl text-lg transition"
       >

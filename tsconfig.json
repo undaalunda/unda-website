@@ -1,9 +1,12 @@
 //tsconfig.json
-
 {
   "compilerOptions": {
-    "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "target": "ES2020",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -15,10 +18,16 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "baseUrl": "./src",       
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["*"]                 
+      "@/*": [
+        "src/*"
+      ]
     },
+    "types": [
+      "node",
+      "react"
+    ],
     "plugins": [
       {
         "name": "next"
@@ -31,5 +40,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }
