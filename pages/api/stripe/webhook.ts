@@ -15,7 +15,7 @@ export const config = {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
-    return res.status(405).end('Method Not Allowed'); // This was the 405 source, dummy.
+    return res.status(405).end('Method Not Allowed');
   }
 
   const isLive = process.env.NODE_ENV === 'production';
@@ -37,61 +37,59 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     apiVersion: '2024-04-10' as Stripe.LatestApiVersion,
   });
 
-  let event: Stripe.Event;
-
   try {
     const buf = await buffer(req);
     const sig = req.headers['stripe-signature'] as string;
+    const event = stripe.webhooks.constructEvent(buf, sig, webhookSecret);
 
-    event = stripe.webhooks.constructEvent(buf, sig, webhookSecret);
-  } catch (err: any) {
-    console.error('❌ Webhook signature error:', err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
+    console.log('📬 Stripe event received:', event.type);
 
-  console.log('📬 Stripe event received:', event.type);
+    if (event.type === 'payment_intent.succeeded' || event.type === 'charge.succeeded') {
+      const object = event.data.object as any;
+      const { email, id: orderId } = object.metadata || {};
 
-  if (event.type === 'payment_intent.succeeded' || event.type === 'charge.succeeded') {
-    const object = event.data.object as any;
-    const { email, id: orderId } = object.metadata || {};
+      if (!email || !orderId) {
+        console.warn('⚠️ Missing metadata (email or id)');
+        return res.json({ received: true });
+      }
 
-    if (!email || !orderId) {
-      console.warn('⚠️ Missing metadata (email or id)');
-      return res.json({ received: true });
-    }
-
-    const { data, error: fetchError } = await supabase
-      .from('Orders')
-      .select('*')
-      .eq('id', orderId)
-      .eq('email', email)
-      .single();
-
-    if (fetchError) {
-      console.error('❌ Supabase fetch failed:', fetchError.message);
-      return res.json({ received: true });
-    }
-
-    if (data.payment_status !== 'succeeded') {
-      const updateData: any = { payment_status: 'succeeded' };
-      if (!data.shipping_method && !data.tracking_number) updateData.status = 'paid';
-
-      const { error: updateError } = await supabase
+      const { data, error: fetchError } = await supabase
         .from('Orders')
-        .update(updateData)
-        .eq('id', orderId);
+        .select('*')
+        .eq('id', orderId)
+        .eq('email', email)
+        .single();
 
-      if (updateError) {
-        console.error('❌ Failed to update order:', updateError.message);
-      } else {
+      if (fetchError) throw new Error(fetchError.message);
+      if (!data) throw new Error('Order not found');
+
+      if (data.payment_status !== 'succeeded') {
+        const updateData: any = { payment_status: 'succeeded' };
+        if (!data.shipping_method && !data.tracking_number) {
+          updateData.status = 'paid';
+        }
+
+        const { error: updateError } = await supabase
+          .from('Orders')
+          .update(updateData)
+          .eq('id', orderId);
+
+        if (updateError) {
+          throw new Error(updateError.message);
+        }
+
         console.log(`✅ Order ${orderId} updated successfully`);
+      } else {
+        console.log('🟢 Order already marked as succeeded');
       }
     } else {
-      console.log('🟢 Order already marked as succeeded');
+      console.log('🙅 Ignored event:', event.type);
     }
-  } else {
-    console.log('🙅 Ignored event:', event.type);
-  }
 
-  return res.json({ received: true });
+    return res.json({ received: true });
+
+  } catch (err: any) {
+    console.error('💥 Webhook handler error:', err.message);
+    return res.status(500).send('Internal Server Error');
+  }
 }
