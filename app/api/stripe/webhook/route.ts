@@ -99,8 +99,8 @@ export async function POST(req: NextRequest) {
         // อัพเดทสถานะถ้ายังไม่เป็น succeeded
         if (order.payment_status !== 'succeeded') {
           const updateData: any = { 
-            payment_status: 'succeeded',
-            updated_at: new Date().toISOString()
+            payment_status: 'succeeded'
+            // ❌ ลบ updated_at ออก เพราะ table ไม่มี column นี้
           };
 
           // ถ้าเป็น digital only ให้เปลี่ยนสถานะเป็น paid เลย
