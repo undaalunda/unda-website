@@ -14,9 +14,11 @@ export const config = {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const isLive = process.env.NODE_ENV === 'production';
 
-  const stripeSecretKey = isLive
-    ? process.env.STRIPE_SECRET_KEY_LIVE
-    : process.env.STRIPE_SECRET_KEY;
+  console.log('🚨 ENV STRIPE_SECRET_KEY:', process.env.STRIPE_SECRET_KEY);
+
+const stripeSecretKey =
+  process.env.STRIPE_SECRET_KEY ??
+  (isLive ? process.env.STRIPE_SECRET_KEY_LIVE : process.env.STRIPE_SECRET_KEY_TEST);
 
   const webhookSecret = isLive
     ? process.env.STRIPE_WEBHOOK_SECRET_LIVE

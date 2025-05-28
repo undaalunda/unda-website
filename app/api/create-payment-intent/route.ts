@@ -5,9 +5,11 @@ import Stripe from 'stripe';
 
 const isLive = process.env.NODE_ENV === 'production';
 
-const stripeSecretKey = isLive
-  ? process.env.STRIPE_SECRET_KEY_LIVE
-  : process.env.STRIPE_SECRET_KEY_TEST;
+console.log('🚨 ENV STRIPE_SECRET_KEY:', process.env.STRIPE_SECRET_KEY);
+
+const stripeSecretKey =
+  process.env.STRIPE_SECRET_KEY ??
+  (isLive ? process.env.STRIPE_SECRET_KEY_LIVE : process.env.STRIPE_SECRET_KEY_TEST);
 
 const recaptchaSecretKey = process.env.RECAPTCHA_SECRET_KEY;
 
