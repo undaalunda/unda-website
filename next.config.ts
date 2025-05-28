@@ -18,6 +18,13 @@ const nextConfig: NextConfig = {
     DHL_ACCOUNT_NUMBER: process.env.DHL_ACCOUNT_NUMBER,
     DHL_API_URL: process.env.DHL_API_URL,
     DHL_TRACKING_AUTH: process.env.DHL_TRACKING_AUTH,
+
+    // 👇 Add these Stripe keys explicitly
+    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+    STRIPE_SECRET_KEY_TEST: process.env.STRIPE_SECRET_KEY_TEST,
+    STRIPE_SECRET_KEY_LIVE: process.env.STRIPE_SECRET_KEY_LIVE,
+    STRIPE_WEBHOOK_SECRET_TEST: process.env.STRIPE_WEBHOOK_SECRET_TEST,
+    STRIPE_WEBHOOK_SECRET_LIVE: process.env.STRIPE_WEBHOOK_SECRET_LIVE,
   },
 };
 
