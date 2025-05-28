@@ -12,12 +12,16 @@ export const config = {
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // ✅ ใส่ new Stripe ใน handler เพื่อไม่ให้มันรันตอน build
+  // 👇 Create Stripe instance inside the handler to avoid build-time errors
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: '2024-04-10' as Stripe.LatestApiVersion,
   });
 
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET_TEST!;
+  // 👇 Switch between live and test secrets based on NODE_ENV
+  const webhookSecret =
+    process.env.NODE_ENV === 'production'
+      ? process.env.STRIPE_WEBHOOK_SECRET_LIVE!
+      : process.env.STRIPE_WEBHOOK_SECRET_TEST!;
 
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -38,7 +42,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   console.log('📬 Received event:', event.type);
 
-  if (event.type === 'payment_intent.succeeded' || event.type === 'charge.succeeded') {
+  if (
+    event.type === 'payment_intent.succeeded' ||
+    event.type === 'charge.succeeded'
+  ) {
     const object = event.data.object as any;
     const metadata = object.metadata || {};
 
@@ -53,7 +60,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.json({ received: true });
     }
 
-    // เผื่อข้อมูลยัง propagate ไม่ทัน
+    // Delay to wait for Supabase propagation
     await new Promise((r) => setTimeout(r, 3000));
 
     const { data: orders, error: fetchError } = await supabase
