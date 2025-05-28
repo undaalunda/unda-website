@@ -5,19 +5,24 @@ import supabase from '../../../../lib/supabase';
 
 const isLive = process.env.NODE_ENV === 'production';
 
-const stripeSecretKey = isLive 
-  ? process.env.STRIPE_SECRET_KEY_LIVE 
-  : (process.env.STRIPE_SECRET_KEY_TEST || process.env.STRIPE_SECRET_KEY);
+// ลองหา STRIPE_SECRET_KEY จากหลายแหล่ง
+const stripeSecretKey = 
+  process.env.STRIPE_SECRET_KEY ||
+  process.env.STRIPE_SECRET_KEY_TEST ||
+  process.env.STRIPE_SECRET_KEY_LIVE;
 
-const webhookSecret = isLive
-  ? process.env.STRIPE_WEBHOOK_SECRET_LIVE
-  : (process.env.STRIPE_WEBHOOK_SECRET_TEST || process.env.STRIPE_WEBHOOK_SECRET);
+// ลองหา WEBHOOK_SECRET จากหลายแหล่ง  
+const webhookSecret = 
+  process.env.STRIPE_WEBHOOK_SECRET_TEST ||  // ✅ ตรงกับที่มีใน Vercel
+  process.env.STRIPE_WEBHOOK_SECRET_LIVE ||
+  process.env.STRIPE_WEBHOOK_SECRET;
 
 console.log('🔍 Environment check:', {
   isLive,
   hasStripeKey: !!stripeSecretKey,
   hasWebhookSecret: !!webhookSecret,
-  nodeEnv: process.env.NODE_ENV
+  nodeEnv: process.env.NODE_ENV,
+  availableKeys: Object.keys(process.env).filter(key => key.includes('STRIPE'))
 });
 
 if (!stripeSecretKey || !webhookSecret) {
