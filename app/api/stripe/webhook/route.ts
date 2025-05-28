@@ -108,6 +108,8 @@ export async function POST(req: NextRequest) {
             updateData.status = 'paid';
           }
 
+          console.log('🔄 Updating order with data:', updateData);
+
           const { error: updateError } = await supabase
             .from('Orders')
             .update(updateData)
@@ -115,6 +117,7 @@ export async function POST(req: NextRequest) {
 
           if (updateError) {
             console.error('❌ Supabase update error:', updateError.message);
+            console.error('❌ Full error details:', JSON.stringify(updateError, null, 2));
             return NextResponse.json({ error: 'Database update failed' }, { status: 500 });
           }
 
