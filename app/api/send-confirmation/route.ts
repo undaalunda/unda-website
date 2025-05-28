@@ -3,18 +3,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { v4 as uuidv4 } from 'uuid';
-import path from 'path';
-import fs from 'fs/promises';
+import supabase from '../../../lib/supabase';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const DOWNLOAD_DB = path.join(process.cwd(), 'data', 'downloads.json');
 
 interface CartItem {
   id: string;
   title: string;
   subtitle: string;
   category: string;
-  type?: string; // for safety
+  type?: string;
 }
 
 const getDownloadFileForItem = (item: CartItem): string | null => {
@@ -28,38 +26,22 @@ const getDownloadFileForItem = (item: CartItem): string | null => {
     'reddown-bass': '/download/reddown-bass.wav',
     'quietness-bass': '/download/quietness-bass.wav',
   };
-
   return downloadMap[item.id] || null;
 };
 
 export async function POST(req: NextRequest) {
-  const { name, email, cartItems, receiptUrl } = await req.json(); // 👈 เพิ่ม receiptUrl
-
+  const { name, email, cartItems, receiptUrl, orderId } = await req.json();
   console.log('🧾 cartItems received:', cartItems);
 
   try {
     let linksHtml = '';
+    let token = '';
 
     for (const item of cartItems || []) {
       if (item.type === 'digital' || item.category === 'Backing Track') {
         const filePath = getDownloadFileForItem(item);
         if (filePath) {
-          const token = uuidv4();
-          const entry = {
-            token,
-            filePath,
-            createdAt: new Date().toISOString(),
-            expiresInMinutes: 60,
-          };
-
-          let existing = [];
-          try {
-            const raw = await fs.readFile(DOWNLOAD_DB, 'utf-8');
-            existing = JSON.parse(raw);
-          } catch {}
-
-          existing.push(entry);
-          await fs.writeFile(DOWNLOAD_DB, JSON.stringify(existing, null, 2));
+          token = uuidv4();
 
           const baseUrl = process.env.VERCEL_URL
             ? `https://${process.env.VERCEL_URL}`
@@ -67,6 +49,22 @@ export async function POST(req: NextRequest) {
 
           linksHtml += `<li style="margin-bottom: 10px;"><a href="${baseUrl}/download/${token}" target="_blank" style="color: #dc9e63; text-decoration: underline;">${item.title} – ${item.subtitle}</a></li>`;
         }
+      }
+    }
+
+    const downloadExpires = new Date(Date.now() + 60 * 60000).toISOString();
+
+    if (orderId && token) {
+      const { error } = await supabase
+        .from('Orders')
+        .update({
+          download_token: token,
+          download_expires: downloadExpires,
+        })
+        .eq('id', orderId);
+
+      if (error) {
+        console.error('❌ Failed to update download token:', error.message);
       }
     }
 
@@ -87,7 +85,7 @@ export async function POST(req: NextRequest) {
                   <td style="padding: 40px; color: #f8fcdc !important;">
                     <h1 style="color: #dc9e63 !important; font-size: 28px; margin-bottom: 20px;">Thank you for your purchase!</h1>
                     <p style="color: #f8fcdc; margin-bottom: 16px;">Hi <strong>${name}</strong>,</p>
-<p style="color: #f8fcdc; margin-bottom: 16px;">We're thrilled to let you know that your order has been successfully received and is now being processed.</p>
+                    <p style="color: #f8fcdc; margin-bottom: 16px;">We're thrilled to let you know that your order has been successfully received and is now being processed.</p>
                     ${
                       linksHtml
                         ? `<p style="margin-top: 30px;">Here are your download links (valid for 1 hour):</p><ul style="padding-left: 20px;">${linksHtml}</ul>`
