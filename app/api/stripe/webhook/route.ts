@@ -7,23 +7,35 @@ const isLive = process.env.NODE_ENV === 'production';
 
 const stripeSecretKey = isLive 
   ? process.env.STRIPE_SECRET_KEY_LIVE 
-  : process.env.STRIPE_SECRET_KEY_TEST;
+  : (process.env.STRIPE_SECRET_KEY_TEST || process.env.STRIPE_SECRET_KEY);
 
 const webhookSecret = isLive
   ? process.env.STRIPE_WEBHOOK_SECRET_LIVE
-  : process.env.STRIPE_WEBHOOK_SECRET_TEST;
+  : (process.env.STRIPE_WEBHOOK_SECRET_TEST || process.env.STRIPE_WEBHOOK_SECRET);
+
+console.log('🔍 Environment check:', {
+  isLive,
+  hasStripeKey: !!stripeSecretKey,
+  hasWebhookSecret: !!webhookSecret,
+  nodeEnv: process.env.NODE_ENV
+});
 
 if (!stripeSecretKey || !webhookSecret) {
-  console.error('🚨 Missing Stripe keys.');
+  console.error('🚨 Missing Stripe keys. StripeKey:', !!stripeSecretKey, 'WebhookSecret:', !!webhookSecret);
 }
 
-const stripe = new Stripe(stripeSecretKey!, {
+const stripe = stripeSecretKey ? new Stripe(stripeSecretKey, {
   apiVersion: '2024-04-10' as Stripe.LatestApiVersion,
-});
+}) : null;
 
 export async function POST(req: NextRequest) {
   try {
     console.log('🎯 Webhook received');
+    
+    if (!stripe) {
+      console.error('❌ Stripe not initialized');
+      return NextResponse.json({ error: 'Stripe configuration missing' }, { status: 500 });
+    }
     
     const body = await req.text();
     const sig = req.headers.get('stripe-signature');
@@ -43,7 +55,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
-   console.log('📬 Stripe event received:', event.type);
+    console.log('📬 Stripe event received:', event.type);
     console.log('🔍 Full event metadata:', JSON.stringify(event.data.object, null, 2));
 
     if (event.type === 'payment_intent.succeeded' || event.type === 'charge.succeeded') {
