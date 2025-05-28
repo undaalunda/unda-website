@@ -12,16 +12,23 @@ export const config = {
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // 👇 Create Stripe instance inside the handler to avoid build-time errors
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  const isLive = process.env.NODE_ENV === 'production';
+
+  const stripeSecretKey = isLive
+    ? process.env.STRIPE_SECRET_KEY_LIVE
+    : process.env.STRIPE_SECRET_KEY;
+
+  const webhookSecret = isLive
+    ? process.env.STRIPE_WEBHOOK_SECRET_LIVE
+    : process.env.STRIPE_WEBHOOK_SECRET_TEST;
+
+  if (!stripeSecretKey || !webhookSecret) {
+    throw new Error('🚫 Missing Stripe secret key or webhook secret.');
+  }
+
+  const stripe = new Stripe(stripeSecretKey, {
     apiVersion: '2024-04-10' as Stripe.LatestApiVersion,
   });
-
-  // 👇 Switch between live and test secrets based on NODE_ENV
-  const webhookSecret =
-    process.env.NODE_ENV === 'production'
-      ? process.env.STRIPE_WEBHOOK_SECRET_LIVE!
-      : process.env.STRIPE_WEBHOOK_SECRET_TEST!;
 
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -60,7 +67,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.json({ received: true });
     }
 
-    // Delay to wait for Supabase propagation
     await new Promise((r) => setTimeout(r, 3000));
 
     const { data: orders, error: fetchError } = await supabase
