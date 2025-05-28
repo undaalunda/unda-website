@@ -3,6 +3,12 @@
 import { notFound } from 'next/navigation';
 import supabase from '../../../lib/supabase';
 
+interface PageProps {
+  params: {
+    token: string;
+  };
+}
+
 interface DownloadEntry {
   id: string;
   file_path: string;
@@ -10,7 +16,7 @@ interface DownloadEntry {
   expires_in_minutes: number;
 }
 
-export default async function Page({ params }: { params: { token: string } }) {
+export default async function Page({ params }: PageProps) {
   const token = params.token;
 
   const { data: entry, error } = await supabase
