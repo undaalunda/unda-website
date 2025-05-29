@@ -76,46 +76,47 @@ export async function POST(req: NextRequest) {
       }
 
       try {
-        // ค้นหา order ใน database
-        const { data: order, error: fetchError } = await supabase
+        // ✅ ค้นหา order ใน database โดยไม่ใช้ .single() ที่ทำให้เกิด error
+        const { data: orders, error: fetchError } = await supabase
           .from('Orders')
           .select('*')
           .eq('id', orderId)
-          .eq('email', email)
-          .single();
+          .eq('email', email);
 
         if (fetchError) {
           console.error('❌ Supabase fetch error:', fetchError.message);
           return NextResponse.json({ error: 'Database fetch failed' }, { status: 500 });
         }
 
-        if (!order) {
-          console.error('❌ Order not found');
+        if (!orders || orders.length === 0) {
+          console.error('❌ Order not found for ID:', orderId, 'Email:', email);
           return NextResponse.json({ error: 'Order not found' }, { status: 404 });
         }
 
-        console.log('📦 Found order:', order.id, 'Status:', order.payment_status);
+        const order = orders[0]; // เอา order แรกมาใช้
+        console.log('📦 Found order:', order.id, 'Current payment_status:', order.payment_status);
 
-        // อัพเดทสถานะถ้ายังไม่เป็น succeeded
+        // ✅ อัพเดทสถานะถ้ายังไม่เป็น succeeded
         if (order.payment_status !== 'succeeded') {
+          // ✅ ใช้ field ที่ถูกต้องตาม database schema
           const updateData: any = { 
             payment_status: 'succeeded'
-            // ❌ ลบ updated_at ออก เพราะ table ไม่มี column นี้
           };
 
-          // ถ้าเป็น digital only ให้เปลี่ยนสถานะเป็น paid เลย
-          if (!order.shipping_method && !order.tracking_number) {
+          // ✅ ถ้าเป็น digital only หรือไม่มี shipping ให้เปลี่ยนสถานะเป็น paid
+          if (!order.shipping_method || order.shipping_method === null) {
             updateData.status = 'paid';
+            console.log('🎵 Digital order detected, setting status to paid');
           }
 
           console.log('🔄 Updating order with data:', updateData);
 
-          const { data: updatedOrder, error: updateError } = await supabase
+          // ✅ ใช้ .eq() แทน .single() เพื่อหลีกเลี่ยง multiple rows error
+          const { error: updateError } = await supabase
             .from('Orders')
             .update(updateData)
             .eq('id', orderId)
-            .select() // ✅ เพิ่ม .select() เพื่อ return ข้อมูลที่ update
-            .single();
+            .eq('email', email);
 
           if (updateError) {
             console.error('❌ Supabase update error:', updateError.message);
@@ -124,7 +125,15 @@ export async function POST(req: NextRequest) {
           }
 
           console.log(`✅ Order ${orderId} updated successfully to payment_status: succeeded`);
-          console.log('📋 Updated order data:', updatedOrder); // ✅ Log ข้อมูลที่ update แล้ว
+          
+          // ✅ ดึงข้อมูล order ที่ update แล้วเพื่อ confirm
+          const { data: updatedOrder } = await supabase
+            .from('Orders')
+            .select('payment_status, status')
+            .eq('id', orderId)
+            .single();
+            
+          console.log('📋 Updated order status:', updatedOrder);
         } else {
           console.log('🟢 Order already marked as succeeded');
         }
@@ -142,6 +151,7 @@ export async function POST(req: NextRequest) {
 
   } catch (err: any) {
     console.error('💥 Webhook handler unexpected error:', err.message);
+    console.error('💥 Full error stack:', err.stack);
     return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
   }
 }
