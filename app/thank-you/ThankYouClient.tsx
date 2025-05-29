@@ -117,6 +117,11 @@ export default function ThankYouClient() {
     );
   }
 
+  // Check if order has digital products
+  const hasDigitalProducts = data.items?.some((item: any) => item.type === 'digital' || item.category === 'Backing Track');
+  const hasPhysicalProducts = data.items?.some((item: any) => item.type === 'physical');
+  const isDigitalOnly = hasDigitalProducts && !hasPhysicalProducts;
+
   return (
     <main className="pt-44 px-6 max-w-2xl mx-auto text-[#f8fcdc] font-[Cinzel]">
       <h1 className="text-3xl font-bold mb-6 text-[#dc9e63]">Thank you for your order!</h1>
@@ -124,18 +129,18 @@ export default function ThankYouClient() {
         <p><strong>Email:</strong> <span className="text-[#f8fcdc]/50">{data.email}</span></p>
         <p><strong>Order ID:</strong> <span className="text-[#f8fcdc]/50">{orderId}</span></p>
         <p><strong>Date:</strong> 
-  <span className="text-[#f8fcdc]/50">
-    {new Date(data.created_at).toLocaleString('th-TH', {
-      timeZone: 'Asia/Bangkok',
-      year: 'numeric',
-      month: '2-digit', 
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    })}
-  </span>
-</p>
+          <span className="text-[#f8fcdc]/50">
+            {new Date(data.created_at).toLocaleString('th-TH', {
+              timeZone: 'Asia/Bangkok',
+              year: 'numeric',
+              month: '2-digit', 
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit'
+            })}
+          </span>
+        </p>
         
         {/* ✅ สถานะแสดงผลให้ชัดเจนขึ้น */}
         <p>
@@ -154,14 +159,28 @@ export default function ThankYouClient() {
         </p>
 
         <p><strong>Amount:</strong> ${(data.amount / 100).toFixed(2)}</p>
-        <p><strong>Shipping Method:</strong> <span className="text-[#f8fcdc]/50">{data.shipping_method || 'Digital Delivery'}</span></p>
-        <p><strong>Shipping Zone:</strong> <span className="text-[#f8fcdc]/50">{data.shipping_zone || 'N/A'}</span></p>
+        
+        {/* ✅ แสดง Shipping Method ตาม product type */}
+        {!isDigitalOnly && (
+          <>
+            <p><strong>Shipping Method:</strong> <span className="text-[#f8fcdc]/50">{data.shipping_method || 'Standard Delivery'}</span></p>
+            <p><strong>Shipping Zone:</strong> <span className="text-[#f8fcdc]/50">{data.shipping_zone || 'Processing'}</span></p>
+          </>
+        )}
+        
+        {/* ✅ แสดง Order Type สำหรับ Digital Only */}
+        {isDigitalOnly && (
+          <p><strong>Order Type:</strong> <span className="text-[#f8fcdc]/50">Digital Download</span></p>
+        )}
 
         <div>
           <strong>Items:</strong>
           <ul className="list-disc ml-5 mt-2 text-sm text-[#f8fcdc]/50">
             {data.items.map((item: any, i: number) => (
-              <li key={i}>{item.title} x {item.quantity}</li>
+              <li key={i}>
+                {item.title} x {item.quantity}
+                {item.type === 'digital' && <span className="text-[#dc9e63] ml-1">(Digital)</span>}
+              </li>
             ))}
           </ul>
         </div>
@@ -180,12 +199,28 @@ export default function ThankYouClient() {
         {data.payment_status === 'succeeded' && (
           <div className="mt-4 p-3 bg-green-900/30 border border-green-600/50 rounded">
             <p className="text-sm text-green-200">
-              <strong>Payment Confirmed</strong><br/>
-              Check your email for download links and order details.
+              <strong>✅ Payment Confirmed</strong><br/>
+              {isDigitalOnly 
+                ? 'Check your email for download links to your digital products.'
+                : hasDigitalProducts && hasPhysicalProducts
+                ? 'Check your email for download links and shipping details.'
+                : 'Check your email for order confirmation and shipping details.'
+              }
             </p>
           </div>
         )}
 
+        {/* ✅ แสดงข้อมูล Digital Downloads */}
+        {data.payment_status === 'succeeded' && hasDigitalProducts && (
+          <div className="mt-4 p-3 bg-[#dc9e63]/10 border border-[#dc9e63]/30 rounded">
+            <p className="text-sm text-[#dc9e63]">
+              <strong>📥 Digital Downloads</strong><br/>
+              Download links have been sent to your email and are valid for 1 hour.
+            </p>
+          </div>
+        )}
+
+        {/* ✅ Tracking info สำหรับ physical products */}
         {data.tracking_number && (
           <div className="pt-2 text-sm">
             <p><strong>Courier:</strong> <span className="text-[#f8fcdc]/50">{data.courier || 'DHL'}</span></p>
