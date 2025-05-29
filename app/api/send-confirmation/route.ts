@@ -19,11 +19,21 @@ const getDownloadFileForItem = (item: CartItem): string | null => {
     'jyy-guitars': '/files/jyy-guitars.pdf', 
     'atlantic-guitar': '/files/atlantic-guitar.wav',
     'out-dark-drums': '/files/out-dark-drums.wav',
+    'out-of-the-dark-drums': '/files/out-dark-drums.wav', // เพิ่มแบบเต็ม
     'feign-guitars': '/files/feign-guitars.wav',
     'dark-keys': '/files/dark-keys.wav',
     'reddown-bass': '/files/reddown-bass.wav',
     'quietness-bass': '/files/quietness-bass.wav',
   };
+  
+  // Log เพื่อ debug
+  console.log('🔍 Looking for download file:', {
+    itemId: item.id,
+    itemTitle: item.title,
+    itemSubtitle: item.subtitle,
+    foundInMap: downloadMap[item.id] ? 'Yes' : 'No'
+  });
+  
   return downloadMap[item.id] || null;
 };
 
@@ -50,9 +60,17 @@ export async function POST(req: NextRequest) {
       if (item.type === 'digital' || item.category === 'Backing Track') {
         hasDigitalItems = true;
         digitalItemsCount++;
-        console.log('🎵 Processing digital item:', item.id);
+        console.log('🎵 Processing digital item:', {
+          id: item.id,
+          title: item.title,
+          subtitle: item.subtitle,
+          category: item.category,
+          type: item.type
+        });
         
         const filePath = getDownloadFileForItem(item);
+        console.log('📁 File path for item:', filePath);
+        
         if (filePath) {
           // ✅ เรียก API สร้าง download token
           const baseUrl = process.env.NODE_ENV === 'production' 
