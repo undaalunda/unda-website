@@ -1,7 +1,7 @@
 // app/api/stripe/webhook/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import supabase from '.../../lib/supabase';
+import supabase from '../../../../lib/supabase';
 
 const isLive = process.env.NODE_ENV === 'production';
 
