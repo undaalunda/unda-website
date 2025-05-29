@@ -28,8 +28,16 @@ const getDownloadFileForItem = (item: CartItem): string | null => {
 };
 
 export async function POST(req: NextRequest) {
+  console.log('📧 Send confirmation API called');
+  
+  // Check if API key exists
+  if (!process.env.RESEND_API_KEY) {
+    console.error('❌ RESEND_API_KEY is missing!');
+    return NextResponse.json({ error: 'Email service not configured' }, { status: 500 });
+  }
+
   const { name, email, cartItems, receiptUrl } = await req.json();
-  console.log('🧾 cartItems received:', cartItems);
+  console.log('🧾 Request data:', { name, email, cartItemsCount: cartItems?.length, receiptUrl });
 
   try {
     let linksHtml = '';
@@ -37,24 +45,32 @@ export async function POST(req: NextRequest) {
     // ✅ สร้าง download links สำหรับแต่ละ digital item
     for (const item of cartItems || []) {
       if (item.type === 'digital' || item.category === 'Backing Track') {
+        console.log('🎵 Processing digital item:', item.id);
+        
         const filePath = getDownloadFileForItem(item);
         if (filePath) {
           // ✅ เรียก API สร้าง download token
-          const tokenRes = await fetch(`${process.env.NODE_ENV === 'production' 
+          const baseUrl = process.env.NODE_ENV === 'production' 
             ? 'https://unda-website.vercel.app' 
-            : 'http://localhost:3000'}/api/download-link`, {
+            : 'http://localhost:3000';
+            
+          console.log('🔗 Creating download link for:', filePath);
+          
+          const tokenRes = await fetch(`${baseUrl}/api/download-link`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ filePath })
           });
 
+          if (!tokenRes.ok) {
+            console.error('❌ Failed to create download token:', await tokenRes.text());
+            continue;
+          }
+
           const tokenData = await tokenRes.json();
+          console.log('✅ Download token created:', tokenData.token);
           
           if (tokenData.token) {
-            const baseUrl = process.env.NODE_ENV === 'production' 
-              ? 'https://unda-website.vercel.app'
-              : 'http://localhost:3000';
-
             linksHtml += `<li style="margin-bottom: 10px;">
               <a href="${baseUrl}/download/${tokenData.token}" target="_blank" 
                  style="color: #dc9e63; text-decoration: underline;">
@@ -119,18 +135,24 @@ export async function POST(req: NextRequest) {
       </body>
     `;
 
+    console.log('📨 Sending email to:', email);
+    
     // ✅ ส่ง email
-    await resend.emails.send({
+    const emailResult = await resend.emails.send({
       from: 'Unda Alunda <noreply@updates.undaalunda.com>',
       to: [email],
       subject: 'Thank you for your order — Unda Alunda',
       html,
     });
 
+    console.log('✅ Email sent successfully:', JSON.stringify(emailResult, null, 2));
     return NextResponse.json({ success: true });
     
   } catch (error) {
     console.error('🔥 Email send failed:', error);
-    return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });
+    return NextResponse.json({ 
+      error: 'Failed to send email',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
   }
 }
