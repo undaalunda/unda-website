@@ -2,8 +2,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import { v4 as uuidv4 } from 'uuid';
-import supabase from '../../../lib/supabase';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -17,62 +15,73 @@ interface CartItem {
 
 const getDownloadFileForItem = (item: CartItem): string | null => {
   const downloadMap: Record<string, string> = {
-    'anomic-drums': '/download/anomic-drums.wav',
-    'jyy-guitars': '/download/jyy-guitars.pdf',
-    'atlantic-guitar': '/download/atlantic-guitar.wav',
-    'out-dark-drums': '/download/out-dark-drums.wav',
-    'feign-guitars': '/download/feign-guitars.wav',
-    'dark-keys': '/download/dark-keys.wav',
-    'reddown-bass': '/download/reddown-bass.wav',
-    'quietness-bass': '/download/quietness-bass.wav',
+    'anomic-drums': '/files/anomic-drums.wav',
+    'jyy-guitars': '/files/jyy-guitars.pdf', 
+    'atlantic-guitar': '/files/atlantic-guitar.wav',
+    'out-dark-drums': '/files/out-dark-drums.wav',
+    'feign-guitars': '/files/feign-guitars.wav',
+    'dark-keys': '/files/dark-keys.wav',
+    'reddown-bass': '/files/reddown-bass.wav',
+    'quietness-bass': '/files/quietness-bass.wav',
   };
   return downloadMap[item.id] || null;
 };
 
 export async function POST(req: NextRequest) {
-  const { name, email, cartItems, receiptUrl, orderId } = await req.json();
+  const { name, email, cartItems, receiptUrl } = await req.json();
   console.log('🧾 cartItems received:', cartItems);
 
   try {
     let linksHtml = '';
-    let token = '';
 
+    // ✅ สร้าง download links สำหรับแต่ละ digital item
     for (const item of cartItems || []) {
       if (item.type === 'digital' || item.category === 'Backing Track') {
         const filePath = getDownloadFileForItem(item);
         if (filePath) {
-          token = uuidv4();
+          // ✅ เรียก API สร้าง download token
+          const tokenRes = await fetch(`${process.env.NODE_ENV === 'production' 
+            ? 'https://unda-website.vercel.app' 
+            : 'http://localhost:3000'}/api/download-link`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filePath })
+          });
 
-          const baseUrl = process.env.VERCEL_URL
-            ? `https://${process.env.VERCEL_URL}`
-            : 'http://localhost:3000';
+          const tokenData = await tokenRes.json();
+          
+          if (tokenData.token) {
+            const baseUrl = process.env.NODE_ENV === 'production' 
+              ? 'https://unda-website.vercel.app'
+              : 'http://localhost:3000';
 
-          linksHtml += `<li style="margin-bottom: 10px;"><a href="${baseUrl}/download/${token}" target="_blank" style="color: #dc9e63; text-decoration: underline;">${item.title} – ${item.subtitle}</a></li>`;
+            linksHtml += `<li style="margin-bottom: 10px;">
+              <a href="${baseUrl}/download/${tokenData.token}" target="_blank" 
+                 style="color: #dc9e63; text-decoration: underline;">
+                ${item.title} – ${item.subtitle}
+              </a>
+            </li>`;
+          }
         }
       }
     }
 
-    const downloadExpires = new Date(Date.now() + 60 * 60000).toISOString();
-
-    if (orderId && token) {
-      const { error } = await supabase
-        .from('Orders')
-        .update({
-          download_token: token,
-          download_expires: downloadExpires,
-        })
-        .eq('id', orderId);
-
-      if (error) {
-        console.error('❌ Failed to update download token:', error.message);
-      }
-    }
-
+    // ✅ สร้าง receipt link
     const receiptHtml = receiptUrl
       ? `<p style="margin-top: 24px;">You can also view your payment receipt here:<br/>
-          <a href="${receiptUrl}" target="_blank" style="color: #dc9e63; text-decoration: underline;">Stripe Payment Receipt</a></p>`
+          <a href="${receiptUrl}" target="_blank" style="color: #dc9e63; text-decoration: underline;">
+            Stripe Payment Receipt
+          </a>
+        </p>`
       : '';
 
+    // ✅ สร้าง download section
+    const downloadSection = linksHtml
+      ? `<p style="margin-top: 30px;">Here are your download links (valid for 1 hour):</p>
+         <ul style="padding-left: 20px;">${linksHtml}</ul>`
+      : '<p style="margin-bottom: 30px;">You will receive another email once your items have shipped.</p>';
+
+    // ✅ Email HTML template
     const html = `
       <body style="margin: 0; padding: 0; font-family: Cinzel, serif; background-color: #000;">
         <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" 
@@ -82,21 +91,23 @@ export async function POST(req: NextRequest) {
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" 
                 style="margin: 0 auto; background-image: url('https://unda-website.vercel.app/redsky-bg.jpeg'); background-size: cover; border-radius: 12px; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
                 <tr>
-                  <td style="padding: 40px; color: #f8fcdc !important;">
-                    <h1 style="color: #dc9e63 !important; font-size: 28px; margin-bottom: 20px;">Thank you for your purchase!</h1>
-                    <p style="color: #f8fcdc; margin-bottom: 16px;">Hi <strong>${name}</strong>,</p>
-                    <p style="color: #f8fcdc; margin-bottom: 16px;">We're thrilled to let you know that your order has been successfully received and is now being processed.</p>
-                    ${
-                      linksHtml
-                        ? `<p style="margin-top: 30px;">Here are your download links (valid for 1 hour):</p><ul style="padding-left: 20px;">${linksHtml}</ul>`
-                        : '<p style="margin-bottom: 30px;">You’ll receive another email once your items have shipped.</p>'
-                    }
+                  <td style="padding: 40px; color: #f8fcdc;">
+                    <h1 style="color: #dc9e63; font-size: 28px; margin-bottom: 20px;">
+                      Thank you for your purchase!
+                    </h1>
+                    <p style="color: #f8fcdc; margin-bottom: 16px;">
+                      Hi <strong>${name}</strong>,
+                    </p>
+                    <p style="color: #f8fcdc; margin-bottom: 16px;">
+                      We're thrilled to let you know that your order has been successfully received and is now being processed.
+                    </p>
+                    ${downloadSection}
                     ${receiptHtml}
                     <a href="https://www.undaalunda.com" 
-                      style="display: inline-block; background-color: #dc9e63; color: #000000 !important; text-decoration: none !important; padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 14px; margin-top: 30px;">
+                      style="display: inline-block; background-color: #dc9e63; color: #000000; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 14px; margin-top: 30px;">
                       Return to Store
                     </a>
-                    <p style="font-size: 12px; color: #999 !important; margin-top: 30px; text-align: center;">
+                    <p style="font-size: 12px; color: #999; margin-top: 30px; text-align: center;">
                       Copyright © 2025 Unda Alunda
                     </p>
                   </td>
@@ -108,6 +119,7 @@ export async function POST(req: NextRequest) {
       </body>
     `;
 
+    // ✅ ส่ง email
     await resend.emails.send({
       from: 'Unda Alunda <noreply@updates.undaalunda.com>',
       to: [email],
@@ -116,6 +128,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true });
+    
   } catch (error) {
     console.error('🔥 Email send failed:', error);
     return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });

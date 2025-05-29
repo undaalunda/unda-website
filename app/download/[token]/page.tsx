@@ -1,54 +1,89 @@
 // app/download/[token]/page.tsx
 
 import { notFound } from 'next/navigation';
-import fs from 'fs/promises';
-import path from 'path';
+import supabase from '../../../lib/supabase';
 
-interface DownloadEntry {
-  token: string;
-  filePath: string;
-  createdAt: string;
-  expiresInMinutes: number;
-}
-
-export default async function Page({ params }: any) {
-  const DB_PATH = path.join(process.cwd(), 'data', 'downloads.json');
-
-  let entries: DownloadEntry[] = [];
+export default async function Page({ params }: { params: { token: string } }) {
   try {
-    const raw = await fs.readFile(DB_PATH, 'utf-8');
-    entries = JSON.parse(raw);
-  } catch (err) {
-    console.error('Failed to read downloads.json', err);
-    notFound();
+    // ✅ ดึงข้อมูลจาก Supabase แทน JSON file
+    const { data: order, error } = await supabase
+      .from('Orders')
+      .select('*')
+      .eq('download_token', params.token)
+      .single();
+
+    if (error || !order) {
+      console.error('❌ Order not found:', error?.message);
+      return notFound();
+    }
+
+    // ✅ เช็คว่า link หมดอายุหรือยัง
+    const now = new Date();
+    const expiresAt = new Date(order.download_expires);
+    
+    if (now > expiresAt) {
+      console.log('⏰ Download link expired');
+      return (
+        <main className="min-h-screen flex flex-col justify-center items-center px-4 text-[#f8fcdc] font-[Cinzel] bg-black text-center">
+          <h1 className="text-4xl font-bold mb-8 text-red-500">Download Link Expired</h1>
+          <p className="mb-7">This download link has expired. Please contact support.</p>
+          <a 
+            href="mailto:support@undaalunda.com"
+            className="bg-[#dc9e63] hover:bg-[#f8cfa3] text-black px-6 py-3 rounded-xl text-lg transition"
+          >
+            Contact Support
+          </a>
+        </main>
+      );
+    }
+
+    // ✅ สร้างรายการไฟล์ download
+    const downloadItems = order.items
+      .filter((item: any) => item.type === 'digital' || item.category === 'Backing Track')
+      .map((item: any) => ({
+        title: item.title,
+        subtitle: item.subtitle,
+        fileName: `${item.id}.wav`, // หรือ extension ที่ถูกต้อง
+        downloadUrl: `/api/download-file/${item.id}?token=${params.token}`
+      }));
+
+    if (downloadItems.length === 0) {
+      return notFound();
+    }
+
+    return (
+      <main className="min-h-screen flex flex-col justify-center items-center px-4 text-[#f8fcdc] font-[Cinzel] bg-black text-center">
+        <h1 className="text-4xl font-bold mb-8 text-[#dc9e63]">Your Downloads are Ready</h1>
+        <p className="mb-7">Click the buttons below to download your files:</p>
+
+        <div className="space-y-4 mb-8">
+          {downloadItems.map((item: any, index: number) => (
+            <a
+              key={index}
+              href={item.downloadUrl}
+              download={item.fileName}
+              className="block bg-[#dc9e63] hover:bg-[#f8cfa3] text-black px-6 py-3 rounded-xl text-lg transition max-w-md"
+            >
+              Download {item.title} - {item.subtitle}
+            </a>
+          ))}
+        </div>
+
+        <p className="text-xs mt-6 opacity-50">
+          Links expire at: {expiresAt.toLocaleString()}
+        </p>
+        
+        <a 
+          href="https://unda-website.vercel.app"
+          className="mt-4 text-[#dc9e63] hover:text-[#f8cfa3] underline"
+        >
+          ← Back to Store
+        </a>
+      </main>
+    );
+
+  } catch (error) {
+    console.error('💥 Download page error:', error);
+    return notFound();
   }
-
-  const entry = entries.find((e) => e.token === params.token);
-  if (!entry) return notFound();
-
-  const createdAt = new Date(entry.createdAt);
-  const expiresAt = new Date(createdAt.getTime() + entry.expiresInMinutes * 60000);
-  const now = new Date();
-  if (now > expiresAt) return notFound();
-
-  const fileName = entry.filePath.split('/').pop();
-
-  return (
-    <main className="min-h-screen flex flex-col justify-center items-center px-4 text-[#f8fcdc] font-[Cinzel] bg-black text-center">
-      <h1 className="text-4xl font-bold mb-8 text-[#dc9e63]">Your Download is Ready</h1>
-      <p className="mb-7">Click the button below to download your file:</p>
-
-      <a
-        href={entry.filePath}
-        download={fileName}
-        className="bg-[#dc9e63] hover:bg-[#f8cfa3] text-black px-6 py-3 rounded-xl text-lg transition"
-      >
-        Download {fileName}
-      </a>
-
-      <p className="text-xs mt-6 opacity-50">
-        Link expires at: {expiresAt.toLocaleString()}
-      </p>
-    </main>
-  );
 }
