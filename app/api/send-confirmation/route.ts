@@ -41,10 +41,15 @@ export async function POST(req: NextRequest) {
 
   try {
     let linksHtml = '';
+    let hasDigitalItems = false;
+    let hasPhysicalItems = false;
+    let digitalItemsCount = 0;
 
-    // ✅ สร้าง download links สำหรับแต่ละ digital item
+    // ✅ ตรวจสอบว่ามี digital items หรือไม่
     for (const item of cartItems || []) {
       if (item.type === 'digital' || item.category === 'Backing Track') {
+        hasDigitalItems = true;
+        digitalItemsCount++;
         console.log('🎵 Processing digital item:', item.id);
         
         const filePath = getDownloadFileForItem(item);
@@ -79,23 +84,73 @@ export async function POST(req: NextRequest) {
             </li>`;
           }
         }
+      } else {
+        hasPhysicalItems = true;
       }
+    }
+
+    // ✅ สร้าง content แยกตาม order type
+    let mainContent = '';
+    
+    if (hasDigitalItems && hasPhysicalItems) {
+      // Mixed order - มีทั้ง digital และ physical
+      mainContent = `
+        <p style="color: #f8fcdc; margin-bottom: 16px;">
+          We're thrilled to let you know that your order has been successfully received!
+        </p>
+        <p style="color: #f8fcdc; margin-bottom: 16px;">
+          Your order contains both digital and physical items:
+        </p>
+        <p style="margin-top: 30px; font-weight: bold; color: #dc9e63;">
+          📥 Digital Downloads (${digitalItemsCount} items)
+        </p>
+        <p style="margin-top: 10px;">Here are your download links (valid for 1 hour):</p>
+        <ul style="padding-left: 20px;">${linksHtml}</ul>
+        <p style="margin-top: 30px; font-weight: bold; color: #dc9e63;">
+          📦 Physical Items
+        </p>
+        <p style="margin-top: 10px;">
+          Your physical items are being prepared for shipping. You will receive another email with tracking information once they have been dispatched.
+        </p>
+      `;
+    } else if (hasDigitalItems) {
+      // Digital only order
+      mainContent = `
+        <p style="color: #f8fcdc; margin-bottom: 16px;">
+          We're thrilled to let you know that your digital order has been successfully received!
+        </p>
+        <p style="color: #f8fcdc; margin-bottom: 16px;">
+          Your downloads are ready immediately:
+        </p>
+        <p style="margin-top: 30px;">Here are your download links (valid for 1 hour):</p>
+        <ul style="padding-left: 20px;">${linksHtml}</ul>
+        <p style="margin-top: 20px; font-size: 14px; color: #999;">
+          💡 Tip: Save your files to a safe location as download links expire after 1 hour.
+        </p>
+      `;
+    } else {
+      // Physical only order
+      mainContent = `
+        <p style="color: #f8fcdc; margin-bottom: 16px;">
+          We're thrilled to let you know that your order has been successfully received and is now being processed!
+        </p>
+        <p style="color: #f8fcdc; margin-bottom: 16px;">
+          Your items are being carefully prepared for shipping.
+        </p>
+        <p style="margin-bottom: 30px;">
+          You will receive another email with tracking information once your items have been dispatched.
+        </p>
+      `;
     }
 
     // ✅ สร้าง receipt link
     const receiptHtml = receiptUrl
-      ? `<p style="margin-top: 24px;">You can also view your payment receipt here:<br/>
+      ? `<p style="margin-top: 24px;">You can view your payment receipt here:<br/>
           <a href="${receiptUrl}" target="_blank" style="color: #dc9e63; text-decoration: underline;">
             Stripe Payment Receipt
           </a>
         </p>`
       : '';
-
-    // ✅ สร้าง download section
-    const downloadSection = linksHtml
-      ? `<p style="margin-top: 30px;">Here are your download links (valid for 1 hour):</p>
-         <ul style="padding-left: 20px;">${linksHtml}</ul>`
-      : '<p style="margin-bottom: 30px;">You will receive another email once your items have shipped.</p>';
 
     // ✅ Email HTML template
     const html = `
@@ -114,10 +169,7 @@ export async function POST(req: NextRequest) {
                     <p style="color: #f8fcdc; margin-bottom: 16px;">
                       Hi <strong>${name}</strong>,
                     </p>
-                    <p style="color: #f8fcdc; margin-bottom: 16px;">
-                      We're thrilled to let you know that your order has been successfully received and is now being processed.
-                    </p>
-                    ${downloadSection}
+                    ${mainContent}
                     ${receiptHtml}
                     <a href="https://www.undaalunda.com" 
                       style="display: inline-block; background-color: #dc9e63; color: #000000; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 14px; margin-top: 30px;">
@@ -136,6 +188,7 @@ export async function POST(req: NextRequest) {
     `;
 
     console.log('📨 Sending email to:', email);
+    console.log('📦 Order type:', hasDigitalItems && hasPhysicalItems ? 'Mixed' : hasDigitalItems ? 'Digital only' : 'Physical only');
     
     // ✅ ส่ง email
     const emailResult = await resend.emails.send({
