@@ -198,27 +198,36 @@ export default function ThankYouClient() {
         {/* ✅ ข้อความสำหรับ succeeded */}
         {data.payment_status === 'succeeded' && (
           <div className="mt-4 p-3 bg-green-900/30 border border-green-600/50 rounded">
-            <p className="text-sm text-green-200">
-              <strong>✅ Payment Confirmed</strong><br/>
-              {isDigitalOnly 
-                ? 'Check your email for download links to your digital products.'
-                : hasDigitalProducts && hasPhysicalProducts
-                ? 'Check your email for download links and shipping details.'
-                : 'Check your email for order confirmation and shipping details.'
-              }
-            </p>
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <p className="text-sm text-green-200">
+                  <strong>✅ Payment Confirmed</strong><br/>
+                  {isDigitalOnly 
+                    ? 'Check your email for download links.'
+                    : hasDigitalProducts && hasPhysicalProducts
+                    ? 'Check your email for download links and shipping details.'
+                    : 'Check your email for order confirmation and shipping details.'
+                  }
+                </p>
+                {/* ✅ Digital download note - เล็กและจางลง */}
+                {hasDigitalProducts && (
+                  <p className="text-xs text-[#f8fcdc]/40 mt-1">
+                    📥 Download links expire in 1 hour
+                  </p>
+                )}
+              </div>
+              {/* ✅ Email button - เล็กและกลมกลืน */}
+              <a 
+                href={`mailto:${data.email}`} 
+                className="ml-3 px-3 py-1 text-xs bg-green-800/50 hover:bg-green-700/50 rounded transition-colors"
+              >
+                Open Email
+              </a>
+            </div>
           </div>
         )}
 
-        {/* ✅ แสดงข้อมูล Digital Downloads */}
-        {data.payment_status === 'succeeded' && hasDigitalProducts && (
-          <div className="mt-4 p-3 bg-[#dc9e63]/10 border border-[#dc9e63]/30 rounded">
-            <p className="text-sm text-[#dc9e63]">
-              <strong>📥 Digital Downloads</strong><br/>
-              Download links have been sent to your email and are valid for 1 hour.
-            </p>
-          </div>
-        )}
+        {/* ✅ ลบ Digital Downloads box ออก */}
 
         {/* ✅ Tracking info สำหรับ physical products */}
         {data.tracking_number && (
