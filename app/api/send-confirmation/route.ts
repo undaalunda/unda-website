@@ -139,10 +139,22 @@ export async function POST(req: NextRequest) {
 
     // ✅ สร้าง content แยกตาม order type
     let mainContent = '';
+    let orderSummary = '';
+    
+    // สร้าง order summary
+    if (hasDigitalItems && !hasPhysicalItems) {
+      orderSummary = `
+        <div style="background-color: rgba(30, 0, 0, 0.5); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+          <p style="margin: 0 0 8px 0; color: #dc9e63; font-weight: bold;">📥 Digital Order</p>
+          <p style="margin: 0; color: #f8fcdc; font-size: 14px;">Instant download available below</p>
+        </div>
+      `;
+    }
     
     if (hasDigitalItems && hasPhysicalItems) {
       // Mixed order - มีทั้ง digital และ physical
       mainContent = `
+        ${orderSummary}
         <p style="color: #f8fcdc; margin-bottom: 16px;">
           We're thrilled to let you know that your order has been successfully received!
         </p>
@@ -164,6 +176,7 @@ export async function POST(req: NextRequest) {
     } else if (hasDigitalItems) {
       // Digital only order
       mainContent = `
+        ${orderSummary}
         <p style="color: #f8fcdc; margin-bottom: 16px;">
           We're thrilled to let you know that your digital order has been successfully received!
         </p>
