@@ -28,16 +28,16 @@ const getDownloadFileForItem = (item: CartItem): string | null => {
     ];
     
     const downloadMap: Record<string, string> = {
-      'anomic-drums': '/download/anomic-drums.wav',
-      'jyy-guitars': '/download/jyy-guitars.pdf', 
-      'atlantic-guitar': '/download/atlantic-guitar.wav',
-      'out-dark-drums': '/download/out-dark-drums.wav',
-      'out-of-the-dark-drums': '/download/out-dark-drums.wav',
-      'out-of-the-dark': '/download/out-dark-drums.wav', // อาจจะเป็นแบบนี้
-      'feign-guitars': '/download/feign-guitars.wav',
-      'dark-keys': '/download/dark-keys.wav',
-      'reddown-bass': '/download/reddown-bass.wav',
-      'quietness-bass': '/download/quietness-bass.wav',
+      'anomic-drums': '/files/anomic-drums.wav',
+      'jyy-guitars': '/files/jyy-guitars.pdf', 
+      'atlantic-guitar': '/files/atlantic-guitar.wav',
+      'out-dark-drums': '/files/out-dark-drums.wav',
+      'out-of-the-dark-drums': '/files/out-dark-drums.wav',
+      'out-of-the-dark': '/files/out-dark-drums.wav', // อาจจะเป็นแบบนี้
+      'feign-guitars': '/files/feign-guitars.wav',
+      'dark-keys': '/files/dark-keys.wav',
+      'reddown-bass': '/files/reddown-bass.wav',
+      'quietness-bass': '/files/quietness-bass.wav',
     };
     
     // Log เพื่อ debug
