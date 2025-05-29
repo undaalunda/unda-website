@@ -1,19 +1,17 @@
 // app/api/stripe/webhook/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import supabase from '../../../../lib/supabase';
+import supabase from '.../../lib/supabase';
 
 const isLive = process.env.NODE_ENV === 'production';
 
-// ลองหา STRIPE_SECRET_KEY จากหลายแหล่ง
 const stripeSecretKey = 
   process.env.STRIPE_SECRET_KEY ||
   process.env.STRIPE_SECRET_KEY_TEST ||
   process.env.STRIPE_SECRET_KEY_LIVE;
 
-// ลองหา WEBHOOK_SECRET จากหลายแหล่ง  
 const webhookSecret = 
-  process.env.STRIPE_WEBHOOK_SECRET_TEST ||  // ✅ ตรงกับที่มีใน Vercel
+  process.env.STRIPE_WEBHOOK_SECRET_TEST ||
   process.env.STRIPE_WEBHOOK_SECRET_LIVE ||
   process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -22,7 +20,6 @@ console.log('🔍 Environment check:', {
   hasStripeKey: !!stripeSecretKey,
   hasWebhookSecret: !!webhookSecret,
   nodeEnv: process.env.NODE_ENV,
-  availableKeys: Object.keys(process.env).filter(key => key.includes('STRIPE'))
 });
 
 if (!stripeSecretKey || !webhookSecret) {
@@ -61,49 +58,100 @@ export async function POST(req: NextRequest) {
     }
 
     console.log('📬 Stripe event received:', event.type);
-    console.log('🔍 Full event metadata:', JSON.stringify(event.data.object, null, 2));
 
     if (event.type === 'payment_intent.succeeded' || event.type === 'charge.succeeded') {
       const object = event.data.object as any;
-      const { email, id: orderId } = object.metadata || {};
+      
+      // 🔍 DEBUG: ดู metadata ทั้งหมด
+      console.log('🔍 FULL METADATA:', JSON.stringify(object.metadata, null, 2));
+      
+      // ✅ ลองหา orderId จากหลาย field
+      const email = object.metadata?.email;
+      const orderId = object.metadata?.id || object.metadata?.orderId || object.metadata?.order_id;
 
       console.log('📧 Email from metadata:', email);
       console.log('🆔 OrderId from metadata:', orderId);
+      console.log('🔍 Available metadata keys:', Object.keys(object.metadata || {}));
 
       if (!email || !orderId) {
-        console.warn('⚠️ Missing metadata (email or orderId)');
-        return NextResponse.json({ received: true, warning: 'Missing metadata' });
+        console.warn('⚠️ Missing metadata:', { email: !!email, orderId: !!orderId });
+        console.warn('⚠️ Full metadata object:', object.metadata);
+        return NextResponse.json({ 
+          received: true, 
+          warning: 'Missing metadata',
+          debug: { metadata: object.metadata }
+        });
       }
 
       try {
-        // ✅ ค้นหา order ใน database โดยไม่ใช้ .single() ที่ทำให้เกิด error
+        // 🔍 DEBUG: ค้นหา order ทุกวิธี
+        console.log('🔍 Searching for order with:', { email, orderId });
+        
+        // ✅ ค้นหาแบบ flexible - ลอง search ทั้ง string และ UUID
         const { data: orders, error: fetchError } = await supabase
           .from('Orders')
           .select('*')
-          .eq('id', orderId)
-          .eq('email', email);
+          .eq('email', email)
+          .or(`id.eq.${orderId},id.eq."${orderId}"`);
 
         if (fetchError) {
           console.error('❌ Supabase fetch error:', fetchError.message);
+          
+          // ✅ ลองค้นหาแบบอื่น
+          const { data: allOrders, error: altError } = await supabase
+            .from('Orders')
+            .select('*')
+            .eq('email', email)
+            .order('created_at', { ascending: false })
+            .limit(5);
+            
+          console.log('🔍 Recent orders for email:', allOrders?.map(o => ({ id: o.id, status: o.payment_status })));
+          
           return NextResponse.json({ error: 'Database fetch failed' }, { status: 500 });
         }
 
+        console.log('🔍 Found orders:', orders?.length || 0);
+        console.log('🔍 Orders data:', orders?.map(o => ({ 
+          id: o.id, 
+          payment_status: o.payment_status,
+          created_at: o.created_at 
+        })));
+
         if (!orders || orders.length === 0) {
+          // ✅ ลองค้นหาด้วย email อย่างเดียว
+          const { data: emailOrders } = await supabase
+            .from('Orders')
+            .select('*')
+            .eq('email', email)
+            .order('created_at', { ascending: false })
+            .limit(3);
+            
+          console.log('🔍 All orders for this email:', emailOrders?.map(o => ({ 
+            id: o.id, 
+            payment_status: o.payment_status 
+          })));
+          
           console.error('❌ Order not found for ID:', orderId, 'Email:', email);
-          return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+          return NextResponse.json({ 
+            error: 'Order not found',
+            debug: { 
+              searchedOrderId: orderId,
+              searchedEmail: email,
+              foundOrders: emailOrders?.length || 0
+            }
+          }, { status: 404 });
         }
 
-        const order = orders[0]; // เอา order แรกมาใช้
+        const order = orders[0];
         console.log('📦 Found order:', order.id, 'Current payment_status:', order.payment_status);
 
         // ✅ อัพเดทสถานะถ้ายังไม่เป็น succeeded
         if (order.payment_status !== 'succeeded') {
-          // ✅ ใช้ field ที่ถูกต้องตาม database schema
           const updateData: any = { 
             payment_status: 'succeeded'
           };
 
-          // ✅ ถ้าเป็น digital only หรือไม่มี shipping ให้เปลี่ยนสถานะเป็น paid
+          // ✅ ถ้าเป็น digital only ให้เปลี่ยนสถานะเป็น paid
           if (!order.shipping_method || order.shipping_method === null) {
             updateData.status = 'paid';
             console.log('🎵 Digital order detected, setting status to paid');
@@ -111,12 +159,11 @@ export async function POST(req: NextRequest) {
 
           console.log('🔄 Updating order with data:', updateData);
 
-          // ✅ ใช้ .eq() แทน .single() เพื่อหลีกเลี่ยง multiple rows error
-          const { error: updateError } = await supabase
+          const { data: updatedData, error: updateError } = await supabase
             .from('Orders')
             .update(updateData)
-            .eq('id', orderId)
-            .eq('email', email);
+            .eq('id', order.id)
+            .select();
 
           if (updateError) {
             console.error('❌ Supabase update error:', updateError.message);
@@ -124,22 +171,22 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Database update failed' }, { status: 500 });
           }
 
-          console.log(`✅ Order ${orderId} updated successfully to payment_status: succeeded`);
-          
-          // ✅ ดึงข้อมูล order ที่ update แล้วเพื่อ confirm
-          const { data: updatedOrder } = await supabase
-            .from('Orders')
-            .select('payment_status, status')
-            .eq('id', orderId)
-            .single();
-            
-          console.log('📋 Updated order status:', updatedOrder);
+          console.log(`✅ Order ${order.id} updated successfully!`);
+          console.log('📋 Updated data:', updatedData);
         } else {
           console.log('🟢 Order already marked as succeeded');
         }
 
+        return NextResponse.json({ 
+          received: true,
+          processed: true,
+          orderId: order.id,
+          newStatus: 'succeeded'
+        });
+
       } catch (dbError: any) {
         console.error('💥 Database operation error:', dbError.message);
+        console.error('💥 Full stack:', dbError.stack);
         return NextResponse.json({ error: 'Database error' }, { status: 500 });
       }
       

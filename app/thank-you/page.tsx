@@ -1,4 +1,4 @@
-// /app/thank-you/page.tsx
+// app/thank-you/page.tsx
 
 'use client';
 
