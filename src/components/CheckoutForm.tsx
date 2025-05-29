@@ -386,16 +386,17 @@ if (result.error) {
   setSuccess(true);
   clearCart();
 
-  await fetch('/api/send-confirmation', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      name: trimmedBilling.firstName,
-      email: trimmedBilling.email,
-      cartItems,
-      receiptUrl: result.receiptUrl,
-    }),
-  });
+ await fetch('/api/send-confirmation', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    name: trimmedBilling.firstName,
+    email: trimmedBilling.email,
+    cartItems,
+    receiptUrl: result.receiptUrl,
+    orderId: orderId, // เพิ่ม orderId
+  }),
+});
 
   const saveRes = await fetch('/api/save-order', {
   method: 'POST',

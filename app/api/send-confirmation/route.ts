@@ -14,27 +14,57 @@ interface CartItem {
 }
 
 const getDownloadFileForItem = (item: CartItem): string | null => {
-  const downloadMap: Record<string, string> = {
-    'anomic-drums': '/files/anomic-drums.wav',
-    'jyy-guitars': '/files/jyy-guitars.pdf', 
-    'atlantic-guitar': '/files/atlantic-guitar.wav',
-    'out-dark-drums': '/files/out-dark-drums.wav',
-    'out-of-the-dark-drums': '/files/out-dark-drums.wav', // เพิ่มแบบเต็ม
-    'feign-guitars': '/files/feign-guitars.wav',
-    'dark-keys': '/files/dark-keys.wav',
-    'reddown-bass': '/files/reddown-bass.wav',
-    'quietness-bass': '/files/quietness-bass.wav',
-  };
+  // ถ้าเป็น Backing Track หรือ digital product
+  if (item.category === 'Backing Track' || item.type === 'digital') {
+    // สร้าง filename จาก title และ subtitle
+    const titleSlug = item.title.toLowerCase().replace(/\s+/g, '-');
+    const subtitleSlug = item.subtitle.toLowerCase();
+    
+    // Map ตาม pattern ที่มีอยู่
+    const possibleIds = [
+      item.id,
+      `${titleSlug}-${subtitleSlug}`,
+      `${titleSlug}`,
+    ];
+    
+    const downloadMap: Record<string, string> = {
+      'anomic-drums': '/files/anomic-drums.wav',
+      'jyy-guitars': '/files/jyy-guitars.pdf', 
+      'atlantic-guitar': '/files/atlantic-guitar.wav',
+      'out-dark-drums': '/files/out-dark-drums.wav',
+      'out-of-the-dark-drums': '/files/out-dark-drums.wav',
+      'out-of-the-dark': '/files/out-dark-drums.wav', // อาจจะเป็นแบบนี้
+      'feign-guitars': '/files/feign-guitars.wav',
+      'dark-keys': '/files/dark-keys.wav',
+      'reddown-bass': '/files/reddown-bass.wav',
+      'quietness-bass': '/files/quietness-bass.wav',
+    };
+    
+    // Log เพื่อ debug
+    console.log('🔍 Looking for download file:', {
+      itemId: item.id,
+      itemTitle: item.title,
+      itemSubtitle: item.subtitle,
+      possibleIds,
+      category: item.category,
+      type: item.type
+    });
+    
+    // ลองหาจาก possible IDs
+    for (const id of possibleIds) {
+      if (downloadMap[id]) {
+        console.log('✅ Found file for ID:', id);
+        return downloadMap[id];
+      }
+    }
+    
+    // ถ้าไม่เจอใน map ให้ลองสร้าง path เอง
+    const defaultFile = `/files/${titleSlug}-${subtitleSlug}.wav`;
+    console.log('⚠️ No mapping found, using default:', defaultFile);
+    return defaultFile;
+  }
   
-  // Log เพื่อ debug
-  console.log('🔍 Looking for download file:', {
-    itemId: item.id,
-    itemTitle: item.title,
-    itemSubtitle: item.subtitle,
-    foundInMap: downloadMap[item.id] ? 'Yes' : 'No'
-  });
-  
-  return downloadMap[item.id] || null;
+  return null;
 };
 
 export async function POST(req: NextRequest) {
@@ -46,8 +76,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Email service not configured' }, { status: 500 });
   }
 
-  const { name, email, cartItems, receiptUrl } = await req.json();
-  console.log('🧾 Request data:', { name, email, cartItemsCount: cartItems?.length, receiptUrl });
+  const { name, email, cartItems, receiptUrl, orderId } = await req.json();
+  console.log('🧾 Request data:', { name, email, cartItemsCount: cartItems?.length, receiptUrl, orderId });
 
   try {
     let linksHtml = '';
@@ -82,7 +112,7 @@ export async function POST(req: NextRequest) {
           const tokenRes = await fetch(`${baseUrl}/api/download-link`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ filePath })
+            body: JSON.stringify({ filePath, orderId })
           });
 
           if (!tokenRes.ok) {
