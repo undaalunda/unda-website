@@ -123,7 +123,19 @@ export default function ThankYouClient() {
       <div className="bg-[#1a0000]/60 border border-[#f8fcdc]/20 p-6 rounded-md space-y-3">
         <p><strong>Email:</strong> <span className="text-[#f8fcdc]/50">{data.email}</span></p>
         <p><strong>Order ID:</strong> <span className="text-[#f8fcdc]/50">{orderId}</span></p>
-        <p><strong>Date:</strong> <span className="text-[#f8fcdc]/50">{new Date(data.created_at).toLocaleString()}</span></p>
+        <p><strong>Date:</strong> 
+  <span className="text-[#f8fcdc]/50">
+    {new Date(data.created_at).toLocaleString('th-TH', {
+      timeZone: 'Asia/Bangkok',
+      year: 'numeric',
+      month: '2-digit', 
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    })}
+  </span>
+</p>
         
         {/* ✅ สถานะแสดงผลให้ชัดเจนขึ้น */}
         <p>
@@ -135,7 +147,7 @@ export default function ThankYouClient() {
               ? 'bg-yellow-600 text-white'
               : 'bg-gray-600 text-white'
           }`}>
-            {data.payment_status === 'succeeded' ? '✅ PAID' : 
+            {data.payment_status === 'succeeded' ? 'PAID' : 
              data.payment_status === 'pending' ? '⏳ PROCESSING' : 
              data.payment_status?.toUpperCase()}
           </span>
@@ -168,7 +180,7 @@ export default function ThankYouClient() {
         {data.payment_status === 'succeeded' && (
           <div className="mt-4 p-3 bg-green-900/30 border border-green-600/50 rounded">
             <p className="text-sm text-green-200">
-              <strong>✅ Payment Confirmed</strong><br/>
+              <strong>Payment Confirmed</strong><br/>
               Check your email for download links and order details.
             </p>
           </div>
