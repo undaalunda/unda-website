@@ -110,10 +110,12 @@ export async function POST(req: NextRequest) {
 
           console.log('🔄 Updating order with data:', updateData);
 
-          const { error: updateError } = await supabase
+          const { data: updatedOrder, error: updateError } = await supabase
             .from('Orders')
             .update(updateData)
-            .eq('id', orderId);
+            .eq('id', orderId)
+            .select() // ✅ เพิ่ม .select() เพื่อ return ข้อมูลที่ update
+            .single();
 
           if (updateError) {
             console.error('❌ Supabase update error:', updateError.message);
@@ -122,6 +124,7 @@ export async function POST(req: NextRequest) {
           }
 
           console.log(`✅ Order ${orderId} updated successfully to payment_status: succeeded`);
+          console.log('📋 Updated order data:', updatedOrder); // ✅ Log ข้อมูลที่ update แล้ว
         } else {
           console.log('🟢 Order already marked as succeeded');
         }

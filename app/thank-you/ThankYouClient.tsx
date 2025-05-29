@@ -29,7 +29,8 @@ export default function ThankYouClient() {
       try {
         console.log(`🔁 Polling Attempt ${attempts + 1} for order:`, { email, orderId });
 
-        const res = await fetch(`/api/order-status?email=${email}&id=${orderId}`, {
+        const timestamp = Date.now(); // ✅ Cache buster
+        const res = await fetch(`/api/order-status?email=${email}&id=${orderId}&t=${timestamp}`, {
           cache: 'no-store',
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
