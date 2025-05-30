@@ -203,10 +203,10 @@ export default function ThankYouClient() {
                 <p className="text-sm text-green-200">
                   <strong>Payment Confirmed</strong><br/>
                   {isDigitalOnly 
-                    ? 'Check your email for download links.'
+                    ? <>Check your email <strong>{data.email}</strong> for download links.</>
                     : hasDigitalProducts && hasPhysicalProducts
-                    ? 'Check your email for download links and shipping details.'
-                    : 'Check your email for order confirmation and shipping details.'
+                    ? <>Check your email <strong>{data.email}</strong> for download links and shipping details.</>
+                    : <>Check your email <strong>{data.email}</strong> for order confirmation and shipping details.</>
                   }
                 </p>
                 {/* ✅ Digital download note - เล็กและจางลง */}
