@@ -1,4 +1,4 @@
-// AppClientWrapper.tsx
+// AppClientWrapper.tsx - Performance Optimized
 
 'use client';
 
@@ -9,14 +9,15 @@ import CartSuccessPopup from '@/components/CartSuccessPopup';
 import NewsletterForm from '@/components/NewsletterForm';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useCart } from '@/context/CartContext'; // ✅ import มาใช้งานเลย
+import { useCart } from '@/context/CartContext';
 
+// 🚀 Lazy load Navbar for better initial load
 const Navbar = dynamic(() => import('@/components/Navbar'), { ssr: false });
 
 export default function AppClientWrapper({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
-  const { setLastActionItem } = useCart(); // ✅ เคลียร์ popup ตอน path เปลี่ยน
+  const { setLastActionItem } = useCart();
 
   useEffect(() => {
     const handler = (e: any) => {
@@ -32,7 +33,7 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
   }, []);
 
   useEffect(() => {
-    setLastActionItem(null); // ✅ เคลียร์ popup ตอน path เปลี่ยนทุกหน้า
+    setLastActionItem(null);
   }, [pathname]);
 
   return (
@@ -52,22 +53,34 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
           <section className="newsletter-section">
             <div className="footer-logo-social">
               <Image
-                src="/footer-logo-v7.png"
+                src="/footer-logo-v7.webp"  // 🚀 เปลี่ยนเป็น WebP
                 alt="Unda Alunda Cat Logo"
                 width={120}
                 height={120}
-                quality={100}
-                priority
-                unoptimized={true}
+                quality={90}  // 🎯 ปรับ quality ลงเล็กน้อย
+                loading="lazy" // 🚀 Lazy load footer logo
+                sizes="120px" // 📐 Fixed size
                 className="glow-logo mx-auto mb-6"
               />
               <div className="social-icons mb-6">
-                <a href="https://www.facebook.com/UndaAlunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-facebook" /></a>
-                <a href="https://www.youtube.com/@undaalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-youtube" /></a>
-                <a href="https://www.instagram.com/undalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-instagram" /></a>
-                <a href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0?si=JsdyQRqGRCGYfxU_nB_qvQ" target="_blank" rel="noopener noreferrer"><i className="fab fa-spotify" /></a>
-                <a href="https://twitter.com/undaalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-x-twitter" /></a>
-                <a href="https://www.threads.net/@undalunda" target="_blank" rel="noopener noreferrer"><i className="fab fa-threads" /></a>
+                <a href="https://www.facebook.com/UndaAlunda" target="_blank" rel="noopener noreferrer">
+                  <i className="fab fa-facebook" />
+                </a>
+                <a href="https://www.youtube.com/@undaalunda" target="_blank" rel="noopener noreferrer">
+                  <i className="fab fa-youtube" />
+                </a>
+                <a href="https://www.instagram.com/undalunda" target="_blank" rel="noopener noreferrer">
+                  <i className="fab fa-instagram" />
+                </a>
+                <a href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0?si=JsdyQRqGRCGYfxU_nB_qvQ" target="_blank" rel="noopener noreferrer">
+                  <i className="fab fa-spotify" />
+                </a>
+                <a href="https://twitter.com/undaalunda" target="_blank" rel="noopener noreferrer">
+                  <i className="fab fa-x-twitter" />
+                </a>
+                <a href="https://www.threads.net/@undalunda" target="_blank" rel="noopener noreferrer">
+                  <i className="fab fa-threads" />
+                </a>
               </div>
               <div className="newsletter-divider"></div>
             </div>
@@ -78,11 +91,17 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
 
             <div className="footer-bottom mt-5 text-center">
               <div className="footer-links flex flex-wrap justify-center items-center gap-2 text-sm text-[#f8fcdc]/80 tracking-wide">
-                <Link href="/shipping-and-returns" className="hover:text-[#dc9e63] transition-colors duration-200">SHIPPING & RETURNS</Link>
+                <Link href="/shipping-and-returns" className="hover:text-[#dc9e63] transition-colors duration-200">
+                  SHIPPING & RETURNS
+                </Link>
                 <span className="divider">|</span>
-                <Link href="/terms-and-conditions" className="hover:text-[#dc9e63] transition-colors duration-200">TERMS & CONDITIONS</Link>
+                <Link href="/terms-and-conditions" className="hover:text-[#dc9e63] transition-colors duration-200">
+                  TERMS & CONDITIONS
+                </Link>
                 <span className="divider">|</span>
-                <Link href="/privacy-policy" className="hover:text-[#dc9e63] transition-colors duration-200">PRIVACY POLICY</Link>
+                <Link href="/privacy-policy" className="hover:text-[#dc9e63] transition-colors duration-200">
+                  PRIVACY POLICY
+                </Link>
               </div>
               <p className="text-[#f8fcdc] mt-6 text-xs text-center">
                 Copyright © 2025 Unda Alunda

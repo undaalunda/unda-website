@@ -1,4 +1,4 @@
-// app/layout.tsx
+// app/layout.tsx - Performance Optimized
 
 import './globals.css';
 import type { Metadata } from 'next';
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Unda Alunda',
     description: 'Official site and merch shop for Unda Alunda.',
-    images: ['/catmoon-bg.jpeg'],
+    images: ['/catmoon-bg.jpeg'], // ✅ เก็บ JPEG สำหรับ social media
     creator: '@undaalunda',
   },
   icons: {
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     'og:description': 'The New Album Dark Wonderful World out July 1, 2025 — Purchase now!',
     'og:url': 'https://unda-website.vercel.app',
     'og:site_name': 'Unda Alunda',
-    'og:image': 'https://unda-website.vercel.app/catmoon-bg.jpeg',
+    'og:image': 'https://unda-website.vercel.app/catmoon-bg.jpeg', // ✅ เก็บ JPEG
     'og:image:width': '1200',
     'og:image:height': '630',
     'og:image:alt': 'Unda Alunda Hero Image',
@@ -44,6 +44,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
+        {/* 🚀 Preload critical assets */}
+        <link rel="preload" href="/text-hero-section.webp" as="image" type="image/webp" />
+        <link rel="preload" href="/footer-logo-v7.webp" as="image" type="image/webp" />
+        
+        {/* 🎯 DNS prefetch for external domains */}
+        <link rel="dns-prefetch" href="//widget.bandsintown.com" />
+        <link rel="dns-prefetch" href="//www.youtube.com" />
+        <link rel="dns-prefetch" href="//open.spotify.com" />
+        
         <meta name="google-site-verification" content="l9-GepfNOG2FpwhTM3lKy6YjpQ0ifAmNbLsv1oqC2uo" />
         <meta name="robots" content="index, follow" />
         <meta name="author" content="Unda Alunda" />
@@ -60,7 +69,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <meta property="music:musician" content="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0" />
 
-        {/* ✅ Force preview images */}
+        {/* ✅ Force preview images - เก็บ JPEG สำหรับ social media */}
         <meta property="og:image" content="https://unda-website.vercel.app/catmoon-bg.jpeg" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
@@ -89,50 +98,50 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
 
         {/* ✅ Structured Data for Person */}
-<script
-  type="application/ld+json"
-  dangerouslySetInnerHTML={{
-    __html: JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "Person",
-      "@id": "https://unda-website.vercel.app#person",
-      "name": "Alunda Chantharattanachoke",
-      "alternateName": "Unda Alunda",
-      "url": "https://unda-website.vercel.app",
-      "image": "https://unda-website.vercel.app/catmoon-bg.jpeg",
-      "sameAs": [
-        "https://www.instagram.com/undalunda",
-        "https://www.youtube.com/@undaalunda",
-        "https://www.facebook.com/undaalunda",
-        "https://www.threads.net/@undalunda",
-        "https://twitter.com/undaalunda",
-        "https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0",
-        "https://music.apple.com/us/artist/unda-alunda/1543677299",
-        "https://www.deezer.com/en/artist/115903802",
-        "https://tidal.com/browse/artist/22524871",
-        "https://music.amazon.com/artists/B08PVKFZDZ"
-      ],
-      "jobTitle": "Guitarist, Composer",
-      "nationality": "Thai",
-      "birthDate": "1999-10-11",
-      "gender": "Male",
-      "brand": {
-        "@type": "Brand",
-        "name": "Abasi Concepts",
-        "url": "https://www.abasiconcepts.com"
-      },
-      "affiliation": {
-        "@type": "Organization",
-        "name": "Abasi Concepts",
-        "url": "https://www.abasiconcepts.com"
-      },
-      "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": "https://unda-website.vercel.app/about"
-      }
-    })
-  }}
-/>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Person",
+              "@id": "https://unda-website.vercel.app#person",
+              "name": "Alunda Chantharattanachoke",
+              "alternateName": "Unda Alunda",
+              "url": "https://unda-website.vercel.app",
+              "image": "https://unda-website.vercel.app/catmoon-bg.jpeg",
+              "sameAs": [
+                "https://www.instagram.com/undalunda",
+                "https://www.youtube.com/@undaalunda",
+                "https://www.facebook.com/undaalunda",
+                "https://www.threads.net/@undalunda",
+                "https://twitter.com/undaalunda",
+                "https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0",
+                "https://music.apple.com/us/artist/unda-alunda/1543677299",
+                "https://www.deezer.com/en/artist/115903802",
+                "https://tidal.com/browse/artist/22524871",
+                "https://music.amazon.com/artists/B08PVKFZDZ"
+              ],
+              "jobTitle": "Guitarist, Composer",
+              "nationality": "Thai",
+              "birthDate": "1999-10-11",
+              "gender": "Male",
+              "brand": {
+                "@type": "Brand",
+                "name": "Abasi Concepts",
+                "url": "https://www.abasiconcepts.com"
+              },
+              "affiliation": {
+                "@type": "Organization",
+                "name": "Abasi Concepts",
+                "url": "https://www.abasiconcepts.com"
+              },
+              "mainEntityOfPage": {
+                "@type": "WebPage",
+                "@id": "https://unda-website.vercel.app/about"
+              }
+            })
+          }}
+        />
 
         {/* ✅ Structured Data for Education & Awards */}
         <script

@@ -1,4 +1,4 @@
-/* Globals.css */
+/* Globals.css - Performance Optimized */
 
 @import "tailwindcss";
 
@@ -30,6 +30,7 @@ body {
   background-color: #190000;
 }
 
+/* 🚀 Background image optimization with WebP + fallback */
 body::before {
   content: '';
   position: fixed;
@@ -37,7 +38,7 @@ body::before {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-image: url('/redsky-bg.jpeg');
+  background-image: url('/redsky-bg.webp'); /* 🎯 WebP แทน JPEG */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -45,6 +46,13 @@ body::before {
   pointer-events: none;
   will-change: transform;
   transform: translate3d(0, 0, 0);
+}
+
+/* 🔄 Fallback สำหรับเบราเซอร์เก่าที่ไม่รองรับ WebP */
+@supports not (background-image: url('image.webp')) {
+  body::before {
+    background-image: url('/redsky-bg.jpeg');
+  }
 }
 
 main,
@@ -71,12 +79,13 @@ main,
   margin-top: 0;
 }
 
+/* 🚀 Catmoon background optimization */
 .catmoon-background {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  background-image: url('/catmoon-bg.jpeg');
+  background-image: url('/catmoon-bg.webp'); /* 🎯 WebP แทน JPEG */
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -93,6 +102,13 @@ main,
     rgba(0, 0, 0, 0) 100%);
 }
 
+/* 🔄 Fallback สำหรับ catmoon background */
+@supports not (background-image: url('image.webp')) {
+  .catmoon-background {
+    background-image: url('/catmoon-bg.jpeg');
+  }
+}
+
 .catmoon-background::after {
   content: '';
   position: absolute;
@@ -103,7 +119,7 @@ main,
 
 .hero-text-image {
   position: absolute;
-  top: 10vh; /* น้อยลงนิดหน่อย ถ้าไม่อยากให้มันสูงเกิน */
+  top: 10vh;
   left: 50%;
   transform: translateX(-50%);
   width: 80%;
@@ -153,7 +169,6 @@ main,
 }
 
 @media (max-width: 480px) {
-
   .hero-text-image {
     width: 100%;
     max-width: 400px;
@@ -171,20 +186,17 @@ main,
   transform-origin: top center;
 }
 
-/* สำหรับ layout breakpoint */
 @media (max-width: 768px) {
   .navbar-inner-wrapper {
     gap: 1rem;
   }
 }
 
-/* ปรับไอคอนตอน active (theme-based red) */
 button:active svg,
 .navbar-icon:active svg {
   stroke: #9a1d2e;
 }
 
-/* ให้ svg transition นุ่มนวล */
 button svg,
 .navbar-icon svg {
   transition: stroke 0.3s ease;
@@ -192,7 +204,7 @@ button svg,
 
 /* === NAVBAR ICONS === */
 .navbar-icon {
-  color: #f8fcdc99; /* #f8fcdc/60 */
+  color: #f8fcdc99;
   transition: color 0.3s ease, stroke 0.3s ease;
 }
 
@@ -215,21 +227,18 @@ button svg,
   object-fit: contain;
 }
 
-/* 💻 Tablet */
 @media (max-width: 1279px) {
   .logo-navbar-img {
     width: 200px;
   }
 }
 
-/* 📱 Mobile */
 @media (max-width: 768px) {
   .logo-navbar-img {
     width: 180px;
   }
 }
 
-/* 📱 XS Devices */
 @media (max-width: 480px) {
   .logo-navbar-img {
     width: 160px;
@@ -274,7 +283,6 @@ button svg,
   .hero-line1 {
     font-size: 14px;
     letter-spacing: 0.5em;
-    
   }
   .hero-line2 {
     font-size: 11px;
@@ -364,10 +372,9 @@ button svg,
   width: 800px;
   height: 450px;
   border: none;
-  border-radius: 1%; /* 🌝 เพิ่มความมนแบบละมุน 1% */
+  border-radius: 1%;
 }
 
-/* Responsive YouTube */
 @media (max-width: 1279px) {
   .youtube-frame {
     width: 640px;
@@ -378,7 +385,7 @@ button svg,
 
 @media (max-width: 768px) {
   .video-section {
-    margin-top: 0rem; /* 👈 ปรับเพื่อใกล้ปุ่มบนมือถือ */
+    margin-top: 0rem;
   }
 
   .youtube-frame {
@@ -396,7 +403,7 @@ button svg,
   }
 }
 
-/* === BUTTON GROUP (Homepage ปุ่มใหญ่ๆ เช่น SCORES / STEMS / MERCH / PHYSICAL / DIGITAL) === */
+/* === BUTTON GROUP === */
 .button-group {
   display: flex;
   flex-wrap: wrap;
@@ -414,7 +421,6 @@ button svg,
   transform: translateY(0);
 }
 
-/* ปุ่มใน Homepage (ใหญ่ๆ) */
 .info-button {
   background-color: transparent;
   border: 1px solid #dc9e63;
@@ -431,15 +437,12 @@ button svg,
   cursor: pointer;
 }
 
-/* 😌 Hover นุ่มๆ */
 .info-button:hover {
   background-color: #dc9e63;
   color: #0d0d0d;
   mix-blend-mode: difference;
 }
 
-/* --- Breakpoints --- */
-/* 💻 Tablet: ≤1279px */
 @media (max-width: 1279px) {
   .info-button {
     font-size: 10px;
@@ -447,7 +450,6 @@ button svg,
   }
 }
 
-/* 📱 Mobile: ≤768px */
 @media (max-width: 768px) {
   .button-group {
     flex-direction: column;
@@ -463,7 +465,7 @@ button svg,
   }
 }
 
-/* === SHOP PAGE TAB GROUP (ปุ่ม MERCH / MUSIC / BUNDLES / DIGITAL) === */
+/* === SHOP PAGE TAB GROUP === */
 .shop-tab-group {
   display: flex;
   flex-wrap: wrap;
@@ -471,7 +473,6 @@ button svg,
   gap: 1rem;
 }
 
-/* ปุ่มเล็กลงหน่อย */
 .shop-tab-button {
   min-width: 160px;
   padding: 0.75rem 1.5rem;
@@ -487,20 +488,16 @@ button svg,
   white-space: nowrap;
 }
 
-/* 😌 Hover นุ่มๆ */
 .shop-tab-button:hover {
   background-color: #dc9e63;
   color: #0d0d0d;
 }
 
-/* ถ้า Active */
 .shop-tab-button.active-tab {
   background-color: #dc9e63;
   color: #0d0d0d;
 }
 
-/* --- Breakpoints --- */
-/* 💻 Tablet: <1280px */
 @media (max-width: 1279px) {
   .shop-tab-button {
     min-width: 120px;
@@ -509,7 +506,6 @@ button svg,
   }
 }
 
-/* 📱 Mobile: <768px */
 @media (max-width: 927px) {
   .shop-tab-group {
     justify-content: center;
@@ -519,7 +515,7 @@ button svg,
 
   .shop-tab-button {
     min-width: 100px;
-    width: auto; /* ⬅️ ไม่ยืดเต็มจอแล้วนะจ๊ะ */
+    width: auto;
     padding: 0.5rem 0.3rem;
     font-size: 11px;
   }
@@ -534,17 +530,13 @@ button svg,
 
   .shop-tab-button {
     min-width: 80px;
-    width: auto; /* ⬅️ ไม่ยืดเต็มจอแล้วนะจ๊ะ */
+    width: auto;
     padding: 0.5rem 0.3rem;
     font-size: 9px;
   }
 }
 
-
 /* Contact Layout */
-
-/* === CONTACT PAGE STYLING === */
-
 .contact-section {
   min-height: 100vh;
   display: flex;
@@ -557,7 +549,6 @@ button svg,
   color: #f8fcdc;
 }
 
-/* responsive padding */
 @media (min-width: 640px) {
   .contact-section {
     padding-left: 1.5rem;
@@ -595,21 +586,18 @@ button svg,
   margin-bottom: 2rem;
 }
 
-/* 💻 Tablet (≤1024px) */
 @media (max-width: 1024px) {
   .contact-title {
     font-size: 2rem;
   }
 }
 
-/* 📱 Mobile (≤768px) */
 @media (max-width: 768px) {
   .contact-title {
     font-size: 1.75rem;
   }
 }
 
-/* 🍼 Extra Small (≤480px) */
 @media (max-width: 480px) {
   .contact-title {
     font-size: 1.5rem;
@@ -669,22 +657,20 @@ button svg,
 
 .since-note {
   text-align: center;
-  font-size: 0.65rem; /* 💻 Desktop default */
-  color: #bcbcbc; /* สีเทาหม่นใจ */
+  font-size: 0.65rem;
+  color: #bcbcbc;
   letter-spacing: 0.2em;
   font-family: 'Cinzel', serif;
   text-transform: uppercase;
   margin-top: -0.5rem;
 }
 
-/* 💻 Tablet หรือจอไม่ใหญ่เกินไป (≤1279px) */
 @media (max-width: 1279px) {
   .since-note {
     font-size: 0.6rem;
   }
 }
 
-/* 📱 Mobile จอเล็ก (≤768px) */
 @media (max-width: 768px) {
   .since-note {
     font-size: 0.55rem;
@@ -692,7 +678,6 @@ button svg,
 }
 
 /* === TRANSCRIPTION PRODUCT SECTION === */
-
 .transcription-section {
   text-align: center;
   padding: 5rem 2rem 5rem;
@@ -725,7 +710,6 @@ button svg,
   margin: 0 auto;
 }
 
-/* 💻 Desktop: ≥1279px — บรรทัดละ 4 */
 @media (min-width: 1279px) {
   .product-item {
     flex: 0 0 calc(25% - 2rem);
@@ -733,7 +717,6 @@ button svg,
   }
 }
 
-/* 💻 Tablet: 768px - 1278px — บรรทัดละ 2 */
 @media (max-width: 1278px) and (min-width: 768px) {
   .product-item {
     flex: 0 0 calc(50% - 2rem);
@@ -741,7 +724,6 @@ button svg,
   }
 }
 
-/* 📱 Mobile: <768px — บรรทัดละ 2 (ไม่ใช่ 1 ละนะนาย) */
 @media (max-width: 767px) {
   .product-item {
     flex: 0 0 calc(50% - 2rem);
@@ -764,21 +746,18 @@ button svg,
   transition: transform 0.3s ease;
 }
 
-/* 🖥️ Jumbo Screen: ≥1280px */
 @media (min-width: 1280px) {
   .product-image {
     width: 200px;
   }
 }
 
-/* 💻 Tablet: ≤1279px */
 @media (max-width: 1279px) {
   .product-image {
     width: 160px;
   }
 }
 
-/* 📱 Extra-Smol Devices: ≤480px */
 @media (max-width: 480px) {
   .product-image {
     width: 140px;
@@ -787,12 +766,6 @@ button svg,
 
 .product-image:hover {
   transform: scale(1.05);
-}
-
-.product-label-link {
-  text-decoration: none;
-  color: inherit;
-  transition: color 0.3s ease;
 }
 
 .product-label-link {
@@ -808,7 +781,6 @@ button svg,
   cursor: pointer;
 }
 
-/* 🪄 ให้ภาพขยับเวลา hover ที่ลิงก์รวมทั้งข้อความ */
 .product-label-link:hover .product-image {
   transform: scale(1.05);
 }
@@ -819,8 +791,7 @@ button svg,
   font-family: 'Cinzel', serif;
 }
 
-/* === TRANSCRIPTIONS PRODRUCT FONT SIZE === */
-
+/* === TRANSCRIPTIONS PRODUCT FONT SIZE === */
 .product-title {
   font-size: 0.8rem;
   font-weight: 600;
@@ -836,7 +807,6 @@ button svg,
   color: #f8fcdc;
 }
 
-/* 💻 Tablet: ≤1279px */
 @media (max-width: 1279px) {
   .product-title {
     font-size: 0.7rem;
@@ -847,7 +817,6 @@ button svg,
   }
 }
 
-/* 📱 Mobile: ≤768px */
 @media (max-width: 768px) {
   .product-title {
     font-size: 0.8rem;
@@ -858,7 +827,6 @@ button svg,
   }
 }
 
-/* 📱 Ultra Small: ≤480px */
 @media (max-width: 480px) {
   .product-title {
     font-size: 0.75rem;
@@ -873,7 +841,7 @@ button svg,
   font-size: 1rem;
   font-weight: bold;
   margin-top: 0rem;
-  color: #cc3f33  ;
+  color: #cc3f33;
   letter-spacing: 0.2em;
   font-family: 'Cinzel', serif;
   transition: color 0.3s ease;
@@ -886,7 +854,6 @@ button svg,
 }
 
 /* === STEMS & BACKING TRACKS, MUSIC & MERCH PRODUCT SECTION === */
-
 .stems-section {
   text-align: center;
   padding: 2rem 2rem 5rem;
@@ -919,7 +886,6 @@ button svg,
   margin: 0 auto;
 }
 
-/* 💻 Desktop: ≥1279px — บรรทัดละ 4 */
 @media (min-width: 1279px) {
   .stems-item {
     flex: 0 0 calc(25% - 2rem);
@@ -927,7 +893,6 @@ button svg,
   }
 }
 
-/* 💻 Tablet: 768px - 1278px — บรรทัดละ 2 */
 @media (max-width: 1278px) and (min-width: 768px) {
   .stems-item {
     flex: 0 0 calc(50% - 2rem);
@@ -935,7 +900,6 @@ button svg,
   }
 }
 
-/* 📱 Mobile: <768px — บรรทัดละ 2 */
 @media (max-width: 767px) {
   .stems-item {
     flex: 0 0 calc(50% - 2rem);
@@ -966,8 +930,8 @@ button svg,
   .stems-image {
     width: 160px;
   }
-
 }
+
 @media (max-width: 480px) {
   .stems-image {
     width: 140px;
@@ -992,7 +956,7 @@ button svg,
 }
 
 .stems-subtitle {
-  font-size: 0.78rem; /* เดิม 0.8 → เพิ่มนิดเพื่อเทียบกับ Transcription */
+  font-size: 0.78rem;
   font-weight: 200;
   letter-spacing: 0.05em;
   margin-top: 0.25rem;
@@ -1000,7 +964,7 @@ button svg,
 }
 
 .stems-subtitle-tiny {
-  font-size: 0.7rem; /* เดิม 0.65 → เพิ่มนิดให้บาลานซ์กับด้านบน */
+  font-size: 0.7rem;
   font-weight: 100;
   color: #f8fcdc;
   margin-top: 0.15rem;
@@ -1018,7 +982,6 @@ button svg,
   transition: color 0.3s ease;
 }
 
-/* เดิม: ทุก .stems-item:hover .backing-line ได้หมดเลย — ไม่ดี */
 .backing-line {
   display: block;
   height: 1px;
@@ -1028,14 +991,11 @@ button svg,
   transition: width 0.6s ease;
 }
 
-/* ✅ ให้ hover ทำงานเฉพาะ is-backing */
 .is-backing:hover .backing-line {
   width: 70%;
 }
 
 /* === FONT SIZE RESPONSIVE BREAKPOINTS === */
-
-/* 💻 Desktop: ≤1279px */
 @media (max-width: 1279px) {
   .stems-title-text {
     font-size: 0.724rem;
@@ -1054,7 +1014,6 @@ button svg,
   }
 }
 
-/* 📱 Tablet: ≤768px */
 @media (max-width: 768px) {
   .stems-title-text {
     font-size: 0.724rem;
@@ -1073,7 +1032,6 @@ button svg,
   }
 }
 
-/* 📱 Extra Small: ≤480px */
 @media (max-width: 480px) {
   .stems-title-text {
     font-size: 0.724rem;
@@ -1092,7 +1050,6 @@ button svg,
   }
 }
 
-/* 🛒 Button Section */
 .shopall-button-wrapper {
   margin-top: 3rem;
   display: flex;
@@ -1100,52 +1057,44 @@ button svg,
 }
 
 /* Tour Section */
-
 .tour-widget-container {
   width: 100%;
   margin-left: auto;
   margin-right: auto;
   padding-left: 1rem;
   padding-right: 1rem;
-
-  /* สไตล์พื้นฐาน */
   max-width: 100%;
 }
 
-/* Tablet breakpoint */
 @media (min-width: 480px) {
   .tour-widget-container {
     max-width: 640px;
   }
 }
 
-/* Desktop breakpoint */
 @media (min-width: 768px) {
   .tour-widget-container {
     max-width: 600px;
   }
 }
 
-/* XL screen */
 @media (min-width: 1280px) {
   .tour-widget-container {
     max-width: 960px;
   }
 }
 
-/* ปรับมุมปุ่ม RSVP และ TICKETS ใน Bandsintown widget */
 .bit-button,
 .bit-button--solid {
-  border-radius: 3px !important; /* หรือใส่เป็น 8px, 12px แล้วแต่ style นาย */
+  border-radius: 3px !important;
 }
 
 /* Footer logo */
-
 .logo-divider {
   display: flex;
   justify-content: center;
-  margin-top: 0rem; /* ห่างจาก tour list */
-  margin-bottom: 2.5rem; /* ห่างจากฟอร์ม */
+  margin-top: 0rem;
+  margin-bottom: 2.5rem;
 }
 
 .glow-logo {
@@ -1157,7 +1106,6 @@ button svg,
 }
 
 /* Social footer logo */
-
 .social-icons {
   display: flex;
   justify-content: center;
@@ -1177,7 +1125,6 @@ button svg,
 }
 
 /* newsletter.css */
-
 .newsletter-container {
   max-width: 768px;
   margin: 0 auto;
@@ -1198,13 +1145,12 @@ button svg,
   font-weight: 400;
   letter-spacing: 0.18em;
   text-align: center;
-  text-transform: none; /* <-- เอา uppercase ออกตามคำสั่งนาย */
+  text-transform: none;
   color: #dc9e63;
   margin-bottom: 2rem;
   font-family: 'Cinzel', serif;
 }
 
-/* 📐 Layout: grid */
 .newsletter-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -1212,7 +1158,6 @@ button svg,
   margin-bottom: 0.75rem;
 }
 
-/* Tablet and small desktop */
 @media (min-width: 480px) {
   .newsletter-container {
     max-width: 600px;
@@ -1225,14 +1170,12 @@ button svg,
   }
 }
 
-/* Tablet and small desktop */
 @media (min-width: 768px) {
   .newsletter-container {
     max-width: 600px;
   }
 }
 
-/* 🖥️ Desktop Screens */
 @media (min-width: 1280px) {
   .newsletter-container {
     max-width: 600px;
@@ -1240,7 +1183,6 @@ button svg,
 }
 
 /* ✨ Inputs + Select */
-
 .newsletter-section {
   margin-top: 2rem;
   padding-top: 2rem;
@@ -1259,12 +1201,10 @@ button svg,
   width: 100%;
   font-size: 1rem;
   transition: border-color 0.2s ease;
-
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
   background-image: none;
-
   font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
 }
 
@@ -1276,7 +1216,6 @@ button svg,
   background-color: #190000;
 }
 
-/* 🎯 Focus + Hover Styles */
 .newsletter-select:hover {
   cursor: pointer;
   border-color: #a67c52;
@@ -1290,7 +1229,6 @@ button svg,
   box-shadow: none;
 }
 
-/* 🟠 Subscribe Button */
 .newsletter-button {
   display: block;
   width: 100%;
@@ -1316,13 +1254,12 @@ button svg,
 .newsletter-divider {
   height: 1px;
   background-color: #dc9e63;
-  transform: scaleY(0.5); /* ทำให้มันบางลงครึ่งหนึ่ง */
+  transform: scaleY(0.5);
   width: 150px;
   margin: 4rem auto -2rem auto;
 }
 
 /* === Footer Bottom === */
-
 .footer-bottom {
   text-align: center;
   font-family: 'Cinzel', serif;
@@ -1330,7 +1267,6 @@ button svg,
   padding-bottom: 2.5rem;
 }
 
-/* 👉 ปรับขนาด + เว้นระยะของลิงก์ด้านบน */
 .footer-links {
   display: flex;
   justify-content: center;
@@ -1360,7 +1296,6 @@ button svg,
   color: #dc9e63;
 }
 
-/* 💻 Tablet and smaller (≤768px) เปลี่ยนเป็นแนวตั้ง */
 @media (max-width: 768px) {
   .footer-links {
     flex-direction: column;
@@ -1372,7 +1307,6 @@ button svg,
   }
 }
 
-/* 👇 Copyright */
 .footer-bottom .copyright {
   font-size: 0.72rem;
   color: #f8fcdc;
@@ -1380,21 +1314,17 @@ button svg,
 }
 
 /* Tour/Page */
-
 .tour-page-main {
-  margin-top: 15rem;  /* หรือ padding ถ้าเธออยากให้มันหายใจโล่งๆ */
+  margin-top: 15rem;
   margin-bottom: 20rem;
 }
 
 /* ปุ่มMerch, Music, Bundles Shoppage */
-
-/* ปุ่มเมื่อถูกคลิกแล้ว (active) */
 .active-tab {
   background-color: #dc9e63;
   color: #0f0f0f;
 }
 
-/* ยังให้ hover ทำงานด้วย */
 .info-button:hover {
   background-color: #dc9e63;
   color: #0f0f0f;
@@ -1402,11 +1332,11 @@ button svg,
 }
 
 .shop-newsletter-wrapper .newsletter-section {
-  margin-top: 8rem; /* แค่ของ shop */
+  margin-top: 8rem;
   padding-top: 4rem;
   padding-bottom: 6rem;
-  background: none; /* ถ้าอยากเอาพื้นหลังออก */
-  border-top: 1px solid rgba(255, 255, 255, 0.05); /* ตกแต่งแยกเฉพาะได้เลย */
+  background: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .shop-newsletter-wrapper .newsletter-title {
@@ -1420,7 +1350,6 @@ button svg,
 }
 
 /* === PRODUCT DETAIL PAGE === */
-
 .product-detail-wrapper {
   display: flex;
   flex-direction: column;
@@ -1528,8 +1457,7 @@ button svg,
   opacity: 1;
 }
 
-/* === RELATED PRODUCTS (แบบเดียวกับ Homepage) === */
-
+/* === RELATED PRODUCTS === */
 .related-products-wrapper {
   width: 100%;
   max-width: 1200px;
@@ -1594,10 +1522,7 @@ button svg,
   letter-spacing: 0.1em;
 }
 
-/* ------------------------ */
-/* เฉพาะ Product Detail Page */
-/* ------------------------ */
-
+/* Product Detail Page */
 .product-title-detail {
   font-size: 26px;
   font-weight: 700;
@@ -1618,7 +1543,6 @@ button svg,
   margin-bottom: 1rem;
 }
 
-/* มือถือให้มันเล็กลงอีก */
 @media (max-width: 767px) {
   .product-title-detail {
     font-size: 24px;
@@ -1632,7 +1556,6 @@ button svg,
 }
 
 /* === ✨ FADE IN ANIMATION === */
-
 .fade-in-section {
   opacity: 0;
   transform: translateY(10px);
@@ -1658,7 +1581,6 @@ button svg,
 }
 
 /* === Cart Success Popup === */
-
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -1690,10 +1612,9 @@ button svg,
 }
 
 /* === Cart Error Popup === */
-
 .cart-error-popup {
   position: absolute;
-  top: -2.5rem; /* ลอยขึ้นไปเหนือลูกพี่ add button */
+  top: -2.5rem;
   left: 50%;
   transform: translateX(-50%);
   background-color: #ffcccc;

@@ -294,7 +294,7 @@ export default function Navbar() {
 >
   <Link href="/" className="block">
     <Image
-  src="/unda-alunda-header.png"
+  src="/unda-alunda-header.webp"
   alt="Unda Alunda Logo"
   width={200}
   height={50}
@@ -309,7 +309,7 @@ export default function Navbar() {
   <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[60]">
     <Link href="/" onClick={() => setMenuOpen(false)}>
       <Image
-  src="/unda-alunda-header.png"
+  src="/unda-alunda-header.webp"
   alt="Unda Alunda Logo"
   width={200}
   height={50}

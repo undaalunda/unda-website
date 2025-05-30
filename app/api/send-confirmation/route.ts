@@ -206,7 +206,7 @@ export async function POST(req: NextRequest) {
           <tr>
             <td align="center" style="background-color: rgba(0, 0, 0, 0.8); padding: 60px 20px;">
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" 
-                style="margin: 0 auto; background-image: url('https://unda-website.vercel.app/redsky-bg.jpeg'); background-size: cover; border-radius: 12px; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
+                style="margin: 0 auto; background-image: url('https://unda-website.vercel.app/redsky-bg.webp'); background-size: cover; border-radius: 12px; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
                 <tr>
                   <td style="padding: 40px; color: #f8fcdc;">
                     <h1 style="color: #dc9e63; font-size: 28px; margin-bottom: 20px;">
