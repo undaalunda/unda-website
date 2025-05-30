@@ -53,15 +53,16 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
           <section className="newsletter-section">
             <div className="footer-logo-social">
               <Image
-                src="/footer-logo-v7.webp"  // 🚀 เปลี่ยนเป็น WebP
-                alt="Unda Alunda Cat Logo"
-                width={120}
-                height={120}
-                quality={90}  // 🎯 ปรับ quality ลงเล็กน้อย
-                loading="lazy" // 🚀 Lazy load footer logo
-                sizes="120px" // 📐 Fixed size
-                className="glow-logo mx-auto mb-6"
-              />
+  src="/footer-logo-v7.webp"
+  alt="Unda Alunda Cat Logo"
+  width={120}
+  height={120}
+  quality={100}      // ← เพิ่มจาก 90
+  loading="lazy"
+  unoptimized={true} // ← เพิ่มกลับมา
+  sizes="120px"
+  className="glow-logo mx-auto mb-6"
+/>
               <div className="social-icons mb-6">
                 <a href="https://www.facebook.com/UndaAlunda" target="_blank" rel="noopener noreferrer">
                   <i className="fab fa-facebook" />

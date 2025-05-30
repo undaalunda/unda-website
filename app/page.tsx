@@ -86,14 +86,15 @@ export default function HomePage() {
           <div className="catmoon-background" />
           <div className="hero-text-image">
             <Image
-              src="/text-hero-section.webp"
-              alt="Dark Wonderful World on Moon"
-              height={400}
-              width={600}
-              quality={95}  // 🎯 ชัดมาก แต่ยัง optimize ได้
-              priority      // 🚀 โหลดเร็ว สำหรับรูปสำคัญ
-              sizes="(max-width: 768px) 95vw, (max-width: 1279px) 90vw, 500px" // 📐 Responsive
-            />
+  src="/text-hero-section.webp"
+  alt="Dark Wonderful World on Moon"
+  height={400}
+  width={600}
+  quality={100}
+  priority
+  unoptimized={true}  // ← เพิ่มกลับมา
+  sizes="(max-width: 480px) 300px, (max-width: 768px) 400px, 600px"
+/>
           </div>
           
           <div className="hero-text desktop-only">

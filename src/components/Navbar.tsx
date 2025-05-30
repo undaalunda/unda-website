@@ -18,6 +18,21 @@ const pageLinks = [
   { title: 'Contact', href: '/contact' },
 ];
 
+// 🚀 สร้าง LogoImage component แยกเพื่อลดการซ้ำซ้อน
+const LogoImage = ({ onClick }: { onClick?: () => void }) => (
+  <Image
+    src="/unda-alunda-header.webp"
+    alt="Unda Alunda Logo"
+    width={200}
+    height={50}
+    quality={100}
+    priority
+    unoptimized={true}
+    sizes="200px"
+    onClick={onClick}
+  />
+);
+
 export default function Navbar() {
   const [highlightIndex, setHighlightIndex] = useState<number>(-1);
   const resultRefs = useRef<(HTMLElement | null)[]>([]);
@@ -171,8 +186,6 @@ export default function Navbar() {
       : [];
   }, [delayedQuery]);
 
-  const hasLeftContent = suggestions.length > 0 || pageMatches.length > 0;
-
   if (!hasMounted) return null;
   const isHomepage = pathname === '/';
 
@@ -284,40 +297,22 @@ export default function Navbar() {
           </div>
         )}
   
-        {/* 🚀 Logo กลาง - ใช้ WebP + optimization */}
+        {/* 🚀 Logo กลาง - ปรับปรุงแล้ว ไม่ซ้ำ */}
         <div
-          className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-40 transition-opacity duration-[1200ms] ${
-            scrolledDown || !isHomepage ? 'opacity-100' : 'opacity-0'
+          className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-[1200ms] ${
+            menuOpen ? 'z-[60]' : 'z-40'
+          } ${
+            scrolledDown || !isHomepage || menuOpen ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          <Link href="/" className="block">
-            <Image
-              src="/unda-alunda-header.webp"
-              alt="Unda Alunda Logo"
-              width={200}
-              height={50}
-              quality={95} // 🎯 ลด quality เล็กน้อย
-              priority
-              sizes="200px" // 📐 Fixed size
-            />
+          <Link 
+            href="/" 
+            className="block"
+            onClick={menuOpen ? () => setMenuOpen(false) : undefined}
+          >
+            <LogoImage />
           </Link>
         </div>
-
-        {menuOpen && (
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[60]">
-            <Link href="/" onClick={() => setMenuOpen(false)}>
-              <Image
-                src="/unda-alunda-header.webp"
-                alt="Unda Alunda Logo"
-                width={200}
-                height={50}
-                quality={95} // 🎯 ลด quality เล็กน้อย
-                priority
-                sizes="200px" // 📐 Fixed size
-              />
-            </Link>
-          </div>
-        )}
       </div>
 
       {/* MENU OPEN OVERLAY */}
@@ -561,9 +556,9 @@ export default function Navbar() {
                                 width={48}
                                 height={48}
                                 className="w-12 h-12 object-cover rounded"
-                                loading="lazy" // 🚀 Lazy loading
-                                quality={75}   // 🎯 ลด quality สำหรับ thumbnail
-                                sizes="48px"   // 📐 Fixed size
+                                loading="lazy"
+                                quality={75}
+                                sizes="48px"
                               />
                               <div className="flex flex-col">
                                 <span className="text-sm font-medium text-[#f8fcdc]">
