@@ -201,7 +201,7 @@ export default function ThankYouClient() {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <p className="text-sm text-green-200">
-                  <strong>✅ Payment Confirmed</strong><br/>
+                  <strong>Payment Confirmed</strong><br/>
                   {isDigitalOnly 
                     ? 'Check your email for download links.'
                     : hasDigitalProducts && hasPhysicalProducts
@@ -212,22 +212,34 @@ export default function ThankYouClient() {
                 {/* ✅ Digital download note - เล็กและจางลง */}
                 {hasDigitalProducts && (
                   <p className="text-xs text-[#f8fcdc]/40 mt-1">
-                    📥 Download links expire in 1 hour
+                    Download links expire in 1 hour
                   </p>
                 )}
               </div>
-              {/* ✅ Email button - เล็กและกลมกลืน */}
-              <a 
-                href={`mailto:${data.email}`} 
-                className="ml-3 px-3 py-1 text-xs bg-green-800/50 hover:bg-green-700/50 rounded transition-colors"
-              >
-                Open Email
-              </a>
+              {/* ✅ ปุ่มไป email providers */}
+              {hasDigitalProducts && (
+                <div className="ml-3 flex flex-col gap-1">
+                  <a 
+                    href="https://mail.google.com" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1 text-xs bg-green-800/50 hover:bg-green-700/50 rounded transition-colors text-center"
+                  >
+                    Gmail
+                  </a>
+                  <a 
+                    href="https://outlook.live.com/mail" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1 text-xs bg-green-800/50 hover:bg-green-700/50 rounded transition-colors text-center"
+                  >
+                    Outlook
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         )}
-
-        {/* ✅ ลบ Digital Downloads box ออก */}
 
         {/* ✅ Tracking info สำหรับ physical products */}
         {data.tracking_number && (
