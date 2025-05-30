@@ -1,4 +1,4 @@
-// app/layout.tsx - Performance Optimized + Font Awesome
+// app/layout.tsx - Performance Optimized + Reduced Bundle Size
 
 import './globals.css';
 import type { Metadata } from 'next';
@@ -44,32 +44,39 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
-        {/* 🚀 Preload critical assets */}
-        <link rel="preload" href="/text-hero-section.webp" as="image" type="image/webp" />
-        <link rel="preload" href="/footer-logo-v7.webp" as="image" type="image/webp" />
-        
-        {/* 🎯 DNS prefetch for external domains */}
-        <link rel="dns-prefetch" href="//widget.bandsintown.com" />
-        <link rel="dns-prefetch" href="//www.youtube.com" />
-        <link rel="dns-prefetch" href="//open.spotify.com" />
-        <link rel="dns-prefetch" href="//cdnjs.cloudflare.com" />
-        
-        {/* 🎯 Font Awesome สำหรับ social icons */}
-        <link 
-          rel="stylesheet" 
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" 
-          integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" 
-          crossOrigin="anonymous" 
-          referrerPolicy="no-referrer" 
-        />
-        
-        {/* 🎯 Google Fonts - Cinzel */}
+        {/* 🚀 Critical resource hints */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link 
-          href="https://fonts.googleapis.com/css2?family=Cinzel:wght@300;400;500;600;700&display=swap" 
-          rel="stylesheet" 
+        
+        {/* 🎯 Preload เฉพาะรูปสำคัญที่อยู่ above-the-fold */}
+        <link rel="preload" href="/text-hero-section.webp" as="image" type="image/webp" />
+        <link rel="preload" href="/unda-alunda-header.webp" as="image" type="image/webp" />
+        
+        {/* 🎯 DNS prefetch สำหรับ resources ที่จำเป็น */}
+        <link rel="dns-prefetch" href="//widget.bandsintown.com" />
+        <link rel="dns-prefetch" href="//www.youtube.com" />
+        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+        
+        {/* 🚀 Optimized Google Fonts - คงไว้ weights เดิมที่ชอบ */}
+        {/* แบบปกติง่ายๆ - ไม่มี onLoad */}
+      <link 
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@300;400;500;600;700&display=swap" 
+        rel="stylesheet"
         />
+        <noscript>
+          <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+        </noscript>
+        
+        {/* 🎯 Minimal social icons - ใช้ SVG แทน Font Awesome */}
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            /* Critical CSS สำหรับ hero section */
+            .hero-wrapper{width:100vw;min-height:100vh;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-top:6rem;padding-bottom:6vh;z-index:0;margin-top:0}
+            .hero-text-image{position:absolute;top:10vh;left:50%;transform:translateX(-50%);width:80%;max-width:500px;z-index:10;pointer-events:none;opacity:0;margin-top:1rem;animation:fadeInHero 1.3s ease-out 0.2s forwards}
+            @keyframes fadeInHero{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+            body{background-color:#190000;margin:0;padding:0;overflow-x:hidden}
+          `
+        }} />
         
         <meta name="google-site-verification" content="l9-GepfNOG2FpwhTM3lKy6YjpQ0ifAmNbLsv1oqC2uo" />
         <meta name="robots" content="index, follow" />

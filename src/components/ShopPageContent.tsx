@@ -1,8 +1,6 @@
-//ShopPageContent.tsx - Performance Optimized
-
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
@@ -28,21 +26,24 @@ export default function ShopPageContent({ tab }: { tab?: TabType }) {
     }
   }, [activeTab]);
 
-  const itemsToRender = allItems.filter((item) => {
-    const category = item.category;
-    switch (activeTab) {
-      case 'MERCH':
-        return category === 'Merch';
-      case 'MUSIC':
-        return category === 'Music';
-      case 'BUNDLES':
-        return category === 'Bundles';
-      case 'DIGITAL':
-        return category === 'Backing Track';
-      default:
-        return false;
-    }
-  });
+  // 🚀 Memoize filtered items เพื่อลด re-computation
+  const itemsToRender = useMemo(() => {
+    return allItems.filter((item) => {
+      const category = item.category;
+      switch (activeTab) {
+        case 'MERCH':
+          return category === 'Merch';
+        case 'MUSIC':
+          return category === 'Music';
+        case 'BUNDLES':
+          return category === 'Bundles';
+        case 'DIGITAL':
+          return category === 'Backing Track';
+        default:
+          return false;
+      }
+    });
+  }, [activeTab]);
 
   return (
     <main className="shop-page-main min-h-screen text-[#f8fcdc] font-[Cinzel] px-4 pt-35 pb-4">
@@ -107,7 +108,7 @@ export default function ShopPageContent({ tab }: { tab?: TabType }) {
                     height={200}
                     className="stems-image"
                     loading="lazy" // 🚀 Lazy loading
-                    quality={85}   // 🎯 Optimize quality
+                    quality={75}   // 🎯 ลดจาก 85 → 75
                     sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px" // 📐 Responsive
                     placeholder="blur" // 🌟 Smooth loading
                     blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="

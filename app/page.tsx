@@ -86,15 +86,15 @@ export default function HomePage() {
           <div className="catmoon-background" />
           <div className="hero-text-image">
             <Image
-  src="/text-hero-section.webp"
-  alt="Dark Wonderful World on Moon"
-  height={400}
-  width={600}
-  quality={100}
-  priority
-  unoptimized={true}  // ← เพิ่มกลับมา
-  sizes="(max-width: 480px) 300px, (max-width: 768px) 400px, 600px"
-/>
+              src="/text-hero-section.webp"
+              alt="Dark Wonderful World on Moon"
+              height={400}
+              width={600}
+              quality={100}      // ✅ คงไว้ชัดตามที่ต้องการ
+              priority
+              unoptimized={true} // ✅ คงไว้ชัดตามที่ต้องการ
+              sizes="(max-width: 480px) 300px, (max-width: 768px) 400px, 600px"
+            />
           </div>
           
           <div className="hero-text desktop-only">
@@ -177,7 +177,7 @@ export default function HomePage() {
                     height={200}
                     className="product-image"
                     loading="lazy" // 🚀 Lazy loading
-                    quality={85}   // 🎯 ลดขนาดแต่ยังชัด
+                    quality={75}   // 🎯 ลดจาก 85 → 75 สำหรับ thumbnails
                     sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 200px" // 📐 Responsive
                   />
                   <div className="product-label-group">
@@ -218,7 +218,7 @@ export default function HomePage() {
                       height={200}
                       className="stems-image"
                       loading="lazy" // 🚀 Lazy loading
-                      quality={85}   // 🎯 Optimize
+                      quality={75}   // 🎯 ลดจาก 85 → 75
                       sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
                     />
                     <div className="stems-label-group">
@@ -267,7 +267,7 @@ export default function HomePage() {
                     height={200} 
                     className="stems-image"
                     loading="lazy" // 🚀 Lazy loading
-                    quality={85}   // 🎯 Optimize
+                    quality={75}   // 🎯 ลดจาก 85 → 75
                     sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
                   />
                   <div className="stems-label-group">
@@ -313,7 +313,7 @@ export default function HomePage() {
           <div className="tour-widget-container">
             <div style={{ textAlign: 'left' }}>
               {showBandsintown ? (
-                <Suspense fallback={<div style={{ height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading tour dates...</div>}>
+                <Suspense fallback={<div style={{ height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f8fcdc' }}>Loading tour dates...</div>}>
                   <BandsinTownWidget />
                 </Suspense>
               ) : (

@@ -1,8 +1,6 @@
-//CartContext.tsx
-
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { allItems } from '@/components/allItems';
 
 export type CartItem = {
@@ -32,6 +30,7 @@ interface CartContextType {
   cartError: string | null;
   setCartError: (msg: string | null) => void;
   isCartReady: boolean;
+  cartTotal: number; // 🚀 Pre-computed total
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -41,6 +40,14 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [lastActionItem, setLastActionItem] = useState<LastActionItem | null>(null);
   const [cartError, setCartError] = useState<string | null>(null);
   const [isCartReady, setIsCartReady] = useState(false);
+
+  // 🚀 Memoize cart total เพื่อลด re-computation
+  const cartTotal = useMemo(() => {
+    return cartItems.reduce((acc, item) => {
+      const price = typeof item.price === 'object' ? item.price.sale : item.price;
+      return acc + price * item.quantity;
+    }, 0);
+  }, [cartItems]);
 
   useEffect(() => {
     try {
@@ -63,7 +70,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [cartItems]);
 
-  const addToCart = (id: string, quantity: number = 1): void => {
+  // 🚀 Memoize functions เพื่อลด re-renders
+  const addToCart = useCallback((id: string, quantity: number = 1): void => {
     const item = allItems.find((i) => i.id === id);
     if (!item) return;
 
@@ -116,17 +124,17 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
       return updatedCart;
     });
-  };
+  }, []);
 
-  const removeFromCart = (id: string) => {
+  const removeFromCart = useCallback((id: string) => {
     const item = cartItems.find((item) => item.id === id);
     if (item) {
       setLastActionItem({ item, action: 'remove' });
     }
     setCartItems((prev) => prev.filter((item) => item.id !== id));
-  };
+  }, [cartItems]);
 
-  const updateQuantity = (id: string, quantity: number) => {
+  const updateQuantity = useCallback((id: string, quantity: number) => {
     setCartItems((prev) =>
       prev.map((item) =>
         item.id === id
@@ -134,28 +142,40 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           : item
       )
     );
-  };
+  }, []);
 
-  const clearCart = () => {
+  const clearCart = useCallback(() => {
     setCartItems([]);
     localStorage.removeItem('cart');
-  };
+  }, []);
+
+  // 🚀 Memoize context value เพื่อลด re-renders
+  const contextValue = useMemo(() => ({
+    cartItems,
+    addToCart,
+    removeFromCart,
+    updateQuantity,
+    clearCart,
+    lastActionItem,
+    setLastActionItem,
+    cartError,
+    setCartError,
+    isCartReady,
+    cartTotal,
+  }), [
+    cartItems,
+    addToCart,
+    removeFromCart,
+    updateQuantity,
+    clearCart,
+    lastActionItem,
+    cartError,
+    isCartReady,
+    cartTotal,
+  ]);
 
   return (
-    <CartContext.Provider
-      value={{
-        cartItems,
-        addToCart,
-        removeFromCart,
-        updateQuantity,
-        clearCart,
-        lastActionItem,
-        setLastActionItem,
-        cartError,
-        setCartError,
-        isCartReady,
-      }}
-    >
+    <CartContext.Provider value={contextValue}>
       {children}
     </CartContext.Provider>
   );
