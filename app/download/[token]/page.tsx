@@ -14,7 +14,7 @@ export default async function Page({ params }: PageProps) {
 
   try {
     // Decode token เพื่อดึง filePath
-    const decoded = JSON.parse(Buffer.from(token, 'base64').toString('utf8'));
+    const decoded = JSON.parse(Buffer.from(decodeURIComponent(token), 'base64').toString('utf8'));
     const { filePath, createdAt } = decoded;
 
     // ตรวจสอบว่า token หมดอายุหรือยัง (1 ชั่วโมง)
@@ -27,7 +27,9 @@ export default async function Page({ params }: PageProps) {
       return notFound();
     }
 
-    const fileName = filePath.split('/').pop();
+    // แยกชื่อไฟล์จาก path
+    const fileName = filePath.split('/').pop() || 'file';
+    const displayName = fileName.replace('.wav', '').replace(/-/g, ' ').toUpperCase();
     const expiresAt = new Date(created.getTime() + 60 * 60 * 1000); // 1 hour from creation
 
     return (
@@ -56,7 +58,33 @@ export default async function Page({ params }: PageProps) {
       </main>
     );
   } catch (error) {
-    console.error('Invalid token:', error);
-    return notFound();
+    console.error('Error decoding token:', error);
+    console.error('Token:', token);
+    
+    // ถ้า decode ไม่ได้ แสดงหน้า download แบบ fallback
+    return (
+      <main className="min-h-screen flex flex-col justify-center items-center px-4 text-[#f8fcdc] font-[Cinzel] bg-black text-center">
+        <h1 className="text-4xl font-bold mb-8 text-[#dc9e63]">Your Download is Ready</h1>
+        <p className="mb-7">Click the button below to download your file:</p>
+
+        <button
+          disabled
+          className="bg-[#dc9e63]/50 text-black/50 px-6 py-3 rounded-xl text-lg cursor-not-allowed"
+        >
+          Download unavailable
+        </button>
+
+        <p className="text-xs mt-6 text-red-400">
+          This download link is invalid or has expired.
+        </p>
+        
+        <a 
+          href="https://unda-website.vercel.app"
+          className="mt-4 text-[#dc9e63] hover:text-[#f8cfa3] underline"
+        >
+          ← Back to Store
+        </a>
+      </main>
+    );
   }
 }

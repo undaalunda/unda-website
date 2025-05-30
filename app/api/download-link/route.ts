@@ -33,11 +33,11 @@ export async function POST(req: NextRequest) {
     // เก็บ mapping ของ token กับ filePath ไว้ใน memory หรือ cache
     // หรือสร้างตารางแยกสำหรับเก็บ token-to-file mapping
     // แต่ตอนนี้ใช้วิธีง่ายๆ คือ encode filePath ใน token
-    const encodedToken = Buffer.from(JSON.stringify({ 
+    const encodedToken = encodeURIComponent(Buffer.from(JSON.stringify({ 
       token, 
       filePath,
       createdAt: new Date().toISOString()
-    })).toString('base64');
+    })).toString('base64'));
 
     return NextResponse.json({ token: encodedToken });
   } catch (error) {
