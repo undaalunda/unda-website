@@ -73,11 +73,11 @@ const PRIVACY_SECTIONS = [
 
 // Type definitions for better TypeScript support
 type PrivacySection = {
-  id: string;
-  title: string;
-  content: string;
-  items?: string[];
-  contactEmail?: string;
+  readonly id: string;
+  readonly title: string;
+  readonly content: string;
+  readonly items?: readonly string[];
+  readonly contactEmail?: string;
 };
 
 // Memoized Privacy Section Component
