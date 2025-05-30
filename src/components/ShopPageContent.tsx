@@ -1,9 +1,10 @@
-//ShopPageConten.tsx
+//ShopPageContent.tsx - Performance Optimized
 
 'use client';
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { allItems } from './allItems';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -99,12 +100,17 @@ export default function ShopPageContent({ tab }: { tab?: TabType }) {
                     isBackingTrack ? 'is-backing' : ''
                   }`}
                 >
-                  <img
+                  <Image
                     src={item.image}
                     alt={item.title}
-                    className="stems-image"
                     width={200}
                     height={200}
+                    className="stems-image"
+                    loading="lazy" // 🚀 Lazy loading
+                    quality={85}   // 🎯 Optimize quality
+                    sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px" // 📐 Responsive
+                    placeholder="blur" // 🌟 Smooth loading
+                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                   />
                   <div className="stems-label-group">
                     <p className="stems-title-text">{item.title}</p>

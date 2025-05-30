@@ -1,4 +1,4 @@
-/* ProductPageContent.tsx */
+/* ProductPageContent.tsx - Performance Optimized */
 
 'use client';
 
@@ -13,10 +13,7 @@ import { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import CartErrorPopup from '@/components/CartErrorPopup';
 import AppClientWrapper from '@/components/AppClientWrapper';
-
 import ProductSchema from '@/components/ProductSchema';
-
-
 
 function isBundle(price: number | { original: number; sale: number }): price is { original: number; sale: number } {
   return typeof price === 'object' && price !== null && 'original' in price && 'sale' in price;
@@ -27,7 +24,6 @@ function getStockStatus(product: Product): 'in-stock' | 'out-of-stock' | 'pre-or
   return 'in-stock';
 }
 
-// ✨ NEW: map category to path
 function getTabPathFromCategory(category: string): string {
   switch (category) {
     case 'Merch':
@@ -107,6 +103,9 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                   sizes="(max-width: 768px) 80vw, 50vw"
                   className="object-contain"
                   priority
+                  quality={90} // 🎯 ปรับ quality ลงเล็กน้อย
+                  placeholder="blur" // 🌟 Smooth loading
+                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                 />
               </div>
             </div>
@@ -145,105 +144,100 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
             )}
 
             {product.description && (
-  <div className="product-description mt-6 text-[#f8fcdc]/80 leading-relaxed text-sm whitespace-pre-line">
-    {product.description.split('\n').map((line, idx) => {
-      let trimmed = line.trim();
+              <div className="product-description mt-6 text-[#f8fcdc]/80 leading-relaxed text-sm whitespace-pre-line">
+                {product.description.split('\n').map((line, idx) => {
+                  let trimmed = line.trim();
 
-      // spacing
-      if (trimmed === '') return <div key={idx} className="h-4" />;
+                  if (trimmed === '') return <div key={idx} className="h-4" />;
 
-      // PHYSICAL products
-      if (product.type === 'physical') {
-        if (trimmed.startsWith('Please Note:')) {
-          return (
-            <p key={idx} className="italic text-[#f8fcdc]/50 mt-4">
-              {line}
-            </p>
-          );
-        }
-        return <p key={idx}>{line}</p>;
-      }
+                  if (product.type === 'physical') {
+                    if (trimmed.startsWith('Please Note:')) {
+                      return (
+                        <p key={idx} className="italic text-[#f8fcdc]/50 mt-4">
+                          {line}
+                        </p>
+                      );
+                    }
+                    return <p key={idx}>{line}</p>;
+                  }
 
-      // DIGITAL products
-      if (trimmed === 'For personal use only.') {
-        return (
-          <p key={idx}>
-            <em>For personal use only.</em>
-          </p>
-        );
-      }
+                  if (trimmed === 'For personal use only.') {
+                    return (
+                      <p key={idx}>
+                        <em>For personal use only.</em>
+                      </p>
+                    );
+                  }
 
-      if (trimmed.includes('Terms & Conditions')) {
-        const parts = trimmed.split('Terms & Conditions');
-        return (
-          <p key={idx}>
-            <em>
-              {parts[0]}
-              <a
-                href="/terms-and-conditions"
-                className="text-s text-[#dc9e63] hover:text-[#f8fcdc] cursor-pointer no-underline transition-colors duration-300"
-              >
-                Terms & Conditions
-              </a>
-              {parts[1]}
-            </em>
-          </p>
-        );
-      }
+                  if (trimmed.includes('Terms & Conditions')) {
+                    const parts = trimmed.split('Terms & Conditions');
+                    return (
+                      <p key={idx}>
+                        <em>
+                          {parts[0]}
+                          <a
+                            href="/terms-and-conditions"
+                            className="text-s text-[#dc9e63] hover:text-[#f8fcdc] cursor-pointer no-underline transition-colors duration-300"
+                          >
+                            Terms & Conditions
+                          </a>
+                          {parts[1]}
+                        </em>
+                      </p>
+                    );
+                  }
 
-      if (trimmed.startsWith('Copyright')) {
-        return (
-          <p key={idx} className="text-xs text-[#f8fcdc]/70 mt-2">
-            <strong>{trimmed}</strong>
-          </p>
-        );
-      }
+                  if (trimmed.startsWith('Copyright')) {
+                    return (
+                      <p key={idx} className="text-xs text-[#f8fcdc]/70 mt-2">
+                        <strong>{trimmed}</strong>
+                      </p>
+                    );
+                  }
 
-      // UPPERCASE instruments
-      const instruments = ['drums', 'guitars', 'bass', 'keys', 'lead guitar'];
-      instruments.forEach((inst) => {
-        const regex = new RegExp(`\\b${inst}\\b`, 'gi');
-        trimmed = trimmed.replace(regex, inst.toUpperCase());
-      });
+                  const instruments = ['drums', 'guitars', 'bass', 'keys', 'lead guitar'];
+                  instruments.forEach((inst) => {
+                    const regex = new RegExp(`\\b${inst}\\b`, 'gi');
+                    trimmed = trimmed.replace(regex, inst.toUpperCase());
+                  });
 
-      // inline BOLD logic (skip "Full-length")
-      const parts: Array<string | React.ReactNode> = [];
-      const boldRegex = /\*\*(.+?)\*\*/g;
-      let lastIndex = 0;
-      let match;
+                  const parts: Array<string | React.ReactNode> = [];
+                  const boldRegex = /\*\*(.+?)\*\*/g;
+                  let lastIndex = 0;
+                  let match;
 
-      while ((match = boldRegex.exec(trimmed)) !== null) {
-        const start = match.index;
-        const end = boldRegex.lastIndex;
-        if (start > lastIndex) {
-          parts.push(trimmed.slice(lastIndex, start));
-        }
+                  while ((match = boldRegex.exec(trimmed)) !== null) {
+                    const start = match.index;
+                    const end = boldRegex.lastIndex;
+                    if (start > lastIndex) {
+                      parts.push(trimmed.slice(lastIndex, start));
+                    }
 
-        const boldText = match[1];
-        parts.push(
-          boldText.toLowerCase().includes('full-length') ? (
-            boldText
-          ) : (
-            <strong key={parts.length} className="text-[#f8fcdc]">
-              {boldText}
-            </strong>
-          )
-        );
+                    const boldText = match[1];
+                    parts.push(
+                      boldText.toLowerCase().includes('full-length') ? (
+                        boldText
+                      ) : (
+                        <strong key={parts.length} className="text-[#f8fcdc]">
+                          {boldText}
+                        </strong>
+                      )
+                    );
 
-        lastIndex = end;
-      }
+                    lastIndex = end;
+                  }
 
-      if (parts.length > 0) {
-        if (lastIndex < trimmed.length) {
-          parts.push(trimmed.slice(lastIndex));
-        }
-        return <p key={idx}>{parts}</p>;
-      }
+                  if (parts.length > 0) {
+                    if (lastIndex < trimmed.length) {
+                      parts.push(trimmed.slice(lastIndex));
+                    }
+                    return <p key={idx}>{parts}</p>;
+                  }
 
-      return <p key={idx}>{trimmed}</p>;
-    })}
-  </div>
-)}
+                  return <p key={idx}>{trimmed}</p>;
+                })}
+              </div>
+            )}
 
             <div className="relative mt-6">
               {errorMessage && <CartErrorPopup message={errorMessage} />}
@@ -256,44 +250,42 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                   Coming Soon
                 </button>
               ) : (
-               <button
-  className={`add-to-cart-button ${
-    isAlreadyInCart
-      ? 'bg-green-700/80 text-[#f8fcdc] cursor-pointer'
-      : 'cursor-pointer'
-  }`}
-  onClick={() => {
-    const cartActionItem: LastActionItem = {
-      item: {
-        id: product.id,
-        title: product.title,
-        subtitle: product.subtitle ?? '',
-        price: product.price,
-        image: product.image,
-        quantity: 1,
-        type: product.type,
-        weight: product.weight ?? 0,
-      },
-      action: isAlreadyInCart ? 'remove' : 'add',
-    };
+                <button
+                  className={`add-to-cart-button ${
+                    isAlreadyInCart
+                      ? 'bg-green-700/80 text-[#f8fcdc] cursor-pointer'
+                      : 'cursor-pointer'
+                  }`}
+                  onClick={() => {
+                    const cartActionItem: LastActionItem = {
+                      item: {
+                        id: product.id,
+                        title: product.title,
+                        subtitle: product.subtitle ?? '',
+                        price: product.price,
+                        image: product.image,
+                        quantity: 1,
+                        type: product.type,
+                        weight: product.weight ?? 0,
+                      },
+                      action: isAlreadyInCart ? 'remove' : 'add',
+                    };
 
-    // เคลียร์ popup เดิม เพื่อให้ re-render ทันทีแบบมี animation
-    setLastActionItem(null);
+                    setLastActionItem(null);
 
-    // หน่วงเบาๆ ให้ React มีเวลาหายใจ ก่อนเรา set ใหม่
-    setTimeout(() => {
-      if (isAlreadyInCart) {
-        removeFromCart(product.id);
-      } else {
-        addToCart(product.id, 1);
-        setErrorMessage(null);
-      }
-      setLastActionItem(cartActionItem);
-    }, 10); // 10ms คือความอดทนของ animation ต่อโลกใบนี้
-  }}
->
-  {isAlreadyInCart ? '✔ Added to Cart' : 'Add to Cart'}
-</button>
+                    setTimeout(() => {
+                      if (isAlreadyInCart) {
+                        removeFromCart(product.id);
+                      } else {
+                        addToCart(product.id, 1);
+                        setErrorMessage(null);
+                      }
+                      setLastActionItem(cartActionItem);
+                    }, 10);
+                  }}
+                >
+                  {isAlreadyInCart ? '✔ Added to Cart' : 'Add to Cart'}
+                </button>
               )}
             </div>
 
@@ -310,6 +302,7 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
           </div>
         </div>
 
+        {/* 🚀 Related Products - Optimized */}
         {relatedProducts.length > 0 && (
           <div className="related-products-wrapper mt-20 w-full max-w-5xl">
             <h2 className="text-2xl font-bold text-[#dc9e63] mb-8">RELATED PRODUCTS</h2>
@@ -326,6 +319,11 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                     width={200}
                     height={200}
                     className="stems-image"
+                    loading="lazy" // 🚀 Lazy loading
+                    quality={85}   // 🎯 Optimize quality
+                    sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 200px"
+                    placeholder="blur" // 🌟 Smooth loading
+                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                   />
                   <div className="stems-label-group mt-2">
                     <p className="stems-title-text capitalize">{item.title}</p>

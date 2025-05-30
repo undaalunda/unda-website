@@ -46,7 +46,6 @@ export default function BandsinTownWidget() {
               borderBottom: '1px solid #dc9e63'
             }}
           >
-            View All Tour Dates →
           </a>
         </div>
       )}
