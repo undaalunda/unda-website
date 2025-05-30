@@ -1,4 +1,4 @@
-// app/product/[slug]/page.tsx - Performance Optimized + Enhanced SEO
+// app/product/[slug]/page.tsx - Performance Optimized + Enhanced SEO (Next.js 15 Compatible)
 
 import { allItems } from '@/components/allItems';
 import ProductPageContent from '@/components/ProductPageContent';
@@ -7,13 +7,6 @@ import { notFound } from 'next/navigation';
 
 const BASE_URL = 'https://unda-website.vercel.app';
 
-// 🚀 Type-safe params interface
-interface ProductPageProps {
-  params: {
-    slug: string;
-  };
-}
-
 // 🚀 Optimized static params generation
 export async function generateStaticParams() {
   return allItems.map((item) => ({
@@ -21,9 +14,10 @@ export async function generateStaticParams() {
   }));
 }
 
-// 🚀 Enhanced metadata generation with better SEO
-export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
-  const product = allItems.find((item) => item.id === params.slug);
+// 🚀 Enhanced metadata generation with better SEO (Next.js 15 compatible)
+export async function generateMetadata({ params }: any): Promise<Metadata> {
+  const { slug } = await params;
+  const product = allItems.find((item) => item.id === slug);
 
   if (!product) {
     return {
@@ -51,9 +45,6 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     ? product.price.sale 
     : product.price;
 
-  const currency = 'USD';
-  const availability = 'https://schema.org/InStock'; // Assume in stock
-
   return {
     title,
     description,
@@ -71,13 +62,20 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     
     // 🚀 Enhanced Open Graph
     openGraph: {
-  title,
-  description,
-  url: `${BASE_URL}/product/${params.slug}`,
-  images: [
-  ],
-  siteName: 'UNDA ALUNDA',
-},
+      title,
+      description,
+      type: 'website',
+      url: `${BASE_URL}/product/${slug}`,
+      images: [
+        {
+          url: `${BASE_URL}${product.image}`,
+          width: 1200,
+          height: 630,
+          alt: `${product.title} - ${product.subtitle}`,
+        },
+      ],
+      siteName: 'UNDA ALUNDA',
+    },
 
     // 🚀 Twitter Card
     twitter: {
@@ -93,7 +91,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
       'og:title': title,
       'og:description': description,
       'og:type': 'product.item',
-      'og:url': `${BASE_URL}/product/${params.slug}`,
+      'og:url': `${BASE_URL}/product/${slug}`,
       'og:image': `${BASE_URL}${product.image}`,
       'og:image:width': '1200',
       'og:image:height': '630',
@@ -101,7 +99,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
       
       // 🚀 Product-specific metadata
       'product:price:amount': price?.toString() || '0',
-      'product:price:currency': currency,
+      'product:price:currency': 'USD',
       'product:availability': 'in stock',
       'product:condition': 'new',
       'product:retailer_item_id': product.id,
@@ -111,7 +109,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
     // 🚀 Canonical URL
     alternates: {
-      canonical: `${BASE_URL}/product/${params.slug}`,
+      canonical: `${BASE_URL}/product/${slug}`,
     },
 
     // 🚀 Robots
@@ -129,8 +127,9 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   };
 }
 
-export default async function ProductPage({ params }: ProductPageProps) {
-  const product = allItems.find((item) => item.id === params.slug);
+export default async function ProductPage({ params }: any) {
+  const { slug } = await params;
+  const product = allItems.find((item) => item.id === slug);
 
   // 🚀 Use Next.js notFound() for better 404 handling
   if (!product) {
@@ -175,7 +174,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             },
             "category": product.category,
             "sku": product.id,
-            "gtin": product.id, // Use product ID as identifier
+            "gtin": product.id,
             "productID": product.id,
             "url": `${BASE_URL}/product/${product.id}`,
             "mainEntityOfPage": `${BASE_URL}/product/${product.id}`,
@@ -186,13 +185,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
               "url": `${BASE_URL}/product/${product.id}`,
               "priceCurrency": "USD",
               "price": price?.toString() || "0",
-              ...(originalPrice && isOnSale && {
-                "priceSpecification": {
-                  "@type": "PriceSpecification",
-                  "price": originalPrice.toString(),
-                  "priceCurrency": "USD"
-                }
-              }),
               "availability": "https://schema.org/InStock",
               "itemCondition": "https://schema.org/NewCondition",
               "seller": {
@@ -201,7 +193,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 "url": BASE_URL,
               },
               "validFrom": new Date().toISOString(),
-              "priceValidUntil": new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year from now
+              "priceValidUntil": new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
             },
 
             // 🚀 Additional product details
@@ -226,7 +218,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 "name": "Tag",
                 "value": tag
               }))),
-            ],
+            ]
           })
         }}
       />

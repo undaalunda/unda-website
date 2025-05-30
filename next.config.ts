@@ -24,7 +24,7 @@ const nextConfig: NextConfig = {
     STRIPE_WEBHOOK_SECRET_TEST: process.env.STRIPE_WEBHOOK_SECRET_TEST,
     STRIPE_WEBHOOK_SECRET_LIVE: process.env.STRIPE_WEBHOOK_SECRET_LIVE,
   },
-  
+
   output: "standalone",
 
   // 🚀 เพิ่ม Performance optimizations
@@ -40,10 +40,10 @@ const nextConfig: NextConfig = {
   compress: true,
   
   experimental: {
-    scrollRestoration: true, // ✅ คงไว้เดิม
-    optimizeCss: true,      // 🚀 เพิ่มใหม่
-    webpackBuildWorker: true, // 🚀 เพิ่มใหม่
-  },
+  scrollRestoration: true,
+  // optimizeCss: true,      // ← comment หรือลบบรรทัดนี้ออก
+  webpackBuildWorker: true,
+},
 
   // 🚀 Headers สำหรับ caching
   async headers() {
