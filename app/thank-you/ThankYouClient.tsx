@@ -8,23 +8,6 @@ import { useEffect, useState } from 'react';
 export default function ThankYouClient() {
 
   function getEmailLink(email: string) {
-  const domain = email.split('@')[1]?.toLowerCase();
-  if (!domain) return '#';
-
-  if (domain.includes('gmail') || domain.includes('googlemail')) return 'https://mail.google.com/';
-  if (domain.includes('outlook') || domain.includes('hotmail') || domain.includes('live') || domain.includes('msn')) return 'https://outlook.live.com/mail/';
-  if (domain.includes('yahoo') || domain.includes('ymail') || domain.includes('rocketmail')) return 'https://mail.yahoo.com/';
-  if (domain.includes('icloud') || domain.includes('me.com') || domain.includes('mac.com')) return 'https://www.icloud.com/mail/';
-  if (domain.includes('aol')) return 'https://mail.aol.com/';
-  if (domain.includes('zoho')) return 'https://mail.zoho.com/';
-  if (domain.includes('proton')) return 'https://mail.proton.me/u/0/inbox';
-  if (domain.includes('gmx')) return 'https://www.gmx.com/';
-  if (domain.includes('mail.com')) return 'https://www.mail.com/';
-  if (domain.includes('yandex')) return 'https://mail.yandex.com/';
-  if (domain.includes('tutanota')) return 'https://mail.tutanota.com/';
-  if (domain.includes('fastmail')) return 'https://www.fastmail.com/mail/';
-  if (domain.includes('hushmail')) return 'https://secure.hushmail.com/';
-  
   return `mailto:${email}`;
 }
 
@@ -152,10 +135,10 @@ export default function ThankYouClient() {
   <strong>Email:</strong>{' '}
   <a
     href={getEmailLink(data.email)}
+    className="text-[#f8cfa3] underline hover:text-[#dc9e63] transition"
     target="_blank"
     rel="noopener noreferrer"
-    className="text-[#f8cfa3] underline hover:text-[#dc9e63] transition"
-    title="Open your email provider"
+    title={`Send email to ${data.email}`}
   >
     {data.email}
   </a>
