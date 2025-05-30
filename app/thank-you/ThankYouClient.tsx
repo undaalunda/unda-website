@@ -5,6 +5,28 @@
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+// 🧠 EMAIL LINK FUNCTION
+function getEmailLink(email: string) {
+  const domain = email.split('@')[1]?.toLowerCase();
+  if (!domain) return `mailto:${email}`;
+
+  if (domain.includes('gmail') || domain.includes('googlemail')) return 'https://mail.google.com/';
+  if (domain.includes('outlook') || domain.includes('hotmail') || domain.includes('live') || domain.includes('msn')) return 'https://outlook.live.com/mail/';
+  if (domain.includes('yahoo') || domain.includes('ymail') || domain.includes('rocketmail')) return 'https://mail.yahoo.com/';
+  if (domain.includes('icloud') || domain.includes('me.com') || domain.includes('mac.com')) return 'https://www.icloud.com/mail/';
+  if (domain.includes('aol')) return 'https://mail.aol.com/';
+  if (domain.includes('zoho')) return 'https://mail.zoho.com/';
+  if (domain.includes('proton')) return 'https://mail.proton.me/u/0/inbox';
+  if (domain.includes('gmx')) return 'https://www.gmx.com/';
+  if (domain.includes('mail.com')) return 'https://www.mail.com/';
+  if (domain.includes('yandex')) return 'https://mail.yandex.com/';
+  if (domain.includes('tutanota')) return 'https://mail.tutanota.com/';
+  if (domain.includes('fastmail')) return 'https://www.fastmail.com/mail/';
+  if (domain.includes('hushmail')) return 'https://secure.hushmail.com/';
+
+  return `mailto:${email}`;
+}
+
 export default function ThankYouClient() {
   const params = useSearchParams();
   const email = params?.get('email') || '';
@@ -201,14 +223,14 @@ export default function ThankYouClient() {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <p className="text-sm text-green-200">
-                  <strong>Payment Confirmed</strong><br/>
-                  {isDigitalOnly 
-                    ? 'Check your email for download links.'
-                    : hasDigitalProducts && hasPhysicalProducts
-                    ? 'Check your email for download links and shipping details.'
-                    : 'Check your email for order confirmation and shipping details.'
-                  }
-                </p>
+  <strong>Payment Confirmed</strong><br/>
+  {isDigitalOnly 
+    ? <>Check your email <a href={getEmailLink(data.email)} target="_blank" rel="noopener noreferrer" className="underline text-green-100 hover:text-white">{data.email}</a> for download links.</>
+    : hasDigitalProducts && hasPhysicalProducts
+    ? <>Check your email <a href={getEmailLink(data.email)} target="_blank" rel="noopener noreferrer" className="underline text-green-100 hover:text-white">{data.email}</a> for download links and shipping details.</>
+    : <>Check your email <a href={getEmailLink(data.email)} target="_blank" rel="noopener noreferrer" className="underline text-green-100 hover:text-white">{data.email}</a> for order confirmation and shipping details.</>
+  }
+</p>
                 {/* ✅ Digital download note - เล็กและจางลง */}
                 {hasDigitalProducts && (
                   <p className="text-xs text-[#f8fcdc]/40 mt-1">
@@ -216,27 +238,6 @@ export default function ThankYouClient() {
                   </p>
                 )}
               </div>
-              {/* ✅ ปุ่มไป email providers */}
-              {hasDigitalProducts && (
-                <div className="ml-3 flex flex-col gap-1">
-                  <a 
-                    href="https://mail.google.com" 
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3 py-1 text-xs bg-green-800/50 hover:bg-green-700/50 rounded transition-colors text-center"
-                  >
-                    Gmail
-                  </a>
-                  <a 
-                    href="https://outlook.live.com/mail" 
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3 py-1 text-xs bg-green-800/50 hover:bg-green-700/50 rounded transition-colors text-center"
-                  >
-                    Outlook
-                  </a>
-                </div>
-              )}
             </div>
           </div>
         )}
