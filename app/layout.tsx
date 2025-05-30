@@ -1,4 +1,4 @@
-// app/layout.tsx - Performance Optimized
+// app/layout.tsx - Performance Optimized + Font Awesome
 
 import './globals.css';
 import type { Metadata } from 'next';
@@ -52,6 +52,24 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="dns-prefetch" href="//widget.bandsintown.com" />
         <link rel="dns-prefetch" href="//www.youtube.com" />
         <link rel="dns-prefetch" href="//open.spotify.com" />
+        <link rel="dns-prefetch" href="//cdnjs.cloudflare.com" />
+        
+        {/* 🎯 Font Awesome สำหรับ social icons */}
+        <link 
+          rel="stylesheet" 
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" 
+          integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" 
+          crossOrigin="anonymous" 
+          referrerPolicy="no-referrer" 
+        />
+        
+        {/* 🎯 Google Fonts - Cinzel */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link 
+          href="https://fonts.googleapis.com/css2?family=Cinzel:wght@300;400;500;600;700&display=swap" 
+          rel="stylesheet" 
+        />
         
         <meta name="google-site-verification" content="l9-GepfNOG2FpwhTM3lKy6YjpQ0ifAmNbLsv1oqC2uo" />
         <meta name="robots" content="index, follow" />
@@ -172,10 +190,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "WebSite",
-              "@id": "https://unda-website.vercel.app#website",
+              "@type": "MusicGroup",
+              "@id": "https://unda-website.vercel.app#musicgroup",
               "name": "Unda Alunda",
-              "description": "Thai guitarist and composer.",
+              "description": "Progressive Rock guitarist and composer from Thailand.",
               "url": "https://unda-website.vercel.app",
               "image": "https://unda-website.vercel.app/catmoon-bg.jpeg",
               "sameAs": [
@@ -190,7 +208,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 "https://tidal.com/browse/artist/22524871",
                 "https://music.amazon.com/artists/B08PVKFZDZ"
               ],
-              "genre": "Progressive Rock",
+              "genre": ["Progressive Rock", "Progressive Metal", "Instrumental Rock", "Jazz Fusion"],
               "foundingLocation": { "@type": "Place", "name": "Thailand" },
               "member": { "@id": "https://unda-website.vercel.app#person" },
               "mainEntityOfPage": { "@id": "https://unda-website.vercel.app#website" }
@@ -228,10 +246,37 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               "thumbnailUrl": "https://i.ytimg.com/vi/ZwXeCx8cAIM/hqdefault.jpg",
               "uploadDate": "2024-06-19T00:00:00+07:00",
               "embedUrl": "https://www.youtube.com/embed/ZwXeCx8cAIM",
+              "contentUrl": "https://www.youtube.com/watch?v=ZwXeCx8cAIM",
+              "duration": "PT5M30S",
               "mainEntityOfPage": { "@id": "https://unda-website.vercel.app#website" }
             })
           }}
         />
+
+        {/* ✅ Structured Data for Album */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "MusicAlbum",
+              "name": "Dark Wonderful World",
+              "description": "The upcoming album by Unda Alunda, featuring progressive rock and metal compositions.",
+              "image": "https://unda-website.vercel.app/catmoon-bg.jpeg",
+              "datePublished": "2025-07-01",
+              "byArtist": { "@id": "https://unda-website.vercel.app#person" },
+              "recordLabel": "Independent",
+              "genre": ["Progressive Rock", "Progressive Metal"],
+              "mainEntityOfPage": { "@id": "https://unda-website.vercel.app#website" }
+            })
+          }}
+        />
+
+        {/* 🎯 Performance & Security Headers */}
+        <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
+        <meta httpEquiv="X-Frame-Options" content="DENY" />
+        <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />
+        <meta name="referrer" content="strict-origin-when-cross-origin" />
       </head>
       <body className="bg-[#190000] text-[#f8fcdc] m-0 p-0 overflow-x-hidden">
         <CartProvider>

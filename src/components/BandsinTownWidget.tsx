@@ -33,22 +33,7 @@ export default function BandsinTownWidget() {
         data-request-show="true"
         data-language="en"
       />
-      
-      {/* 💡 Link ไป Tour page เต็ม */}
-      {scriptLoaded && (
-        <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-          <a 
-            href="/tour" 
-            style={{ 
-              color: '#dc9e63', 
-              fontSize: '0.875rem',
-              textDecoration: 'none',
-              borderBottom: '1px solid #dc9e63'
-            }}
-          >
-          </a>
-        </div>
-      )}
+    
     </>
   );
 }
