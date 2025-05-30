@@ -839,7 +839,7 @@ export default function CheckoutForm() {
             )}
           </div>
 
-          <p className="text-s text-[#f8fcdc] mb-4">
+          <p className="text-[14px] text-[#f8fcdc] mb-4">
             Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our{' '}
             <a
               href="/privacy-policy"
@@ -849,7 +849,7 @@ export default function CheckoutForm() {
             </a>
           </p>
 
-          <label className="block mb-2 text-s">
+          <label className="block mb-2 text-[13px]">
             <input
               type="checkbox"
               checked={consentMarketing}
@@ -859,7 +859,7 @@ export default function CheckoutForm() {
             I consent to receive marketing emails and updates. <span className="text-[#f8fcdc]/50">(optional)</span>
           </label>
 
-          <label className="block mb-4 text-s">
+          <label className="block mb-4 text-[14px]">
             <input
               type="checkbox"
               checked={consentTerms}

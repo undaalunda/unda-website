@@ -1,12 +1,12 @@
-//AboutClientComponent.tsx
+// AboutClientComponent.tsx - Performance Optimized
 
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AppClientWrapper from '@/components/AppClientWrapper';
 
-
+// 🚀 Memoized animation variants
 const fadeInUp = {
   hidden: { opacity: 0, y: 40 },
   visible: (i = 1) => ({
@@ -30,7 +30,7 @@ const fadeInSection = {
   },
 };
 
-
+// 🚀 Memoized paragraph data
 const styledParagraphs = [
   {
     text: `Unda Alunda began hearing those sounds as a child.\nAt the age of 11, he started using the guitar as his own language.\nAnd ever since, "sound" has become both his voice—and his way of being—in this world.`,
@@ -53,8 +53,8 @@ const styledParagraphs = [
     className: 'text-left'
   },
   {
-    text: `“Without music… would I still be me?”`,
-  className: 'text-center italic text-2xl text-[#dc9e63] mt-10 mb-10',
+    text: `"Without music… would I still be me?"`,
+    className: 'text-center italic text-2xl text-[#dc9e63] mt-10 mb-10',
   },
   {
     text: `Unda spent much of his childhood practicing guitar 10–15 hours a day,\nand began composing music not long after.`,
@@ -73,7 +73,7 @@ const styledParagraphs = [
     className: 'font-semibold text-center'
   },
   {
-    text: `It was the moment when the name “Unda Alunda” first began to be spoken in Thailand.`,
+    text: `It was the moment when the name "Unda Alunda" first began to be spoken in Thailand.`,
     className: 'text-center font-semibold mb-15'
   },
   {
@@ -81,7 +81,7 @@ const styledParagraphs = [
     className: 'text-left mt-10'
   },
   {
-    text: `But that voice wouldn’t stay within Thailand for long.`,
+    text: `But that voice wouldn't stay within Thailand for long.`,
     className: 'italic text-left mb-10'
   },
   {
@@ -89,7 +89,7 @@ const styledParagraphs = [
     className: 'text-left'
   },
   {
-    text: `Not only did he earn the judges’ respect,\nbut Tosin also invited him to officially join Abasi Concepts as a signed artist.`,
+    text: `Not only did he earn the judges' respect,\nbut Tosin also invited him to officially join Abasi Concepts as a signed artist.`,
     className: 'text-left'
   },
   {
@@ -105,7 +105,7 @@ const styledParagraphs = [
     className: 'text-left'
   },
   {
-    text: `Whether joy or sorrow, light or darkness,\nmusic has always been the vessel through which he’s expressed who he is.\nAnd it continues to carry him—\nas it did in the beginning.`,
+    text: `Whether joy or sorrow, light or darkness,\nmusic has always been the vessel through which he's expressed who he is.\nAnd it continues to carry him—\nas it did in the beginning.`,
     className: 'text-left'
   },
   {
@@ -124,136 +124,142 @@ const styledParagraphs = [
     text: `Live performance at Mahidol University, Nakhon Pathom in Thailand.`,
     className: 'text-sm text-center italic mb-24'
   }
-];
+] as const;
 
-
+// 🚀 Memoized section ranges
 const sectionRanges = [
   [0, 6],
   [6, 11],
   [11, 17],
   [17, 19],
   [19, 23],
-];
+] as const;
 
 export default function AboutClientComponent() {
-
   const [showScrollHint, setShowScrollHint] = useState(true);
   const scrollHintTriggerRef = useRef<HTMLDivElement | null>(null);
 
-useEffect(() => {
-  const handleScroll = () => {
+  // 🚀 Memoized scroll handler
+  const handleScroll = useCallback(() => {
     const rect = scrollHintTriggerRef.current?.getBoundingClientRect();
     if (!rect) return;
     if (rect.top < window.innerHeight - 300) {
       setShowScrollHint(false);
     }
-  };
-  window.addEventListener('scroll', handleScroll);
-  return () => window.removeEventListener('scroll', handleScroll);
-}, []);
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
+
+  // 🚀 Memoized viewport settings
+  const viewportSettings = useMemo(() => ({ 
+    once: true, 
+    amount: 0.6 
+  }), []);
 
   return (
     <AppClientWrapper>
-    <main className="about-page-main font-[Cinzel] text-[#f8fcdc] px-4 sm:px-8 md:px-16 lg:px-32 py-5 max-w-5xl mx-auto leading-relaxed tracking-wide">
-      <motion.section
-        className="min-h-screen flex items-center justify-center text-center"
-        initial="hidden"
-        animate="visible"
-        variants={fadeInSection}
-      >
-        <motion.h1
-          className="text-3xl sm:text-4xl md:text-5xl"
-          variants={fadeInUp}
-          custom={0}
-        >
-          Have you ever heard a song that seems to know you better than you know yourself..?
-        </motion.h1>
-      </motion.section>
-
-      <motion.section
-  ref={scrollHintTriggerRef}
-  className="min-h-[60vh] flex items-center justify-center text-center"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.6 }}
-        variants={fadeInSection}
-      >
-        <motion.h2
-          className="text-2xl sm:text-3xl md:text-4xl"
-          variants={fadeInUp}
-          custom={1}
-        >
-          When was the last time you truly felt like yourself..?
-        </motion.h2>
-      </motion.section>
-
-      <motion.section
-        className="min-h-screen flex flex-col items-center justify-center text-center space-y-4"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.6 }}
-        variants={fadeInSection}
-      >
-        <motion.p className="text-2xl sm:text-3xl font-light italic tracking-wide" variants={fadeInUp} custom={2}>
-          Sometimes, there's something within us that defies explanation.
-        </motion.p>
-        <motion.p className="text-xl sm:text-2xl" variants={fadeInUp} custom={3}>
-          It's not words.
-        </motion.p>
-        <motion.p className="text-xl sm:text-2xl" variants={fadeInUp} custom={4}>
-          It's not logic.
-        </motion.p>
-        <motion.p className="text-xl sm:text-2xl text-[#dc9e63] font-semibold" variants={fadeInUp} custom={5}>
-          But it knows us—deeply, clearly.
-        </motion.p>
-        <motion.p className="text-xl sm:text-2xl italic" variants={fadeInUp} custom={6}>
-          Even in moments when we barely recognize ourselves.
-        </motion.p>
-      </motion.section>
-
-      {sectionRanges.map(([start, end], sectionIndex) => (
+      <main className="about-page-main font-[Cinzel] text-[#f8fcdc] px-4 sm:px-8 md:px-16 lg:px-32 py-5 max-w-5xl mx-auto leading-relaxed tracking-wide">
         <motion.section
-          key={sectionIndex}
-          className="min-h-screen flex flex-col items-center justify-center text-center space-y-4 "
+          className="min-h-screen flex items-center justify-center text-center"
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.6 }}
+          animate="visible"
           variants={fadeInSection}
         >
-          {styledParagraphs.slice(start, end).map((p, i) => (
-            <motion.p
-              key={i}
-              className={`text-lg sm:text-xl ${p.className}`}
-              variants={fadeInUp}
-              custom={i + 1}
-            >
-              {p.text}
-            </motion.p>
-          ))}
+          <motion.h1
+            className="text-3xl sm:text-4xl md:text-5xl"
+            variants={fadeInUp}
+            custom={0}
+          >
+            Have you ever heard a song that seems to know you better than you know yourself..?
+          </motion.h1>
         </motion.section>
-      ))}
 
-            {/* Floating Scroll Hint */}
-     <AnimatePresence>
-  {showScrollHint && (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed bottom-10 left-1/2 -translate-x-1/2 pointer-events-none z-50"
-    >
-      <motion.p
-        className="text-sm sm:text-base italic text-[#f8fcdc]/50"
-        animate={{ y: [0, -5, 0] }}
-        transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
-      >
-        scroll down slowly...
-      </motion.p>
-    </motion.div>
-  )}
-</AnimatePresence>
-      
-    </main>
+        <motion.section
+          ref={scrollHintTriggerRef}
+          className="min-h-[60vh] flex items-center justify-center text-center"
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportSettings}
+          variants={fadeInSection}
+        >
+          <motion.h2
+            className="text-2xl sm:text-3xl md:text-4xl"
+            variants={fadeInUp}
+            custom={1}
+          >
+            When was the last time you truly felt like yourself..?
+          </motion.h2>
+        </motion.section>
+
+        <motion.section
+          className="min-h-screen flex flex-col items-center justify-center text-center space-y-4"
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportSettings}
+          variants={fadeInSection}
+        >
+          <motion.p className="text-2xl sm:text-3xl font-light italic tracking-wide" variants={fadeInUp} custom={2}>
+            Sometimes, there's something within us that defies explanation.
+          </motion.p>
+          <motion.p className="text-xl sm:text-2xl" variants={fadeInUp} custom={3}>
+            It's not words.
+          </motion.p>
+          <motion.p className="text-xl sm:text-2xl" variants={fadeInUp} custom={4}>
+            It's not logic.
+          </motion.p>
+          <motion.p className="text-xl sm:text-2xl text-[#dc9e63] font-semibold" variants={fadeInUp} custom={5}>
+            But it knows us—deeply, clearly.
+          </motion.p>
+          <motion.p className="text-xl sm:text-2xl italic" variants={fadeInUp} custom={6}>
+            Even in moments when we barely recognize ourselves.
+          </motion.p>
+        </motion.section>
+
+        {sectionRanges.map(([start, end], sectionIndex) => (
+          <motion.section
+            key={sectionIndex}
+            className="min-h-screen flex flex-col items-center justify-center text-center space-y-4"
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportSettings}
+            variants={fadeInSection}
+          >
+            {styledParagraphs.slice(start, end).map((p, i) => (
+              <motion.p
+                key={i}
+                className={`text-lg sm:text-xl ${p.className}`}
+                variants={fadeInUp}
+                custom={i + 1}
+              >
+                {p.text}
+              </motion.p>
+            ))}
+          </motion.section>
+        ))}
+
+        {/* 🚀 Optimized Floating Scroll Hint */}
+        <AnimatePresence>
+          {showScrollHint && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed bottom-10 left-1/2 -translate-x-1/2 pointer-events-none z-50"
+            >
+              <motion.p
+                className="text-sm sm:text-base italic text-[#f8fcdc]/50"
+                animate={{ y: [0, -5, 0] }}
+                transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+              >
+                scroll down slowly...
+              </motion.p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
     </AppClientWrapper>
   );
 }
