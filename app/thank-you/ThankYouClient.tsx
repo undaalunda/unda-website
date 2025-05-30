@@ -198,48 +198,46 @@ export default function ThankYouClient() {
         {/* ✅ ข้อความสำหรับ succeeded */}
         {data.payment_status === 'succeeded' && (
           <div className="mt-4 p-3 bg-green-900/30 border border-green-600/50 rounded">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <p className="text-sm text-green-200">
-                  <strong>Payment Confirmed</strong><br/>
-                  {isDigitalOnly 
-                    ? 'Check your email for download links.'
-                    : hasDigitalProducts && hasPhysicalProducts
-                    ? 'Check your email for download links and shipping details.'
-                    : 'Check your email for order confirmation and shipping details.'
-                  }
-                </p>
-                {/* ✅ Digital download note - เล็กและจางลง */}
-                {hasDigitalProducts && (
-                  <p className="text-xs text-[#f8fcdc]/40 mt-1">
-                    Download links expire in 1 hour
-                  </p>
-                )}
+            <p className="text-sm text-green-200">
+              <strong>Payment Confirmed</strong><br/>
+              {isDigitalOnly 
+                ? 'Your download links have been sent to your email.'
+                : hasDigitalProducts && hasPhysicalProducts
+                ? 'Download links and shipping details have been sent to your email.'
+                : 'Order confirmation and shipping details have been sent to your email.'
+              }
+            </p>
+            {/* ✅ Digital download note - เล็กและจางลง */}
+            {hasDigitalProducts && (
+              <p className="text-xs text-[#f8fcdc]/40 mt-2">
+                Download links expire in 1 hour
+              </p>
+            )}
+            {/* ✅ ปุ่มไป email inbox - ฉลาดขึ้น */}
+            {hasDigitalProducts && (
+              <div className="mt-3 flex gap-2">
+                <a 
+                  href={`https://mail.google.com/mail/u/0/#search/from%3Anoreply%40updates.undaalunda.com+to%3A${encodeURIComponent(data.email)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block px-4 py-2 text-xs bg-[#dc9e63] hover:bg-[#f8cfa3] text-black rounded transition-colors"
+                >
+                  Open in Gmail
+                </a>
+                <a 
+                  href="https://outlook.live.com/mail" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block px-4 py-2 text-xs bg-[#dc9e63]/70 hover:bg-[#f8cfa3]/70 text-black rounded transition-colors"
+                >
+                  Open in Outlook
+                </a>
               </div>
-              {/* ✅ ปุ่มไป email providers */}
-              {hasDigitalProducts && (
-                <div className="ml-3 flex flex-col gap-1">
-                  <a 
-                    href="https://mail.google.com" 
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3 py-1 text-xs bg-green-800/50 hover:bg-green-700/50 rounded transition-colors text-center"
-                  >
-                    Gmail
-                  </a>
-                  <a 
-                    href="https://outlook.live.com/mail" 
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3 py-1 text-xs bg-green-800/50 hover:bg-green-700/50 rounded transition-colors text-center"
-                  >
-                    Outlook
-                  </a>
-                </div>
-              )}
-            </div>
+            )}
           </div>
         )}
+
+        {/* ✅ ลบ Digital Downloads box ออก */}
 
         {/* ✅ Tracking info สำหรับ physical products */}
         {data.tracking_number && (
