@@ -169,10 +169,10 @@ export default function ThankYouClient() {
           <strong>Status:</strong> 
           <span className={`ml-2 px-2 py-1 rounded text-xs ${
             data.payment_status === 'succeeded' 
-              ? 'bg-green-900/30 text-white' 
+              ? 'bg-green-700 text-white' 
               : data.payment_status === 'pending'
-              ? 'bg-yellow-900/30 text-white'
-              : 'bg-gray-900/30 text-white'
+              ? 'bg-yellow-700 text-white'
+              : 'bg-gray-700 text-white'
           }`}>
             {data.payment_status === 'succeeded' ? 'PAID' : 
              data.payment_status === 'pending' ? '⏳ PROCESSING' : 
