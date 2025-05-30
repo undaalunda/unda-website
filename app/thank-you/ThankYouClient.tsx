@@ -6,6 +6,28 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function ThankYouClient() {
+
+  function getEmailLink(email: string) {
+  const domain = email.split('@')[1]?.toLowerCase();
+  if (!domain) return '#';
+
+  if (domain.includes('gmail') || domain.includes('googlemail')) return 'https://mail.google.com/';
+  if (domain.includes('outlook') || domain.includes('hotmail') || domain.includes('live') || domain.includes('msn')) return 'https://outlook.live.com/mail/';
+  if (domain.includes('yahoo') || domain.includes('ymail') || domain.includes('rocketmail')) return 'https://mail.yahoo.com/';
+  if (domain.includes('icloud') || domain.includes('me.com') || domain.includes('mac.com')) return 'https://www.icloud.com/mail/';
+  if (domain.includes('aol')) return 'https://mail.aol.com/';
+  if (domain.includes('zoho')) return 'https://mail.zoho.com/';
+  if (domain.includes('proton')) return 'https://mail.proton.me/u/0/inbox';
+  if (domain.includes('gmx')) return 'https://www.gmx.com/';
+  if (domain.includes('mail.com')) return 'https://www.mail.com/';
+  if (domain.includes('yandex')) return 'https://mail.yandex.com/';
+  if (domain.includes('tutanota')) return 'https://mail.tutanota.com/';
+  if (domain.includes('fastmail')) return 'https://www.fastmail.com/mail/';
+  if (domain.includes('hushmail')) return 'https://secure.hushmail.com/';
+  
+  return `mailto:${email}`;
+}
+
   const params = useSearchParams();
   const email = params?.get('email') || '';
   const orderId = params?.get('orderId') || '';
@@ -126,7 +148,18 @@ export default function ThankYouClient() {
     <main className="pt-44 px-6 max-w-2xl mx-auto text-[#f8fcdc] font-[Cinzel]">
       <h1 className="text-3xl font-bold mb-6 text-[#dc9e63]">Thank you for your order!</h1>
       <div className="bg-[#1a0000]/60 border border-[#f8fcdc]/20 p-6 rounded-md space-y-3">
-        <p><strong>Email:</strong> <span className="text-[#f8fcdc]/50">{data.email}</span></p>
+        <p>
+  <strong>Email:</strong>{' '}
+  <a
+    href={getEmailLink(data.email)}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-[#f8cfa3] underline hover:text-[#dc9e63] transition"
+    title="Open your email provider"
+  >
+    {data.email}
+  </a>
+</p>
         <p><strong>Order ID:</strong> <span className="text-[#f8fcdc]/50">{orderId}</span></p>
         <p><strong>Date:</strong> 
           <span className="text-[#f8fcdc]/50">
@@ -216,27 +249,6 @@ export default function ThankYouClient() {
                   </p>
                 )}
               </div>
-              {/* ✅ ปุ่มไป email providers */}
-              {hasDigitalProducts && (
-                <div className="ml-3 flex flex-col gap-1">
-                  <a 
-                    href="https://mail.google.com" 
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3 py-1 text-xs bg-green-800/50 hover:bg-green-700/50 rounded transition-colors text-center"
-                  >
-                    Gmail
-                  </a>
-                  <a 
-                    href="https://outlook.live.com/mail" 
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3 py-1 text-xs bg-green-800/50 hover:bg-green-700/50 rounded transition-colors text-center"
-                  >
-                    Outlook
-                  </a>
-                </div>
-              )}
             </div>
           </div>
         )}
