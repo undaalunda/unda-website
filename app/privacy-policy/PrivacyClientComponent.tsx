@@ -66,8 +66,7 @@ const PRIVACY_SECTIONS = [
   {
     id: 'contact',
     title: '9. Contact',
-    content: 'For any privacy-related questions or requests, please contact us at:',
-    contactEmail: 'support@undaalunda.com'
+    content: 'For any privacy-related questions or requests, please use the contact form below or visit our contact page.'
   }
 ] as const;
 
@@ -77,7 +76,6 @@ type PrivacySection = {
   readonly title: string;
   readonly content: string;
   readonly items?: readonly string[];
-  readonly contactEmail?: string;
 };
 
 // Memoized Privacy Section Component
@@ -107,19 +105,6 @@ const PrivacySectionCard = memo(({
             </li>
           ))}
         </ul>
-      )}
-      
-      {banana.contactEmail && (
-        <div className="mt-4 p-4 bg-[#dc9e63]/10 rounded-lg border-l-4 border-[#dc9e63]">
-          <p className="text-[#f8fcdc]/90">
-            Email: <a 
-              href={`mailto:${banana.contactEmail}`}
-              className="text-[#dc9e63] font-semibold hover:text-[#f8cfa3] transition-colors duration-200 focus:outline-none focus:underline"
-            >
-              {banana.contactEmail}
-            </a>
-          </p>
-        </div>
       )}
     </div>
   </section>
