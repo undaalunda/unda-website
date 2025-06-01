@@ -282,7 +282,7 @@ export default function PrivacyClientComponent() {
                   href="/contact"
                   className="inline-block bg-[#dc9e63] text-[#160000] px-6 py-3 font-bold text-sm rounded-xl hover:bg-[#f8cfa3] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#dc9e63] focus:ring-offset-2 focus:ring-offset-[#1a0000]"
                 >
-                  Contact Privacy Team
+                  Contact Support
                 </Link>
                 <Link
                   href="/terms-and-conditions"

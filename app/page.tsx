@@ -1,4 +1,4 @@
-/* HomePage.tsx - Performance Optimized + Accessibility Enhanced */
+/* HomePage.tsx - Performance Optimized */
 
 'use client';
 
@@ -56,7 +56,7 @@ export default function HomePage() {
             if (entry.target === musicMerchRef.current) setShowMerch(true);
             if (entry.target === tourRef.current) {
               setShowTour(true);
-              setShowBandsintown(true);
+              setShowBandsintown(true); // 🎯 โหลด widget ตอนเลื่อนมาถึง
             }
           }
         });
@@ -78,142 +78,107 @@ export default function HomePage() {
 
   return (
     <AppClientWrapper>
-      <main id="main-content" className="homepage-main" style={{ overflow: 'visible' }}>
-        {/* 🎯 Improved heading structure */}
-        <h1 className="sr-only">Unda Alunda - Official Website and Music Store</h1>
+      <main className="homepage-main" style={{ overflow: 'visible' }}>
+        <h1 className="sr-only">Unda Alunda | Official Website & Merch Store</h1>
 
         {/* HERO SECTION */}
-        <section className="hero-wrapper" aria-labelledby="hero-heading">
+        <div className="hero-wrapper">
           <div className="catmoon-background" />
           <div className="hero-text-image">
             <Image
               src="/text-hero-section.webp"
-              alt="Dark Wonderful World album artwork - mystical moon landscape with dramatic typography announcing the new album coming July 1, 2025"
+              alt="Dark Wonderful World on Moon"
               height={400}
               width={600}
-              quality={100}
+              quality={100}      // ✅ คงไว้ชัดตามที่ต้องการ
               priority
-              unoptimized={true}
+              unoptimized={true} // ✅ คงไว้ชัดตามที่ต้องการ
               sizes="(max-width: 480px) 300px, (max-width: 768px) 400px, 600px"
             />
           </div>
           
           <div className="hero-text desktop-only">
-            <h2 id="hero-heading" className="sr-only">New Album Announcement</h2>
             <p className="hero-line1">
               THE NEW ALBUM'S COMING <span className="highlight">JULY 1 2025</span>
             </p>
             <p className="hero-line2">
-              AVAILABLE NOW TO <Link 
-                href="/shop/merch" 
-                className="hero-cta-link"
-                aria-label="Pre-order Dark Wonderful World album"
-              >PRE-ORDER</Link> &{' '}
-              <a 
-                href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="hero-cta-link"
-                aria-label="Pre-save Dark Wonderful World album on Spotify"
-              >
+              AVAILABLE NOW TO <Link href="/shop/merch" className="hero-cta-link">PRE-ORDER</Link> &{' '}
+              <a href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0" target="_blank" rel="noopener noreferrer" className="hero-cta-link">
                 PRE-SAVE
               </a>
             </p>
           </div>
           
           <div className="hero-text mobile-only">
-            <h2 className="sr-only">New Album Announcement</h2>
             <p className="hero-line1">THE NEW ALBUM'S COMING</p>
             <p className="hero-line1"><span className="highlight">JULY 1 2025</span></p>
             <p className="hero-line2">AVAILABLE NOW TO</p>
             <p className="hero-line2">
-              <Link 
-                href="/shop/merch" 
-                className="hero-cta-link"
-                aria-label="Pre-order Dark Wonderful World album"
-              >PRE-ORDER</Link> &{' '}
-              <a 
-                href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="hero-cta-link"
-                aria-label="Pre-save Dark Wonderful World album on Spotify"
-              >
+              <Link href="/shop/merch" className="hero-cta-link">PRE-ORDER</Link> &{' '}
+              <a href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0" target="_blank" rel="noopener noreferrer" className="hero-cta-link">
                 PRE-SAVE
               </a>
             </p>
           </div>
-        </section>
+        </div>
 
         <div className="after-hero-spacing" />
+        <h2 className="sr-only">Shop by Category</h2>
 
-        {/* NAVIGATION SECTION */}
-        <section aria-labelledby="shop-navigation">
-          <h2 id="shop-navigation" className="sr-only">Shop by Category</h2>
-
-          {/* BUTTON GROUP */}
-          <nav ref={buttonGroupRef} className={`button-group ${showButtons ? 'fade-in' : ''}`} aria-label="Shop categories">
-            <Link href="/shop/digital" className="info-button" aria-label="Browse music scores and transcriptions">SCORES</Link>
-            <Link href="/shop/digital" className="info-button" aria-label="Browse stems and sample packs">STEMS & SAMPLES</Link>
-            <Link href="/shop/merch" className="info-button" aria-label="Browse merchandise and apparel">MERCH</Link>
-            <Link href="/shop/music" className="info-button" aria-label="Browse physical album releases">PHYSICAL ALBUMS</Link>
-            <a
-              href="https://undaalunda.bandcamp.com/album/dark-wonderful-world-live-in-thailand"
-              className="info-button"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Purchase digital albums on Bandcamp"
-            >
-              DIGITAL ALBUMS
-            </a>
-          </nav>
-          <p className="since-note">Delivering Worldwide Since 2025</p>
-        </section>
+        {/* BUTTON GROUP */}
+        <div ref={buttonGroupRef} className={`button-group ${showButtons ? 'fade-in' : ''}`}>
+          <Link href="/shop/digital" className="info-button">SCORES</Link>
+          <Link href="/shop/digital" className="info-button">STEMS & SAMPLES</Link>
+          <Link href="/shop/merch" className="info-button">MERCH</Link>
+          <Link href="/shop/music" className="info-button">PHYSICAL ALBUMS</Link>
+          <a
+            href="https://undaalunda.bandcamp.com/album/dark-wonderful-world-live-in-thailand"
+            className="info-button"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            DIGITAL ALBUMS
+          </a>
+        </div>
+        <p className="since-note">Delivering Worldwide Since 2025</p>
 
         {/* VIDEO SECTION */}
-        <section ref={videoRef} className={`video-section ${showVideo ? 'fade-in' : ''}`} aria-labelledby="video-section-title">
-          <h2 id="video-section-title" className="sr-only">Featured Performance Video</h2>
+        <section ref={videoRef} className={`video-section ${showVideo ? 'fade-in' : ''}`}>
+          <h2 className="sr-only">Watch on YouTube</h2>
           {showVideo ? (
             <iframe
               className="youtube-frame"
               src="https://www.youtube.com/embed/ZwXeCx8cAIM"
-              title="Unda Alunda - Anomic Live Performance in Thailand"
+              title="YouTube video player"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
-              loading="lazy"
-              aria-label="Watch Unda Alunda perform Anomic live in Thailand"
+              loading="lazy" // 🚀 Lazy load iframe
             />
           ) : (
-            <div className="youtube-frame loading-state" style={{ backgroundColor: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ color: '#fff' }} aria-live="polite">Loading video...</span>
+            <div className="youtube-frame" style={{ backgroundColor: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ color: '#fff' }}>Loading video...</span>
             </div>
           )}
         </section>
 
         {/* TRANSCRIPTION SECTION */}
-        <section className="transcription-section" aria-labelledby="transcriptions-title">
+        <section className="transcription-section">
           <div ref={transcriptionRef} className={`fade-trigger ${showTranscriptions ? 'fade-in' : ''}`}>
-            <p className="transcription-sub" aria-hidden="true">LEARN THE MUSIC</p>
-            <h2 id="transcriptions-title" className="transcription-title">TRANSCRIPTIONS</h2>
-            <div className="product-row" role="list" aria-label="Available transcription books">
+            <p className="transcription-sub">LEARN THE MUSIC</p>
+            <h2 className="transcription-title">TRANSCRIPTIONS</h2>
+            <div className="product-row">
               {["guitar", "keys", "bass", "drums"].map((inst, i) => (
-                <Link 
-                  href="/shop/digital" 
-                  key={i} 
-                  className="product-item product-label-link"
-                  role="listitem"
-                  aria-label={`Dark Wonderful World complete ${inst} transcription book`}
-                >
+                <Link href="/shop/digital" key={i} className="product-item product-label-link">
                   <Image
                     src={`/product-${inst}.webp`}
-                    alt={`Dark Wonderful World ${inst} transcription book cover`}
+                    alt={`${inst} Book`}
                     width={200}
                     height={200}
                     className="product-image"
-                    loading="lazy"
-                    quality={75}
-                    sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 200px"
+                    loading="lazy" // 🚀 Lazy loading
+                    quality={75}   // 🎯 ลดจาก 85 → 75 สำหรับ thumbnails
+                    sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 200px" // 📐 Responsive
                   />
                   <div className="product-label-group">
                     <h3 className="product-title">
@@ -227,21 +192,17 @@ export default function HomePage() {
               ))}
             </div>
             <div className="shopall-button-wrapper">
-              <Link 
-                href="/shop/digital" 
-                className="info-button"
-                aria-label="View all digital transcriptions and scores"
-              >SHOP ALL</Link>
+              <Link href="/shop/digital" className="info-button">SHOP ALL</Link>
             </div>
           </div>
         </section>
 
         {/* STEMS SECTION */}
-        <section className="stems-section" aria-labelledby="stems-title">
+        <section className="stems-section">
           <div ref={stemsRef} className={`fade-trigger ${showStems ? 'fade-in' : ''}`}>
-            <p className="stems-sub" aria-hidden="true">JAM THE TRACKS</p>
-            <h2 id="stems-title" className="stems-title">STEMS & BACKINGS</h2>
-            <div className="stems-row" role="list" aria-label="Available backing tracks and stems">
+            <p className="stems-sub">JAM THE TRACKS</p>
+            <h2 className="stems-title">STEMS & BACKINGS</h2>
+            <div className="stems-row">
               {allItems
                 .filter((item) => item.category === 'Backing Track')
                 .map((item) => (
@@ -249,17 +210,15 @@ export default function HomePage() {
                     href={`/product/${item.id}`}
                     key={item.id}
                     className="stems-item product-label-link is-backing"
-                    role="listitem"
-                    aria-label={`${item.title} backing track - $${typeof item.price === 'object' ? item.price.sale.toFixed(2) : item.price.toFixed(2)}`}
                   >
                     <Image
                       src={item.image}
-                      alt={`${item.title} backing track cover art`}
+                      alt={item.title}
                       width={200}
                       height={200}
                       className="stems-image"
-                      loading="lazy"
-                      quality={75}
+                      loading="lazy" // 🚀 Lazy loading
+                      quality={75}   // 🎯 ลดจาก 85 → 75
                       sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
                     />
                     <div className="stems-label-group">
@@ -271,11 +230,11 @@ export default function HomePage() {
                           .replace(' STEM', '')
                           .replace(' TAB', '')}
                       </p>
-                      <span className="backing-line" aria-hidden="true"></span>
+                      <span className="backing-line"></span>
                       <p className="stems-subtitle-tiny tracking-wide uppercase text-center backing-text">
                         BACKING TRACK
                       </p>
-                      <p className="stems-price" aria-label={`Price: $${typeof item.price === 'object' ? item.price.sale.toFixed(2) : item.price.toFixed(2)}`}>
+                      <p className="stems-price">
                         $
                         {typeof item.price === 'object'
                           ? item.price.sale.toFixed(2)
@@ -286,11 +245,7 @@ export default function HomePage() {
                 ))}
             </div>
             <div className="shopall-button-wrapper">
-              <Link 
-                href="/shop?tab=DIGITAL" 
-                className="info-button"
-                aria-label="View all digital stems and backing tracks"
-              >
+              <Link href="/shop?tab=DIGITAL" className="info-button">
                 SHOP ALL
               </Link>
             </div>
@@ -298,31 +253,21 @@ export default function HomePage() {
         </section>
 
         {/* MUSIC & MERCH */}
-        <section className="stems-section" aria-labelledby="music-merch-title">
+        <section className="stems-section">
           <div ref={musicMerchRef} className={`fade-trigger ${showMerch ? 'fade-in' : ''}`}>
-            <p className="stems-sub" aria-hidden="true">MUSIC IN YOUR HANDS</p>
-            <h2 id="music-merch-title" className="stems-title">MUSIC & MERCH</h2>
-            <div className="stems-row" role="list" aria-label="Available music and merchandise">
+            <p className="stems-sub">MUSIC IN YOUR HANDS</p>
+            <h2 className="stems-title">MUSIC & MERCH</h2>
+            <div className="stems-row">
               {homepageItems.map((item) => (
-                <Link 
-                  href={`/product/${item.id}`} 
-                  key={item.id} 
-                  className="stems-item product-label-link"
-                  role="listitem"
-                  aria-label={`${item.title} - ${typeof item.price === 'object' && item.price !== null 
-                    ? `Sale price ${item.price.sale.toFixed(2)}, was ${item.price.original.toFixed(2)}` 
-                    : typeof item.price === 'number' 
-                      ? `${item.price.toFixed(2)}` 
-                      : 'Price available on product page'}`}
-                >
+                <Link href={`/product/${item.id}`} key={item.id} className="stems-item product-label-link">
                   <Image 
                     src={item.image} 
-                    alt={`${item.title} product image`}
+                    alt={item.title} 
                     width={200} 
                     height={200} 
                     className="stems-image"
-                    loading="lazy"
-                    quality={75}
+                    loading="lazy" // 🚀 Lazy loading
+                    quality={75}   // 🎯 ลดจาก 85 → 75
                     sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
                   />
                   <div className="stems-label-group">
@@ -337,15 +282,15 @@ export default function HomePage() {
                     <p className="stems-price">
                       {typeof item.price === 'object' && item.price !== null
                         ? <>
-                            <span className="line-through mr-1 text-[#f8fcdc]" aria-label={`Original price ${item.price.original.toFixed(2)}`}>
+                            <span className="line-through mr-1 text-[#f8fcdc]">
                               ${item.price.original.toFixed(2)}
                             </span>
-                            <span className="text-[#cc3f33]" aria-label={`Sale price ${item.price.sale.toFixed(2)}`}>
+                            <span className="text-[#cc3f33]">
                               ${item.price.sale.toFixed(2)}
                             </span>
                           </>
                         : typeof item.price === 'number'
-                          ? <span aria-label={`Price ${item.price.toFixed(2)}`}>${item.price.toFixed(2)}</span>
+                          ? `$${item.price.toFixed(2)}`
                           : null}
                     </p>
                   </div>
@@ -353,38 +298,26 @@ export default function HomePage() {
               ))}
             </div>
             <div className="shopall-button-wrapper">
-              <Link 
-                href="/shop?tab=MERCH" 
-                className="info-button"
-                aria-label="View all music and merchandise"
-              >SHOP ALL</Link>
+              <Link href="/shop?tab=MERCH" className="info-button">SHOP ALL</Link>
             </div>
           </div>
         </section>
 
         {/* TOUR SECTION */}
-        <section ref={tourRef} className="tour-section" aria-labelledby="tour-dates-title">
+        <section ref={tourRef} className="tour-section">
           <div className={`fade-trigger ${showTour ? 'fade-in' : ''}`}>
-            <p className="stems-sub" aria-hidden="true">SEE IT LIVE</p>
-            <h2 id="tour-dates-title" className="stems-title">TOUR DATES</h2>
-            <h3 className="sr-only">Upcoming Concert Dates and Ticket Information</h3>
+            <p className="stems-sub">SEE IT LIVE</p>
+            <h2 className="stems-title">TOUR DATES</h2>
+            <h3 className="sr-only">Upcoming Tour dates from Bandsintown Widget</h3>
           </div>
           <div className="tour-widget-container">
             <div style={{ textAlign: 'left' }}>
               {showBandsintown ? (
-                <Suspense fallback={
-                  <div 
-                    style={{ height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f8fcdc' }}
-                    aria-live="polite"
-                    aria-label="Loading tour dates and concert information"
-                  >
-                    Loading tour dates...
-                  </div>
-                }>
+                <Suspense fallback={<div style={{ height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f8fcdc' }}>Loading tour dates...</div>}>
                   <BandsinTownWidget />
                 </Suspense>
               ) : (
-                <div style={{ height: '400px' }} aria-hidden="true" />
+                <div style={{ height: '400px' }} />
               )}
             </div>
           </div>
