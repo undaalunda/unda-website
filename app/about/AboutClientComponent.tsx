@@ -1,4 +1,4 @@
-// AboutClientComponent.tsx - Performance Optimized
+// AboutClientComponent.tsx - Minimal SEO Changes 🎨
 
 'use client';
 
@@ -6,7 +6,7 @@ import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
 import AppClientWrapper from '@/components/AppClientWrapper';
 
-// 🚀 Memoized animation variants
+// 🚀 Memoized animation variants (unchanged)
 const fadeInUp = {
   hidden: { opacity: 0, y: 40 },
   visible: (i = 1) => ({
@@ -30,7 +30,7 @@ const fadeInSection = {
   },
 };
 
-// 🚀 Memoized paragraph data
+// 🚀 Memoized paragraph data (unchanged)
 const styledParagraphs = [
   {
     text: `Unda Alunda began hearing those sounds as a child.\nAt the age of 11, he started using the guitar as his own language.\nAnd ever since, "sound" has become both his voice—and his way of being—in this world.`,
@@ -126,7 +126,7 @@ const styledParagraphs = [
   }
 ] as const;
 
-// 🚀 Memoized section ranges
+// 🚀 Memoized section ranges (unchanged)
 const sectionRanges = [
   [0, 6],
   [6, 11],
@@ -139,7 +139,7 @@ export default function AboutClientComponent() {
   const [showScrollHint, setShowScrollHint] = useState(true);
   const scrollHintTriggerRef = useRef<HTMLDivElement | null>(null);
 
-  // 🚀 Memoized scroll handler
+  // 🚀 Memoized scroll handler (unchanged)
   const handleScroll = useCallback(() => {
     const rect = scrollHintTriggerRef.current?.getBoundingClientRect();
     if (!rect) return;
@@ -153,7 +153,7 @@ export default function AboutClientComponent() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
 
-  // 🚀 Memoized viewport settings
+  // 🚀 Memoized viewport settings (unchanged)
   const viewportSettings = useMemo(() => ({ 
     once: true, 
     amount: 0.6 
@@ -162,19 +162,24 @@ export default function AboutClientComponent() {
   return (
     <AppClientWrapper>
       <main className="about-page-main font-[Cinzel] text-[#f8fcdc] px-4 sm:px-8 md:px-16 lg:px-32 py-5 max-w-5xl mx-auto leading-relaxed tracking-wide">
+        
+        {/* 🎯 Invisible H1 for SEO only */}
+        <h1 className="sr-only">About Unda Alunda</h1>
+
+        {/* 🎨 Your original artistic sections - completely unchanged */}
         <motion.section
           className="min-h-screen flex items-center justify-center text-center"
           initial="hidden"
           animate="visible"
           variants={fadeInSection}
         >
-          <motion.h1
+          <motion.h2
             className="text-3xl sm:text-4xl md:text-5xl"
             variants={fadeInUp}
             custom={0}
           >
             Have you ever heard a song that seems to know you better than you know yourself..?
-          </motion.h1>
+          </motion.h2>
         </motion.section>
 
         <motion.section
@@ -185,13 +190,13 @@ export default function AboutClientComponent() {
           viewport={viewportSettings}
           variants={fadeInSection}
         >
-          <motion.h2
+          <motion.h3
             className="text-2xl sm:text-3xl md:text-4xl"
             variants={fadeInUp}
             custom={1}
           >
             When was the last time you truly felt like yourself..?
-          </motion.h2>
+          </motion.h3>
         </motion.section>
 
         <motion.section
@@ -218,6 +223,7 @@ export default function AboutClientComponent() {
           </motion.p>
         </motion.section>
 
+        {/* 📖 Your original story sections - completely unchanged */}
         {sectionRanges.map(([start, end], sectionIndex) => (
           <motion.section
             key={sectionIndex}
@@ -240,7 +246,7 @@ export default function AboutClientComponent() {
           </motion.section>
         ))}
 
-        {/* 🚀 Optimized Floating Scroll Hint */}
+        {/* 🚀 Your original scroll hint - unchanged */}
         <AnimatePresence>
           {showScrollHint && (
             <motion.div

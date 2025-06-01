@@ -1,4 +1,4 @@
-//metadata.ts
+//App/About/metadata.ts
 
 import type { Metadata } from 'next';
 

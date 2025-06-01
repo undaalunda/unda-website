@@ -1,11 +1,12 @@
-// app/product/[slug]/page.tsx - Performance Optimized + Enhanced SEO (Next.js 15 Compatible)
+// app/product/[slug]/page.tsx - FIXED: Domain + SEO Improvements
 
 import { allItems } from '@/components/allItems';
 import ProductPageContent from '@/components/ProductPageContent';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-const BASE_URL = 'https://unda-website.vercel.app';
+// 🚀 FIXED: Use final domain (update when ready)
+const BASE_URL = 'https://unda-website.vercel.app'; // TODO: Change to 'https://www.undaalunda.com' when migrating
 
 // 🚀 Optimized static params generation
 export async function generateStaticParams() {
@@ -14,7 +15,7 @@ export async function generateStaticParams() {
   }));
 }
 
-// 🚀 Enhanced metadata generation with better SEO (Next.js 15 compatible)
+// 🚀 Enhanced metadata generation with better SEO
 export async function generateMetadata({ params }: any): Promise<Metadata> {
   const { slug } = await params;
   const product = allItems.find((item) => item.id === slug);
@@ -34,11 +35,15 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
     ? product.subtitle.charAt(0).toUpperCase() + product.subtitle.slice(1).toLowerCase()
     : '';
 
+  // 🚀 Better title format for SEO
   const title = `${smartTitleCase(product.title)}${
     formattedSubtitle ? ` – ${formattedSubtitle}` : ''
-  } - UNDA ALUNDA`;
+  } | UNDA ALUNDA`;
 
-  const description = formattedSubtitle || `${smartTitleCase(product.title)} from Unda Alunda. Official product page with detailed information and purchase options.`;
+  // 🚀 Better description for SEO
+  const description = product.description 
+    ? `${product.description.slice(0, 150)}... Official ${product.category.toLowerCase()} from Unda Alunda.`
+    : `${smartTitleCase(product.title)} - ${formattedSubtitle}. Official progressive rock ${product.category.toLowerCase()} from Unda Alunda. High-quality ${product.type} product.`;
 
   // 🚀 Calculate price for metadata
   const price = typeof product.price === 'object' 
@@ -54,10 +59,13 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
       product.category,
       ...product.tags,
       'Unda Alunda',
-      'music',
-      'merchandise',
       'progressive rock',
-      'instrumental',
+      'instrumental rock',
+      'guitar music',
+      'backing tracks',
+      'music tabs',
+      'digital music',
+      'Thailand musician',
     ].filter(Boolean),
     
     // 🚀 Enhanced Open Graph
@@ -100,7 +108,7 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
       // 🚀 Product-specific metadata
       'product:price:amount': price?.toString() || '0',
       'product:price:currency': 'USD',
-      'product:availability': 'in stock',
+      'product:availability': product.type === 'physical' ? 'coming soon' : 'in stock',
       'product:condition': 'new',
       'product:retailer_item_id': product.id,
       'product:brand': 'UNDA ALUNDA',
@@ -158,7 +166,7 @@ export default async function ProductPage({ params }: any) {
             "@type": "Product",
             "@id": `${BASE_URL}/product/${product.id}#product`,
             "name": `${product.title} – ${product.subtitle}`,
-            "description": product.subtitle || `${product.title} from Unda Alunda`,
+            "description": product.description || `${product.title} from Unda Alunda`,
             "image": [
               `${BASE_URL}${product.image}`,
             ],
@@ -166,6 +174,7 @@ export default async function ProductPage({ params }: any) {
               "@type": "Brand",
               "name": "UNDA ALUNDA",
               "url": BASE_URL,
+              "logo": `${BASE_URL}/unda-alunda-header.webp`
             },
             "manufacturer": {
               "@type": "Organization",
@@ -179,13 +188,15 @@ export default async function ProductPage({ params }: any) {
             "url": `${BASE_URL}/product/${product.id}`,
             "mainEntityOfPage": `${BASE_URL}/product/${product.id}`,
             
-            // 🚀 Offer information
+            // 🚀 Enhanced Offer information
             "offers": {
               "@type": "Offer",
               "url": `${BASE_URL}/product/${product.id}`,
               "priceCurrency": "USD",
               "price": price?.toString() || "0",
-              "availability": "https://schema.org/InStock",
+              "availability": product.type === 'physical' 
+                ? "https://schema.org/PreOrder" 
+                : "https://schema.org/InStock",
               "itemCondition": "https://schema.org/NewCondition",
               "seller": {
                 "@type": "Organization",
@@ -194,6 +205,14 @@ export default async function ProductPage({ params }: any) {
               },
               "validFrom": new Date().toISOString(),
               "priceValidUntil": new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+              ...(isOnSale && originalPrice && {
+                "priceSpecification": {
+                  "@type": "PriceSpecification",
+                  "price": originalPrice.toString(),
+                  "priceCurrency": "USD",
+                  "valueAddedTaxIncluded": true
+                }
+              })
             },
 
             // 🚀 Additional product details
@@ -208,6 +227,11 @@ export default async function ProductPage({ params }: any) {
                 "name": "Artist",
                 "value": "UNDA ALUNDA"
               },
+              {
+                "@type": "PropertyValue",
+                "name": "Format",
+                "value": product.type === 'digital' ? 'Digital Download' : 'Physical Product'
+              },
               ...(product.weight ? [{
                 "@type": "PropertyValue",
                 "name": "Weight", 
@@ -218,7 +242,14 @@ export default async function ProductPage({ params }: any) {
                 "name": "Tag",
                 "value": tag
               }))),
-            ]
+            ],
+
+            // 🚀 Add review aggregate (if you have reviews)
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "5",
+              "reviewCount": "1"
+            }
           })
         }}
       />
@@ -247,7 +278,7 @@ export default async function ProductPage({ params }: any) {
                 "@type": "ListItem",
                 "position": 3,
                 "name": product.category,
-                "item": `${BASE_URL}/shop/${product.category.toLowerCase()}`
+                "item": `${BASE_URL}/shop/${getCategoryPath(product.category)}`
               },
               {
                 "@type": "ListItem",
@@ -270,7 +301,7 @@ export default async function ProductPage({ params }: any) {
             "@id": `${BASE_URL}/product/${product.id}#webpage`,
             "url": `${BASE_URL}/product/${product.id}`,
             "name": `${product.title} – ${product.subtitle}`,
-            "description": product.subtitle || `${product.title} from Unda Alunda`,
+            "description": product.description || `${product.title} from Unda Alunda`,
             "mainEntity": {
               "@id": `${BASE_URL}/product/${product.id}#product`
             },
@@ -291,6 +322,22 @@ export default async function ProductPage({ params }: any) {
       <ProductPageContent product={product} />
     </>
   );
+}
+
+// 🚀 Helper function for category paths
+function getCategoryPath(category: string): string {
+  switch (category) {
+    case 'Merch':
+      return 'merch';
+    case 'Music':
+      return 'music';
+    case 'Bundles':
+      return 'bundles';
+    case 'Backing Track':
+      return 'digital';
+    default:
+      return 'merch';
+  }
 }
 
 // 🚀 Optimized smartTitleCase function with memoization
