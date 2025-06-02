@@ -1,4 +1,4 @@
-// AppClientWrapper.tsx - Performance Optimized + Fixed Accessibility
+// AppClientWrapper.tsx - Performance Optimized + FIXED Scroll Restoration
 
 'use client';
 
@@ -66,9 +66,12 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
       }
     };
     window.addEventListener('toggle-menu', handler);
+    
+    // 🔧 FIXED: เปลี่ยน 'auto' เป็น 'manual' เพื่อให้ browser จัดการเอง!
     if ('scrollRestoration' in window.history) {
-      window.history.scrollRestoration = 'auto';
+      window.history.scrollRestoration = 'manual';
     }
+    
     return () => window.removeEventListener('toggle-menu', handler);
   }, []);
 

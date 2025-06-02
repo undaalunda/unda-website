@@ -1,4 +1,4 @@
-// app/layout.tsx - Level 2 Performance Enhanced + Mobile Optimized
+// app/layout.tsx - Simple Scroll Restoration (เหมือนเว็บปกติ)
 
 import './globals.css';
 import type { Metadata } from 'next';
@@ -44,17 +44,19 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
-        {/* 🚀 LEVEL 2: Enhanced Critical Resource Hints */}
+        {/* 🚀 LEVEL 3: Critical Resource Hints */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         
-        {/* 🎯 Aggressive Preloading - Hero + Product Images */}
-        <link rel="preload" href="/text-hero-section.webp" as="image" type="image/webp" />
-        <link rel="preload" href="/unda-alunda-header.webp" as="image" type="image/webp" />
+        {/* 🎯 CRITICAL: Hero Images - Highest Priority */}
+        <link rel="preload" href="/text-hero-section.webp" as="image" type="image/webp" fetchPriority="high" />
+        <link rel="preload" href="/catmoon-bg.webp" as="image" type="image/webp" fetchPriority="high" />
+        
+        {/* 🚀 Secondary Priority - Product Images */}
         <link rel="preload" href="/product-guitar.webp" as="image" type="image/webp" />
         <link rel="preload" href="/product-keys.webp" as="image" type="image/webp" />
         
-        {/* 🚀 Enhanced DNS Prefetch for External Resources */}
+        {/* 🚀 Enhanced DNS Prefetch */}
         <link rel="dns-prefetch" href="//widget.bandsintown.com" />
         <link rel="dns-prefetch" href="//www.youtube.com" />
         <link rel="dns-prefetch" href="//i.ytimg.com" />
@@ -63,43 +65,42 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="dns-prefetch" href="//fonts.gstatic.com" />
         
-        {/* 🚀 OPTIMIZED Google Fonts - เร็วขึ้น 60% */}
+        {/* 🚀 OPTIMIZED Google Fonts */}
         <link 
-  href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=swap" 
-  rel="stylesheet"
-/>
+          href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=swap" 
+          rel="stylesheet"
+        />
         <noscript>
           <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=swap" rel="stylesheet" />
         </noscript>
         
-        {/* 🚀 Enhanced Critical CSS - Same Animation All Devices + Mobile Performance */}
+        {/* 🚀 LEVEL 3: Enhanced Critical CSS + Anti-Flash */}
         <style dangerouslySetInnerHTML={{
           __html: `
-            /* Critical performance CSS */
+            /* Critical performance CSS + Anti-flash protection */
             *{box-sizing:border-box}
-            body{background-color:#190000;margin:0;padding:0;overflow-x:hidden;font-family:system-ui,sans-serif}
-            img{max-width:100%;height:auto}
-            iframe{max-width:100%}
+            html{scroll-behavior:auto;-webkit-text-size-adjust:100%}
+            body{background-color:#190000;margin:0;padding:0;overflow-x:hidden;font-family:system-ui,sans-serif;opacity:1 !important;visibility:visible !important}
             
-            /* Hero section critical styles */
-            .hero-wrapper{width:100vw;min-height:100vh;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-top:6rem;padding-bottom:6vh;z-index:0;margin-top:0}
+            /* 🎯 ANTI-FLASH: Prevent layout shift during load */
+            .hero-wrapper{opacity:1;position:relative;width:100vw;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-top:6rem;padding-bottom:6vh;z-index:0;margin-top:0;overflow:hidden}
             
-            /* 🎯 SAME ANIMATION FOR ALL DEVICES - เหมือน desktop */
+            /* 🚀 Catmoon background - Immediate display */
+            .catmoon-background{position:absolute;inset:0;width:100%;height:100%;background-image:url('/catmoon-bg.webp');background-repeat:no-repeat;background-size:cover;background-position:center;z-index:-1;opacity:1;will-change:auto}
+            
+            /* 🎯 Hero text - Immediate position, controlled animation */
             .hero-text-image{position:absolute;top:10vh;left:50%;transform:translateX(-50%);width:80%;max-width:500px;z-index:10;pointer-events:none;opacity:0;margin-top:1rem;animation:fadeInHero 1.3s ease-out 0.2s forwards}
             
-            /* 🚀 MOBILE PERFORMANCE OPTIMIZATIONS */
-            
-            /* GPU Acceleration */
+            /* 🚀 GPU Acceleration for critical elements only */
             .hero-wrapper,
             .catmoon-background,
             .hero-text-image,
             .video-section {
               transform: translateZ(0);
-              will-change: transform;
               backface-visibility: hidden;
             }
             
-            /* Mobile Scroll Performance */
+            /* 🎯 Mobile optimizations */
             @media (max-width: 768px) {
               .catmoon-background {
                 background-attachment: scroll !important;
@@ -124,12 +125,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               }
             }
             
-            /* Performance optimizations */
-            .hero-wrapper,.video-section{transform:translateZ(0);will-change:transform}
-            .fade-in,.fade-trigger{will-change:opacity,transform}
-            .catmoon-background{will-change:opacity;backface-visibility:hidden;transform:translateZ(0)}
-            
-            /* 🎯 ENHANCED ANIMATION - เหมือนเดิม แต่เร็วขึ้น */
+            /* 🎯 Original animation - เหมือนเดิม */
             @keyframes fadeInHero{
               from{opacity:0;transform:translateX(-50%) translateY(20px) translateZ(0)}
               to{opacity:1;transform:translateX(-50%) translateY(0) translateZ(0)}
@@ -137,100 +133,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             
             /* Loading states */
             .section-loading{height:400px;background-color:#2a0808;display:flex;align-items:center;justify-content:center;color:#f8fcdc;contain:strict;content-visibility:auto}
+            
+            /* 🎯 Prevent initial flicker */
+            img{max-width:100%;height:auto;opacity:1}
+            iframe{max-width:100%}
           `
         }} />
-        
-        {/* 🚀 FIXED: Enhanced Scroll Position Preservation */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              // Enhanced scroll preservation - multiple strategies
-              (function() {
-                'use strict';
-                
-                let scrollPosition = 0;
-                
-                // Strategy 1: Save on scroll (real-time)
-                let scrollTimeout;
-                window.addEventListener('scroll', function() {
-                  clearTimeout(scrollTimeout);
-                  scrollTimeout = setTimeout(function() {
-                    scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-                    sessionStorage.setItem('undaScrollPos', scrollPosition.toString());
-                  }, 100);
-                }, { passive: true });
-                
-                // Strategy 2: Save before leaving
-                window.addEventListener('beforeunload', function() {
-                  scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-                  sessionStorage.setItem('undaScrollPos', scrollPosition.toString());
-                  localStorage.setItem('undaScrollPosBackup', scrollPosition.toString());
-                });
-                
-                // Strategy 3: Save on visibility change (mobile)
-                document.addEventListener('visibilitychange', function() {
-                  if (document.visibilityState === 'hidden') {
-                    scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-                    sessionStorage.setItem('undaScrollPos', scrollPosition.toString());
-                  }
-                });
-                
-                // Strategy 4: Multiple restore attempts
-                function restoreScroll() {
-                  const savedPos = sessionStorage.getItem('undaScrollPos') || 
-                                  localStorage.getItem('undaScrollPosBackup') || '0';
-                  const targetPos = parseInt(savedPos);
-                  
-                  if (targetPos > 0) {
-                    // Immediate restore
-                    window.scrollTo(0, targetPos);
-                    document.documentElement.scrollTop = targetPos;
-                    document.body.scrollTop = targetPos;
-                    
-                    // Delayed restore (in case page still loading)
-                    setTimeout(function() {
-                      window.scrollTo(0, targetPos);
-                      document.documentElement.scrollTop = targetPos;
-                    }, 50);
-                    
-                    // Final restore attempt
-                    setTimeout(function() {
-                      window.scrollTo(0, targetPos);
-                      document.documentElement.scrollTop = targetPos;
-                      // Clear after successful restore
-                      sessionStorage.removeItem('undaScrollPos');
-                      localStorage.removeItem('undaScrollPosBackup');
-                    }, 200);
-                  }
-                }
-                
-                // Restore on multiple events
-                if (document.readyState === 'loading') {
-                  document.addEventListener('DOMContentLoaded', restoreScroll);
-                } else {
-                  restoreScroll();
-                }
-                
-                window.addEventListener('load', restoreScroll);
-                window.addEventListener('pageshow', function(event) {
-                  if (event.persisted) {
-                    restoreScroll();
-                  }
-                });
-                
-                // Override Next.js router if present
-                if (typeof window !== 'undefined' && window.history) {
-                  const originalPushState = window.history.pushState;
-                  window.history.pushState = function() {
-                    scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-                    sessionStorage.setItem('undaScrollPos', scrollPosition.toString());
-                    return originalPushState.apply(this, arguments);
-                  };
-                }
-              })();
-            `
-          }}
-        />
         
         {/* 🎯 Viewport with Performance Hints */}
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -382,7 +290,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 { "@type": "SiteNavigationElement", "name": "Home", "url": "https://unda-website.vercel.app/" },
                 { "@type": "SiteNavigationElement", "name": "Shop", "url": "https://unda-website.vercel.app/shop" },
                 { "@type": "SiteNavigationElement", "name": "About", "url": "https://unda-website.vercel.app/about" },
-                { "@type": "SiteNavigationElement", "name": "Tour", "url": "https://unda-website.vercel.app/tour" },
                 { "@type": "SiteNavigationElement", "name": "Contact", "url": "https://unda-website.vercel.app/contact" }
               ]
             })

@@ -464,7 +464,7 @@ export default function Navbar() {
             ref={searchOverlayRef}
             className="w-full max-w-5xl flex flex-col items-center fade-in-section"
           >
-            {/* ✅ Fixed SEARCH INPUT */}
+            {/* ✅ Fixed SEARCH INPUT - เอา outline ออก */}
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -492,7 +492,7 @@ export default function Navbar() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={(e) => handleKeyDown(e)} 
                   autoFocus
-                  className="w-full pl-12 pr-12 py-2 text-base text-[#f8fcdc] caret-[#dc9e63] bg-transparent border border-[#dc9e63] rounded-md placeholder:text-[#777] outline-none"
+                  className="w-full pl-12 pr-12 py-2 text-base text-[#f8fcdc] caret-[#dc9e63] bg-transparent border border-[#dc9e63] rounded-md placeholder:text-[#777] outline-none focus:ring-0 focus:outline-none"
                   aria-describedby="search-instructions"
                 />
                 <button

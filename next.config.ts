@@ -1,4 +1,4 @@
-// next.config.ts - Performance Optimized + Original Settings
+// next.config.ts - Performance Optimized + Fixed Scroll
 
 import type { NextConfig } from "next";
 
@@ -39,11 +39,11 @@ const nextConfig: NextConfig = {
 
   compress: true,
   
+  // 🔧 FIXED: ลบ scrollRestoration ออก!
   experimental: {
-  scrollRestoration: true,
-  // optimizeCss: true,      // ← comment หรือลบบรรทัดนี้ออก
-  webpackBuildWorker: true,
-},
+    // scrollRestoration: true,  // ← ลบออกแล้ว!
+    webpackBuildWorker: true,
+  },
 
   // 🚀 Headers สำหรับ caching
   async headers() {
