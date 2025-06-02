@@ -1,4 +1,4 @@
-/* Navbar.tsx - Performance Optimized (Complete Version) */
+/* Navbar.tsx - Performance Optimized + Fixed Accessibility */
 
 'use client';
 
@@ -245,40 +245,53 @@ export default function Navbar() {
       <div className={`absolute inset-0 bg-[#160000] transition-opacity duration-[1200ms] pointer-events-none ${scrolledDown ? 'opacity-100' : 'opacity-0'}`} />
       <div className="relative flex items-center justify-between px-4 py-8 h-full">
         
-        {/* ✅ ซ่อน hamburger ตอน searchOpen === true */}
+        {/* ✅ Fixed hamburger menu button - ซ่อน ตอน searchOpen === true */}
         {!searchOpen && (
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors z-50"
+            aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={menuOpen}
+            aria-controls="main-navigation"
           >
             <div
               className={`transition-transform duration-200 ease-in-out ${
                 menuOpen ? 'rotate-180 scale-100' : 'rotate-0 scale-100'
               }`}
             >
-              {menuOpen ? <X size={28} strokeWidth={1.2} /> : <Menu
-                size={23}
-                strokeWidth={1.2}
-                className="transition-opacity duration-300 opacity-70 hover:opacity-100"
-              />}
+              {menuOpen ? (
+                <X size={28} strokeWidth={1.2} aria-hidden="true" />
+              ) : (
+                <Menu
+                  size={23}
+                  strokeWidth={1.2}
+                  className="transition-opacity duration-300 opacity-70 hover:opacity-100"
+                  aria-hidden="true"
+                />
+              )}
             </div>
           </button>
         )}
   
-        {/* ✅ ซ่อน icons ตอน menuOpen === true */}
+        {/* ✅ Fixed cart and search buttons - ซ่อน icons ตอน menuOpen === true */}
         {!menuOpen && !searchOpen && (
           <div className="flex items-center gap-7 pr-3 z-40">
             <Link
               href="/cart"
               className="relative cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
+              aria-label={`Shopping cart with ${totalQuantity} ${totalQuantity === 1 ? 'item' : 'items'}`}
             >
               <ShoppingCart
                 size={23}
                 strokeWidth={1.2}
                 className="transition-opacity duration-300 opacity-70 hover:opacity-100"
+                aria-hidden="true"
               />
               {totalQuantity > 0 && (
-                <span className="absolute -top-2 -right-2 bg-[#dc9e63] text-[#160000] rounded-full w-5 h-5 flex items-center justify-center text-xs font-light">
+                <span 
+                  className="absolute -top-2 -right-2 bg-[#dc9e63] text-[#160000] rounded-full w-5 h-5 flex items-center justify-center text-xs font-light"
+                  aria-hidden="true"
+                >
                   {totalQuantity}
                 </span>
               )}
@@ -287,11 +300,13 @@ export default function Navbar() {
             <button
               onClick={() => setSearchOpen(true)}
               className="hidden md:block cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
+              aria-label="Open search"
             >
               <Search
                 size={23}
                 strokeWidth={1.2}
                 className="transition-opacity duration-300 opacity-70 hover:opacity-100"
+                aria-hidden="true"
               />
             </button>
           </div>
@@ -309,56 +324,147 @@ export default function Navbar() {
             href="/" 
             className="block"
             onClick={menuOpen ? () => setMenuOpen(false) : undefined}
+            aria-label="Unda Alunda - Go to homepage"
           >
             <LogoImage />
           </Link>
         </div>
       </div>
 
-      {/* MENU OPEN OVERLAY */}
+      {/* ✅ Fixed MENU OPEN OVERLAY */}
       {menuOpen && (
-        <div className="fixed inset-0 bg-transparent flex flex-col items-center justify-center text-[#f8fcdc] text-lg font-semibold tracking-widest space-y-6 z-30 backdrop-blur-none font-[Cinzel]">
-          <Link href="/" onClick={() => setMenuOpen(false)} className="hover:text-[#dc9e63]">HOME</Link>
-          <Link href="/shop" onClick={() => setMenuOpen(false)} className="hover:text-[#dc9e63]">SHOP</Link>
+        <nav 
+          id="main-navigation"
+          className="fixed inset-0 bg-transparent flex flex-col items-center justify-center text-[#f8fcdc] text-lg font-semibold tracking-widest space-y-6 z-30 backdrop-blur-none font-[Cinzel]"
+          aria-label="Main navigation"
+        >
+          <Link 
+            href="/" 
+            onClick={() => setMenuOpen(false)} 
+            className="hover:text-[#dc9e63]"
+          >
+            HOME
+          </Link>
+          <Link 
+            href="/shop" 
+            onClick={() => setMenuOpen(false)} 
+            className="hover:text-[#dc9e63]"
+          >
+            SHOP
+          </Link>
           
-          {/* MUSIC DROPDOWN MENU */}
+          {/* ✅ Fixed MUSIC DROPDOWN MENU */}
           <div className="flex flex-col items-center z-30 font-[Cinzel] w-full">
             <button
               onClick={() => setMusicDropdownOpen(!musicDropdownOpen)}
               className="hover:text-[#dc9e63] text-[#f8fcdc] text-lg font-semibold tracking-widest cursor-pointer"
+              aria-expanded={musicDropdownOpen}
+              aria-controls="music-submenu"
+              aria-label="Music streaming platforms"
             >
               MUSIC
             </button>
 
             <div
+              id="music-submenu"
               className={`
                 overflow-hidden transition-all duration-500 ease-in-out
                 flex flex-col items-center text-sm font-thin text-[#f8fcdc]/60 space-y-1
                 ${musicDropdownOpen ? 'max-h-60 mt-2' : 'max-h-0'}
               `}
+              role="menu"
+              aria-labelledby="music-button"
             >
-              <a href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0" target="_blank" rel="noopener noreferrer" className="hover:text-[#dc9e63]">Spotify</a>
-              <a href="https://music.apple.com/us/artist/unda-alunda/1543677299" target="_blank" rel="noopener noreferrer" className="hover:text-[#dc9e63]">Apple</a>
-              <a href="https://www.deezer.com/en/artist/115903802" target="_blank" rel="noopener noreferrer" className="hover:text-[#dc9e63]">Deezer</a>
-              <a href="https://tidal.com/browse/artist/22524871" target="_blank" rel="noopener noreferrer" className="hover:text-[#dc9e63]">Tidal</a>
-              <a href="https://music.amazon.com/artists/B08PVKFZDZ/unda-alunda" target="_blank" rel="noopener noreferrer" className="hover:text-[#dc9e63]">Amazon</a>
+              <a 
+                href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="hover:text-[#dc9e63]"
+                role="menuitem"
+                aria-label="Listen on Spotify"
+              >
+                Spotify
+              </a>
+              <a 
+                href="https://music.apple.com/us/artist/unda-alunda/1543677299" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="hover:text-[#dc9e63]"
+                role="menuitem"
+                aria-label="Listen on Apple Music"
+              >
+                Apple
+              </a>
+              <a 
+                href="https://www.deezer.com/en/artist/115903802" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="hover:text-[#dc9e63]"
+                role="menuitem"
+                aria-label="Listen on Deezer"
+              >
+                Deezer
+              </a>
+              <a 
+                href="https://tidal.com/browse/artist/22524871" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="hover:text-[#dc9e63]"
+                role="menuitem"
+                aria-label="Listen on Tidal"
+              >
+                Tidal
+              </a>
+              <a 
+                href="https://music.amazon.com/artists/B08PVKFZDZ/unda-alunda" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="hover:text-[#dc9e63]"
+                role="menuitem"
+                aria-label="Listen on Amazon Music"
+              >
+                Amazon
+              </a>
             </div>
           </div>
           
-          <Link href="/about" onClick={() => setMenuOpen(false)} className="hover:text-[#dc9e63]">ABOUT</Link>
-          <Link href="/tour" onClick={() => setMenuOpen(false)} className="hover:text-[#dc9e63]">TOUR</Link>
-          <Link href="/contact" onClick={() => setMenuOpen(false)} className="hover:text-[#dc9e63]">CONTACT</Link>
-        </div>
+          <Link 
+            href="/about" 
+            onClick={() => setMenuOpen(false)} 
+            className="hover:text-[#dc9e63]"
+          >
+            ABOUT
+          </Link>
+          <Link 
+            href="/tour" 
+            onClick={() => setMenuOpen(false)} 
+            className="hover:text-[#dc9e63]"
+          >
+            TOUR
+          </Link>
+          <Link 
+            href="/contact" 
+            onClick={() => setMenuOpen(false)} 
+            className="hover:text-[#dc9e63]"
+          >
+            CONTACT
+          </Link>
+        </nav>
       )}
 
-      {/* SEARCH OPEN OVERLAY */}
+      {/* ✅ Fixed SEARCH OPEN OVERLAY */}
       {searchOpen && (
-        <div className="fixed inset-0 z-40 bg-[#0d0d0dea] flex items-start justify-center px-4 pt-40 animate-fadeIn">
+        <div 
+          className="fixed inset-0 z-40 bg-[#0d0d0dea] flex items-start justify-center px-4 pt-40 animate-fadeIn"
+          role="dialog"
+          aria-label="Search products"
+          aria-modal="true"
+        >
           <div
             ref={searchOverlayRef}
             className="w-full max-w-5xl flex flex-col items-center fade-in-section"
           >
-            {/* SEARCH INPUT */}
+            {/* ✅ Fixed SEARCH INPUT */}
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -371,12 +477,15 @@ export default function Navbar() {
                 }
               }}
               className="relative w-full max-w-xl"
+              role="search"
             >
               <div className="relative">
-                <span className="absolute top-1/2 left-4 -translate-y-1/2 text-[#f8fcdc]/50">
+                <span className="absolute top-1/2 left-4 -translate-y-1/2 text-[#f8fcdc]/50" aria-hidden="true">
                   <Search size={20} />
                 </span>
+                <label htmlFor="search-input" className="sr-only">Search products</label>
                 <input
+                  id="search-input"
                   type="text"
                   placeholder="Search..."
                   value={searchQuery}
@@ -384,14 +493,19 @@ export default function Navbar() {
                   onKeyDown={(e) => handleKeyDown(e)} 
                   autoFocus
                   className="w-full pl-12 pr-12 py-2 text-base text-[#f8fcdc] caret-[#dc9e63] bg-transparent border border-[#dc9e63] rounded-md placeholder:text-[#777] outline-none"
+                  aria-describedby="search-instructions"
                 />
                 <button
                   type="button"
                   onClick={() => setSearchOpen(false)}
                   className="absolute top-1/2 right-4 -translate-y-1/2 text-[#f8fcdc] hover:text-[#dc9e63] transition"
+                  aria-label="Close search"
                 >
-                  <X size={24} strokeWidth={1.4} />
+                  <X size={24} strokeWidth={1.4} aria-hidden="true" />
                 </button>
+              </div>
+              <div id="search-instructions" className="sr-only">
+                Use arrow keys to navigate search results, Enter to select
               </div>
             </form>
 
@@ -402,7 +516,7 @@ export default function Navbar() {
                 {/* LEFT - MAIN MENU */}
                 <div>
                   <h4 className="text-sm mb-2 font-semibold text-[#f8fcdc]">Main Menu</h4>
-                  <ul className="space-y-1 text-sm">
+                  <ul className="space-y-1 text-sm" role="list">
                     {pageLinks.map((page, i) => {
                       const offsetIndex = 1 + i;
                       return (
@@ -416,6 +530,7 @@ export default function Navbar() {
                               ? 'text-[#dc9e63]'
                               : 'text-[#f8fcdc]/70 hover:text-[#dc9e63]'
                           }`}
+                          role="listitem"
                         >
                           <Link
                             href={page.href}
@@ -434,12 +549,13 @@ export default function Navbar() {
                 {recentSearches.length > 0 && (
                   <div>
                     <h4 className="text-sm mb-2 font-semibold text-[#f8fcdc]">Recent Searches</h4>
-                    <ul className="space-y-1 text-sm">
+                    <ul className="space-y-1 text-sm" role="list">
                       {recentSearches.map((term, i) => (
                         <li
                           key={i}
                           className="cursor-pointer text-[#f8fcdc]/70 hover:text-[#dc9e63]"
                           onClick={() => setSearchQuery(term)}
+                          role="listitem"
                         >
                           {term}
                         </li>
@@ -455,7 +571,7 @@ export default function Navbar() {
                   {/* LEFT - Suggestions */}
                   <div className="text-[#f8fcdc]">
                     <h4 className="text-sm mb-2 font-semibold">Suggestions</h4>
-                    <ul className="space-y-1 text-sm">
+                    <ul className="space-y-1 text-sm" role="list">
                       {suggestions.map((term, i) => {
                         const offsetIndex = 1 + filtered.length + i;
                         return (
@@ -470,6 +586,7 @@ export default function Navbar() {
                                 ? 'text-[#dc9e63]'
                                 : 'text-[#f8fcdc]/70 hover:text-[#dc9e63]'
                             }`}
+                            role="listitem"
                           >
                             {term}
                           </li>
@@ -481,7 +598,7 @@ export default function Navbar() {
                     {pageMatches.length > 0 && (
                       <div className="text-[#f8fcdc] mt-6">
                         <h4 className="text-sm mb-2 font-semibold">Pages</h4>
-                        <ul className="space-y-1 text-sm">
+                        <ul className="space-y-1 text-sm" role="list">
                           {pageMatches.map((page, i) => {
                             const offsetIndex = 1 + filtered.length + suggestions.length + i;
                             return (
@@ -495,6 +612,7 @@ export default function Navbar() {
                                     ? 'text-[#dc9e63]'
                                     : 'text-[#f8fcdc]/70 hover:text-[#dc9e63]'
                                 }`}
+                                role="listitem"
                               >
                                 <Link
                                   href={page.href}
@@ -522,70 +640,74 @@ export default function Navbar() {
                         </p>
                       </div>
                     ) : (
-                      filtered.map((item, i) => {
-                        const offsetIndex = i + 1;
-                        return (
-                          <div
-                            key={item.id}
-                            ref={(el: HTMLDivElement | null) => {
-                              resultRefs.current[offsetIndex] = el;
-                            }}
-                            className={`flex items-center gap-4 p-3 rounded-lg transition-colors cursor-pointer ${
-                              highlightIndex === offsetIndex
-                                ? 'bg-[#dc9e63]/10'
-                                : 'hover:bg-[#dc9e63]/10'
-                            }`}
-                          >
-                            <Link
-                              href={item.url}
-                              onClick={() => {
-                                setSearchOpen(false);
-                                const q = searchQuery.trim();
-                                if (q.length > 0) {
-                                  setRecentSearches((prev) => {
-                                    const withoutDupes = prev.filter((t) => t !== q);
-                                    return [q, ...withoutDupes].slice(0, 5);
-                                  });
-                                }
+                      <ul role="list">
+                        {filtered.map((item, i) => {
+                          const offsetIndex = i + 1;
+                          return (
+                            <li
+                              key={item.id}
+                              ref={(el: HTMLLIElement | null) => {
+                                resultRefs.current[offsetIndex] = el;
                               }}
-                              className="flex items-center gap-4 w-full"
+                              className={`flex items-center gap-4 p-3 rounded-lg transition-colors cursor-pointer ${
+                                highlightIndex === offsetIndex
+                                  ? 'bg-[#dc9e63]/10'
+                                  : 'hover:bg-[#dc9e63]/10'
+                              }`}
+                              role="listitem"
                             >
-                              <Image
-                                src={item.image}
-                                alt={item.title}
-                                width={48}
-                                height={48}
-                                className="w-12 h-12 object-cover rounded"
-                                loading="lazy"
-                                quality={75}
-                                sizes="48px"
-                              />
-                              <div className="flex flex-col">
-                                <span className="text-sm font-medium text-[#f8fcdc]">
-                                  {item.title}
-                                </span>
-                                <span className="text-xs text-[#f8fcdc]/70">{item.subtitle}</span>
-                                {item.price && (
-                                  typeof item.price === 'object' ? (
-                                    <div className="flex items-center gap-2 text-xs mt-1">
-                                      <span className="line-through text-[#f8fcdc]/40">
-                                        ${item.price.original.toFixed(2)}
-                                      </span>
-                                      <span className="text-[#dc9e63]">
-                                        ${item.price.sale.toFixed(2)}
-                                      </span>
-                                    </div>
-                                  ) : (
-                                    <div className="text-xs text-[#dc9e63] mt-1">
-                                      ${item.price.toFixed(2)}
-                                    </div>
-                                  )
-                                )}
-                              </div>
-                            </Link>
-                          </div>
-                        );
-                      })
+                              <Link
+                                href={item.url}
+                                onClick={() => {
+                                  setSearchOpen(false);
+                                  const q = searchQuery.trim();
+                                  if (q.length > 0) {
+                                    setRecentSearches((prev) => {
+                                      const withoutDupes = prev.filter((t) => t !== q);
+                                      return [q, ...withoutDupes].slice(0, 5);
+                                    });
+                                  }
+                                }}
+                                className="flex items-center gap-4 w-full"
+                                aria-label={`${item.title} - ${item.subtitle}`}
+                              >
+                                <Image
+                                  src={item.image}
+                                  alt={item.title}
+                                  width={48}
+                                  height={48}
+                                  className="w-12 h-12 object-cover rounded"
+                                  loading="lazy"
+                                  quality={75}
+                                  sizes="48px"
+                                />
+                                <div className="flex flex-col">
+                                  <span className="text-sm font-medium text-[#f8fcdc]">
+                                    {item.title}
+                                  </span>
+                                  <span className="text-xs text-[#f8fcdc]/70">{item.subtitle}</span>
+                                  {item.price && (
+                                    typeof item.price === 'object' ? (
+                                      <div className="flex items-center gap-2 text-xs mt-1">
+                                        <span className="line-through text-[#f8fcdc]/40">
+                                          ${item.price.original.toFixed(2)}
+                                        </span>
+                                        <span className="text-[#dc9e63]">
+                                          ${item.price.sale.toFixed(2)}
+                                        </span>
+                                      </div>
+                                    ) : (
+                                      <div className="text-xs text-[#dc9e63] mt-1">
+                                        ${item.price.toFixed(2)}
+                                      </div>
+                                    )
+                                  )}
+                                </div>
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
                     )}
                   </div>
                 </div>

@@ -1,4 +1,4 @@
-/* NewsletterForm.tsx - พร้อม Social Media Icons */
+/* NewsletterForm.tsx - Fixed Accessibility Issues */
 
 'use client';
 
@@ -20,14 +20,26 @@ export default function NewsletterForm() {
         className="newsletter-form"
       >
         <div className="newsletter-grid">
+          {/* ✅ เพิ่ม label และ id สำหรับ email input */}
+          <label htmlFor="newsletter-email" className="sr-only">Email Address</label>
           <input
+            id="newsletter-email"
             type="email"
             name="EMAIL"
             required
             placeholder="Email Address"
             className="newsletter-input"
+            aria-describedby="email-help"
           />
-          <select name="MMERGE7" className="newsletter-select">
+          
+          {/* ✅ เพิ่ม label และ aria-label สำหรับ country select */}
+          <label htmlFor="country-select" className="sr-only">Select your country</label>
+          <select 
+            id="country-select"
+            name="MMERGE7" 
+            className="newsletter-select"
+            aria-label="Select your country"
+          >
             <option value="">Select a country...</option>
             <option value="United States">United States</option>
             <option value="United Kingdom">United Kingdom</option>
@@ -149,13 +161,20 @@ export default function NewsletterForm() {
         </div>
 
         <div className="newsletter-grid">
+          {/* ✅ เพิ่ม label สำหรับ first name */}
+          <label htmlFor="first-name" className="sr-only">First Name</label>
           <input
+            id="first-name"
             type="text"
             name="FNAME"
             placeholder="First Name"
             className="newsletter-input"
           />
+          
+          {/* ✅ เพิ่ม label สำหรับ last name */}
+          <label htmlFor="last-name" className="sr-only">Last Name</label>
           <input
+            id="last-name"
             type="text"
             name="LNAME"
             placeholder="Last Name"
@@ -163,9 +182,20 @@ export default function NewsletterForm() {
           />
         </div>
 
-        <button type="submit" name="subscribe" className="newsletter-button">
+        {/* ✅ เพิ่ม aria-label สำหรับ submit button */}
+        <button 
+          type="submit" 
+          name="subscribe" 
+          className="newsletter-button"
+          aria-label="Subscribe to newsletter"
+        >
           SUBSCRIBE
         </button>
+
+        {/* ✅ เพิ่ม hidden text สำหรับ screen readers */}
+        <div id="email-help" className="sr-only">
+          We'll never share your email with anyone else
+        </div>
       </form>
 
     </section>
