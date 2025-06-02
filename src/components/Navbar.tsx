@@ -28,8 +28,9 @@ const LogoImage = ({ onClick }: { onClick?: () => void }) => (
     quality={100}
     priority
     unoptimized={true}
-    sizes="200px"
+    sizes="(max-width: 1279px) 150px, 200px"
     onClick={onClick}
+    className="logo-navbar-img"
   />
 );
 
