@@ -1,4 +1,4 @@
-/* HomePage.tsx - Performance Optimized */
+/* HomePage.tsx - Level 3: Smart Image Loading */
 
 'use client';
 
@@ -9,7 +9,6 @@ import Script from 'next/script';
 import { allItems } from '@/components/allItems';
 import AppClientWrapper from '@/components/AppClientWrapper';
 
-// 🚀 Lazy load heavy components
 const BandsinTownWidget = lazy(() => import('@/components/BandsinTownWidget'));
 
 const blacklist = [
@@ -28,6 +27,9 @@ export default function HomePage() {
   const [isClient, setIsClient] = useState(false);
   const [showBandsintown, setShowBandsintown] = useState(false);
   
+  // 🚀 LEVEL 3: Connection speed detection
+  const [isSlowConnection, setIsSlowConnection] = useState(false);
+  
   const videoRef = useRef<HTMLDivElement>(null);
   const transcriptionRef = useRef<HTMLDivElement>(null);
   const stemsRef = useRef<HTMLDivElement>(null);
@@ -45,6 +47,35 @@ export default function HomePage() {
   useEffect(() => {
     setIsClient(true);
     
+    // 🎯 LEVEL 3: Detect connection speed
+    if ('connection' in navigator) {
+      const connection = (navigator as any).connection;
+      if (connection && (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g')) {
+        setIsSlowConnection(true);
+      }
+    }
+    
+    // 🚀 LEVEL 3: Smart preloading based on scroll behavior
+    let scrollTimeout: NodeJS.Timeout;
+    const handleScroll = () => {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        // Preload next section images when user stops scrolling
+        const scrollY = window.scrollY;
+        const windowHeight = window.innerHeight;
+        
+        if (scrollY > windowHeight * 0.5 && !showTranscriptions) {
+          // Preload transcription images
+          ['bass', 'drums'].forEach(inst => {
+            const img = new window.Image();
+            img.src = `/product-${inst}.webp`;
+          });
+        }
+      }, 150);
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -56,12 +87,16 @@ export default function HomePage() {
             if (entry.target === musicMerchRef.current) setShowMerch(true);
             if (entry.target === tourRef.current) {
               setShowTour(true);
-              setShowBandsintown(true); // 🎯 โหลด widget ตอนเลื่อนมาถึง
+              // 🎯 Delay BandsinTown on slow connections
+              setTimeout(() => setShowBandsintown(true), isSlowConnection ? 1000 : 100);
             }
           }
         });
       },
-      { threshold: 0.01 }
+      { 
+        threshold: 0.1,
+        rootMargin: isSlowConnection ? '50px' : '100px' // 🚀 Smaller margin on slow connections
+      }
     );
 
     const refs = [videoRef, transcriptionRef, stemsRef, buttonGroupRef, musicMerchRef, tourRef];
@@ -70,18 +105,20 @@ export default function HomePage() {
     });
 
     return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearTimeout(scrollTimeout);
       refs.forEach((ref) => {
         if (ref.current) observer.unobserve(ref.current);
       });
     };
-  }, []);
+  }, [isSlowConnection]);
 
   return (
     <AppClientWrapper>
       <main className="homepage-main" style={{ overflow: 'visible' }}>
         <h1 className="sr-only">Unda Alunda | Official Website & Merch Store</h1>
 
-        {/* HERO SECTION */}
+        {/* HERO SECTION - เหมือนเดิม */}
         <div className="hero-wrapper">
           <div className="catmoon-background" />
           <div className="hero-text-image">
@@ -90,9 +127,9 @@ export default function HomePage() {
               alt="Dark Wonderful World on Moon"
               height={400}
               width={600}
-              quality={100}      // ✅ คงไว้ชัดตามที่ต้องการ
+              quality={100}
               priority
-              unoptimized={true} // ✅ คงไว้ชัดตามที่ต้องการ
+              unoptimized={true}
               sizes="(max-width: 480px) 300px, (max-width: 768px) 400px, 600px"
             />
           </div>
@@ -125,7 +162,7 @@ export default function HomePage() {
         <div className="after-hero-spacing" />
         <h2 className="sr-only">Shop by Category</h2>
 
-        {/* BUTTON GROUP */}
+        {/* BUTTON GROUP - เหมือนเดิม */}
         <div ref={buttonGroupRef} className={`button-group ${showButtons ? 'fade-in' : ''}`}>
           <Link href="/shop/digital" className="info-button">SCORES</Link>
           <Link href="/shop/digital" className="info-button">STEMS & SAMPLES</Link>
@@ -142,18 +179,21 @@ export default function HomePage() {
         </div>
         <p className="since-note">Delivering Worldwide Since 2025</p>
 
-        {/* VIDEO SECTION */}
+        {/* 🚀 LEVEL 3: Smart VIDEO SECTION */}
         <section ref={videoRef} className={`video-section ${showVideo ? 'fade-in' : ''}`}>
           <h2 className="sr-only">Watch on YouTube</h2>
           {showVideo ? (
             <iframe
               className="youtube-frame"
-              src="https://www.youtube.com/embed/ZwXeCx8cAIM"
+              src={isSlowConnection 
+                ? "https://www.youtube.com/embed/ZwXeCx8cAIM?autoplay=0&rel=0" 
+                : "https://www.youtube.com/embed/ZwXeCx8cAIM"
+              }
               title="YouTube video player"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
-              loading="lazy" // 🚀 Lazy load iframe
+              loading="lazy"
             />
           ) : (
             <div className="youtube-frame" style={{ backgroundColor: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -162,7 +202,7 @@ export default function HomePage() {
           )}
         </section>
 
-        {/* TRANSCRIPTION SECTION */}
+        {/* TRANSCRIPTION SECTION - เหมือนเดิม */}
         <section className="transcription-section">
           <div ref={transcriptionRef} className={`fade-trigger ${showTranscriptions ? 'fade-in' : ''}`}>
             <p className="transcription-sub">LEARN THE MUSIC</p>
@@ -176,9 +216,9 @@ export default function HomePage() {
                     width={200}
                     height={200}
                     className="product-image"
-                    loading="lazy" // 🚀 Lazy loading
-                    quality={75}   // 🎯 ลดจาก 85 → 75 สำหรับ thumbnails
-                    sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 200px" // 📐 Responsive
+                    loading="lazy"
+                    quality={isSlowConnection ? 65 : 75} // 🎯 Lower quality on slow connections
+                    sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 200px"
                   />
                   <div className="product-label-group">
                     <h3 className="product-title">
@@ -197,7 +237,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* STEMS SECTION */}
+        {/* STEMS SECTION - เหมือนเดิม */}
         <section className="stems-section">
           <div ref={stemsRef} className={`fade-trigger ${showStems ? 'fade-in' : ''}`}>
             <p className="stems-sub">JAM THE TRACKS</p>
@@ -217,8 +257,8 @@ export default function HomePage() {
                       width={200}
                       height={200}
                       className="stems-image"
-                      loading="lazy" // 🚀 Lazy loading
-                      quality={75}   // 🎯 ลดจาก 85 → 75
+                      loading="lazy"
+                      quality={isSlowConnection ? 65 : 75}
                       sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
                     />
                     <div className="stems-label-group">
@@ -252,7 +292,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* MUSIC & MERCH */}
+        {/* MUSIC & MERCH - เหมือนเดิม */}
         <section className="stems-section">
           <div ref={musicMerchRef} className={`fade-trigger ${showMerch ? 'fade-in' : ''}`}>
             <p className="stems-sub">MUSIC IN YOUR HANDS</p>
@@ -266,8 +306,8 @@ export default function HomePage() {
                     width={200} 
                     height={200} 
                     className="stems-image"
-                    loading="lazy" // 🚀 Lazy loading
-                    quality={75}   // 🎯 ลดจาก 85 → 75
+                    loading="lazy"
+                    quality={isSlowConnection ? 65 : 75}
                     sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
                   />
                   <div className="stems-label-group">
@@ -303,7 +343,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* TOUR SECTION */}
+        {/* 🚀 LEVEL 3: Smart TOUR SECTION */}
         <section ref={tourRef} className="tour-section">
           <div className={`fade-trigger ${showTour ? 'fade-in' : ''}`}>
             <p className="stems-sub">SEE IT LIVE</p>
@@ -313,7 +353,18 @@ export default function HomePage() {
           <div className="tour-widget-container">
             <div style={{ textAlign: 'left' }}>
               {showBandsintown ? (
-                <Suspense fallback={<div style={{ height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f8fcdc' }}>Loading tour dates...</div>}>
+                <Suspense fallback={
+                  <div style={{ 
+                    height: '400px', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    color: '#f8fcdc',
+                    fontSize: isSlowConnection ? '12px' : '14px'
+                  }}>
+                    {isSlowConnection ? 'Loading tour dates (slow connection)...' : 'Loading tour dates...'}
+                  </div>
+                }>
                   <BandsinTownWidget />
                 </Suspense>
               ) : (

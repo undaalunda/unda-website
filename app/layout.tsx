@@ -1,4 +1,4 @@
-// app/layout.tsx - Performance Optimized + Reduced Bundle Size
+// app/layout.tsx - Level 2 Performance Enhanced
 
 import './globals.css';
 import type { Metadata } from 'next';
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Unda Alunda',
     description: 'Official site and merch shop for Unda Alunda.',
-    images: ['/catmoon-bg.jpeg'], // ✅ เก็บ JPEG สำหรับ social media
+    images: ['/catmoon-bg.jpeg'],
     creator: '@undaalunda',
   },
   icons: {
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     'og:description': 'The New Album Dark Wonderful World out July 1, 2025 — Purchase now!',
     'og:url': 'https://unda-website.vercel.app',
     'og:site_name': 'Unda Alunda',
-    'og:image': 'https://unda-website.vercel.app/catmoon-bg.jpeg', // ✅ เก็บ JPEG
+    'og:image': 'https://unda-website.vercel.app/catmoon-bg.jpeg',
     'og:image:width': '1200',
     'og:image:height': '630',
     'og:image:alt': 'Unda Alunda Hero Image',
@@ -44,40 +44,169 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
-        {/* 🚀 Critical resource hints */}
+        {/* 🚀 LEVEL 2: Enhanced Critical Resource Hints */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         
-        {/* 🎯 Preload เฉพาะรูปสำคัญที่อยู่ above-the-fold */}
+        {/* 🎯 Aggressive Preloading - Hero + Product Images */}
         <link rel="preload" href="/text-hero-section.webp" as="image" type="image/webp" />
         <link rel="preload" href="/unda-alunda-header.webp" as="image" type="image/webp" />
+        <link rel="preload" href="/product-guitar.webp" as="image" type="image/webp" />
+        <link rel="preload" href="/product-keys.webp" as="image" type="image/webp" />
         
-        {/* 🎯 DNS prefetch สำหรับ resources ที่จำเป็น */}
+        {/* 🚀 Enhanced DNS Prefetch for External Resources */}
         <link rel="dns-prefetch" href="//widget.bandsintown.com" />
         <link rel="dns-prefetch" href="//www.youtube.com" />
+        <link rel="dns-prefetch" href="//i.ytimg.com" />
+        <link rel="dns-prefetch" href="//s.ytimg.com" />
+        <link rel="dns-prefetch" href="//www.youtube-nocookie.com" />
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="//fonts.gstatic.com" />
         
-        {/* 🚀 Optimized Google Fonts - คงไว้ weights เดิมที่ชอบ */}
-        {/* แบบปกติง่ายๆ - ไม่มี onLoad */}
-      <link 
-        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@300;400;500;600;700&display=swap" 
-        rel="stylesheet"
+        {/* 🚀 Simple Google Fonts - No Conflicts */}
+        <link 
+          href="https://fonts.googleapis.com/css2?family=Cinzel:wght@300;400;500;600;700&display=swap" 
+          rel="stylesheet"
         />
         <noscript>
           <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
         </noscript>
+        <noscript>
+          <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+        </noscript>
         
-        {/* 🎯 Minimal social icons - ใช้ SVG แทน Font Awesome */}
+        {/* 🚀 Enhanced Critical CSS - Same Animation All Devices */}
         <style dangerouslySetInnerHTML={{
           __html: `
-            /* Critical CSS สำหรับ hero section */
+            /* Critical performance CSS */
+            *{box-sizing:border-box}
+            body{background-color:#190000;margin:0;padding:0;overflow-x:hidden;font-family:system-ui,sans-serif}
+            img{max-width:100%;height:auto}
+            iframe{max-width:100%}
+            
+            /* Hero section critical styles */
             .hero-wrapper{width:100vw;min-height:100vh;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-top:6rem;padding-bottom:6vh;z-index:0;margin-top:0}
+            
+            /* 🎯 SAME ANIMATION FOR ALL DEVICES - เหมือน desktop */
             .hero-text-image{position:absolute;top:10vh;left:50%;transform:translateX(-50%);width:80%;max-width:500px;z-index:10;pointer-events:none;opacity:0;margin-top:1rem;animation:fadeInHero 1.3s ease-out 0.2s forwards}
+            
+            /* Performance optimizations */
+            .hero-wrapper,.video-section{transform:translateZ(0);will-change:transform}
+            .fade-in,.fade-trigger{will-change:opacity,transform}
+            .catmoon-background{will-change:opacity;backface-visibility:hidden;transform:translateZ(0)}
+            
+            /* 🎯 ORIGINAL ANIMATION - เหมือนเดิม */
             @keyframes fadeInHero{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-            body{background-color:#190000;margin:0;padding:0;overflow-x:hidden}
+            
+            /* Mobile optimizations - ไม่แตะ animation */
+            @media (max-width: 768px) {
+              .hero-text-image{width:90%;max-width:400px}
+              .catmoon-background{background-attachment:scroll}
+              /* ลบ animation-duration override ออก */
+            }
+            
+            /* Loading states */
+            .section-loading{height:400px;background-color:#2a0808;display:flex;align-items:center;justify-content:center;color:#f8fcdc}
           `
         }} />
         
+        {/* 🚀 FIXED: Enhanced Scroll Position Preservation */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Enhanced scroll preservation - multiple strategies
+              (function() {
+                'use strict';
+                
+                let scrollPosition = 0;
+                
+                // Strategy 1: Save on scroll (real-time)
+                let scrollTimeout;
+                window.addEventListener('scroll', function() {
+                  clearTimeout(scrollTimeout);
+                  scrollTimeout = setTimeout(function() {
+                    scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+                    sessionStorage.setItem('undaScrollPos', scrollPosition.toString());
+                  }, 100);
+                }, { passive: true });
+                
+                // Strategy 2: Save before leaving
+                window.addEventListener('beforeunload', function() {
+                  scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+                  sessionStorage.setItem('undaScrollPos', scrollPosition.toString());
+                  localStorage.setItem('undaScrollPosBackup', scrollPosition.toString());
+                });
+                
+                // Strategy 3: Save on visibility change (mobile)
+                document.addEventListener('visibilitychange', function() {
+                  if (document.visibilityState === 'hidden') {
+                    scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+                    sessionStorage.setItem('undaScrollPos', scrollPosition.toString());
+                  }
+                });
+                
+                // Strategy 4: Multiple restore attempts
+                function restoreScroll() {
+                  const savedPos = sessionStorage.getItem('undaScrollPos') || 
+                                  localStorage.getItem('undaScrollPosBackup') || '0';
+                  const targetPos = parseInt(savedPos);
+                  
+                  if (targetPos > 0) {
+                    // Immediate restore
+                    window.scrollTo(0, targetPos);
+                    document.documentElement.scrollTop = targetPos;
+                    document.body.scrollTop = targetPos;
+                    
+                    // Delayed restore (in case page still loading)
+                    setTimeout(function() {
+                      window.scrollTo(0, targetPos);
+                      document.documentElement.scrollTop = targetPos;
+                    }, 50);
+                    
+                    // Final restore attempt
+                    setTimeout(function() {
+                      window.scrollTo(0, targetPos);
+                      document.documentElement.scrollTop = targetPos;
+                      // Clear after successful restore
+                      sessionStorage.removeItem('undaScrollPos');
+                      localStorage.removeItem('undaScrollPosBackup');
+                    }, 200);
+                  }
+                }
+                
+                // Restore on multiple events
+                if (document.readyState === 'loading') {
+                  document.addEventListener('DOMContentLoaded', restoreScroll);
+                } else {
+                  restoreScroll();
+                }
+                
+                window.addEventListener('load', restoreScroll);
+                window.addEventListener('pageshow', function(event) {
+                  if (event.persisted) {
+                    restoreScroll();
+                  }
+                });
+                
+                // Override Next.js router if present
+                if (typeof window !== 'undefined' && window.history) {
+                  const originalPushState = window.history.pushState;
+                  window.history.pushState = function() {
+                    scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+                    sessionStorage.setItem('undaScrollPos', scrollPosition.toString());
+                    return originalPushState.apply(this, arguments);
+                  };
+                }
+              })();
+            `
+          }}
+        />
+        
+        {/* 🎯 Viewport with Performance Hints */}
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta httpEquiv="X-DNS-Prefetch-Control" content="on" />
+        
+        {/* SEO & Verification */}
         <meta name="google-site-verification" content="l9-GepfNOG2FpwhTM3lKy6YjpQ0ifAmNbLsv1oqC2uo" />
         <meta name="robots" content="index, follow" />
         <meta name="author" content="Unda Alunda" />
@@ -94,14 +223,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <meta property="music:musician" content="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0" />
 
-        {/* ✅ Force preview images - เก็บ JPEG สำหรับ social media */}
+        {/* Social Media Images */}
         <meta property="og:image" content="https://unda-website.vercel.app/catmoon-bg.jpeg" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:image:alt" content="Unda Alunda Hero Image" />
         <meta name="twitter:card" content="summary_large_image" />
 
-        {/* ✅ Structured Data for WebSite */}
+        {/* 🚀 Optimized Structured Data - WebSite */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -122,7 +251,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           }}
         />
 
-        {/* ✅ Structured Data for Person */}
+        {/* 🎯 Structured Data - Person */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -163,19 +292,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               "mainEntityOfPage": {
                 "@type": "WebPage",
                 "@id": "https://unda-website.vercel.app/about"
-              }
-            })
-          }}
-        />
-
-        {/* ✅ Structured Data for Education & Awards */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Person",
-              "@id": "https://unda-website.vercel.app#person",
+              },
               "alumniOf": {
                 "@type": "CollegeOrUniversity",
                 "name": "College of Music, Mahidol University",
@@ -191,7 +308,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           }}
         />
 
-        {/* ✅ Structured Data for MusicGroup */}
+        {/* 🚀 Structured Data - MusicGroup */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -223,7 +340,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           }}
         />
 
-        {/* ✅ Structured Data for SiteNavigationElement */}
+        {/* 🎯 Structured Data - Navigation */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -241,7 +358,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           }}
         />
 
-        {/* ✅ Structured Data for VideoObject */}
+        {/* 🚀 Structured Data - Video */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -260,7 +377,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           }}
         />
 
-        {/* ✅ Structured Data for Album */}
+        {/* 🎯 Structured Data - Album */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -279,7 +396,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           }}
         />
 
-        {/* 🎯 Performance & Security Headers */}
+        {/* 🚀 Performance & Security Headers */}
         <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
         <meta httpEquiv="X-Frame-Options" content="DENY" />
         <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />
