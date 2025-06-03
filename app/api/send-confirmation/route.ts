@@ -130,9 +130,9 @@ export async function POST(req: NextRequest) {
           console.log('✅ Download token created:', tokenData.token);
           
           if (tokenData.token) {
-            linksHtml += `<li style="margin-bottom: 10px; font-family: 'Cinzel', Georgia, 'Times New Roman', serif;">
+            linksHtml += `<li style="margin-bottom: 10px;">
               <a href="${publicBaseUrl}/download/${tokenData.token}" target="_blank" 
-                 style="color: #dc9e63; text-decoration: underline; font-family: 'Cinzel', Georgia, 'Times New Roman', serif;">
+                 style="color: #dc9e63; text-decoration: underline;">
                 ${item.title} – ${item.subtitle}
               </a>
             </li>`;
@@ -149,49 +149,49 @@ export async function POST(req: NextRequest) {
     if (hasDigitalItems && hasPhysicalItems) {
       // Mixed order - มีทั้ง digital และ physical
       mainContent = `
-        <p style="color: #f8fcdc; margin-bottom: 16px; font-family: 'Cinzel', Georgia, 'Times New Roman', serif;">
+        <p style="color: #f8fcdc; margin-bottom: 16px;">
           We're thrilled to let you know that your order has been successfully received!
         </p>
-        <p style="color: #f8fcdc; margin-bottom: 16px; font-family: 'Cinzel', Georgia, 'Times New Roman', serif;">
+        <p style="color: #f8fcdc; margin-bottom: 16px;">
           Your order contains both digital and physical items:
         </p>
-        <p style="margin-top: 30px; font-weight: bold; color: #dc9e63; font-family: 'Cinzel', Georgia, 'Times New Roman', serif;">
+        <p style="margin-top: 30px; font-weight: bold; color: #dc9e63;">
           📥 Digital Downloads (${digitalItemsCount} items)
         </p>
-        <p style="margin-top: 10px; font-family: 'Cinzel', Georgia, 'Times New Roman', serif;">Here are your download links (valid for 1 hour):</p>
-        <ul style="padding-left: 20px; font-family: 'Cinzel', Georgia, 'Times New Roman', serif;">${linksHtml}</ul>
-        <p style="margin-top: 30px; font-weight: bold; color: #dc9e63; font-family: 'Cinzel', Georgia, 'Times New Roman', serif;">
+        <p style="margin-top: 10px;">Here are your download links (valid for 1 hour):</p>
+        <ul style="padding-left: 20px;">${linksHtml}</ul>
+        <p style="margin-top: 30px; font-weight: bold; color: #dc9e63;">
           📦 Physical Items
         </p>
-        <p style="margin-top: 10px; font-family: 'Cinzel', Georgia, 'Times New Roman', serif;">
+        <p style="margin-top: 10px;">
           Your physical items are being prepared for shipping. You will receive another email with tracking information once they have been dispatched.
         </p>
       `;
     } else if (hasDigitalItems) {
       // Digital only order
       mainContent = `
-        <p style="color: #f8fcdc; margin-bottom: 16px; font-family: 'Cinzel', Georgia, 'Times New Roman', serif;">
+        <p style="color: #f8fcdc; margin-bottom: 16px;">
           We're thrilled to let you know that your digital order has been successfully received!
         </p>
-        <p style="color: #f8fcdc; margin-bottom: 16px; font-family: 'Cinzel', Georgia, 'Times New Roman', serif;">
+        <p style="color: #f8fcdc; margin-bottom: 16px;">
           Your downloads are ready immediately:
         </p>
-        <p style="margin-top: 30px; font-family: 'Cinzel', Georgia, 'Times New Roman', serif;">Here are your download links (valid for 1 hour):</p>
-        <ul style="padding-left: 20px; font-family: 'Cinzel', Georgia, 'Times New Roman', serif;">${linksHtml}</ul>
-        <p style="margin-top: 20px; font-size: 14px; color: #999; font-family: 'Cinzel', Georgia, 'Times New Roman', serif;">
+        <p style="margin-top: 30px;">Here are your download links (valid for 1 hour):</p>
+        <ul style="padding-left: 20px;">${linksHtml}</ul>
+        <p style="margin-top: 20px; font-size: 14px; color: #999;">
           💡 Tip: Save your files to a safe location as download links expire after 1 hour.
         </p>
       `;
     } else {
       // Physical only order
       mainContent = `
-        <p style="color: #f8fcdc; margin-bottom: 16px; font-family: 'Cinzel', Georgia, 'Times New Roman', serif;">
+        <p style="color: #f8fcdc; margin-bottom: 16px;">
           We're thrilled to let you know that your order has been successfully received and is now being processed!
         </p>
-        <p style="color: #f8fcdc; margin-bottom: 16px; font-family: 'Cinzel', Georgia, 'Times New Roman', serif;">
+        <p style="color: #f8fcdc; margin-bottom: 16px;">
           Your items are being carefully prepared for shipping.
         </p>
-        <p style="margin-bottom: 30px; font-family: 'Cinzel', Georgia, 'Times New Roman', serif;">
+        <p style="margin-bottom: 30px;">
           You will receive another email with tracking information once your items have been dispatched.
         </p>
       `;
@@ -200,81 +200,37 @@ export async function POST(req: NextRequest) {
     // ✅ สร้าง receipt link
     const publicBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://unda-website.vercel.app';
     const receiptHtml = receiptUrl
-      ? `<p style="margin-top: 24px; font-family: 'Cinzel', Georgia, 'Times New Roman', serif;">You can view your payment receipt here:<br/>
-          <a href="${receiptUrl}" target="_blank" style="color: #dc9e63; text-decoration: underline; font-family: 'Cinzel', Georgia, 'Times New Roman', serif;">
+      ? `<p style="margin-top: 24px;">You can view your payment receipt here:<br/>
+          <a href="${receiptUrl}" target="_blank" style="color: #dc9e63; text-decoration: underline;">
             Stripe Payment Receipt
           </a>
         </p>`
       : '';
 
-    // ✅ Email HTML template with Cinzel Font
+    // ✅ Email HTML template
     const html = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <!-- 🎯 GOOGLE FONTS FOR EMAIL -->
-        <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
-        <style>
-          @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=swap');
-          
-          /* 🎯 FORCE CINZEL EVERYWHERE IN EMAIL */
-          *, *::before, *::after {
-            font-family: 'Cinzel', Georgia, 'Times New Roman', serif !important;
-          }
-          
-          body, table, td, p, h1, h2, h3, h4, h5, h6, div, span, a, li, ul {
-            font-family: 'Cinzel', Georgia, 'Times New Roman', serif !important;
-          }
-          
-          /* 🎯 LETTER SPACING LIKE WEBSITE */
-          h1 {
-            letter-spacing: 0.05em;
-          }
-          
-          p, li {
-            letter-spacing: 0.02em;
-          }
-          
-          /* 🎯 EMAIL CLIENT COMPATIBILITY */
-          table {
-            border-collapse: collapse;
-            mso-table-lspace: 0pt;
-            mso-table-rspace: 0pt;
-          }
-          
-          img {
-            border: 0;
-            height: auto;
-            line-height: 100%;
-            outline: none;
-            text-decoration: none;
-          }
-        </style>
-      </head>
-      <body style="margin: 0; padding: 0; font-family: 'Cinzel', Georgia, 'Times New Roman', serif; background-color: #000;">
+      <body style="margin: 0; padding: 0; font-family: Cinzel, serif; background-color: #000;">
         <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" 
-          style="background-image: url('${publicBaseUrl}/catmoon-bg.jpeg'); background-size: cover; background-position: center; font-family: 'Cinzel', Georgia, 'Times New Roman', serif;">
+          style="background-image: url('${publicBaseUrl}/catmoon-bg.jpeg'); background-size: cover; background-position: center;">
           <tr>
             <td align="center" style="background-color: rgba(0, 0, 0, 0.8); padding: 60px 20px;">
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" 
                 style="margin: 0 auto; background-image: url('${publicBaseUrl}/redsky-bg.webp'); background-size: cover; border-radius: 12px; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
                 <tr>
-                  <td style="padding: 40px; color: #f8fcdc; font-family: 'Cinzel', Georgia, 'Times New Roman', serif;">
-                    <h1 style="color: #dc9e63; font-size: 28px; margin-bottom: 20px; font-family: 'Cinzel', Georgia, 'Times New Roman', serif; letter-spacing: 0.05em;">
+                  <td style="padding: 40px; color: #f8fcdc;">
+                    <h1 style="color: #dc9e63; font-size: 28px; margin-bottom: 20px;">
                       Thank you for your purchase!
                     </h1>
-                    <p style="color: #f8fcdc; margin-bottom: 16px; font-family: 'Cinzel', Georgia, 'Times New Roman', serif; letter-spacing: 0.02em;">
-                      Hi <strong style="font-family: 'Cinzel', Georgia, 'Times New Roman', serif;">${name}</strong>,
+                    <p style="color: #f8fcdc; margin-bottom: 16px;">
+                      Hi <strong>${name}</strong>,
                     </p>
                     ${mainContent}
                     ${receiptHtml}
                     <a href="${publicBaseUrl}" 
-                      style="display: inline-block; background-color: #dc9e63; color: #000000; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 14px; margin-top: 30px; font-family: 'Cinzel', Georgia, 'Times New Roman', serif; letter-spacing: 0.05em;">
+                      style="display: inline-block; background-color: #dc9e63; color: #000000; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 14px; margin-top: 30px;">
                       Return to Store
                     </a>
-                    <p style="font-size: 12px; color: #999; margin-top: 30px; text-align: center; font-family: 'Cinzel', Georgia, 'Times New Roman', serif;">
+                    <p style="font-size: 12px; color: #999; margin-top: 30px; text-align: center;">
                       Copyright © 2025 Unda Alunda
                     </p>
                   </td>
@@ -284,7 +240,6 @@ export async function POST(req: NextRequest) {
           </tr>
         </table>
       </body>
-      </html>
     `;
 
     console.log('📨 Sending email to:', email);
