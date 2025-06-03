@@ -1,24 +1,8 @@
-// /app/api/download-link/route.ts
+// /app/api/download-link/route.ts - แก้แล้ว (ลบ File System ออก)
 
 import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 import supabase from '../../../lib/supabase';
-import fs from 'fs/promises';
-import path from 'path';
-
-interface DownloadEntry {
-  token: string;
-  filePath: string;
-  createdAt: string;
-  expiresInMinutes: number;
-  orderId?: string;
-  downloadStarted?: boolean;
-  downloadCompleted?: boolean;
-  deviceFingerprint?: string;
-  userAgent?: string;
-  startedAt?: string;
-  completedAt?: string;
-}
 
 // 🧹 ฟังก์ชัน cleanup expired tokens ใน Supabase
 const cleanupExpiredTokensInSupabase = async () => {
@@ -54,7 +38,6 @@ export async function POST(req: NextRequest) {
   }
 
   const token = uuidv4();
-  const DB_PATH = path.join(process.cwd(), 'data', 'downloads.json');
 
   try {
     // ถ้ามี orderId ให้อัพเดท download_token และ download_expires ในตาราง Orders
@@ -83,60 +66,6 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // สร้าง entry ใหม่
-    const newEntry: DownloadEntry = {
-      token,
-      filePath,
-      createdAt: new Date().toISOString(),
-      expiresInMinutes,
-      orderId,
-      downloadStarted: false,
-      downloadCompleted: false
-    };
-
-    // อ่านไฟล์ downloads.json หรือสร้างใหม่ถ้าไม่มี
-    let entries: DownloadEntry[] = [];
-    try {
-      // สร้างโฟลเดอร์ data ถ้าไม่มี
-      await fs.mkdir(path.dirname(DB_PATH), { recursive: true });
-      
-      const raw = await fs.readFile(DB_PATH, 'utf-8');
-      entries = JSON.parse(raw);
-    } catch (err) {
-      // ถ้าไฟล์ไม่มี ให้สร้างใหม่
-      console.log('Creating new downloads.json file');
-      entries = [];
-    }
-
-    // เพิ่ม entry ใหม่
-    entries.push(newEntry);
-
-    // ลบ entries ที่หมดอายุแล้ว (เฉพาะที่ไม่ได้ดาวน์โหลด)
-    const now = new Date();
-    const expiredCount = entries.filter(entry => {
-      // ถ้าดาวน์โหลดเสร็จแล้ว = ไม่หมดอายุ แต่ลบออกเพื่อ cleanup
-      if (entry.downloadCompleted) return true;
-      
-      // ถ้ายังไม่ได้ดาวน์โหลด = เช็คเวลาปกติ
-      const expiresAt = new Date(entry.createdAt);
-      expiresAt.setMinutes(expiresAt.getMinutes() + entry.expiresInMinutes);
-      return now >= expiresAt;
-    }).length;
-
-    // กรอง entries ที่ยังไม่หมดอายุ
-    entries = entries.filter(entry => {
-      // ถ้าดาวน์โหลดเสร็จแล้ว = ลบออก (cleanup)
-      if (entry.downloadCompleted) return false;
-      
-      // ถ้ายังไม่ได้ดาวน์โหลด = เช็คเวลาปกติ
-      const expiresAt = new Date(entry.createdAt);
-      expiresAt.setMinutes(expiresAt.getMinutes() + entry.expiresInMinutes);
-      return now < expiresAt;
-    });
-
-    // เขียนกลับไปยังไฟล์
-    await fs.writeFile(DB_PATH, JSON.stringify(entries, null, 2));
-
     // 🧹 Cleanup expired tokens ใน Supabase (run in background)
     cleanupExpiredTokensInSupabase().catch(err => 
       console.error('Background cleanup failed:', err)
@@ -145,16 +74,11 @@ export async function POST(req: NextRequest) {
     console.log('✅ Download token created:', token);
     console.log('📁 File path:', filePath);
     console.log('⏰ Expires in:', expiresInMinutes, 'minutes');
-    console.log('📊 Total active tokens:', entries.length);
 
     return NextResponse.json({ 
       token,
       success: true,
-      expiresInMinutes,
-      stats: {
-        activeTokens: entries.length,
-        cleanedExpired: expiredCount
-      }
+      expiresInMinutes
     });
 
   } catch (error) {
