@@ -5,13 +5,13 @@ import supabase from '../../../lib/supabase';
 import DownloadPageClient from './DownloadPageClient';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     token: string;
-  };
+  }>;
 }
 
 export default async function DownloadPage({ params }: PageProps) {
-  const { token } = params;
+  const { token } = await params;
 
   console.log('🔍 Looking up download token:', token);
 
