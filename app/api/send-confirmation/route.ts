@@ -100,14 +100,20 @@ export async function POST(req: NextRequest) {
         console.log('📁 File path for item:', filePath);
         
         if (filePath) {
-          // ✅ เรียก API สร้าง download token - ใช้ URL ที่ถูก!
-          const baseUrl = process.env.NODE_ENV === 'production' 
-            ? 'https://unda-website.vercel.app' 
+          // ✅ ใช้ environment variable และ relative URL สำหรับ internal calls
+          const apiBaseUrl = process.env.NODE_ENV === 'production' 
+            ? process.env.VERCEL_URL 
+              ? `https://${process.env.VERCEL_URL}` 
+              : ''  // fallback to relative URL
             : 'http://localhost:3000';
             
-          console.log('🔗 Creating download link for:', filePath);
+          const publicBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://unda-website.vercel.app';
           
-          const tokenRes = await fetch(`${baseUrl}/api/download-link`, {
+          console.log('🔗 Creating download link for:', filePath);
+          console.log('🌐 API Base URL:', apiBaseUrl);
+          console.log('🌐 Public Base URL:', publicBaseUrl);
+          
+          const tokenRes = await fetch(`${apiBaseUrl}/api/download-link`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
@@ -127,7 +133,7 @@ export async function POST(req: NextRequest) {
           
           if (tokenData.token) {
             linksHtml += `<li style="margin-bottom: 10px;">
-              <a href="${baseUrl}/download/${tokenData.token}" target="_blank" 
+              <a href="${publicBaseUrl}/download/${tokenData.token}" target="_blank" 
                  style="color: #dc9e63; text-decoration: underline;">
                 ${item.title} – ${item.subtitle}
               </a>
@@ -194,6 +200,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ✅ สร้าง receipt link
+    const publicBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://unda-website.vercel.app';
     const receiptHtml = receiptUrl
       ? `<p style="margin-top: 24px;">You can view your payment receipt here:<br/>
           <a href="${receiptUrl}" target="_blank" style="color: #dc9e63; text-decoration: underline;">
@@ -206,11 +213,11 @@ export async function POST(req: NextRequest) {
     const html = `
       <body style="margin: 0; padding: 0; font-family: Cinzel, serif; background-color: #000;">
         <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" 
-          style="background-image: url('https://unda-website.vercel.app/catmoon-bg.jpeg'); background-size: cover; background-position: center;">
+          style="background-image: url('${publicBaseUrl}/catmoon-bg.jpeg'); background-size: cover; background-position: center;">
           <tr>
             <td align="center" style="background-color: rgba(0, 0, 0, 0.8); padding: 60px 20px;">
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" 
-                style="margin: 0 auto; background-image: url('https://unda-website.vercel.app/redsky-bg.webp'); background-size: cover; border-radius: 12px; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
+                style="margin: 0 auto; background-image: url('${publicBaseUrl}/redsky-bg.webp'); background-size: cover; border-radius: 12px; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
                 <tr>
                   <td style="padding: 40px; color: #f8fcdc;">
                     <h1 style="color: #dc9e63; font-size: 28px; margin-bottom: 20px;">
@@ -221,7 +228,7 @@ export async function POST(req: NextRequest) {
                     </p>
                     ${mainContent}
                     ${receiptHtml}
-                    <a href="https://unda-website.vercel.app" 
+                    <a href="${publicBaseUrl}" 
                       style="display: inline-block; background-color: #dc9e63; color: #000000; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 14px; margin-top: 30px;">
                       Return to Store
                     </a>
