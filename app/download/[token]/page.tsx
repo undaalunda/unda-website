@@ -3,60 +3,223 @@
 import { notFound } from 'next/navigation';
 import fs from 'fs/promises';
 import path from 'path';
+import supabase from '../../../lib/supabase';
+import DownloadPageClient from './DownloadPageClient';
 
 interface DownloadEntry {
   token: string;
   filePath: string;
   createdAt: string;
   expiresInMinutes: number;
+  orderId?: string;
+  downloadStarted?: boolean;
+  downloadCompleted?: boolean;
+  deviceFingerprint?: string;
+  userAgent?: string;
+  startedAt?: string;
+  completedAt?: string;
 }
 
-// ✅ ใช้ any เพื่อหลีกเลี่ยง NextJS 15 type issues
-export default async function Page({ params }: any) {
-  const DB_PATH = path.join(process.cwd(), 'data', 'downloads.json');
+interface CartItem {
+  id: string;
+  title: string;
+  subtitle: string;
+  category: string;
+  type?: string;
+}
 
-  let entries: DownloadEntry[] = [];
+// 🆕 ฟังก์ชันเดียวกับ send-confirmation สำหรับหา filePath
+const getDownloadFileForItem = (item: CartItem): string | null => {
+  if (item.category === 'Backing Track' || item.type === 'digital') {
+    const titleSlug = item.title.toLowerCase().replace(/\s+/g, '-');
+    const subtitleSlug = item.subtitle.toLowerCase();
+    
+    const possibleIds = [
+      item.id,
+      `${titleSlug}-${subtitleSlug}`,
+      `${titleSlug}`,
+    ];
+    
+    const downloadMap: Record<string, string> = {
+      'anomic-drums': '/files/anomic-drums.wav',
+      'jyy-guitars': '/files/jyy-guitars.wav', 
+      'atlantic-guitar': '/files/atlantic-guitar.wav',
+      'out-dark-drums': '/files/out-dark-drums.wav',
+      'feign-guitars': '/files/feign-guitars.wav',
+      'dark-keys': '/files/dark-keys.wav',
+      'reddown-bass': '/files/reddown-bass.wav',
+      'quietness-bass': '/files/quietness-bass.wav',
+    };
+    
+    for (const id of possibleIds) {
+      if (downloadMap[id]) {
+        console.log('✅ Found file for ID:', id);
+        return downloadMap[id];
+      }
+    }
+    
+    const defaultFile = `/download/${titleSlug}-${subtitleSlug}.wav`;
+    console.log('⚠️ No mapping found, using default:', defaultFile);
+    return defaultFile;
+  }
+  
+  return null;
+};
+
+// 🆕 ฟังก์ชันหา token ใน Supabase และดึง order items
+const findTokenInSupabase = async (token: string) => {
+  try {
+    // หา order ที่มี token นี้
+    const { data: orderData, error: orderError } = await supabase
+      .from('Orders')
+      .select(`
+        id, 
+        download_token, 
+        download_expires, 
+        email, 
+        items
+      `)
+      .eq('download_token', token)
+      .single();
+
+    if (orderError || !orderData) {
+      console.log('Token not found in Supabase:', token.substring(0, 8) + '...');
+      return null;
+    }
+
+    // ตรวจสอบว่าหมดอายุหรือยัง
+    if (orderData.download_expires) {
+      const expiresAt = new Date(orderData.download_expires);
+      const now = new Date();
+      
+      if (now > expiresAt) {
+        console.log('Token expired in Supabase:', token.substring(0, 8) + '...');
+        return null;
+      }
+    }
+
+    // หา digital items ใน order
+    let digitalItems: CartItem[] = [];
+    let filePaths: Array<{item: CartItem, filePath: string, displayName: string}> = [];
+    
+    if (orderData.items && Array.isArray(orderData.items)) {
+      digitalItems = orderData.items.filter((item: CartItem) => 
+        item.type === 'digital' || item.category === 'Backing Track'
+      );
+      
+      // หา filePath สำหรับแต่ละ item
+      filePaths = digitalItems.map((item: CartItem) => {
+        const filePath = getDownloadFileForItem(item);
+        return {
+          item,
+          filePath: filePath || '',
+          displayName: `${item.title} – ${item.subtitle}`
+        };
+      }).filter(fp => fp.filePath);
+    }
+
+    console.log('✅ Token found in Supabase:', {
+      orderId: orderData.id,
+      expires: orderData.download_expires,
+      digitalItemsCount: digitalItems.length
+    });
+
+    return {
+      orderId: orderData.id,
+      expiresAt: new Date(orderData.download_expires),
+      email: orderData.email,
+      filePaths,
+      digitalItems
+    };
+
+  } catch (err) {
+    console.error('Error checking Supabase:', err);
+    return null;
+  }
+};
+
+export default async function Page({ params }: any) {
+  // ✅ await params ใน Next.js 15
+  const resolvedParams = await params;
+  const token = resolvedParams.token;
+  const DB_PATH = path.join(process.cwd(), 'data', 'downloads.json');
+  let entry: DownloadEntry | null = null;
+  let supabaseData: any = null;
+
+  // 🔍 ลองหาใน downloads.json ก่อน
   try {
     const raw = await fs.readFile(DB_PATH, 'utf-8');
-    entries = JSON.parse(raw);
+    const entries: DownloadEntry[] = JSON.parse(raw);
+    entry = entries.find((e) => e.token === token) || null;
+    
+    if (entry) {
+      const createdAt = new Date(entry.createdAt);
+      const expiresAt = new Date(createdAt.getTime() + entry.expiresInMinutes * 60000);
+      const now = new Date();
+      
+      // 🎯 ถ้าดาวน์โหลดเสร็จแล้ว = หมดอายุเลย
+      if (entry.downloadCompleted) {
+        console.log('✅ File already downloaded - link expired');
+        return (
+          <DownloadPageClient 
+            token={token}
+            entry={entry}
+            supabaseData={null}
+            expiresAt={new Date().toISOString()}
+            isCompleted={true}
+            completedAt={entry.completedAt}
+          />
+        );
+      }
+      
+      // ⏰ เช็คว่าหมดอายุปกติหรือยัง (สำหรับคนที่ยังไม่ได้โหลด)
+      if (now > expiresAt) {
+        console.log('Token expired in downloads.json');
+        entry = null;
+      } else {
+        console.log('✅ Token found in downloads.json');
+      }
+    }
   } catch (err) {
-    console.error('Failed to read downloads.json', err);
-    notFound();
+    console.log('downloads.json not found or invalid');
   }
 
-  const entry = entries.find((e) => e.token === params.token);
+  // 🔍 ถ้าไม่เจอใน downloads.json ให้ลองหาใน Supabase
+  if (!entry) {
+    console.log('🔍 Searching in Supabase...');
+    supabaseData = await findTokenInSupabase(token);
+    
+    if (!supabaseData || !supabaseData.filePaths?.length) {
+      console.log('❌ Token not found anywhere or no digital files');
+      return notFound();
+    }
+
+    // สร้าง entry จาก Supabase data
+    const firstFile = supabaseData.filePaths[0];
+    entry = {
+      token: token,
+      filePath: firstFile.filePath,
+      createdAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+      expiresInMinutes: 60,
+      orderId: supabaseData.orderId
+    };
+    
+    console.log('✅ Using token from Supabase, orderId:', supabaseData.orderId);
+  }
+
   if (!entry) return notFound();
 
-  const createdAt = new Date(entry.createdAt);
-  const expiresAt = new Date(createdAt.getTime() + entry.expiresInMinutes * 60000);
-  const now = new Date();
-  if (now > expiresAt) return notFound();
+  const expiresAt = supabaseData?.expiresAt || new Date(
+    new Date(entry.createdAt).getTime() + entry.expiresInMinutes * 60000
+  );
 
-  const fileName = entry.filePath.split('/').pop();
-
+  // 🎯 ส่งข้อมูลไปให้ Client Component
   return (
-    <main className="min-h-screen flex flex-col justify-center items-center px-4 text-[#f8fcdc] font-[Cinzel] bg-black text-center">
-      <h1 className="text-4xl font-bold mb-8 text-[#dc9e63]">Your Download is Ready</h1>
-      <p className="mb-7">Click the button below to download your file:</p>
-
-      <a
-        href={entry.filePath}
-        download={fileName}
-        className="bg-[#dc9e63] hover:bg-[#f8cfa3] text-black px-6 py-3 rounded-xl text-lg transition"
-      >
-        Download {fileName}
-      </a>
-
-      <p className="text-xs mt-6 opacity-50">
-        Link expires at: {expiresAt.toLocaleString()}
-      </p>
-      
-      <a 
-        href="https://unda-website.vercel.app"
-        className="mt-4 text-[#dc9e63] hover:text-[#f8cfa3] underline"
-      >
-        ← Back to Store
-      </a>
-    </main>
+    <DownloadPageClient 
+      token={token}
+      entry={entry}
+      supabaseData={supabaseData}
+      expiresAt={expiresAt.toISOString()}
+    />
   );
 }

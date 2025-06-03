@@ -52,6 +52,8 @@ const nextConfig: NextConfig = {
       'next/image',
       'react'
     ],
+    // 🔧 แก้ปัญหา swc
+    forceSwcTransforms: false,
   },
 
   // 🚀 SUPERCHARGED Headers with Security
@@ -130,98 +132,16 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // 🚀 BEAST MODE Webpack Optimizations
+  // 🚀 Simplified Webpack Config
   webpack: (config, { isServer, dev }) => {
     // 🎯 Client-side optimizations
     if (!isServer) {
       config.resolve.fallback = {
-        ...config.resolve.fallback,
         fs: false,
         net: false,
         tls: false,
-        crypto: false,
-        stream: false,
-        url: false,
-        zlib: false,
-        http: false,
-        https: false,
-        assert: false,
-        os: false,
-        path: false,
       };
     }
-
-    // 🚀 Production-only optimizations
-    if (!dev) {
-      // Tree shaking optimization
-      config.optimization.usedExports = true;
-      config.optimization.sideEffects = false;
-      
-      // 🎯 Aggressive splitting
-      config.optimization.splitChunks = {
-        chunks: 'all',
-        cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-            priority: 10,
-          },
-          common: {
-            name: 'common',
-            minChunks: 2,
-            chunks: 'all',
-            priority: 5,
-            reuseExistingChunk: true,
-          },
-        },
-      };
-
-      // 🚀 Module concatenation for smaller bundles
-      config.optimization.concatenateModules = true;
-      
-      // 🎯 Remove console.logs in production
-      config.optimization.minimizer = config.optimization.minimizer || [];
-      
-      // 🚀 Preload critical chunks
-      config.optimization.runtimeChunk = 'single';
-    }
-
-    // 🎯 Alias optimization for faster imports
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      '@': require('path').resolve(__dirname),
-    };
-
-    // 🚀 Module rules optimization
-    config.module.rules.push({
-      test: /\.(ts|tsx)$/,
-      use: [
-        {
-          loader: 'swc-loader',
-          options: {
-            jsc: {
-              parser: {
-                syntax: 'typescript',
-                tsx: true,
-                decorators: false,
-                dynamicImport: true,
-              },
-              transform: {
-                react: {
-                  runtime: 'automatic',
-                },
-              },
-              minify: {
-                compress: true,
-                mangle: true,
-              },
-            },
-            minify: !dev,
-          },
-        },
-      ],
-    });
 
     return config;
   },
