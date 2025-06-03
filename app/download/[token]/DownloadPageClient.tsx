@@ -1,9 +1,8 @@
-// app/download/[token]/DownloadPageClient.tsx - อัปเดตแล้ว: ลบ device fingerprint + 48ชม.
+// /app/download/[token]/DownloadPageClient.tsx - ใช้ Supabase + แก้ background
 
 'use client';
 
 import { useState, useEffect } from 'react';
-import DownloadButton from '@/components/DownloadButton';
 
 interface DownloadEntry {
   token: string;
@@ -37,6 +36,8 @@ export default function DownloadPageClient({
   const [mounted, setMounted] = useState(false);
   const [formattedDate, setFormattedDate] = useState('');
   const [timeRemaining, setTimeRemaining] = useState('');
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   
   useEffect(() => {
     setMounted(true);
@@ -72,6 +73,54 @@ export default function DownloadPageClient({
     
     return () => clearInterval(interval);
   }, [completedAt, expiresAt]);
+
+  // Handle download และ mark as used
+  const handleDownload = async () => {
+    if (!entry.filePath || entry.filePath === 'expired' || entry.filePath === 'used') {
+      alert('File not available');
+      return;
+    }
+
+    try {
+      setIsDownloading(true);
+      
+      // Mark token as used ใน Supabase
+      const response = await fetch('/api/mark-downloaded', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token, orderId: entry.orderId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to mark download as used');
+      }
+
+      // ดาวน์โหลดไฟล์
+      const fileName = entry.filePath.split('/').pop() || 'download';
+      const link = document.createElement('a');
+      link.href = entry.filePath;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // แสดง success message
+      setShowSuccess(true);
+      setTimeout(() => {
+        setShowSuccess(false);
+        // รีเฟรชหน้าเพื่อแสดงสถานะ "completed"
+        window.location.reload();
+      }, 2000);
+
+    } catch (error) {
+      console.error('Download failed:', error);
+      alert('Download failed. Please try again.');
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   if (!mounted) {
     return (
@@ -124,8 +173,8 @@ export default function DownloadPageClient({
     );
   }
 
-  // ถ้ามาจาก Supabase และมีหลายไฟล์
-  if (supabaseData && supabaseData.filePaths?.length > 1) {
+  // ถ้า expired
+  if (supabaseData?.isExpired) {
     return (
       <main 
         className="min-h-screen flex flex-col justify-center items-center px-4 text-[#f8fcdc] font-[Cinzel] text-center relative"
@@ -140,46 +189,17 @@ export default function DownloadPageClient({
         <div className="absolute inset-0 bg-black/70"></div>
         
         <div className="relative z-10">
-          <h1 className="text-4xl font-bold mb-8 text-[#dc9e63]">Your Downloads are Ready</h1>
-          <p className="mb-4">Click the links below to download your files:</p>
-          
-          {timeRemaining && (
-            <p className="text-sm opacity-80 mb-7">
-              {timeRemaining}
-            </p>
-          )}
-
-          <div className="space-y-4 mb-8">
-            {supabaseData.filePaths.map((fileData: any, index: number) => {
-              const fileName = fileData.filePath.split('/').pop() || `download-${index + 1}`;
-              return (
-                <DownloadButton
-                  key={index}
-                  href={fileData.filePath}
-                  fileName={fileName}
-                  token={token}
-                  className="block bg-[#dc9e63] hover:bg-[#f8cfa3] text-black px-6 py-3 rounded-xl text-lg transition"
-                >
-                  Download {fileData.displayName}
-                </DownloadButton>
-              );
-            })}
-          </div>
-
-          <p className="text-xs mt-6 opacity-50">
-            Each file can be downloaded once within 48 hours
+          <h1 className="text-4xl font-bold mb-8 text-[#dc9e63]">Download Expired</h1>
+          <p className="mb-7 text-lg">This download link has expired.</p>
+          <p className="text-sm opacity-80 mb-4">
+            Please contact support if you need to re-download your files.
           </p>
-          
-          <p className="text-xs mt-2 opacity-30">
-            Order ID: {supabaseData.orderId}
-          </p>
-                 
           <a 
             href={process.env.NODE_ENV === 'production' 
               ? (process.env.NEXT_PUBLIC_BASE_URL || 'https://unda-website.vercel.app')
               : 'http://localhost:3000'
             }
-            className="mt-4 text-[#dc9e63] hover:text-[#f8cfa3] underline inline-block"
+            className="mt-6 text-[#dc9e63] hover:text-[#f8cfa3] underline inline-block"
           >
             Back to Store
           </a>
@@ -188,24 +208,30 @@ export default function DownloadPageClient({
     );
   }
 
-  // ถ้ามีไฟล์เดียว (จาก downloads.json หรือ Supabase)
-  const fileName = entry.filePath.split('/').pop() || 'download';
+  // ถ้ามีไฟล์ให้ดาวน์โหลด
+  const fileName = entry.filePath?.split('/').pop() || 'download';
 
   return (
     <main 
-      className="min-h-screen flex flex-col justify-center items-center px-4 text-[#f8fcdc] font-[Cinzel] text-center"
+      className="min-h-screen flex flex-col justify-center items-center px-4 text-[#f8fcdc] font-[Cinzel] text-center relative"
       style={{
         backgroundImage: "url('/redsky-bg.webp')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backgroundColor: '#000'
+        backgroundRepeat: 'no-repeat'
       }}
     >
       {/* Dark overlay for readability */}
       <div className="absolute inset-0 bg-black/70"></div>
       
       <div className="relative z-10">
+        {/* Success message */}
+        {showSuccess && (
+          <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-emerald-800 text-[#f8fcdc] font-[Cinzel] px-2 py-1 rounded text-xs border border-emerald-700 opacity-90">
+            Complete
+          </div>
+        )}
+
         <h1 className="text-4xl font-bold mb-8 text-[#dc9e63]">Your Download is Ready</h1>
         <p className="mb-4">Click the button below to download your file:</p>
         
@@ -215,20 +241,19 @@ export default function DownloadPageClient({
           </p>
         )}
 
-        <DownloadButton
-          href={entry.filePath}
-          fileName={fileName}
-          token={token}
-          className="bg-[#dc9e63] hover:bg-[#f8cfa3] text-black px-6 py-3 rounded-xl text-lg transition"
+        <button
+          onClick={handleDownload}
+          disabled={isDownloading}
+          className="bg-[#dc9e63] hover:bg-[#f8cfa3] disabled:bg-gray-600 text-black px-6 py-3 rounded-xl text-lg transition relative"
         >
-          Download {fileName}
-        </DownloadButton>
+          {isDownloading ? 'Downloading...' : `Download ${fileName}`}
+        </button>
 
         <p className="text-xs mt-6 opacity-50">
           This file can be downloaded once within 48 hours
         </p>
 
-        {supabaseData && (
+        {supabaseData?.orderId && (
           <p className="text-xs mt-2 opacity-30">
             Order ID: {supabaseData.orderId}
           </p>

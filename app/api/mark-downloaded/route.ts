@@ -1,92 +1,56 @@
-// app/api/mark-downloaded/route.ts - อัปเดตแล้ว: ลบ device fingerprint + 48ชม.
+// /app/api/mark-downloaded/route.ts - แก้ใช้ Supabase แทน file system
 
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
-
-interface DownloadEntry {
-  token: string;
-  filePath: string;
-  createdAt: string;
-  expiresInMinutes: number;
-  orderId?: string;
-  downloadStarted?: boolean;
-  downloadCompleted?: boolean;
-  startedAt?: string;
-  completedAt?: string;
-}
+import supabase from '../../../lib/supabase';
 
 export async function POST(req: NextRequest) {
   try {
-    const { token } = await req.json();
-    
+    const { token, orderId } = await req.json();
+        
     if (!token) {
       return NextResponse.json({ error: 'Missing token' }, { status: 400 });
     }
 
-    const DB_PATH = path.join(process.cwd(), 'data', 'downloads.json');
+    console.log('🔒 Marking download as used:', { token: token.substring(0, 8) + '...', orderId });
 
-    // 📝 อัพเดท downloads.json
-    try {
-      const raw = await fs.readFile(DB_PATH, 'utf-8');
-      const entries: DownloadEntry[] = JSON.parse(raw);
-      
-      const entryIndex = entries.findIndex(e => e.token === token);
-      if (entryIndex !== -1) {
-        const entry = entries[entryIndex];
-        
-        // เช็คว่าโหลดเสร็จแล้วหรือยัง
-        if (entry.downloadCompleted) {
-          return NextResponse.json({
-            success: true,
-            message: 'Already marked as completed',
-            completedAt: entry.completedAt
-          });
-        }
-        
-        // ✅ Mark as completed
-        const completedAt = new Date().toISOString();
-        entries[entryIndex] = {
-          ...entry,
-          downloadCompleted: true,
-          completedAt
-        };
-        
-        await fs.writeFile(DB_PATH, JSON.stringify(entries, null, 2));
-        
-        console.log('✅ Download completed and marked:', {
-          token: token.substring(0, 8) + '...',
-          completedAt,
-          orderId: entry.orderId,
-          filePath: entry.filePath.split('/').pop()
-        });
-        
-        return NextResponse.json({
-          success: true,
-          message: 'Download marked as completed',
-          completedAt
-        });
-      }
-    } catch (err) {
-      console.log('downloads.json not found, but that\'s okay for Supabase tokens');
+    // อัพเดท Supabase - mark as used
+    const { data, error } = await supabase
+      .from('Orders')
+      .update({
+        is_used: true,
+        used_at: new Date().toISOString()
+      })
+      .eq('download_token', token)
+      .select('id, is_used, used_at, file_path')
+      .single();
+
+    if (error) {
+      console.error('❌ Supabase error:', error);
+      return NextResponse.json({ error: 'Failed to mark download as used' }, { status: 500 });
     }
 
-    // 🤔 ถ้าไม่เจอใน downloads.json แต่มาจาก Supabase
-    // สำหรับ Supabase tokens เราไม่ track completion ใน downloads.json
-    // แต่เราจะ log เอาไว้
-    console.log('📋 Download completion noted for Supabase token:', {
-      token: token.substring(0, 8) + '...',
-      timestamp: new Date().toISOString(),
-      note: 'Supabase token - no local completion tracking'
-    });
+    if (!data) {
+      console.error('❌ Token not found:', token);
+      return NextResponse.json({ error: 'Token not found' }, { status: 404 });
+    }
 
-    return NextResponse.json({
-      success: true,
-      message: 'Download completion noted (Supabase token)'
+    console.log('✅ Download marked as used successfully:', {
+      orderId: data.id,
+      usedAt: data.used_at,
+      filePath: data.file_path?.split('/').pop()
     });
     
+    return NextResponse.json({ 
+      success: true,
+      message: 'Download marked as used',
+      usedAt: data.used_at
+    });
+
   } catch (error) {
-    console.error('Error in mark-downloaded:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('🔥 Error marking download as used:', error);
+    return NextResponse.json({ 
+      error: 'Internal server error',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
   }
 }
