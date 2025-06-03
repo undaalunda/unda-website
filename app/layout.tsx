@@ -1,4 +1,4 @@
-// app/layout.tsx - Simple Scroll Restoration (เหมือนเว็บปกติ)
+// app/layout.tsx - Simple Scroll Restoration (เหมือนเว็บปกติ) + FIXED
 
 import './globals.css';
 import type { Metadata } from 'next';
@@ -137,6 +137,109 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             /* 🎯 Prevent initial flicker */
             img{max-width:100%;height:auto;opacity:1}
             iframe{max-width:100%}
+          `
+        }} />
+
+        {/* 🔧 FIXED: เพิ่ม CSS เพื่อ smooth scroll และป้องกัน jump + Refresh Position */}
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            html { 
+              scroll-behavior: smooth;
+              scroll-padding-top: 96px;
+            }
+            
+            /* ป้องกัน layout shift ขณะโหลด */
+            body {
+              transition: none !important;
+              scroll-behavior: smooth;
+            }
+            
+            /* ป้องกัน scroll jump ขณะ navigation */
+            @media (prefers-reduced-motion: no-preference) {
+              html {
+                scroll-behavior: auto;
+              }
+            }
+          `
+        }} />
+
+        {/* 🚀 Handle Refresh Scroll Position - IMPROVED VERSION */}
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            (function() {
+              // บันทึก scroll position ก่อน refresh
+              window.addEventListener('beforeunload', function() {
+                sessionStorage.setItem('scrollPosition', window.scrollY.toString());
+                sessionStorage.setItem('wasRefreshed', 'true');
+              });
+
+              // กู้คืน scroll position หลัง refresh
+              function restoreScroll() {
+                const savedPosition = sessionStorage.getItem('scrollPosition');
+                const wasRefreshed = sessionStorage.getItem('wasRefreshed');
+                
+                if (savedPosition && wasRefreshed === 'true') {
+                  const position = parseInt(savedPosition, 10);
+                  if (position > 0) {
+                    // ลอง restore หลายรอบเพื่อให้แน่ใจ
+                    let attempts = 0;
+                    const maxAttempts = 5;
+                    
+                    function tryRestore() {
+                      attempts++;
+                      window.scrollTo(0, position);
+                      
+                      // ตรวจสอบว่า scroll สำเร็จหรือไม่
+                      setTimeout(function() {
+                        if (Math.abs(window.scrollY - position) > 10 && attempts < maxAttempts) {
+                          tryRestore();
+                        } else {
+                          // สำเร็จแล้ว หรือครบ attempt แล้ว
+                          sessionStorage.removeItem('wasRefreshed');
+                        }
+                      }, 100);
+                    }
+                    
+                    tryRestore();
+                  } else {
+                    sessionStorage.removeItem('wasRefreshed');
+                  }
+                }
+              }
+
+              // รอให้ DOM โหลดเสร็จก่อน
+              if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', function() {
+                  setTimeout(restoreScroll, 100);
+                });
+              } else if (document.readyState === 'interactive') {
+                setTimeout(restoreScroll, 100);
+              } else {
+                // เมื่อทุกอย่างโหลดเสร็จแล้ว
+                setTimeout(restoreScroll, 50);
+              }
+
+              // รอ window.load ด้วยเผื่อไว้
+              window.addEventListener('load', function() {
+                setTimeout(restoreScroll, 50);
+              });
+
+              // บันทึก scroll position ขณะเลื่อนหน้า
+              window.addEventListener('scroll', function() {
+                sessionStorage.setItem('scrollPosition', window.scrollY.toString());
+              }, { passive: true });
+
+              // เคลียร์ flag เมื่อไปหน้าอื่น (ไม่ใช่ refresh)
+              window.addEventListener('pageshow', function(event) {
+                if (!event.persisted) {
+                  // ถ้าไม่ใช่การ refresh ให้เคลียร์ flag
+                  const isFromRefresh = sessionStorage.getItem('wasRefreshed') === 'true';
+                  if (!isFromRefresh) {
+                    sessionStorage.removeItem('scrollPosition');
+                  }
+                }
+              });
+            })();
           `
         }} />
         

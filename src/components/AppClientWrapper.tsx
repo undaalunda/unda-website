@@ -67,9 +67,9 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
     };
     window.addEventListener('toggle-menu', handler);
     
-    // 🔧 FIXED: เปลี่ยน 'auto' เป็น 'manual' เพื่อให้ browser จัดการเอง!
+    // 🔧 FIXED: เปลี่ยนเป็น 'auto' เพื่อให้ browser จัดการ scroll position เอง!
     if ('scrollRestoration' in window.history) {
-      window.history.scrollRestoration = 'manual';
+      window.history.scrollRestoration = 'auto';
     }
     
     return () => window.removeEventListener('toggle-menu', handler);
