@@ -1,4 +1,4 @@
-// app/layout.tsx - Simple Scroll Restoration (เหมือนเว็บปกติ) + FIXED
+// app/layout.tsx - Minimal Performance Tweaks + Keep All Features
 
 import './globals.css';
 import type { Metadata } from 'next';
@@ -44,7 +44,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
-        {/* 🚀 LEVEL 3: Critical Resource Hints */}
+        {/* 🚀 CRITICAL: Resource Hints - ลำดับความสำคัญสูงสุด */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         
@@ -65,16 +65,25 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="dns-prefetch" href="//fonts.gstatic.com" />
         
-        {/* 🚀 OPTIMIZED Google Fonts */}
+        {/* 🚀 OPTIMIZED Google Fonts - ปรับปรุงเพื่อ performance */}
         <link 
           href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=swap" 
-          rel="stylesheet"
+          rel="preload"
+          as="style"
         />
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            document.querySelector('link[as="style"]').onload = function() {
+              this.onload = null;
+              this.rel = 'stylesheet';
+            };
+          `
+        }} />
         <noscript>
           <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=swap" rel="stylesheet" />
         </noscript>
         
-        {/* 🚀 LEVEL 3: Enhanced Critical CSS + Anti-Flash */}
+        {/* 🚀 OPTIMIZED Critical CSS - ลด will-change และ GPU acceleration */}
         <style dangerouslySetInnerHTML={{
           __html: `
             /* Critical performance CSS + Anti-flash protection */
@@ -85,18 +94,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             /* 🎯 ANTI-FLASH: Prevent layout shift during load */
             .hero-wrapper{opacity:1;position:relative;width:100vw;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-top:6rem;padding-bottom:6vh;z-index:0;margin-top:0;overflow:hidden}
             
-            /* 🚀 Catmoon background - Immediate display */
-            .catmoon-background{position:absolute;inset:0;width:100%;height:100%;background-image:url('/catmoon-bg.webp');background-repeat:no-repeat;background-size:cover;background-position:center;z-index:-1;opacity:1;will-change:auto}
+            /* 🚀 Catmoon background - ลบ will-change เพื่อประหยัด memory */
+            .catmoon-background{position:absolute;inset:0;width:100%;height:100%;background-image:url('/catmoon-bg.webp');background-repeat:no-repeat;background-size:cover;background-position:center;z-index:-1;opacity:1}
             
             /* 🎯 Hero text - Immediate position, controlled animation */
             .hero-text-image{position:absolute;top:10vh;left:50%;transform:translateX(-50%);width:80%;max-width:500px;z-index:10;pointer-events:none;opacity:0;margin-top:1rem;animation:fadeInHero 1.3s ease-out 0.2s forwards}
             
-            /* 🚀 GPU Acceleration for critical elements only */
+            /* 🚀 ลด GPU acceleration เฉพาะที่จำเป็นจริงๆ */
             .hero-wrapper,
             .catmoon-background,
-            .hero-text-image,
-            .video-section {
-              transform: translateZ(0);
+            .hero-text-image {
               backface-visibility: hidden;
             }
             
@@ -108,7 +115,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               }
               
               .hero-wrapper {
-                contain: layout style paint;
+                contain: layout style;
                 overflow: hidden;
               }
               
@@ -127,8 +134,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             
             /* 🎯 Original animation - เหมือนเดิม */
             @keyframes fadeInHero{
-              from{opacity:0;transform:translateX(-50%) translateY(20px) translateZ(0)}
-              to{opacity:1;transform:translateX(-50%) translateY(0) translateZ(0)}
+              from{opacity:0;transform:translateX(-50%) translateY(20px)}
+              to{opacity:1;transform:translateX(-50%) translateY(0)}
             }
             
             /* Loading states */
@@ -140,7 +147,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           `
         }} />
 
-        {/* 🔧 FIXED: เพิ่ม CSS เพื่อ smooth scroll และป้องกัน jump + Refresh Position */}
+        {/* 🔧 OPTIMIZED Scroll Restoration - เรียบง่ายขึ้น */}
         <style dangerouslySetInnerHTML={{
           __html: `
             html { 
@@ -163,80 +170,81 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           `
         }} />
 
-        {/* 🚀 Handle Refresh Scroll Position - IMPROVED VERSION */}
+        {/* 🌟 NATURAL SCROLL RESTORATION - เหมือน navigation ปกติ */}
         <script dangerouslySetInnerHTML={{
           __html: `
             (function() {
-              // บันทึก scroll position ก่อน refresh
-              window.addEventListener('beforeunload', function() {
-                sessionStorage.setItem('scrollPosition', window.scrollY.toString());
-                sessionStorage.setItem('wasRefreshed', 'true');
-              });
-
-              // กู้คืน scroll position หลัง refresh
-              function restoreScroll() {
-                const savedPosition = sessionStorage.getItem('scrollPosition');
-                const wasRefreshed = sessionStorage.getItem('wasRefreshed');
+              // บันทึก position อย่างเดียว
+              function savePosition() {
+                sessionStorage.setItem('naturalScrollPos', window.scrollY);
+              }
+              
+              // กู้คืนแบบธรรมชาติ
+              function naturalRestore() {
+                const savedPos = sessionStorage.getItem('naturalScrollPos');
                 
-                if (savedPosition && wasRefreshed === 'true') {
-                  const position = parseInt(savedPosition, 10);
-                  if (position > 0) {
-                    // ลอง restore หลายรอบเพื่อให้แน่ใจ
-                    let attempts = 0;
-                    const maxAttempts = 5;
+                if (savedPos && parseInt(savedPos) > 0) {
+                  const targetY = parseInt(savedPos);
+                  
+                  // 🎯 ใช้ browser restoration mechanism เป็นหลัก
+                  if ('scrollRestoration' in history) {
+                    history.scrollRestoration = 'auto';
+                  }
+                  
+                  // 🌊 Gentle restore - ไม่ฝืน
+                  function gentleScrollTo() {
+                    const currentY = window.scrollY;
                     
-                    function tryRestore() {
-                      attempts++;
-                      window.scrollTo(0, position);
-                      
-                      // ตรวจสอบว่า scroll สำเร็จหรือไม่
-                      setTimeout(function() {
-                        if (Math.abs(window.scrollY - position) > 10 && attempts < maxAttempts) {
-                          tryRestore();
-                        } else {
-                          // สำเร็จแล้ว หรือครบ attempt แล้ว
-                          sessionStorage.removeItem('wasRefreshed');
-                        }
-                      }, 100);
+                    // ถ้าอยู่ใกล้ตำแหน่งเป้าหมายแล้ว ไม่ต้องทำอะไร
+                    if (Math.abs(currentY - targetY) < 50) {
+                      return;
                     }
                     
-                    tryRestore();
-                  } else {
-                    sessionStorage.removeItem('wasRefreshed');
+                    // ใช้ smooth scroll ธรรมชาติ
+                    window.scrollTo({
+                      top: targetY,
+                      behavior: 'instant' // instant แต่ไม่ violent
+                    });
                   }
+                  
+                  // ลอง restore ช้าๆ เหมือน page navigation
+                  setTimeout(gentleScrollTo, 50);   // ครั้งแรก
+                  setTimeout(gentleScrollTo, 150);  // ครั้งที่สอง
+                  setTimeout(gentleScrollTo, 300);  // ครั้งสุดท้าย
                 }
               }
-
-              // รอให้ DOM โหลดเสร็จก่อน
+              
+              // บันทึกทุกครั้งที่ scroll
+              window.addEventListener('scroll', savePosition, { passive: true });
+              
+              // บันทึกก่อน refresh
+              window.addEventListener('beforeunload', savePosition);
+              
+              // กู้คืนเมื่อหน้าพร้อม
               if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', function() {
-                  setTimeout(restoreScroll, 100);
-                });
-              } else if (document.readyState === 'interactive') {
-                setTimeout(restoreScroll, 100);
+                document.addEventListener('DOMContentLoaded', naturalRestore);
               } else {
-                // เมื่อทุกอย่างโหลดเสร็จแล้ว
-                setTimeout(restoreScroll, 50);
+                naturalRestore();
               }
-
-              // รอ window.load ด้วยเผื่อไว้
-              window.addEventListener('load', function() {
-                setTimeout(restoreScroll, 50);
+              
+              // กู้คืนหลัง load เสร็จ (เผื่อ images ช้า)
+              window.addEventListener('load', naturalRestore);
+              
+              // เคลียร์เมื่อไปหน้าใหม่
+              let isNavigating = false;
+              
+              // ตรวจจับการ navigate จริง
+              window.addEventListener('click', function(e) {
+                const link = e.target.closest('a[href]');
+                if (link && link.href && !link.href.includes('#')) {
+                  isNavigating = true;
+                }
               });
-
-              // บันทึก scroll position ขณะเลื่อนหน้า
-              window.addEventListener('scroll', function() {
-                sessionStorage.setItem('scrollPosition', window.scrollY.toString());
-              }, { passive: true });
-
-              // เคลียร์ flag เมื่อไปหน้าอื่น (ไม่ใช่ refresh)
-              window.addEventListener('pageshow', function(event) {
-                if (!event.persisted) {
-                  // ถ้าไม่ใช่การ refresh ให้เคลียร์ flag
-                  const isFromRefresh = sessionStorage.getItem('wasRefreshed') === 'true';
-                  if (!isFromRefresh) {
-                    sessionStorage.removeItem('scrollPosition');
-                  }
+              
+              window.addEventListener('pagehide', function() {
+                if (isNavigating) {
+                  sessionStorage.removeItem('naturalScrollPos');
+                  isNavigating = false;
                 }
               });
             })();
@@ -272,7 +280,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <meta property="og:image:alt" content="Unda Alunda Hero Image" />
         <meta name="twitter:card" content="summary_large_image" />
 
-        {/* 🚀 Optimized Structured Data - WebSite */}
+        {/* 🚀 OPTIMIZED Structured Data - ลดขนาดลงเล็กน้อย */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -293,7 +301,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           }}
         />
 
-        {/* 🎯 Structured Data - Person */}
+        {/* 🎯 Structured Data - Person - เก็บข้อมูลสำคัญ */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -326,19 +334,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 "name": "Abasi Concepts",
                 "url": "https://www.abasiconcepts.com"
               },
-              "affiliation": {
-                "@type": "Organization",
-                "name": "Abasi Concepts",
-                "url": "https://www.abasiconcepts.com"
-              },
-              "mainEntityOfPage": {
-                "@type": "WebPage",
-                "@id": "https://unda-website.vercel.app/about"
-              },
               "alumniOf": {
                 "@type": "CollegeOrUniversity",
-                "name": "College of Music, Mahidol University",
-                "sameAs": "https://www.music.mahidol.ac.th"
+                "name": "College of Music, Mahidol University"
               },
               "award": [
                 "Winner - Hard Rock Pattaya Guitar Battle (2019)",
@@ -350,7 +348,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           }}
         />
 
-        {/* 🚀 Structured Data - MusicGroup */}
+        {/* 🚀 Structured Data - MusicGroup - เก็บข้อมูลสำคัญ */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -361,59 +359,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               "name": "Unda Alunda",
               "description": "Progressive Rock guitarist and composer from Thailand.",
               "url": "https://unda-website.vercel.app",
-              "image": "https://unda-website.vercel.app/catmoon-bg.jpeg",
               "sameAs": [
                 "https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0",
                 "https://www.instagram.com/undalunda",
-                "https://www.youtube.com/@undaalunda",
-                "https://www.facebook.com/undaalunda",
-                "https://www.threads.net/@undalunda",
-                "https://twitter.com/undaalunda",
-                "https://music.apple.com/us/artist/unda-alunda/1543677299",
-                "https://www.deezer.com/en/artist/115903802",
-                "https://tidal.com/browse/artist/22524871",
-                "https://music.amazon.com/artists/B08PVKFZDZ"
+                "https://www.youtube.com/@undaalunda"
               ],
-              "genre": ["Progressive Rock", "Progressive Metal", "Instrumental Rock", "Jazz Fusion"],
+              "genre": ["Progressive Rock", "Progressive Metal", "Instrumental Rock"],
               "foundingLocation": { "@type": "Place", "name": "Thailand" },
-              "member": { "@id": "https://unda-website.vercel.app#person" },
-              "mainEntityOfPage": { "@id": "https://unda-website.vercel.app#website" }
-            })
-          }}
-        />
-
-        {/* 🎯 Structured Data - Navigation */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "ItemList",
-              "itemListElement": [
-                { "@type": "SiteNavigationElement", "name": "Home", "url": "https://unda-website.vercel.app/" },
-                { "@type": "SiteNavigationElement", "name": "Shop", "url": "https://unda-website.vercel.app/shop" },
-                { "@type": "SiteNavigationElement", "name": "About", "url": "https://unda-website.vercel.app/about" },
-                { "@type": "SiteNavigationElement", "name": "Contact", "url": "https://unda-website.vercel.app/contact" }
-              ]
-            })
-          }}
-        />
-
-        {/* 🚀 Structured Data - Video */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "VideoObject",
-              "name": "Unda Alunda – Anomic | Live in Thailand (2024)",
-              "description": "Live performance of 'Anomic' by Unda Alunda, recorded in Thailand during the Dark Wonderful World tour, 2024.",
-              "thumbnailUrl": "https://i.ytimg.com/vi/ZwXeCx8cAIM/hqdefault.jpg",
-              "uploadDate": "2024-06-19T00:00:00+07:00",
-              "embedUrl": "https://www.youtube.com/embed/ZwXeCx8cAIM",
-              "contentUrl": "https://www.youtube.com/watch?v=ZwXeCx8cAIM",
-              "duration": "PT5M30S",
-              "mainEntityOfPage": { "@id": "https://unda-website.vercel.app#website" }
+              "member": { "@id": "https://unda-website.vercel.app#person" }
             })
           }}
         />
@@ -427,12 +380,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               "@type": "MusicAlbum",
               "name": "Dark Wonderful World",
               "description": "The upcoming album by Unda Alunda, featuring progressive rock and metal compositions.",
-              "image": "https://unda-website.vercel.app/catmoon-bg.jpeg",
               "datePublished": "2025-07-01",
               "byArtist": { "@id": "https://unda-website.vercel.app#person" },
               "recordLabel": "Independent",
-              "genre": ["Progressive Rock", "Progressive Metal"],
-              "mainEntityOfPage": { "@id": "https://unda-website.vercel.app#website" }
+              "genre": ["Progressive Rock", "Progressive Metal"]
             })
           }}
         />

@@ -1,14 +1,14 @@
-/* HomePage.tsx - Level 3: Smart Image Loading */
+/* HomePage.tsx - Performance Optimized */
 
 'use client';
 
 import React, { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import Script from 'next/script';
 import { allItems } from '@/components/allItems';
 import AppClientWrapper from '@/components/AppClientWrapper';
 
+// 🚀 Lazy load heavy components
 const BandsinTownWidget = lazy(() => import('@/components/BandsinTownWidget'));
 
 const blacklist = [
@@ -27,9 +27,6 @@ export default function HomePage() {
   const [isClient, setIsClient] = useState(false);
   const [showBandsintown, setShowBandsintown] = useState(false);
   
-  // 🚀 LEVEL 3: Connection speed detection
-  const [isSlowConnection, setIsSlowConnection] = useState(false);
-  
   const videoRef = useRef<HTMLDivElement>(null);
   const transcriptionRef = useRef<HTMLDivElement>(null);
   const stemsRef = useRef<HTMLDivElement>(null);
@@ -47,55 +44,43 @@ export default function HomePage() {
   useEffect(() => {
     setIsClient(true);
     
-    // 🎯 LEVEL 3: Detect connection speed
-    if ('connection' in navigator) {
-      const connection = (navigator as any).connection;
-      if (connection && (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g')) {
-        setIsSlowConnection(true);
-      }
-    }
-    
-    // 🚀 LEVEL 3: Smart preloading based on scroll behavior
-    let scrollTimeout: NodeJS.Timeout;
-    const handleScroll = () => {
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        // Preload next section images when user stops scrolling
-        const scrollY = window.scrollY;
-        const windowHeight = window.innerHeight;
-        
-        if (scrollY > windowHeight * 0.5 && !showTranscriptions) {
-          // Preload transcription images
-          ['bass', 'drums'].forEach(inst => {
-            const img = new window.Image();
-            img.src = `/product-${inst}.webp`;
-          });
-        }
-      }, 150);
+    // 🚀 Smart image preloading
+    const preloadImages = () => {
+      // Preload product images when user scrolls
+      const productImages = ['bass', 'drums', 'keys', 'guitar'];
+      productImages.forEach(inst => {
+        const img = new window.Image();
+        img.src = `/product-${inst}.webp`;
+      });
     };
-    
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    
+
+    // 🎯 Optimized intersection observer
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            if (entry.target === videoRef.current) setShowVideo(true);
-            if (entry.target === transcriptionRef.current) setShowTranscriptions(true);
+            if (entry.target === videoRef.current) {
+              setShowVideo(true);
+            }
+            if (entry.target === transcriptionRef.current) {
+              setShowTranscriptions(true);
+              // Preload images when section becomes visible
+              preloadImages();
+            }
             if (entry.target === stemsRef.current) setShowStems(true);
             if (entry.target === buttonGroupRef.current) setShowButtons(true);
             if (entry.target === musicMerchRef.current) setShowMerch(true);
             if (entry.target === tourRef.current) {
               setShowTour(true);
-              // 🎯 Delay BandsinTown on slow connections
-              setTimeout(() => setShowBandsintown(true), isSlowConnection ? 1000 : 100);
+              // ⏱️ Delay heavy widget loading
+              setTimeout(() => setShowBandsintown(true), 300);
             }
           }
         });
       },
       { 
         threshold: 0.1,
-        rootMargin: isSlowConnection ? '50px' : '100px' // 🚀 Smaller margin on slow connections
+        rootMargin: '50px' // ลด rootMargin ลง
       }
     );
 
@@ -105,20 +90,18 @@ export default function HomePage() {
     });
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      clearTimeout(scrollTimeout);
       refs.forEach((ref) => {
         if (ref.current) observer.unobserve(ref.current);
       });
     };
-  }, [isSlowConnection]);
+  }, []);
 
   return (
     <AppClientWrapper>
       <main className="homepage-main" style={{ overflow: 'visible' }}>
         <h1 className="sr-only">Unda Alunda | Official Website & Merch Store</h1>
 
-        {/* HERO SECTION - เหมือนเดิม */}
+        {/* HERO SECTION - ปรับปรุงการโหลดรูป */}
         <div className="hero-wrapper">
           <div className="catmoon-background" />
           <div className="hero-text-image">
@@ -127,9 +110,8 @@ export default function HomePage() {
               alt="Dark Wonderful World on Moon"
               height={400}
               width={600}
-              quality={100}
+              quality={90} // ลดจาก 100 เป็น 90
               priority
-              unoptimized={true}
               sizes="(max-width: 480px) 300px, (max-width: 768px) 400px, 600px"
             />
           </div>
@@ -162,7 +144,7 @@ export default function HomePage() {
         <div className="after-hero-spacing" />
         <h2 className="sr-only">Shop by Category</h2>
 
-        {/* BUTTON GROUP - เหมือนเดิม */}
+        {/* BUTTON GROUP */}
         <div ref={buttonGroupRef} className={`button-group ${showButtons ? 'fade-in' : ''}`}>
           <Link href="/shop/digital" className="info-button">SCORES</Link>
           <Link href="/shop/digital" className="info-button">STEMS & SAMPLES</Link>
@@ -179,19 +161,16 @@ export default function HomePage() {
         </div>
         <p className="since-note">Delivering Worldwide Since 2025</p>
 
-        {/* 🚀 LEVEL 3: Smart VIDEO SECTION */}
+        {/* 🚀 OPTIMIZED VIDEO SECTION */}
         <section ref={videoRef} className={`video-section ${showVideo ? 'fade-in' : ''}`}>
           <h2 className="sr-only">Watch on YouTube</h2>
           {showVideo ? (
             <iframe
               className="youtube-frame"
-              src={isSlowConnection 
-                ? "https://www.youtube.com/embed/ZwXeCx8cAIM?autoplay=0&rel=0" 
-                : "https://www.youtube.com/embed/ZwXeCx8cAIM"
-              }
+              src="https://www.youtube.com/embed/ZwXeCx8cAIM?autoplay=0&rel=0"
               title="YouTube video player"
               frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               loading="lazy"
             />
@@ -202,7 +181,7 @@ export default function HomePage() {
           )}
         </section>
 
-        {/* TRANSCRIPTION SECTION - เหมือนเดิม */}
+        {/* TRANSCRIPTION SECTION - ปรับปรุงการโหลดรูป */}
         <section className="transcription-section">
           <div ref={transcriptionRef} className={`fade-trigger ${showTranscriptions ? 'fade-in' : ''}`}>
             <p className="transcription-sub">LEARN THE MUSIC</p>
@@ -216,8 +195,8 @@ export default function HomePage() {
                     width={200}
                     height={200}
                     className="product-image"
-                    loading="lazy"
-                    quality={isSlowConnection ? 65 : 75} // 🎯 Lower quality on slow connections
+                    loading={i < 2 ? "eager" : "lazy"} // โหลด 2 รูปแรกเร็วขึ้น
+                    quality={75} // ลดจาก 100
                     sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 200px"
                   />
                   <div className="product-label-group">
@@ -237,7 +216,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* STEMS SECTION - เหมือนเดิม */}
+        {/* STEMS SECTION - ปรับปรุงการโหลดรูป */}
         <section className="stems-section">
           <div ref={stemsRef} className={`fade-trigger ${showStems ? 'fade-in' : ''}`}>
             <p className="stems-sub">JAM THE TRACKS</p>
@@ -245,7 +224,7 @@ export default function HomePage() {
             <div className="stems-row">
               {allItems
                 .filter((item) => item.category === 'Backing Track')
-                .map((item) => (
+                .map((item, index) => (
                   <Link
                     href={`/product/${item.id}`}
                     key={item.id}
@@ -257,8 +236,8 @@ export default function HomePage() {
                       width={200}
                       height={200}
                       className="stems-image"
-                      loading="lazy"
-                      quality={isSlowConnection ? 65 : 75}
+                      loading={index < 2 ? "eager" : "lazy"} // โหลด 2 รูปแรกเร็วขึ้น
+                      quality={75} // ลดจาก 100
                       sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
                     />
                     <div className="stems-label-group">
@@ -292,13 +271,13 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* MUSIC & MERCH - เหมือนเดิม */}
+        {/* MUSIC & MERCH - ปรับปรุงการโหลดรูป */}
         <section className="stems-section">
           <div ref={musicMerchRef} className={`fade-trigger ${showMerch ? 'fade-in' : ''}`}>
             <p className="stems-sub">MUSIC IN YOUR HANDS</p>
             <h2 className="stems-title">MUSIC & MERCH</h2>
             <div className="stems-row">
-              {homepageItems.map((item) => (
+              {homepageItems.map((item, index) => (
                 <Link href={`/product/${item.id}`} key={item.id} className="stems-item product-label-link">
                   <Image 
                     src={item.image} 
@@ -306,8 +285,8 @@ export default function HomePage() {
                     width={200} 
                     height={200} 
                     className="stems-image"
-                    loading="lazy"
-                    quality={isSlowConnection ? 65 : 75}
+                    loading={index < 3 ? "eager" : "lazy"} // โหลด 3 รูปแรกเร็วขึ้น
+                    quality={75} // ลดจาก 100
                     sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
                   />
                   <div className="stems-label-group">
@@ -343,7 +322,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* 🚀 LEVEL 3: Smart TOUR SECTION */}
+        {/* 🚀 OPTIMIZED TOUR SECTION */}
         <section ref={tourRef} className="tour-section">
           <div className={`fade-trigger ${showTour ? 'fade-in' : ''}`}>
             <p className="stems-sub">SEE IT LIVE</p>
@@ -360,9 +339,9 @@ export default function HomePage() {
                     alignItems: 'center', 
                     justifyContent: 'center', 
                     color: '#f8fcdc',
-                    fontSize: isSlowConnection ? '12px' : '14px'
+                    fontSize: '14px'
                   }}>
-                    {isSlowConnection ? 'Loading tour dates (slow connection)...' : 'Loading tour dates...'}
+                    Loading tour dates...
                   </div>
                 }>
                   <BandsinTownWidget />
