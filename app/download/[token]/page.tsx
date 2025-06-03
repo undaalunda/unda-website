@@ -24,54 +24,20 @@ export default async function DownloadPage({ params }: PageProps) {
       tokenType: typeof token
     });
 
-    // ค้นหา token ใน Supabase - ใช้ debug แบบละเอียด
-    const { data: order, error, count } = await supabase
+    // ค้นหา token ใน Supabase
+    const { data: order, error } = await supabase
       .from('Orders')
-      .select('*', { count: 'exact' })
-      .eq('download_token', token);
+      .select('*')
+      .eq('download_token', token)
+      .single();
 
-    console.log('📊 Supabase query result:', {
-      data: order,
-      error: error,
-      count: count,
-      dataLength: order?.length || 0
-    });
-
-    // 🆕 ถ้าไม่เจอ token ให้ลองหาแบบอื่น
-    if (!order || order.length === 0) {
-      console.log('❌ Token not found with exact match, trying alternative search...');
-      
-      // ลองหาโดยใช้ LIKE หรือ contains
-      const { data: altOrder, error: altError } = await supabase
-        .from('Orders')
-        .select('*')
-        .ilike('download_token', `%${token}%`);
-
-      console.log('🔍 Alternative search result:', {
-        data: altOrder,
-        error: altError
-      });
-
-      // ลองดู Orders ล่าสุด 5 รายการเพื่อ debug
-      const { data: recentOrders } = await supabase
-        .from('Orders')
-        .select('id, download_token, created_at, is_used')
-        .order('created_at', { ascending: false })
-        .limit(5);
-
-      console.log('📋 Recent 5 orders for debugging:', recentOrders?.map(o => ({
-        id: o.id,
-        token: o.download_token ? o.download_token.substring(0, 8) + '...' : 'null',
-        tokenFull: o.download_token,
-        created: o.created_at,
-        isUsed: o.is_used
-      })));
-
+    if (error || !order) {
+      console.error('❌ Token not found:', token, error);
       notFound();
     }
 
-    // ใช้ record แรกถ้าเจอ
-    const orderRecord = order[0];
+    // ใช้ record ที่เจอ
+    const orderRecord = order;
     
     console.log('✅ Token found in Supabase:', {
       token: token.substring(0, 8) + '...',
