@@ -1,4 +1,4 @@
-// app/api/mark-downloaded/route.ts
+// app/api/mark-downloaded/route.ts - อัปเดตแล้ว: ลบ device fingerprint + 48ชม.
 
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs/promises';
@@ -12,22 +12,20 @@ interface DownloadEntry {
   orderId?: string;
   downloadStarted?: boolean;
   downloadCompleted?: boolean;
-  deviceFingerprint?: string;
-  userAgent?: string;
   startedAt?: string;
   completedAt?: string;
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const { token, deviceFingerprint } = await req.json();
+    const { token } = await req.json();
     
     if (!token) {
       return NextResponse.json({ error: 'Missing token' }, { status: 400 });
     }
 
     const DB_PATH = path.join(process.cwd(), 'data', 'downloads.json');
-    
+
     // 📝 อัพเดท downloads.json
     try {
       const raw = await fs.readFile(DB_PATH, 'utf-8');
@@ -35,38 +33,56 @@ export async function POST(req: NextRequest) {
       
       const entryIndex = entries.findIndex(e => e.token === token);
       if (entryIndex !== -1) {
+        const entry = entries[entryIndex];
+        
+        // เช็คว่าโหลดเสร็จแล้วหรือยัง
+        if (entry.downloadCompleted) {
+          return NextResponse.json({
+            success: true,
+            message: 'Already marked as completed',
+            completedAt: entry.completedAt
+          });
+        }
+        
         // ✅ Mark as completed
+        const completedAt = new Date().toISOString();
         entries[entryIndex] = {
-          ...entries[entryIndex],
+          ...entry,
           downloadCompleted: true,
-          completedAt: new Date().toISOString()
+          completedAt
         };
         
         await fs.writeFile(DB_PATH, JSON.stringify(entries, null, 2));
         
         console.log('✅ Download completed and marked:', {
           token: token.substring(0, 8) + '...',
-          device: deviceFingerprint?.substring(0, 8) + '...',
-          completedAt: entries[entryIndex].completedAt
+          completedAt,
+          orderId: entry.orderId,
+          filePath: entry.filePath.split('/').pop()
         });
         
-        return NextResponse.json({ 
-          success: true, 
+        return NextResponse.json({
+          success: true,
           message: 'Download marked as completed',
-          completedAt: entries[entryIndex].completedAt
+          completedAt
         });
       }
     } catch (err) {
-      console.log('downloads.json not found, but that\'s okay');
+      console.log('downloads.json not found, but that\'s okay for Supabase tokens');
     }
-    
+
     // 🤔 ถ้าไม่เจอใน downloads.json แต่มาจาก Supabase
-    // ไม่ต้องทำอะไร เพราะ Supabase tokens ไม่มี completion tracking
-    console.log('📋 Token from Supabase - no completion tracking needed');
-    
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Download noted (Supabase token)' 
+    // สำหรับ Supabase tokens เราไม่ track completion ใน downloads.json
+    // แต่เราจะ log เอาไว้
+    console.log('📋 Download completion noted for Supabase token:', {
+      token: token.substring(0, 8) + '...',
+      timestamp: new Date().toISOString(),
+      note: 'Supabase token - no local completion tracking'
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: 'Download completion noted (Supabase token)'
     });
     
   } catch (error) {

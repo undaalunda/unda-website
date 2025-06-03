@@ -1,4 +1,4 @@
-// app/download/[token]/page.tsx
+// app/download/[token]/page.tsx - อัปเดตแล้ว: ลบ device fingerprint + 48ชม.
 
 import { notFound } from 'next/navigation';
 import fs from 'fs/promises';
@@ -14,8 +14,6 @@ interface DownloadEntry {
   orderId?: string;
   downloadStarted?: boolean;
   downloadCompleted?: boolean;
-  deviceFingerprint?: string;
-  userAgent?: string;
   startedAt?: string;
   completedAt?: string;
 }
@@ -121,7 +119,10 @@ const findTokenInSupabase = async (token: string) => {
     console.log('✅ Token found in Supabase:', {
       orderId: orderData.id,
       expires: orderData.download_expires,
-      digitalItemsCount: digitalItems.length
+      digitalItemsCount: digitalItems.length,
+      hoursRemaining: orderData.download_expires 
+        ? Math.max(0, Math.round((new Date(orderData.download_expires).getTime() - Date.now()) / (1000 * 60 * 60) * 10) / 10)
+        : 0
     });
 
     return {
@@ -159,7 +160,7 @@ export default async function Page({ params }: any) {
       
       // 🎯 ถ้าดาวน์โหลดเสร็จแล้ว = หมดอายุเลย
       if (entry.downloadCompleted) {
-        console.log('✅ File already downloaded - link expired');
+        console.log('✅ File already downloaded - showing completion page');
         return (
           <DownloadPageClient 
             token={token}
@@ -177,7 +178,8 @@ export default async function Page({ params }: any) {
         console.log('Token expired in downloads.json');
         entry = null;
       } else {
-        console.log('✅ Token found in downloads.json');
+        const hoursRemaining = Math.max(0, Math.round((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60) * 10) / 10);
+        console.log('✅ Token found in downloads.json, hours remaining:', hoursRemaining);
       }
     }
   } catch (err) {
@@ -196,15 +198,25 @@ export default async function Page({ params }: any) {
 
     // สร้าง entry จาก Supabase data
     const firstFile = supabaseData.filePaths[0];
+    const now = new Date();
+    const expiresAt = supabaseData.expiresAt;
+    const minutesRemaining = Math.max(0, Math.round((expiresAt.getTime() - now.getTime()) / (1000 * 60)));
+    
     entry = {
       token: token,
       filePath: firstFile.filePath,
-      createdAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-      expiresInMinutes: 60,
-      orderId: supabaseData.orderId
+      createdAt: new Date(expiresAt.getTime() - 48 * 60 * 60 * 1000).toISOString(), // 48 ชั่วโมงก่อนหน้า
+      expiresInMinutes: 2880, // 48 ชั่วโมง
+      orderId: supabaseData.orderId,
+      downloadStarted: false,
+      downloadCompleted: false
     };
     
-    console.log('✅ Using token from Supabase, orderId:', supabaseData.orderId);
+    console.log('✅ Using token from Supabase:', {
+      orderId: supabaseData.orderId,
+      filesCount: supabaseData.filePaths.length,
+      minutesRemaining
+    });
   }
 
   if (!entry) return notFound();

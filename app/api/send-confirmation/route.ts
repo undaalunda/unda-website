@@ -100,12 +100,14 @@ export async function POST(req: NextRequest) {
         console.log('📁 File path for item:', filePath);
         
         if (filePath) {
-          // ✅ แก้แล้ว: ใช้ NEXT_PUBLIC_BASE_URL แทน VERCEL_URL
+          // ✅ ใช้ environment-aware base URL
           const apiBaseUrl = process.env.NODE_ENV === 'production' 
-            ? process.env.NEXT_PUBLIC_BASE_URL || 'https://unda-website.vercel.app'
+            ? (process.env.NEXT_PUBLIC_BASE_URL || 'https://unda-website.vercel.app')
             : 'http://localhost:3000';
             
-          const publicBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://unda-website.vercel.app';
+          const publicBaseUrl = process.env.NODE_ENV === 'production'
+            ? (process.env.NEXT_PUBLIC_BASE_URL || 'https://unda-website.vercel.app')
+            : 'http://localhost:3000';
           
           console.log('🔗 Creating download link for:', filePath);
           console.log('🌐 API Base URL:', apiBaseUrl);
@@ -117,7 +119,7 @@ export async function POST(req: NextRequest) {
             body: JSON.stringify({ 
               filePath, 
               orderId,
-              expiresInMinutes: 60
+              expiresInMinutes: 2880 // 🆕 48 ชั่วโมง = 48 * 60 = 2880 นาที
             })
           });
 
@@ -143,7 +145,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // ✅ สร้าง content แยกตาม order type
+    // ✅ สร้าง content แยกตาม order type (แก้ข้อความให้สุขุม)
     let mainContent = '';
     
     if (hasDigitalItems && hasPhysicalItems) {
@@ -156,12 +158,12 @@ export async function POST(req: NextRequest) {
           Your order contains both digital and physical items:
         </p>
         <p style="margin-top: 30px; font-weight: bold; color: #dc9e63;">
-          📥 Digital Downloads (${digitalItemsCount} items)
+          Digital Downloads (${digitalItemsCount} items)
         </p>
-        <p style="margin-top: 10px;">Here are your download links (valid for 1 hour):</p>
+        <p style="margin-top: 10px;">Here are your download links (valid for 48 hours):</p>
         <ul style="padding-left: 20px;">${linksHtml}</ul>
         <p style="margin-top: 30px; font-weight: bold; color: #dc9e63;">
-          📦 Physical Items
+          Physical Items
         </p>
         <p style="margin-top: 10px;">
           Your physical items are being prepared for shipping. You will receive another email with tracking information once they have been dispatched.
@@ -176,10 +178,10 @@ export async function POST(req: NextRequest) {
         <p style="color: #f8fcdc; margin-bottom: 16px;">
           Your downloads are ready immediately:
         </p>
-        <p style="margin-top: 30px;">Here are your download links (valid for 1 hour):</p>
+        <p style="margin-top: 30px;">Here are your download links (valid for 48 hours):</p>
         <ul style="padding-left: 20px;">${linksHtml}</ul>
         <p style="margin-top: 20px; font-size: 14px; color: #999;">
-          💡 Tip: Save your files to a safe location as download links expire after 1 hour.
+          Download links are valid for 48 hours.
         </p>
       `;
     } else {
@@ -197,8 +199,9 @@ export async function POST(req: NextRequest) {
       `;
     }
 
-    // ✅ สร้าง receipt link
-    const publicBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://unda-website.vercel.app';
+    // ✅ สร้าง receipt link (ใช้ production URL สำหรับ email images)
+    const publicBaseUrl = 'https://unda-website.vercel.app'; // Force production URL for email images
+      
     const receiptHtml = receiptUrl
       ? `<p style="margin-top: 24px;">You can view your payment receipt here:<br/>
           <a href="${receiptUrl}" target="_blank" style="color: #dc9e63; text-decoration: underline;">
@@ -207,7 +210,7 @@ export async function POST(req: NextRequest) {
         </p>`
       : '';
 
-    // ✅ Email HTML template
+    // ✅ Email HTML template - ใช้จากไฟล์สั้น (หน้าตาสวย)
     const html = `
       <body style="margin: 0; padding: 0; font-family: Cinzel, serif; background-color: #000;">
         <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" 
@@ -244,6 +247,8 @@ export async function POST(req: NextRequest) {
 
     console.log('📨 Sending email to:', email);
     console.log('📦 Order type:', hasDigitalItems && hasPhysicalItems ? 'Mixed' : hasDigitalItems ? 'Digital only' : 'Physical only');
+    console.log('⏰ Download links valid for: 48 hours');
+    console.log('🌐 Public Base URL:', publicBaseUrl);
     
     // ✅ ส่ง email
     const emailResult = await resend.emails.send({

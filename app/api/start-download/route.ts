@@ -1,4 +1,4 @@
-// app/api/start-download/route.ts
+// app/api/start-download/route.ts - อัปเดตแล้ว: ลบ device fingerprint + 48ชม.
 
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs/promises';
@@ -13,26 +13,24 @@ interface DownloadEntry {
   orderId?: string;
   downloadStarted?: boolean;
   downloadCompleted?: boolean;
-  deviceFingerprint?: string;
-  userAgent?: string;
   startedAt?: string;
   completedAt?: string;
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const { token, deviceFingerprint, userAgent } = await req.json();
+    const { token } = await req.json();
     
-    if (!token || !deviceFingerprint) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    if (!token) {
+      return NextResponse.json({ error: 'Missing token' }, { status: 400 });
     }
 
     const DB_PATH = path.join(process.cwd(), 'data', 'downloads.json');
-    
+
     // 🔍 หา token ใน downloads.json หรือ Supabase
     let entries: DownloadEntry[] = [];
     let tokenFound = false;
-    
+
     try {
       const raw = await fs.readFile(DB_PATH, 'utf-8');
       entries = JSON.parse(raw);
@@ -45,33 +43,26 @@ export async function POST(req: NextRequest) {
         const createdAt = new Date(entry.createdAt);
         const expiresAt = new Date(createdAt.getTime() + entry.expiresInMinutes * 60000);
         
-        if (new Date() > expiresAt && !entry.downloadCompleted) {
-          return NextResponse.json({ error: 'Token expired' }, { status: 410 });
+        if (new Date() > expiresAt) {
+          return NextResponse.json({ 
+            error: 'Download link has expired',
+            code: 'EXPIRED' 
+          }, { status: 410 });
         }
         
-        // 🕵️‍♂️ เช็ค device fingerprint
-        if (entry.deviceFingerprint && entry.deviceFingerprint !== deviceFingerprint) {
-          console.log('⚠️ Different device detected:', {
-            original: entry.deviceFingerprint.substring(0, 8),
-            new: deviceFingerprint.substring(0, 8)
-          });
-          
-          // ถ้าเป็นคนละเครื่อง แต่ยังไม่โหลด = ให้ผ่าน (อาจเปลี่ยนเครื่อง)
-          // ถ้าโหลดแล้ว = block
-          if (entry.downloadCompleted) {
-            return NextResponse.json({ 
-              error: 'File already downloaded on another device',
-              code: 'ALREADY_DOWNLOADED'
-            }, { status: 403 });
-          }
+        // 🚫 เช็คว่าโหลดเสร็จแล้วหรือยัง
+        if (entry.downloadCompleted) {
+          return NextResponse.json({
+            error: 'File has already been downloaded',
+            code: 'ALREADY_DOWNLOADED',
+            completedAt: entry.completedAt
+          }, { status: 403 });
         }
         
-        // 📝 อัพเดท entry
+        // 📝 อัพเดท entry - mark เป็น started
         entries[entryIndex] = {
           ...entry,
           downloadStarted: true,
-          deviceFingerprint,
-          userAgent,
           startedAt: new Date().toISOString()
         };
         
@@ -80,7 +71,7 @@ export async function POST(req: NextRequest) {
     } catch (err) {
       console.log('downloads.json not found, checking Supabase...');
     }
-    
+
     // 🔍 ถ้าไม่เจอใน downloads.json ให้หาใน Supabase
     if (!tokenFound) {
       const { data: orderData, error } = await supabase
@@ -90,29 +81,39 @@ export async function POST(req: NextRequest) {
         .single();
         
       if (error || !orderData) {
-        return NextResponse.json({ error: 'Token not found' }, { status: 404 });
+        return NextResponse.json({ 
+          error: 'Download link not found',
+          code: 'NOT_FOUND' 
+        }, { status: 404 });
       }
       
       // เช็คว่าหมดอายุหรือยัง
       if (orderData.download_expires && new Date() > new Date(orderData.download_expires)) {
-        return NextResponse.json({ error: 'Token expired' }, { status: 410 });
+        return NextResponse.json({ 
+          error: 'Download link has expired',
+          code: 'EXPIRED' 
+        }, { status: 410 });
       }
       
-      console.log('✅ Token found in Supabase, starting download tracking');
+      console.log('✅ Token found in Supabase, download allowed');
     }
-    
-    // 💾 บันทึกกลับไฟล์
+
+    // 💾 บันทึกกลับไฟล์ (ถ้ามีการเปลี่ยนแปลง)
     if (tokenFound) {
       await fs.writeFile(DB_PATH, JSON.stringify(entries, null, 2));
     }
-    
+
     console.log('🚀 Download started:', {
       token: token.substring(0, 8) + '...',
-      device: deviceFingerprint.substring(0, 8) + '...',
-      userAgent: userAgent?.substring(0, 50) + '...'
+      timestamp: new Date().toISOString(),
+      source: tokenFound ? 'downloads.json' : 'Supabase'
     });
-    
-    return NextResponse.json({ success: true, message: 'Download started' });
+
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Download started',
+      source: tokenFound ? 'downloads.json' : 'Supabase'
+    });
     
   } catch (error) {
     console.error('Error in start-download:', error);

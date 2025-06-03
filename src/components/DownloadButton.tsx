@@ -1,4 +1,5 @@
-// app/components/DownloadButton.tsx
+// app/components/DownloadButton.tsx - อัปเดตแล้ว: ลบ device fingerprint + 48ชม.
+
 'use client';
 
 import { useState } from 'react';
@@ -10,36 +11,6 @@ interface DownloadButtonProps {
   children: React.ReactNode;
   className?: string;
 }
-
-// 🕵️‍♂️ สร้าง Device Fingerprint
-const createDeviceFingerprint = (): string => {
-  try {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      ctx.textBaseline = 'top';
-      ctx.fillText('Device fingerprint check', 2, 2);
-    }
-    
-    const fingerprint = {
-      userAgent: navigator.userAgent,
-      language: navigator.language,
-      platform: navigator.platform,
-      screen: `${screen.width}x${screen.height}`,
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      canvas: canvas.toDataURL(),
-      cookieEnabled: navigator.cookieEnabled,
-      doNotTrack: navigator.doNotTrack,
-      hardwareConcurrency: navigator.hardwareConcurrency || 0
-    };
-    
-    // สร้าง hash จาก fingerprint
-    return btoa(JSON.stringify(fingerprint)).substring(0, 16);
-  } catch (error) {
-    console.error('Failed to create fingerprint:', error);
-    return 'fallback-' + Date.now();
-  }
-};
 
 export default function DownloadButton({
   href,
@@ -56,23 +27,33 @@ export default function DownloadButton({
     setDownloadStatus('downloading');
     
     try {
-      // 🕵️‍♂️ สร้าง device fingerprint
-      const deviceFingerprint = createDeviceFingerprint();
-      
-      // 📡 บันทึก fingerprint และเริ่ม download
-      await fetch('/api/start-download', {
+      // 📡 บันทึกการเริ่ม download (ไม่ต้อง fingerprint แล้ว)
+      const startResponse = await fetch('/api/start-download', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          token, 
-          deviceFingerprint,
-          userAgent: navigator.userAgent 
-        })
+        body: JSON.stringify({ token })
       });
+
+      const startResult = await startResponse.json();
+      
+      if (!startResponse.ok) {
+        // Handle specific error cases
+        if (startResult.code === 'ALREADY_DOWNLOADED') {
+          setDownloadStatus('completed');
+          alert('This file has already been downloaded!');
+          return;
+        } else if (startResult.code === 'EXPIRED') {
+          alert('Download link has expired (48 hours limit)');
+          setDownloadStatus('ready');
+          return;
+        } else {
+          throw new Error(startResult.error || 'Failed to start download');
+        }
+      }
 
       // 🎯 เริ่ม download จริงๆ
       const downloadLink = document.createElement('a');
-      downloadLink.href = href + `?token=${token}&fp=${deviceFingerprint}`;
+      downloadLink.href = href + `?token=${token}`;
       downloadLink.download = fileName;
       downloadLink.style.display = 'none';
       document.body.appendChild(downloadLink);
@@ -85,7 +66,7 @@ export default function DownloadButton({
           await fetch('/api/mark-downloaded', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token, deviceFingerprint })
+            body: JSON.stringify({ token })
           });
           
           setDownloadStatus('completed');
@@ -95,12 +76,15 @@ export default function DownloadButton({
           setTimeout(() => setShowSuccess(false), 3000);
         } catch (error) {
           console.error('Failed to mark as downloaded:', error);
+          // ถึงแม้ mark failed แต่ไฟล์ก็โหลดไปแล้ว
+          setDownloadStatus('completed');
         }
       }, 3000);
 
     } catch (error) {
       console.error('Download failed:', error);
       setDownloadStatus('ready');
+      alert('Download failed. Please try again.');
     }
   };
 

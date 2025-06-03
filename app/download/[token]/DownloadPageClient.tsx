@@ -1,4 +1,4 @@
-// app/download/[token]/DownloadPageClient.tsx - เพิ่ม redsky background
+// app/download/[token]/DownloadPageClient.tsx - อัปเดตแล้ว: ลบ device fingerprint + 48ชม.
 
 'use client';
 
@@ -13,8 +13,6 @@ interface DownloadEntry {
   orderId?: string;
   downloadStarted?: boolean;
   downloadCompleted?: boolean;
-  deviceFingerprint?: string;
-  userAgent?: string;
   startedAt?: string;
   completedAt?: string;
 }
@@ -38,14 +36,42 @@ export default function DownloadPageClient({
 }: DownloadPageClientProps) {
   const [mounted, setMounted] = useState(false);
   const [formattedDate, setFormattedDate] = useState('');
+  const [timeRemaining, setTimeRemaining] = useState('');
   
   useEffect(() => {
     setMounted(true);
-    // Format dates only on client side
+    
+    // Format completion date
     if (completedAt) {
       setFormattedDate(new Date(completedAt).toLocaleString());
     }
-  }, [completedAt]);
+    
+    // Calculate time remaining
+    const updateTimeRemaining = () => {
+      const now = new Date();
+      const expires = new Date(expiresAt);
+      const diff = expires.getTime() - now.getTime();
+      
+      if (diff <= 0) {
+        setTimeRemaining('Expired');
+        return;
+      }
+      
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      
+      if (hours > 0) {
+        setTimeRemaining(`${hours}h ${minutes}m remaining`);
+      } else {
+        setTimeRemaining(`${minutes}m remaining`);
+      }
+    };
+    
+    updateTimeRemaining();
+    const interval = setInterval(updateTimeRemaining, 60000); // Update every minute
+    
+    return () => clearInterval(interval);
+  }, [completedAt, expiresAt]);
 
   if (!mounted) {
     return (
@@ -71,18 +97,24 @@ export default function DownloadPageClient({
         <div className="absolute inset-0 bg-black/70"></div>
         
         <div className="relative z-10">
-          <h1 className="text-4xl font-bold mb-8 text-[#dc9e63]">Download Complete</h1>
-          <p className="mb-7">Your file has been successfully downloaded!</p>
+          <h1 className="text-4xl font-bold mb-8 text-[#dc9e63]">Download Complete!</h1>
+          <p className="mb-7 text-lg">Your file has been successfully downloaded.</p>
           {formattedDate && (
             <p className="text-sm opacity-70 mb-4">
               Downloaded on: {formattedDate}
             </p>
           )}
-          <p className="text-xs opacity-50">
-            For security reasons, this download link has expired.
+          <p className="text-xs opacity-50 mb-6">
+            This download link has expired for security reasons.
+          </p>
+          <p className="text-sm opacity-80 mb-4">
+            Thank you for your purchase.
           </p>
           <a 
-            href="https://unda-website.vercel.app"
+            href={process.env.NODE_ENV === 'production' 
+              ? (process.env.NEXT_PUBLIC_BASE_URL || 'https://unda-website.vercel.app')
+              : 'http://localhost:3000'
+            }
             className="mt-6 text-[#dc9e63] hover:text-[#f8cfa3] underline inline-block"
           >
             Back to Store
@@ -109,7 +141,13 @@ export default function DownloadPageClient({
         
         <div className="relative z-10">
           <h1 className="text-4xl font-bold mb-8 text-[#dc9e63]">Your Downloads are Ready</h1>
-          <p className="mb-7">Click the links below to download your files:</p>
+          <p className="mb-4">Click the links below to download your files:</p>
+          
+          {timeRemaining && (
+            <p className="text-sm opacity-80 mb-7">
+              {timeRemaining}
+            </p>
+          )}
 
           <div className="space-y-4 mb-8">
             {supabaseData.filePaths.map((fileData: any, index: number) => {
@@ -129,7 +167,7 @@ export default function DownloadPageClient({
           </div>
 
           <p className="text-xs mt-6 opacity-50">
-            These download links will expire after use
+            Each file can be downloaded once within 48 hours
           </p>
           
           <p className="text-xs mt-2 opacity-30">
@@ -137,7 +175,10 @@ export default function DownloadPageClient({
           </p>
                  
           <a 
-            href="https://unda-website.vercel.app"
+            href={process.env.NODE_ENV === 'production' 
+              ? (process.env.NEXT_PUBLIC_BASE_URL || 'https://unda-website.vercel.app')
+              : 'http://localhost:3000'
+            }
             className="mt-4 text-[#dc9e63] hover:text-[#f8cfa3] underline inline-block"
           >
             Back to Store
@@ -152,12 +193,13 @@ export default function DownloadPageClient({
 
   return (
     <main 
-      className="min-h-screen flex flex-col justify-center items-center px-4 text-[#f8fcdc] font-[Cinzel] text-center relative"
+      className="min-h-screen flex flex-col justify-center items-center px-4 text-[#f8fcdc] font-[Cinzel] text-center"
       style={{
         backgroundImage: "url('/redsky-bg.webp')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
+        backgroundRepeat: 'no-repeat',
+        backgroundColor: '#000'
       }}
     >
       {/* Dark overlay for readability */}
@@ -165,7 +207,13 @@ export default function DownloadPageClient({
       
       <div className="relative z-10">
         <h1 className="text-4xl font-bold mb-8 text-[#dc9e63]">Your Download is Ready</h1>
-        <p className="mb-7">Click the button below to download your file:</p>
+        <p className="mb-4">Click the button below to download your file:</p>
+        
+        {timeRemaining && (
+          <p className="text-sm opacity-80 mb-7">
+            {timeRemaining}
+          </p>
+        )}
 
         <DownloadButton
           href={entry.filePath}
@@ -177,7 +225,7 @@ export default function DownloadPageClient({
         </DownloadButton>
 
         <p className="text-xs mt-6 opacity-50">
-          This download link will expire after use
+          This file can be downloaded once within 48 hours
         </p>
 
         {supabaseData && (
@@ -187,7 +235,10 @@ export default function DownloadPageClient({
         )}
                
         <a 
-          href="https://unda-website.vercel.app"
+          href={process.env.NODE_ENV === 'production' 
+            ? (process.env.NEXT_PUBLIC_BASE_URL || 'https://unda-website.vercel.app')
+            : 'http://localhost:3000'
+          }
           className="mt-4 text-[#dc9e63] hover:text-[#f8cfa3] underline inline-block"
         >
           Back to Store
