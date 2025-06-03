@@ -175,7 +175,7 @@ export default function ThankYouClient() {
               : 'bg-gray-700 text-white'
           }`}>
             {data.payment_status === 'succeeded' ? 'PAID' : 
-             data.payment_status === 'pending' ? '⏳ PROCESSING' : 
+             data.payment_status === 'pending' ? 'PROCESSING' : 
              data.payment_status?.toUpperCase()}
           </span>
         </p>
@@ -211,7 +211,7 @@ export default function ThankYouClient() {
         {data.payment_status === 'pending' && (
           <div className="mt-4 p-3 bg-yellow-900/30 border border-yellow-600/50 rounded">
             <p className="text-sm text-yellow-200">
-              <strong>⏳ Payment Processing</strong><br/>
+              <strong>Payment Processing</strong><br/>
               Your payment is being confirmed. You'll receive an email once complete.
             </p>
           </div>

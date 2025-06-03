@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
         console.log('📁 File path for item:', filePath);
         
         if (filePath) {
-          // ✅ เรียก API สร้าง download token
+          // ✅ เรียก API สร้าง download token - ใช้ URL ที่ถูก!
           const baseUrl = process.env.NODE_ENV === 'production' 
             ? 'https://unda-website.vercel.app' 
             : 'http://localhost:3000';
@@ -221,7 +221,7 @@ export async function POST(req: NextRequest) {
                     </p>
                     ${mainContent}
                     ${receiptHtml}
-                    <a href="https://www.undaalunda.com" 
+                    <a href="https://unda-website.vercel.app" 
                       style="display: inline-block; background-color: #dc9e63; color: #000000; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; font-size: 14px; margin-top: 30px;">
                       Return to Store
                     </a>

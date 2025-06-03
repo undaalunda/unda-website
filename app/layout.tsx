@@ -1,4 +1,4 @@
-// app/layout.tsx - Minimal Performance Tweaks + Keep All Features
+// app/layout.tsx - Font Flash Fixed Version
 
 import './globals.css';
 import type { Metadata } from 'next';
@@ -65,31 +65,35 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="dns-prefetch" href="//fonts.gstatic.com" />
         
-        {/* 🚀 OPTIMIZED Google Fonts - ปรับปรุงเพื่อ performance */}
+        {/* 🎯 FIXED: Font Loading - No Flash Strategy */}
         <link 
-          href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=swap" 
-          rel="preload"
-          as="style"
+          href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=block" 
+          rel="stylesheet"
         />
-        <script dangerouslySetInnerHTML={{
-          __html: `
-            document.querySelector('link[as="style"]').onload = function() {
-              this.onload = null;
-              this.rel = 'stylesheet';
-            };
-          `
-        }} />
-        <noscript>
-          <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=swap" rel="stylesheet" />
-        </noscript>
         
-        {/* 🚀 OPTIMIZED Critical CSS - ลด will-change และ GPU acceleration */}
+        {/* 🚀 FONT ANTI-FLASH: Critical CSS with proper font fallback */}
         <style dangerouslySetInnerHTML={{
           __html: `
-            /* Critical performance CSS + Anti-flash protection */
+            /* 🎯 ANTI-FLASH: Prevent font switching */
             *{box-sizing:border-box}
             html{scroll-behavior:auto;-webkit-text-size-adjust:100%}
-            body{background-color:#190000;margin:0;padding:0;overflow-x:hidden;font-family:system-ui,sans-serif;opacity:1 !important;visibility:visible !important}
+            
+            /* 🔧 FONT LOADING: Ensure consistent display */
+            body{
+              background-color:#190000;
+              margin:0;
+              padding:0;
+              overflow-x:hidden;
+              font-family:'Cinzel', Georgia, 'Times New Roman', serif;
+              font-display: block;
+              opacity:1 !important;
+              visibility:visible !important;
+            }
+            
+            /* 🎯 Force Cinzel font family everywhere */
+            * {
+              font-family: 'Cinzel', Georgia, 'Times New Roman', serif !important;
+            }
             
             /* 🎯 ANTI-FLASH: Prevent layout shift during load */
             .hero-wrapper{opacity:1;position:relative;width:100vw;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-top:6rem;padding-bottom:6vh;z-index:0;margin-top:0;overflow:hidden}

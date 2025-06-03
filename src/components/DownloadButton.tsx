@@ -106,10 +106,10 @@ export default function DownloadButton({
 
   if (downloadStatus === 'completed') {
     return (
-      <div className={`${className} opacity-50 cursor-not-allowed relative`}>
+      <div className={`${className} font-[Cinzel] opacity-50 cursor-not-allowed relative`}>
         <span>Downloaded Successfully</span>
         {showSuccess && (
-          <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-emerald-700 text-[#f8fcdc] px-3 py-1 rounded text-sm border border-emerald-600">
+          <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-emerald-700 text-[#f8fcdc] font-[Cinzel] px-3 py-1 rounded text-sm border border-emerald-600">
             Download Complete
           </div>
         )}
@@ -121,11 +121,11 @@ export default function DownloadButton({
     <button
       onClick={handleDownload}
       disabled={downloadStatus === 'downloading'}
-      className={`${className} cursor-pointer ${downloadStatus === 'downloading' ? 'opacity-75 cursor-wait' : ''}`}
+      className={`${className} font-[Cinzel] cursor-pointer ${downloadStatus === 'downloading' ? 'opacity-75 cursor-wait' : ''}`}
     >
       {downloadStatus === 'downloading' ? (
         <>
-          <span className="animate-spin mr-2">Loading</span>
+          <span className="animate-spin mr-2"></span>
           Downloading...
         </>
       ) : (
