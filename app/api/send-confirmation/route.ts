@@ -110,7 +110,11 @@ export async function POST(req: NextRequest) {
           const tokenRes = await fetch(`${baseUrl}/api/download-link`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ filePath, orderId })
+            body: JSON.stringify({ 
+              filePath, 
+              orderId,
+              expiresInMinutes: 60
+            })
           });
 
           if (!tokenRes.ok) {

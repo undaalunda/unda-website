@@ -122,6 +122,7 @@ const FooterLinks = memo(() => {
 
 export default function AppClientWrapper({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false); // 🚀 NEW: Client-side check
   const pathname = usePathname();
   const { setLastActionItem } = useCart();
 
@@ -131,6 +132,11 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
       menuOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'
     }`, [menuOpen]
   );
+
+  // 🔧 FIX: Ensure client-side rendering
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     const handler = (e: any) => {
@@ -163,17 +169,20 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
         <div className="global-newsletter-wrapper mt-10">
           <section className="newsletter-section">
             <div className="footer-logo-social">
-              <Image
-                src="/footer-logo-v7.webp"
-                alt="Unda Alunda Cat Logo"
-                width={120}
-                height={120}
-                quality={85}        // 🎯 ลดจาก 100 เป็น 85
-                loading="lazy"
-                priority={false}    // 🚀 เอา priority ออก เพราะอยู่ล่างสุด
-                sizes="120px"
-                className="glow-logo mx-auto mb-6"
-              />
+              {/* 🔧 FIX: Only render Image on client-side */}
+              {isClient && (
+                <Image
+                  src="/footer-logo-v7.webp"
+                  alt="Unda Alunda Cat Logo"
+                  width={120}
+                  height={120}
+                  quality={85}        // 🎯 ลดจาก 100 เป็น 85
+                  loading="lazy"
+                  priority={false}    // 🚀 เอา priority ออก เพราะอยู่ล่างสุด
+                  sizes="120px"
+                  className="glow-logo mx-auto mb-6"
+                />
+              )}
               
               <SocialLinks />
               <div className="newsletter-divider"></div>
