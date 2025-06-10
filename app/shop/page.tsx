@@ -1,32 +1,32 @@
-// app/shop/page.tsx - FINAL VERSION: เลือกที่ดีที่สุดให้แล้ว!
+//app/shop/page.tsx
 
-import type { Metadata } from 'next';
-import ShopPageWrapper from '@/components/ShopPageWrapper';
+import ShopLandingContent from '@/components/ShopLandingContent';
 import AppClientWrapper from '@/components/AppClientWrapper';
+import type { Metadata } from 'next';
 
-// 🚀 ใช้ domain ปัจจุบัน (ยังไม่ต้องเปลี่ยน)
-const BASE_URL = 'https://unda-website.vercel.app';
+const BASE_URL = 'https://unda-website.vercel.app'; // TODO: Change to 'https://www.undaalunda.com' when migrating
 
-// 🚀 SEO metadata ที่ครบถ้วน
+// Enhanced metadata for the new shop landing page
 export const metadata: Metadata = {
-  title: 'Shop Official Unda Alunda | Music, Merch & Digital Downloads',
-  description: 'Browse the complete Unda Alunda collection including progressive rock albums, exclusive merchandise, backing tracks, guitar tabs and bundle deals. Official artist store with worldwide shipping.',
+  title: 'Shop | Physical & Digital Music Store | UNDA ALUNDA',
+  description: 'Shop exclusive Unda Alunda merchandise, physical albums, and digital content. Choose between physical products (merch, CDs, vinyl) or digital downloads (backing tracks, tabs, stems).',
   keywords: [
     'unda alunda shop',
-    'progressive rock store',
-    'official artist merchandise', 
+    'progressive rock merchandise',
     'backing tracks',
     'guitar tabs',
-    'dark wonderful world',
-    'instrumental rock music',
-    'thailand progressive metal',
+    'music stems',
+    'physical albums',
     'digital downloads',
-    'music merch bundles'
+    'musician merchandise',
+    'thai progressive rock',
+    'official store'
   ],
   
+  // Open Graph
   openGraph: {
-    title: 'Shop Official Unda Alunda | Music, Merch & Digital Downloads',
-    description: 'Browse the complete Unda Alunda collection including progressive rock albums, exclusive merchandise, backing tracks, guitar tabs and bundle deals.',
+    title: 'Shop | Physical & Digital Music Store | UNDA ALUNDA',
+    description: 'Shop exclusive Unda Alunda merchandise, physical albums, and digital content. Choose between physical products or digital downloads.',
     type: 'website',
     url: `${BASE_URL}/shop`,
     siteName: 'UNDA ALUNDA',
@@ -40,18 +40,31 @@ export const metadata: Metadata = {
     ],
   },
 
+  // Twitter Card
   twitter: {
     card: 'summary_large_image',
-    title: 'Shop Official Unda Alunda | Music, Merch & Digital Downloads',
-    description: 'Browse the complete Unda Alunda collection including progressive rock albums, exclusive merchandise, backing tracks, guitar tabs and bundle deals.',
+    title: 'Shop | Physical & Digital Music Store | UNDA ALUNDA',
+    description: 'Shop exclusive Unda Alunda merchandise, physical albums, and digital content.',
     creator: '@undaalunda',
     images: [`${BASE_URL}/catmoon-bg.jpeg`],
   },
 
+  // Additional metadata
+  other: {
+    'og:title': 'Shop | Physical & Digital Music Store | UNDA ALUNDA',
+    'og:description': 'Shop exclusive Unda Alunda merchandise, physical albums, and digital content.',
+    'og:type': 'website',
+    'og:url': `${BASE_URL}/shop`,
+    'og:image': `${BASE_URL}/catmoon-bg.jpeg`,
+    'og:site_name': 'UNDA ALUNDA',
+  },
+
+  // Canonical URL
   alternates: {
     canonical: `${BASE_URL}/shop`,
   },
 
+  // Robots
   robots: {
     index: true,
     follow: true,
@@ -64,56 +77,53 @@ export const metadata: Metadata = {
   },
 };
 
-// 🎯 ทางเลือกที่ดีที่สุด: แสดง shop page จริง
 export default function ShopPage() {
+  // Structured data for the shop landing page
+  const shopSchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Unda Alunda Official Shop",
+    "description": "Official store for Unda Alunda merchandise, music, and digital content",
+    "url": `${BASE_URL}/shop`,
+    "mainEntity": {
+      "@type": "ItemList",
+      "name": "Shop Categories",
+      "numberOfItems": 2,
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Physical Products",
+          "description": "Merchandise, CDs, vinyl, books, and bundles",
+          "url": `${BASE_URL}/shop/physical`
+        },
+        {
+          "@type": "ListItem", 
+          "position": 2,
+          "name": "Digital Products",
+          "description": "Backing tracks, tabs, stems, and digital downloads",
+          "url": `${BASE_URL}/shop/digital`
+        }
+      ]
+    },
+    "provider": {
+      "@type": "Organization",
+      "name": "UNDA ALUNDA",
+      "url": BASE_URL
+    }
+  };
+
   return (
     <>
-      {/* 🧠 Schema.org สำหรับ Google เข้าใจว่าเป็นหน้า shop */}
+      {/* Structured data */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "CollectionPage",
-            "name": "Unda Alunda Official Shop",
-            "description": "Complete collection of Unda Alunda music, merchandise and digital downloads",
-            "url": `${BASE_URL}/shop`,
-            "mainEntity": {
-              "@type": "ItemList",
-              "name": "All Products",
-              "numberOfItems": 25
-            },
-            "hasOfferCatalog": {
-              "@type": "OfferCatalog",
-              "name": "Unda Alunda Product Catalog",
-              "itemListElement": [
-                {
-                  "@type": "OfferCatalog",
-                  "name": "Music Albums",
-                  "itemListElement": []
-                },
-                {
-                  "@type": "OfferCatalog", 
-                  "name": "Merchandise",
-                  "itemListElement": []
-                },
-                {
-                  "@type": "OfferCatalog",
-                  "name": "Digital Downloads",
-                  "itemListElement": []
-                },
-                {
-                  "@type": "OfferCatalog",
-                  "name": "Bundle Deals", 
-                  "itemListElement": []
-                }
-              ]
-            }
-          })
+          __html: JSON.stringify(shopSchema)
         }}
       />
 
-      {/* 🗺️ Breadcrumb สำหรับ navigation */}
+      {/* Breadcrumb Schema */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -138,9 +148,8 @@ export default function ShopPage() {
         }}
       />
 
-      {/* 🎨 แสดงหน้า shop จริงๆ (default เป็น merch) */}
       <AppClientWrapper>
-        <ShopPageWrapper category="merch" />
+        <ShopLandingContent />
       </AppClientWrapper>
     </>
   );
