@@ -9,17 +9,6 @@ export default function ShopLandingContent() {
   return (
     <main className="min-h-screen flex flex-col justify-center items-center text-[#f8fcdc] font-[Cinzel] px-4">
       <section className="text-center w-full max-w-6xl">
-        {/* Hero Section */}
-        <div className="shop-landing-hero-section mb-12">
-          <h1 className="shop-landing-main-title">
-            Shop
-          </h1>
-          
-          <p className="shop-landing-subtitle">
-            Choose your shopping experience
-          </p>
-        </div>
-
         {/* Shop Choice Cards */}
         <div className="shop-landing-cards-container">
           <div className="shop-landing-cards-grid min-[1281px]:grid min-[1281px]:grid-cols-2 min-[1281px]:gap-8">
