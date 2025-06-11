@@ -1,4 +1,4 @@
-//PhysicalShopContent.tsx - Updated with Navigation Context Support
+//PhysicalShopContent.tsx - Updated with Cinematic Colors
 
 'use client';
 
@@ -201,7 +201,7 @@ export default function PhysicalShopContent({ initialTab }: { initialTab?: Physi
             <span className="text-[#f8fcdc]/50">Home / Shop / Physical</span>
           </div>
           <div className="text-center mb-12 max-[927px]:mb-10 max-[696px]:mb-8">
-            <h1 className="text-5xl max-[927px]:text-4xl max-[696px]:text-3xl font-bold text-[#dc9e63] mb-4 uppercase tracking-wider">
+            <h1 className="text-5xl max-[927px]:text-4xl max-[696px]:text-3xl font-bold bg-gradient-to-r from-[#fcc276] via-[#d37142] to-[#781a1a] bg-clip-text text-transparent mb-4 uppercase tracking-wider">
               Physical Shop
             </h1>
             <p className="text-base max-[927px]:text-sm max-[696px]:text-xs text-[#f8fcdc] opacity-80">
@@ -232,16 +232,16 @@ export default function PhysicalShopContent({ initialTab }: { initialTab?: Physi
         
         {/* Breadcrumb */}
         <div className="mb-6 text-sm max-[927px]:text-xs max-[696px]:text-xs text-[#f8fcdc]/70 max-[1280px]:text-center">
-          <Link href="/" className="hover:text-[#dc9e63] transition-colors">Home</Link>
+          <Link href="/" className="hover:text-[#d37142] transition-colors">Home</Link>
           <span className="mx-2">/</span>
-          <Link href="/shop" className="hover:text-[#dc9e63] transition-colors">Shop</Link>
+          <Link href="/shop" className="hover:text-[#d37142] transition-colors">Shop</Link>
           <span className="mx-2">/</span>
           <span className="text-[#dc9e63]">Physical</span>
         </div>
 
         {/* Header */}
         <div className="text-center mb-12 max-[927px]:mb-10 max-[696px]:mb-8">
-          <h1 className="text-5xl max-[927px]:text-4xl max-[696px]:text-3xl font-bold text-[#dc9e63] mb-4 uppercase tracking-wider">
+          <h1 className="text-5xl max-[927px]:text-4xl max-[696px]:text-3xl font-bold bg-gradient-to-r from-[#fcc276] via-[#d37142] to-[#781a1a] bg-clip-text text-transparent mb-4 uppercase tracking-wider">
             Physical Shop
           </h1>
           <p className="text-base max-[927px]:text-sm max-[696px]:text-xs text-[#f8fcdc] opacity-80">
@@ -255,8 +255,11 @@ export default function PhysicalShopContent({ initialTab }: { initialTab?: Physi
             <button
               key={tabKey}
               onClick={() => handleTabChange(tabKey)}
-              className={`info-button shop-tab-button transition-all duration-300 cursor-pointer ${
-                activeTab === tabKey ? 'active-tab' : ''
+              className={`info-button shop-tab-button transition-all duration-300 cursor-pointer 
+                         hover:!bg-[#d37142] hover:!text-[#f8fcdc] hover:!border-[#d37142] ${
+                activeTab === tabKey 
+                  ? 'active-tab !bg-[#d37142] !text-[#f8fcdc] !border-[#d37142]' 
+                  : '!bg-transparent !text-[#d37142] !border-[rgba(211,113,66,0.6)]'
               }`}
             >
               {tabKey}
@@ -268,7 +271,7 @@ export default function PhysicalShopContent({ initialTab }: { initialTab?: Physi
         <div className="w-full">
           {itemsToRender.length === 0 ? (
             <div>
-              <p className="text-center text-lg text-[#dc9e63] opacity-60 mt-10">
+              <p className="text-center text-lg text-[#d37142] opacity-60 mt-10">
                 There are currently no products available in this category.
               </p>
             </div>
@@ -305,17 +308,9 @@ export default function PhysicalShopContent({ initialTab }: { initialTab?: Physi
                       blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                     />
                     <div className="stems-label-group">
-                      <p className="stems-title-text">{item.title}</p>
+                      <p className="stems-title-text text-[#d37142]">{item.title}</p>
                       <p className="stems-subtitle-tiny">{item.subtitle}</p>
                       <p className="stems-price">{displayPrice}</p>
-                      
-                      {/* Product Type Badge */}
-                      <div className="flex justify-center mt-2">
-                        <span className="bg-[rgba(220,158,99,0.2)] text-[#dc9e63] 
-                                       px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wide">
-                          {item.category}
-                        </span>
-                      </div>
                     </div>
                   </div>
                 );
@@ -328,7 +323,7 @@ export default function PhysicalShopContent({ initialTab }: { initialTab?: Physi
         <div className="text-center mt-16 max-[927px]:mt-12 max-[696px]:mt-8">
           <Link 
             href="/shop" 
-            className="inline-flex items-center space-x-2 max-[696px]:space-x-1 text-[#dc9e63] hover:text-[#f8fcdc] 
+            className="inline-flex items-center space-x-2 max-[696px]:space-x-1 text-[#dc9e63]/70 hover:text-[#fcc276] 
                      transition-colors duration-300 text-base max-[927px]:text-sm max-[696px]:text-[10px]"
           >
             <span>←</span>

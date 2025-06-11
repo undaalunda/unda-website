@@ -1,4 +1,4 @@
-//TermsClientComponents.tsx
+//TermsClientComponents.tsx - Updated with Shop Landing Gradient Colors
 
 'use client';
 
@@ -168,17 +168,18 @@ const TermsSectionCard = memo(({
         </div>
       )}
 
+      {/* 🚀 DELIVERY SECTION - WITH CSS GRADIENT CLASSES! */}
       {(banana.digitalDelivery || banana.physicalDelivery) && (
         <div className="space-y-3">
           {banana.digitalDelivery && (
-            <div className="p-3 bg-blue-900/20 rounded border-l-4 border-blue-500">
-              <h3 className="font-semibold text-blue-400 mb-1">Digital Products:</h3>
+            <div className="p-3 rounded terms-digital-delivery">
+              <h3 className="font-semibold text-[#5b8199] mb-1">Digital Products:</h3>
               <p className="text-[#f8fcdc]/80 text-sm">{banana.digitalDelivery}</p>
             </div>
           )}
           {banana.physicalDelivery && (
-            <div className="p-3 bg-purple-900/20 rounded border-l-4 border-purple-500">
-              <h3 className="font-semibold text-purple-400 mb-1">Physical Products:</h3>
+            <div className="p-3 rounded terms-physical-delivery">
+              <h3 className="font-semibold text-[#fcc276] mb-1">Physical Products:</h3>
               <p className="text-[#f8fcdc]/80 text-sm">{banana.physicalDelivery}</p>
             </div>
           )}

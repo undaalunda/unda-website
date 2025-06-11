@@ -1,4 +1,4 @@
-//src/components/DigitalShopContent.tsx
+//src/components/DigitalShopContent.tsx - Updated with Cinematic Colors
 
 'use client';
 
@@ -47,6 +47,34 @@ export default function DigitalShopContent() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const collections = [albums[0], soloCollection];
 
+  // Touch/swipe handling for mobile
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
+
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(0); // otherwise the swipe is fired even with usual touch events
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      nextSlide();
+    } else if (isRightSwipe) {
+      prevSlide();
+    }
+  };
+
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % collections.length);
   };
@@ -62,16 +90,16 @@ export default function DigitalShopContent() {
         
         {/* Breadcrumb */}
         <div className="mb-6 text-sm max-[927px]:text-xs max-[696px]:text-xs text-[#f8fcdc]/70 max-[1280px]:text-center">
-          <Link href="/" className="hover:text-[#dc9e63] transition-colors">Home</Link>
+          <Link href="/" className="hover:text-[#5b8199] transition-colors">Home</Link>
           <span className="mx-2">/</span>
-          <Link href="/shop" className="hover:text-[#dc9e63] transition-colors">Shop</Link>
+          <Link href="/shop" className="hover:text-[#5b8199] transition-colors">Shop</Link>
           <span className="mx-2">/</span>
           <span className="text-[#dc9e63]">Digital</span>
         </div>
 
         {/* Header */}
-        <div className="text-center mb-8 max-[927px]:mb-6 max-[696px]:mb-4">
-          <h1 className="text-5xl max-[927px]:text-4xl max-[696px]:text-3xl font-bold text-[#dc9e63] mb-4 uppercase tracking-wider">
+        <div className="text-center mb-12 max-[927px]:mb-10 max-[696px]:mb-8">
+          <h1 className="text-5xl max-[927px]:text-4xl max-[696px]:text-3xl font-bold bg-gradient-to-r from-[#5b8199] via-[#253c50] to-[#102134] bg-clip-text text-transparent mb-4 uppercase tracking-wider">
             Digital Shop
           </h1>
           <p className="text-base max-[927px]:text-sm max-[696px]:text-xs text-[#f8fcdc] opacity-80">
@@ -80,10 +108,10 @@ export default function DigitalShopContent() {
         </div>
 
         {/* Collections Grid */}
-        <div className="w-full xl:max-w-[1400px] md:max-w-4xl mx-auto">
+        <div className="w-full xl:max-w-[1200px] md:max-w-4xl mx-auto">
           
           {/* Desktop/Tablet Layout - Side by side (768px and up) */}
-          <div className="hidden md:flex md:justify-center md:gap-6 xl:gap-12">
+          <div className="hidden md:flex md:justify-center md:gap-8 xl:gap-10">
             
             {/* Albums Collection - Desktop */}
             <div className="group xl:w-[450px] md:w-[350px] xl:flex-shrink-0 md:flex-shrink-0">
@@ -100,7 +128,7 @@ export default function DigitalShopContent() {
                       src={albums[0].coverImage}
                       alt={`${albums[0].title} Album Cover`}
                       fill
-                      className="object-cover group-hover:scale-105"
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
                       sizes="50vw"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
@@ -179,7 +207,7 @@ export default function DigitalShopContent() {
                       src={soloCollection.coverImage}
                       alt={`${soloCollection.title} Cover`}
                       fill
-                      className="object-cover group-hover:scale-105"
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
                       sizes="50vw"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
@@ -245,8 +273,8 @@ export default function DigitalShopContent() {
           </div>
 
           {/* Mobile Layout - Carousel (767px and below) */}
-          <div className="md:hidden relative max-w-sm mx-auto">
-            {/* Navigation Arrows - อยู่นอก container */}
+          <div className="md:hidden relative max-w-xs mx-auto">
+            {/* Navigation Arrows */}
             <button
               onClick={prevSlide}
               className="absolute left-[-20px] top-1/2 -translate-y-1/2 z-10 
@@ -274,7 +302,13 @@ export default function DigitalShopContent() {
             </button>
 
             {/* Carousel Container */}
-            <div className="relative overflow-hidden rounded-3xl">
+            <div 
+              className="relative overflow-hidden rounded-3xl select-none"
+              style={{ touchAction: 'pan-y' }}
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
+            >
               <div 
                 className="flex transition-transform duration-300 ease-in-out"
                 style={{ transform: `translateX(-${currentSlide * 100}%)` }}
@@ -381,11 +415,11 @@ export default function DigitalShopContent() {
         </div>
 
         {/* Back to Shop Link */}
-        <div className="text-center mt-16 max-[927px]:mt-12 max-[696px]:mt-8">
+        <div className="text-center mt-16 max-[927px]:mt-12">
           <Link 
             href="/shop" 
-            className="inline-flex items-center space-x-2 max-[696px]:space-x-1 text-[#dc9e63] hover:text-[#f8fcdc] 
-                     transition-colors duration-300 text-base max-[927px]:text-sm max-[696px]:text-[10px]"
+            className="inline-flex items-center space-x-2 text-[#dc9e63]/70 hover:text-[#fcc276] 
+                     transition-colors duration-300 text-base max-[927px]:text-sm"
           >
             <span>←</span>
             <span>Back to Shop</span>

@@ -22,7 +22,7 @@ const soloCollection = {
     tabs: 3,
     stems: 0
   },
-  priceRange: '$7.95',
+  priceRange: '$3.95-$7.95',
   description: 'Guitar moments and stuff that somehow got popular.',
   available: true
 };
@@ -339,7 +339,7 @@ export default function SoloCollectionPage({
       <div className="w-full max-w-6xl pb-4">
         
         {/* Breadcrumb */}
-        <div className="mb-6 text-sm text-[#f8fcdc]/70 max-[1280px]:text-center">
+        <div className="mb-6 text-sm max-[927px]:text-xs max-[696px]:text-xs text-[#f8fcdc]/70 max-[1280px]:text-center">
           <Link href="/" className="hover:text-[#dc9e63]">Home</Link>
           <span className="mx-2">/</span>
           <Link href="/shop" className="hover:text-[#dc9e63]">Shop</Link>
@@ -349,11 +349,11 @@ export default function SoloCollectionPage({
           <span className="text-[#dc9e63]">Solo Collection</span>
         </div>
 
-        {/* Solo Collection Header */}
-        <div className="mb-10 product-page-header">
-          <div className="flex flex-col max-[1279px]:flex-col min-[1280px]:flex-row gap-4 max-[1279px]:gap-2 min-[1280px]:gap-8 max-[1279px]:items-center min-[1280px]:items-start">
+        {/* Solo Collection Header - Updated to match AlbumHub layout */}
+        <div className="mb-10 xl:-mb-18 product-page-header">
+          <div className="flex flex-col max-[1279px]:flex-col min-[1280px]:flex-row gap-4 max-[1279px]:gap-0 min-[1280px]:gap-8 max-[1279px]:items-center min-[1280px]:items-start">
             {/* Cover Image */}
-            <div className="flex-shrink-0 mx-auto max-[1279px]:mx-auto min-[1280px]:mx-0 w-80 h-80 max-[1279px]:w-[36rem] max-[1279px]:h-[36rem] min-[1280px]:w-80 min-[1280px]:h-80">
+            <div className="flex-shrink-0 mx-auto max-[1279px]:mx-auto min-[1280px]:mx-0 w-80 h-80 min-[769px]:w-[36rem] min-[769px]:h-[36rem] xl:w-80 xl:h-80">
               <Image
                 src={soloCollection.coverImage}
                 alt={`${soloCollection.title} Cover`}
@@ -366,7 +366,7 @@ export default function SoloCollectionPage({
             </div>
             
             {/* Collection Info */}
-            <div className="flex-1 text-center max-[1279px]:text-center min-[1280px]:text-left mx-auto max-[1279px]:mx-auto min-[1280px]:mx-0 max-w-full">
+            <div className="flex-1 text-center max-[1279px]:text-center min-[1280px]:text-left mx-auto max-[1279px]:mx-auto min-[1280px]:mx-0 max-w-full -mt-45 min-[769px]:-mt-85 xl:mt-0">
               <h1 className="product-page-title font-bold text-[#dc9e63] mb-4 uppercase tracking-wider text-base max-[927px]:text-sm max-[696px]:text-xs">
                 {soloCollection.title}
               </h1>
@@ -396,7 +396,7 @@ export default function SoloCollectionPage({
         </div>
 
         {/* Filters */}
-        <div className="mb-8" suppressHydrationWarning={true}>
+        <div className="mb-8 xl:mb-6" suppressHydrationWarning={true}>
           {/* Filter Buttons */}
           <div className="flex flex-wrap justify-center gap-3 mb-6">
             {/* Type Filters */}

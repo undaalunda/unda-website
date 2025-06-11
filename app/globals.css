@@ -1750,7 +1750,7 @@ button svg,
   border: 0;
 }
 
-/* === SHOP LANDING PAGE RESPONSIVE === */
+/* === SHOP LANDING PAGE RESPONSIVE - CINEMATIC COLORS === */
 
 .shop-landing-hero-section {
   max-width: 1200px;
@@ -1794,7 +1794,6 @@ button svg,
   }
   
   .shop-landing-card-item {
-    /* ให้การ์ดขยายกว้างขึ้นพร้อมกัน แต่ยังอยู่ตรงกลาง */
     flex: 1;
     min-width: 450px;
     max-width: 600px;
@@ -1802,7 +1801,6 @@ button svg,
   
   .shop-landing-cards-grid {
     gap: 3rem;
-    /* เอา justify-content: space-between ออก ให้อยู่ตรงกลางเหมือนเดิม */
     justify-content: center;
   }
 }
@@ -1837,9 +1835,9 @@ button svg,
   max-width: 360px;
 }
 
+/* 🔥 PHYSICAL SHOP CARD - Background removed for Tailwind control */
 .shop-landing-card {
-  background: linear-gradient(135deg, rgba(59,130,246,0.08) 0%, rgba(248,252,220,0.03) 100%);
-  border: 1px solid rgba(59,130,246,0.2);
+  border: 1px solid rgba(211,113,66,0.1);
   border-radius: 1.5rem;
   padding: 2.5rem;
   position: relative;
@@ -1848,22 +1846,24 @@ button svg,
   flex-direction: column;
   height: 100%;
   min-height: 320px;
+  transition: all 0.15s ease;
 }
 
 .shop-landing-card:hover {
-  border-color: rgba(59,130,246,0.4);
-  box-shadow: 0 25px 50px rgba(59,130,246,0.15);
+  border-color: rgba(211,113,66,0.25);
+  box-shadow: 0 25px 50px rgba(211,113,66,0.25);
   transform: translateY(-2px);
 }
 
-.shop-landing-digital-card:hover {
-  border-color: rgba(168,85,247,0.4);
-  box-shadow: 0 25px 50px rgba(168,85,247,0.15);
+/* 🔥 DIGITAL SHOP CARD - Background removed for Tailwind control */
+.shop-landing-digital-card {
+  border: 1px solid rgba(37,60,80,0.4);
+  transition: all 0.15s ease;
 }
 
-.shop-landing-digital-card {
-  background: linear-gradient(135deg, rgba(168,85,247,0.08) 0%, rgba(248,252,220,0.03) 100%);
-  border-color: rgba(168,85,247,0.2);
+.shop-landing-digital-card:hover {
+  border-color: rgba(37,60,80,0.6);
+  box-shadow: 0 25px 50px rgba(37,60,80,0.25);
 }
 
 .shop-landing-card-content {
@@ -1882,12 +1882,21 @@ button svg,
   text-align: center;
 }
 
+/* 🔥 TITLE COLORS - Custom Gradients */
 .shop-landing-physical-title {
-  color: #3b82f6;
+  background: linear-gradient(135deg, #fcc276 0%, #d37142 50%, #781a1a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #d37142; /* fallback */
 }
 
 .shop-landing-digital-title {
-  color: #a855f7;
+  background: linear-gradient(135deg, #5b8199 0%, #253c50 50%, #102134 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #253c50; /* fallback */
 }
 
 .shop-landing-card-description {
@@ -1904,9 +1913,9 @@ button svg,
   margin-top: auto;
 }
 
+/* 🔥 BUTTON COLORS - Background removed for Tailwind control */
 .shop-landing-card-button {
-  background-color: #3b82f6;
-  color: #1a1a2e;
+  color: #f8fcdc;
   padding: 0.75rem 2rem;
   border-radius: 2rem;
   font-weight: bold;
@@ -1915,17 +1924,15 @@ button svg,
   letter-spacing: 0.05em;
   text-align: center;
   cursor: pointer;
+  box-shadow: 0 8px 20px rgba(211,113,66,0.4);
 }
 
-/* เอา button hover ออก */
-
 .shop-landing-digital-button {
-  background-color: #a855f7;
+  box-shadow: 0 8px 20px rgba(37,60,80,0.4);
 }
 
 /* === RESPONSIVE FONT SIZES === */
 @media (max-width: 1279px) {
-  
   .shop-landing-main-title {
     font-size: 2.5rem;
   }
@@ -1983,4 +1990,26 @@ button svg,
   .shop-landing-hero-section {
     margin-bottom: 3rem;
   }
+}
+
+/* === TERMS DELIVERY SECTIONS === */
+.terms-digital-delivery {
+  background: linear-gradient(135deg, rgba(2,48,71,0.15) 0%, rgba(18,103,130,0.12) 50%, rgba(33,158,188,0.08) 100%);
+  border-left: 4px solid #023047;
+}
+
+.terms-physical-delivery {
+  background: linear-gradient(135deg, rgba(255,107,53,0.15) 0%, rgba(230,57,70,0.12) 50%, rgba(214,40,40,0.08) 100%);
+  border-left: 4px solid #ff6b35;
+}
+
+/* === TERMS DELIVERY SECTIONS === */
+.terms-digital-delivery {
+  background: linear-gradient(135deg, rgba(2,48,71,0.15) 0%, rgba(18,103,130,0.12) 50%, rgba(33,158,188,0.08) 100%);
+  border-left: 4px solid #023047;
+}
+
+.terms-physical-delivery {
+  background: linear-gradient(135deg, rgba(255,107,53,0.15) 0%, rgba(230,57,70,0.12) 50%, rgba(214,40,40,0.08) 100%);
+  border-left: 4px solid #ff6b35;
 }

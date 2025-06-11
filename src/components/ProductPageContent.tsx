@@ -1,4 +1,4 @@
-/* ProductPageContent.tsx - Simplified without Back Button */
+/* ProductPageContent.tsx - Fixed Related Products Display */
 
 'use client';
 
@@ -78,11 +78,19 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
   useEffect(() => {
     if (product) {
       const pool = product.type === 'digital'
-        ? allItems.filter((item) =>
-            item.id !== product.id &&
-            item.category === product.category &&
-            item.type === 'digital'
-          )
+        ? allItems.filter((item) => {
+            // Exclude Solo Collection items
+            const isSoloCollectionItem = 
+              item.tags?.includes('contest') || 
+              item.id.includes('abasi') || 
+              item.id.includes('mayones') || 
+              item.id.includes('vola');
+            
+            return item.id !== product.id &&
+                   item.category === product.category &&
+                   item.type === 'digital' &&
+                   !isSoloCollectionItem;
+          })
         : allItems.filter((item) =>
             item.id !== product.id &&
             ['Music', 'Merch', 'Bundles'].includes(item.category)
@@ -162,8 +170,8 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
         {/* Container for all content */}
         <div className="w-full max-w-5xl pb-24">
           
-          {/* 🚀 Clean Breadcrumb */}
-          <div className="mb-10 text-sm max-[927px]:text-xs max-[696px]:text-xs text-[#f8fcdc]/70 max-[1280px]:text-center">
+          {/* 🚀 Clean Breadcrumb - Fixed positioning */}
+          <div className="mb-10 text-sm text-[#f8fcdc]/70 max-[1280px]:text-center min-[1280px]:text-left">
             <Link href="/" className="hover:text-[#dc9e63] transition-colors">Home</Link>
             <span className="mx-2">/</span>
             <Link href="/shop" className="hover:text-[#dc9e63] transition-colors">Shop</Link>
@@ -178,15 +186,17 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
           </div>
 
           {/* Product Main Content */}
-          <div className="flex flex-col md:flex-row gap-8 mb-20">
+          <div className="flex flex-col max-[927px]:flex-col md:flex-row 
+                        gap-4 md:gap-6 xl:gap-8 mb-20">
             <div className="w-full md:w-1/2 flex justify-center">
-              <div className="sticky top-32 self-start w-full max-w-[500px]">
+              <div className="sticky top-32 self-start w-full 
+                            max-w-[500px] max-[1280px]:max-w-[400px]">
                 <div className="relative aspect-square w-full">
                   <Image
                     src={product.image}
                     alt={product.title}
                     fill
-                    sizes="(max-width: 768px) 80vw, 50vw"
+                    sizes="(max-width: 1280px) 400px, 500px"
                     className="object-contain"
                     priority
                     quality={90}
@@ -198,8 +208,8 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
             </div>
 
             <div className="w-full md:w-1/2 flex flex-col">
-              <h1 className="product-title-detail capitalize">{product.title}</h1>
-              <p className="product-subtitle-detail capitalize" style={{ color: '#f8fcdc' }}>{product.subtitle}</p>
+              <h1 className="product-title-detail capitalize whitespace-nowrap overflow-hidden text-ellipsis">{product.title}</h1>
+              <p className="product-subtitle-detail capitalize whitespace-nowrap overflow-hidden text-ellipsis" style={{ color: '#f8fcdc' }}>{product.subtitle}</p>
 
               <div className="product-price-detail">
                 {isBundle(product.price) ? (
@@ -377,61 +387,103 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
             </div>
           </div>
 
-          {/* 🚀 Related Products */}
+          {/* 🚀 Related Products - Fixed to exclude Solo Collection */}
           {relatedProducts.length > 0 && (
             <div className="related-products-wrapper w-full">
               <h2 className="text-2xl font-bold text-[#dc9e63] mb-8">RELATED PRODUCTS</h2>
               <div className="stems-row grid grid-cols-2 md:grid-cols-4 gap-6">
                 {relatedProducts.map((item) => {
-                  const isTab = isTabProduct(item);
-                  const isBackingTrack = item.category === 'Backing Track';
-
-                  return (
-                    <div
-                      key={item.id}
-                      onClick={(e) => handleRelatedProductClick(item, e)}
-                      className={`stems-item cursor-pointer ${isTab || isBackingTrack ? 'is-backing' : ''}`}
-                    >
-                      <Image
-                        src={item.image}
-                        alt={item.title}
-                        width={200}
-                        height={200}
-                        className="stems-image"
-                        loading="lazy"
-                        quality={85}
-                        sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 200px"
-                        placeholder="blur"
-                        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-                      />
-                      <div className="stems-label-group mt-2">
-                        <p className="stems-title-text">
-                          {(item as any).song?.toUpperCase() || item.title}
-                        </p>
-                        <p className="stems-subtitle">
-                          {isBackingTrack
-                            ? item.subtitle.replace(/BACKING TRACK/gi, '').trim()
-                            : ((item as any).instrument?.toUpperCase() || item.subtitle)}
-                        </p>
-                        <span className="backing-line" />
-                        <p className="stems-subtitle-tiny">
-                          {isBackingTrack ? 'BACKING TRACK' : isTab ? 'TABS' : 'STEM'}
-                        </p>
-                        <p className="stems-price">
-                          {isBundle(item.price) ? (
-                            <>
-                              <span className="line-through text-[#f8fcdc] mr-1">
-                                ${item.price.original.toFixed(2)}
-                              </span>
-                              <span>${item.price.sale.toFixed(2)}</span>
-                            </>
-                          ) : (
-                            <span>${(item.price as number).toFixed(2)}</span>
-                          )}
-                        </p>
+                  // 🎯 Separate logic for physical vs digital products
+                  if (item.type === 'physical') {
+                    // 🎁 Physical product display - simple and clean (NO badge)
+                    return (
+                      <div
+                        key={item.id}
+                        onClick={(e) => handleRelatedProductClick(item, e)}
+                        className="stems-item cursor-pointer"
+                      >
+                        <Image
+                          src={item.image}
+                          alt={item.title}
+                          width={200}
+                          height={200}
+                          className="stems-image"
+                          loading="lazy"
+                          quality={85}
+                          sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 200px"
+                          placeholder="blur"
+                          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                        />
+                        <div className="stems-label-group">
+                          <p className="stems-title-text text-[#d37142]">{item.title}</p>
+                          <p className="stems-subtitle-tiny">{item.subtitle}</p>
+                          <p className="stems-price">
+                            {isBundle(item.price) ? (
+                              <>
+                                <span className="line-through text-[#f8fcdc] mr-1">
+                                  ${item.price.original.toFixed(2)}
+                                </span>
+                                <span>${item.price.sale.toFixed(2)}</span>
+                              </>
+                            ) : (
+                              <span>${(item.price as number).toFixed(2)}</span>
+                            )}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  );
+                    );
+                  } else {
+                    // 🎵 Digital product display - with animations and special formatting
+                    const isTab = isTabProduct(item);
+                    const isBackingTrack = item.category === 'Backing Track';
+
+                    return (
+                      <div
+                        key={item.id}
+                        onClick={(e) => handleRelatedProductClick(item, e)}
+                        className={`stems-item cursor-pointer ${isTab || isBackingTrack ? 'is-backing' : ''}`}
+                      >
+                        <Image
+                          src={item.image}
+                          alt={item.title}
+                          width={200}
+                          height={200}
+                          className="stems-image"
+                          loading="lazy"
+                          quality={85}
+                          sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 200px"
+                          placeholder="blur"
+                          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                        />
+                        <div className="stems-label-group mt-2">
+                          <p className="stems-title-text">
+                            {(item as any).song?.toUpperCase() || item.title}
+                          </p>
+                          <p className="stems-subtitle">
+                            {isBackingTrack
+                              ? item.subtitle.replace(/BACKING TRACK/gi, '').trim()
+                              : ((item as any).instrument?.toUpperCase() || item.subtitle)}
+                          </p>
+                          <span className="backing-line" />
+                          <p className="stems-subtitle-tiny">
+                            {isBackingTrack ? 'BACKING TRACK' : isTab ? 'TABS' : 'STEM'}
+                          </p>
+                          <p className="stems-price">
+                            {isBundle(item.price) ? (
+                              <>
+                                <span className="line-through text-[#f8fcdc] mr-1">
+                                  ${item.price.original.toFixed(2)}
+                                </span>
+                                <span>${item.price.sale.toFixed(2)}</span>
+                              </>
+                            ) : (
+                              <span>${(item.price as number).toFixed(2)}</span>
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  }
                 })}
               </div>
             </div>

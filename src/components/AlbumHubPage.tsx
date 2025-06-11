@@ -28,9 +28,19 @@ const getCurrentAlbum = (slug: string) => {
 
 // Get digital products for this album
 const getAlbumProducts = (albumSlug: string) => {
-  const realProducts = allItems.filter(item => 
-    item.category === 'Tabs' || item.category === 'Backing Track' || item.category === 'Stem'
-  );
+  const realProducts = allItems.filter(item => {
+    // Only include Tabs, Backing Track, or Stem
+    const isValidCategory = item.category === 'Tabs' || item.category === 'Backing Track' || item.category === 'Stem';
+    
+    // Exclude Solo Collection items (items with contest tag or specific IDs)
+    const isSoloCollectionItem = 
+      item.tags?.includes('contest') || 
+      item.id.includes('abasi') || 
+      item.id.includes('mayones') || 
+      item.id.includes('vola');
+    
+    return isValidCategory && !isSoloCollectionItem;
+  });
   
   return realProducts;
 };
@@ -376,7 +386,7 @@ export default function AlbumHubPage({
       <div className="w-full max-w-6xl pb-4">
         
         {/* Breadcrumb */}
-        <div className="mb-6 text-sm text-[#f8fcdc]/70 max-[1280px]:text-center">
+        <div className="mb-6 text-sm max-[927px]:text-xs max-[696px]:text-xs text-[#f8fcdc]/70 max-[1280px]:text-center">
           <Link href="/" className="hover:text-[#dc9e63]">Home</Link>
           <span className="mx-2">/</span>
           <Link href="/shop" className="hover:text-[#dc9e63]">Shop</Link>
@@ -387,10 +397,10 @@ export default function AlbumHubPage({
         </div>
 
         {/* Album Header */}
-        <div className="mb-10 product-page-header">
-          <div className="flex flex-col max-[1279px]:flex-col min-[1280px]:flex-row gap-4 max-[1279px]:gap-2 min-[1280px]:gap-8 max-[1279px]:items-center min-[1280px]:items-start">
+         <div className="mb-10 xl:-mb-18 product-page-header">
+          <div className="flex flex-col max-[1279px]:flex-col min-[1280px]:flex-row gap-4 max-[1279px]:gap-0 min-[1280px]:gap-8 max-[1279px]:items-center min-[1280px]:items-start">
             {/* Album Cover */}
-            <div className="flex-shrink-0 mx-auto max-[1279px]:mx-auto min-[1280px]:mx-0 w-80 h-80 max-[1279px]:w-[36rem] max-[1279px]:h-[36rem] min-[1280px]:w-80 min-[1280px]:h-80">
+            <div className="flex-shrink-0 mx-auto max-[1279px]:mx-auto min-[1280px]:mx-0 w-75 h-75 min-[769px]:w-[36rem] min-[769px]:h-[36rem] xl:w-80 xl:h-80">
               <Image
                 src="/catmoon-bg.jpeg"
                 alt={`${currentAlbum.title} Album Cover`}
@@ -403,7 +413,7 @@ export default function AlbumHubPage({
             </div>
             
             {/* Album Info */}
-            <div className="flex-1 text-center max-[1279px]:text-center min-[1280px]:text-left mx-auto max-[1279px]:mx-auto min-[1280px]:mx-0 max-w-full">
+            <div className="flex-1 text-center max-[1279px]:text-center min-[1280px]:text-left mx-auto max-[1279px]:mx-auto min-[1280px]:mx-0 max-w-full -mt-16 min-[769px]:-mt-50 xl:mt-0">
               <h1 className="product-page-title font-bold text-[#dc9e63] mb-4 uppercase tracking-wider text-base max-[927px]:text-sm max-[696px]:text-xs">
                 {currentAlbum.title}
               </h1>
@@ -433,7 +443,7 @@ export default function AlbumHubPage({
         </div>
 
         {/* Filters */}
-        <div className="mb-8" suppressHydrationWarning={true}>
+        <div className="mb-8 xl:mb-6" suppressHydrationWarning={true}>
           {/* Filter Buttons */}
           <div className="flex flex-wrap justify-center gap-3 mb-6">
             {/* Type Filters */}

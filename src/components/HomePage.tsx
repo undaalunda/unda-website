@@ -343,7 +343,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* MUSIC & MERCH - 🚀 Updated with Clean URLs */}
+        {/* MUSIC & MERCH - 🚀 Updated with Badge Pattern like Physical Shop */}
         <section className="stems-section">
           <div ref={musicMerchRef} className={`fade-trigger ${showMerch ? 'fade-in' : ''}`}>
             <p className="stems-sub">MUSIC IN YOUR HANDS</p>
@@ -384,6 +384,8 @@ export default function HomePage() {
                           ? `$${item.price.toFixed(2)}`
                           : null}
                     </p>
+                    
+
                   </div>
                 </Link>
               ))}
