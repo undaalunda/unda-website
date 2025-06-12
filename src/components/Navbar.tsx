@@ -1,4 +1,4 @@
-/* Navbar.tsx - Performance Optimized + Fixed Accessibility */
+/* Navbar.tsx - Performance Optimized + Fixed Accessibility + Search in Menu */
 
 'use client';
 
@@ -274,33 +274,39 @@ export default function Navbar() {
           </button>
         )}
   
-        {/* ✅ Fixed cart and search buttons - ซ่อน icons ตอน menuOpen === true */}
-        {!menuOpen && !searchOpen && (
+        {/* ✅ Updated: Cart และ Search buttons - แสดงตามเงื่อนไขใหม่ */}
+        {!searchOpen && (
           <div className="flex items-center gap-7 pr-3 z-40">
-            <Link
-              href="/cart"
-              className="relative cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
-              aria-label={`Shopping cart with ${totalQuantity} ${totalQuantity === 1 ? 'item' : 'items'}`}
-            >
-              <ShoppingCart
-                size={23}
-                strokeWidth={1.2}
-                className="transition-opacity duration-300 opacity-70 hover:opacity-100"
-                aria-hidden="true"
-              />
-              {totalQuantity > 0 && (
-                <span 
-                  className="absolute -top-2 -right-2 bg-[#dc9e63] text-[#160000] rounded-full w-5 h-5 flex items-center justify-center text-xs font-light"
+            {/* Cart button - ซ่อนตอนเปิด menu */}
+            {!menuOpen && (
+              <Link
+                href="/cart"
+                className="relative cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
+                aria-label={`Shopping cart with ${totalQuantity} ${totalQuantity === 1 ? 'item' : 'items'}`}
+              >
+                <ShoppingCart
+                  size={23}
+                  strokeWidth={1.2}
+                  className="transition-opacity duration-300 opacity-70 hover:opacity-100"
                   aria-hidden="true"
-                >
-                  {totalQuantity}
-                </span>
-              )}
-            </Link>
+                />
+                {totalQuantity > 0 && (
+                  <span 
+                    className="absolute -top-2 -right-2 bg-[#dc9e63] text-[#160000] rounded-full w-5 h-5 flex items-center justify-center text-xs font-light"
+                    aria-hidden="true"
+                  >
+                    {totalQuantity}
+                  </span>
+                )}
+              </Link>
+            )}
 
+            {/* Search button - แสดงทั้งตอนปกติ (desktop only) และตอนเปิด menu (ทุกอุปกรณ์) */}
             <button
               onClick={() => setSearchOpen(true)}
-              className="hidden md:block cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
+              className={`${
+                menuOpen ? 'block z-[70]' : 'hidden md:block'
+              } cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors`}
               aria-label="Open search"
             >
               <Search
@@ -456,14 +462,14 @@ export default function Navbar() {
       {/* ✅ Fixed SEARCH OPEN OVERLAY */}
       {searchOpen && (
         <div 
-          className="fixed inset-0 z-40 bg-[#0d0d0dea] flex items-start justify-center px-4 pt-40 animate-fadeIn"
+          className="fixed inset-0 z-40 bg-[#0d0d0dea] flex items-start justify-center px-2 md:px-4 xl:px-6 pt-32 md:pt-36 xl:pt-40 animate-fadeIn"
           role="dialog"
           aria-label="Search products"
           aria-modal="true"
         >
           <div
             ref={searchOverlayRef}
-            className="w-full max-w-5xl flex flex-col items-center fade-in-section"
+            className="w-full max-w-6xl flex flex-col items-center fade-in-section"
           >
             {/* ✅ Fixed SEARCH INPUT - เอา outline ออก */}
             <form
@@ -512,10 +518,10 @@ export default function Navbar() {
 
             {/* SEARCH RESULTS */}
             {delayedQuery.length === 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mt-6 w-full max-w-5xl mx-auto">
+              <div className="grid grid-cols-1 gap-3 md:gap-6 xl:gap-12 mt-3 md:mt-5 xl:mt-6 w-full max-w-6xl mx-auto">
                 
                 {/* LEFT - MAIN MENU */}
-                <div>
+                <div className="px-1 md:px-0">
                   <h4 className="text-sm mb-2 font-semibold text-[#f8fcdc]">Main Menu</h4>
                   <ul className="space-y-1 text-sm" role="list">
                     {pageLinks.map((page, i) => {
@@ -548,7 +554,7 @@ export default function Navbar() {
 
                 {/* RIGHT - RECENT SEARCH */}
                 {recentSearches.length > 0 && (
-                  <div>
+                  <div className="px-1 md:px-0">
                     <h4 className="text-sm mb-2 font-semibold text-[#f8fcdc]">Recent Searches</h4>
                     <ul className="space-y-1 text-sm" role="list">
                       {recentSearches.map((term, i) => (
@@ -567,10 +573,10 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="overflow-y-auto max-h-[calc(100vh-200px)] w-full">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mt-6 w-full max-w-5xl mx-auto">
+                <div className="flex flex-col mt-3 md:mt-5 xl:mt-6 w-full max-w-6xl mx-auto px-1 md:px-0">
                   
-                  {/* LEFT - Suggestions */}
-                  <div className="text-[#f8fcdc]">
+                  {/* 1. Suggestions */}
+                  <div className="text-[#f8fcdc] mb-8 md:mb-12">
                     <h4 className="text-sm mb-2 font-semibold">Suggestions</h4>
                     <ul className="space-y-1 text-sm" role="list">
                       {suggestions.map((term, i) => {
@@ -594,44 +600,10 @@ export default function Navbar() {
                         );
                       })}
                     </ul>
-
-                    {/* Pages */}
-                    {pageMatches.length > 0 && (
-                      <div className="text-[#f8fcdc] mt-6">
-                        <h4 className="text-sm mb-2 font-semibold">Pages</h4>
-                        <ul className="space-y-1 text-sm" role="list">
-                          {pageMatches.map((page, i) => {
-                            const offsetIndex = 1 + filtered.length + suggestions.length + i;
-                            return (
-                              <li
-                                key={i}
-                                ref={(el) => {
-                                  resultRefs.current[offsetIndex] = el;
-                                }}
-                                className={`transition-colors ${
-                                  highlightIndex === offsetIndex
-                                    ? 'text-[#dc9e63]'
-                                    : 'text-[#f8fcdc]/70 hover:text-[#dc9e63]'
-                                }`}
-                                role="listitem"
-                              >
-                                <Link
-                                  href={page.href}
-                                  onClick={() => setSearchOpen(false)}
-                                  className="block w-full"
-                                >
-                                  {page.title}
-                                </Link>
-                              </li>
-                            );
-                          })}
-                        </ul>
-                      </div>
-                    )}
                   </div>
 
-                  {/* RIGHT - Products */}
-                  <div className="flex flex-col gap-3 max-h-[400px] overflow-y-auto pr-2">
+                  {/* 2. Products */}
+                  <div className="mb-8 md:mb-12">
                     <h4 className="text-sm mb-2 font-semibold text-[#f8fcdc]">Products</h4>
                     {filtered.length === 0 ? (
                       <div className="mt-1">
@@ -641,7 +613,7 @@ export default function Navbar() {
                         </p>
                       </div>
                     ) : (
-                      <ul role="list">
+                      <ul role="list" className="space-y-2 md:space-y-3">
                         {filtered.map((item, i) => {
                           const offsetIndex = i + 1;
                           return (
@@ -650,7 +622,7 @@ export default function Navbar() {
                               ref={(el: HTMLLIElement | null) => {
                                 resultRefs.current[offsetIndex] = el;
                               }}
-                              className={`flex items-center gap-4 p-3 rounded-lg transition-colors cursor-pointer ${
+                              className={`flex items-center gap-2 md:gap-4 p-1.5 md:p-3 rounded-lg transition-colors cursor-pointer ${
                                 highlightIndex === offsetIndex
                                   ? 'bg-[#dc9e63]/10'
                                   : 'hover:bg-[#dc9e63]/10'
@@ -669,7 +641,7 @@ export default function Navbar() {
                                     });
                                   }
                                 }}
-                                className="flex items-center gap-4 w-full"
+                                className="flex items-center gap-2 md:gap-4 w-full"
                                 aria-label={`${item.title} - ${item.subtitle}`}
                               >
                                 <Image
@@ -689,7 +661,7 @@ export default function Navbar() {
                                   <span className="text-xs text-[#f8fcdc]/70">{item.subtitle}</span>
                                   {item.price && (
                                     typeof item.price === 'object' ? (
-                                      <div className="flex items-center gap-2 text-xs mt-1">
+                                      <div className="flex items-center gap-1 md:gap-2 text-xs mt-1">
                                         <span className="line-through text-[#f8fcdc]/40">
                                           ${item.price.original.toFixed(2)}
                                         </span>
@@ -711,6 +683,40 @@ export default function Navbar() {
                       </ul>
                     )}
                   </div>
+
+                  {/* 3. Pages */}
+                  {pageMatches.length > 0 && (
+                    <div className="text-[#f8fcdc]">
+                      <h4 className="text-sm mb-2 font-semibold">Pages</h4>
+                      <ul className="space-y-1 text-sm" role="list">
+                        {pageMatches.map((page, i) => {
+                          const offsetIndex = 1 + filtered.length + suggestions.length + i;
+                          return (
+                            <li
+                              key={i}
+                              ref={(el) => {
+                                resultRefs.current[offsetIndex] = el;
+                              }}
+                              className={`transition-colors ${
+                                highlightIndex === offsetIndex
+                                  ? 'text-[#dc9e63]'
+                                  : 'text-[#f8fcdc]/70 hover:text-[#dc9e63]'
+                              }`}
+                              role="listitem"
+                            >
+                              <Link
+                                href={page.href}
+                                onClick={() => setSearchOpen(false)}
+                                className="block w-full"
+                              >
+                                {page.title}
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
