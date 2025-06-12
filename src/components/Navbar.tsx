@@ -157,15 +157,29 @@ export default function Navbar() {
   }, [searchQuery]);
 
   const filtered = useMemo(() => {
-    const q = delayedQuery.toLowerCase();
+    const q = delayedQuery.toLowerCase().trim();
+    const queryWords = q.split(/\s+/); // แยก query เป็นคำๆ
+
     return q.length > 0
-      ? allItems.filter(
-          (item) =>
-            item.title.toLowerCase().includes(q) ||
-            item.subtitle?.toLowerCase().includes(q) ||
-            item.category.toLowerCase().includes(q) ||
-            item.tags.some((tag) => tag.toLowerCase().includes(q))
-        )
+      ? allItems.filter((item) => {
+          const fields = [
+            item.title,
+            item.subtitle,
+            item.category,
+            item.description,
+            ...(item.tags || []),
+            typeof item.price === 'number'
+              ? item.price.toString()
+              : `${item.price?.original || ''} ${item.price?.sale || ''}`
+          ]
+            .filter(Boolean)
+            .map((val) => String(val).toLowerCase());
+
+          // ✅ ตรวจว่า "ทุกคำที่พิมพ์มา" ต้อง match กับ field อะไรก็ได้
+          return queryWords.every((word) =>
+            fields.some((field) => field.includes(word))
+          );
+        })
       : [];
   }, [delayedQuery]);
 
@@ -518,179 +532,17 @@ export default function Navbar() {
 
             {/* SEARCH RESULTS */}
             {delayedQuery.length === 0 ? (
-              <div className="grid grid-cols-1 gap-3 md:gap-6 xl:gap-12 mt-3 md:mt-5 xl:mt-6 w-full max-w-6xl mx-auto">
-                
-                {/* LEFT - MAIN MENU */}
-                <div className="px-1 md:px-0">
-                  <h4 className="text-sm mb-2 font-semibold text-[#f8fcdc]">Main Menu</h4>
-                  <ul className="space-y-1 text-sm" role="list">
-                    {pageLinks.map((page, i) => {
-                      const offsetIndex = 1 + i;
-                      return (
-                        <li
-                          key={i}
-                          ref={(el) => {
-                            resultRefs.current[offsetIndex] = el;
-                          }}
-                          className={`transition-colors ${
-                            highlightIndex === offsetIndex
-                              ? 'text-[#dc9e63]'
-                              : 'text-[#f8fcdc]/70 hover:text-[#dc9e63]'
-                          }`}
-                          role="listitem"
-                        >
-                          <Link
-                            href={page.href}
-                            onClick={() => setSearchOpen(false)}
-                            className="block w-full"
-                          >
-                            {page.title}
-                          </Link>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-
-                {/* RIGHT - RECENT SEARCH */}
-                {recentSearches.length > 0 && (
-                  <div className="px-1 md:px-0">
-                    <h4 className="text-sm mb-2 font-semibold text-[#f8fcdc]">Recent Searches</h4>
-                    <ul className="space-y-1 text-sm" role="list">
-                      {recentSearches.map((term, i) => (
-                        <li
-                          key={i}
-                          className="cursor-pointer text-[#f8fcdc]/70 hover:text-[#dc9e63]"
-                          onClick={() => setSearchQuery(term)}
-                          role="listitem"
-                        >
-                          {term}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            ) : (
               <div className="overflow-y-auto max-h-[calc(100vh-200px)] w-full">
-                <div className="flex flex-col mt-3 md:mt-5 xl:mt-6 w-full max-w-6xl mx-auto px-1 md:px-0">
-                  
-                  {/* 1. Suggestions */}
-                  <div className="text-[#f8fcdc] mb-8 md:mb-12">
-                    <h4 className="text-sm mb-2 font-semibold">Suggestions</h4>
-                    <ul className="space-y-1 text-sm" role="list">
-                      {suggestions.map((term, i) => {
-                        const offsetIndex = 1 + filtered.length + i;
-                        return (
-                          <li
-                            key={i}
-                            ref={(el) => {
-                              resultRefs.current[offsetIndex] = el;
-                            }}
-                            onClick={() => setSearchQuery(term)}
-                            className={`cursor-pointer transition-colors ${
-                              highlightIndex === offsetIndex
-                                ? 'text-[#dc9e63]'
-                                : 'text-[#f8fcdc]/70 hover:text-[#dc9e63]'
-                            }`}
-                            role="listitem"
-                          >
-                            {term}
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
-
-                  {/* 2. Products */}
-                  <div className="mb-8 md:mb-12">
-                    <h4 className="text-sm mb-2 font-semibold text-[#f8fcdc]">Products</h4>
-                    {filtered.length === 0 ? (
-                      <div className="mt-1">
-                        <p className="text-sm font-medium text-[#f8fcdc]/60">No results found...</p>
-                        <p className="text-xs text-[#f8fcdc]/40 mt-[2px]">
-                          Try searching with different keywords.
-                        </p>
-                      </div>
-                    ) : (
-                      <ul role="list" className="space-y-2 md:space-y-3">
-                        {filtered.map((item, i) => {
-                          const offsetIndex = i + 1;
-                          return (
-                            <li
-                              key={item.id}
-                              ref={(el: HTMLLIElement | null) => {
-                                resultRefs.current[offsetIndex] = el;
-                              }}
-                              className={`flex items-center gap-2 md:gap-4 p-1.5 md:p-3 rounded-lg transition-colors cursor-pointer ${
-                                highlightIndex === offsetIndex
-                                  ? 'bg-[#dc9e63]/10'
-                                  : 'hover:bg-[#dc9e63]/10'
-                              }`}
-                              role="listitem"
-                            >
-                              <Link
-                                href={item.url}
-                                onClick={() => {
-                                  setSearchOpen(false);
-                                  const q = searchQuery.trim();
-                                  if (q.length > 0) {
-                                    setRecentSearches((prev) => {
-                                      const withoutDupes = prev.filter((t) => t !== q);
-                                      return [q, ...withoutDupes].slice(0, 5);
-                                    });
-                                  }
-                                }}
-                                className="flex items-center gap-2 md:gap-4 w-full"
-                                aria-label={`${item.title} - ${item.subtitle}`}
-                              >
-                                <Image
-                                  src={item.image}
-                                  alt={item.title}
-                                  width={48}
-                                  height={48}
-                                  className="w-12 h-12 object-cover rounded"
-                                  loading="lazy"
-                                  quality={75}
-                                  sizes="48px"
-                                />
-                                <div className="flex flex-col">
-                                  <span className="text-sm font-medium text-[#f8fcdc]">
-                                    {item.title}
-                                  </span>
-                                  <span className="text-xs text-[#f8fcdc]/70">{item.subtitle}</span>
-                                  {item.price && (
-                                    typeof item.price === 'object' ? (
-                                      <div className="flex items-center gap-1 md:gap-2 text-xs mt-1">
-                                        <span className="line-through text-[#f8fcdc]/40">
-                                          ${item.price.original.toFixed(2)}
-                                        </span>
-                                        <span className="text-[#dc9e63]">
-                                          ${item.price.sale.toFixed(2)}
-                                        </span>
-                                      </div>
-                                    ) : (
-                                      <div className="text-xs text-[#dc9e63] mt-1">
-                                        ${item.price.toFixed(2)}
-                                      </div>
-                                    )
-                                  )}
-                                </div>
-                              </Link>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    )}
-                  </div>
-
-                  {/* 3. Pages */}
-                  {pageMatches.length > 0 && (
-                    <div className="text-[#f8fcdc]">
-                      <h4 className="text-sm mb-2 font-semibold">Pages</h4>
-                      <ul className="space-y-1 text-sm" role="list">
-                        {pageMatches.map((page, i) => {
-                          const offsetIndex = 1 + filtered.length + suggestions.length + i;
+                {/* Mobile & Tablet (0-1279px): แนวตั้ง */}
+                <div className="xl:hidden">
+                  <div className="flex flex-col mt-6 md:mt-10 w-full max-w-2xl mx-auto px-4 space-y-14">
+                    
+                    {/* MAIN MENU - Mobile/Tablet */}
+                    <div className="px-1 md:px-0">
+                      <h4 className="text-sm mb-2 font-semibold text-[#f8fcdc]">Main Menu</h4>
+                      <ul className="space-y-1 text-xs sm:text-sm" role="list">
+                        {pageLinks.map((page, i) => {
+                          const offsetIndex = 1 + i;
                           return (
                             <li
                               key={i}
@@ -716,7 +568,394 @@ export default function Navbar() {
                         })}
                       </ul>
                     </div>
-                  )}
+
+                    {/* RECENT SEARCH - Mobile/Tablet */}
+                    {recentSearches.length > 0 && (
+                      <div className="px-1 md:px-0">
+                        <h4 className="text-sm mb-2 font-semibold text-[#f8fcdc]">Recent Searches</h4>
+                        <ul className="space-y-1 text-xs sm:text-sm" role="list">
+                          {recentSearches.map((term, i) => (
+                            <li
+                              key={i}
+                              className="cursor-pointer text-[#f8fcdc]/70 hover:text-[#dc9e63]"
+                              onClick={() => setSearchQuery(term)}
+                              role="listitem"
+                            >
+                              {term}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Desktop (1280px+): 2 คอลัมน์ */}
+                <div className="hidden xl:block">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 lg:gap-8 mt-6 w-full max-w-6xl mx-auto px-1 md:px-0">
+                    
+                    {/* Left Column: Main Menu + Recent Searches */}
+                    <div className="space-y-12">
+                      {/* MAIN MENU - Desktop Left Column */}
+                      <div className="text-[#f8fcdc]">
+                        <h4 className="text-sm mb-2 font-semibold">Main Menu</h4>
+                        <ul className="space-y-1 text-xs sm:text-sm" role="list">
+                          {pageLinks.map((page, i) => {
+                            const offsetIndex = 1 + i;
+                            return (
+                              <li
+                                key={i}
+                                ref={(el) => {
+                                  resultRefs.current[offsetIndex] = el;
+                                }}
+                                className={`transition-colors ${
+                                  highlightIndex === offsetIndex
+                                    ? 'text-[#dc9e63]'
+                                    : 'text-[#f8fcdc]/70 hover:text-[#dc9e63]'
+                                }`}
+                                role="listitem"
+                              >
+                                <Link
+                                  href={page.href}
+                                  onClick={() => setSearchOpen(false)}
+                                  className="block w-full"
+                                >
+                                  {page.title}
+                                </Link>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </div>
+
+                      {/* RECENT SEARCHES - Desktop Left Column */}
+                      {recentSearches.length > 0 && (
+                        <div className="text-[#f8fcdc]">
+                          <h4 className="text-sm mb-2 font-semibold">Recent Searches</h4>
+                          <ul className="space-y-1 text-xs sm:text-sm" role="list">
+                            {recentSearches.map((term, i) => (
+                              <li
+                                key={i}
+                                className="cursor-pointer text-[#f8fcdc]/70 hover:text-[#dc9e63]"
+                                onClick={() => setSearchQuery(term)}
+                                role="listitem"
+                              >
+                                {term}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right Column: Empty placeholder or future content */}
+                    <div>
+                      {/* This column can be used for other content when no search query */}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="overflow-y-auto max-h-[calc(100vh-200px)] w-full">
+                {/* Mobile & Tablet (0-1279px): แนวตั้ง */}
+                <div className="xl:hidden">
+                  <div className="flex flex-col mt-6 md:mt-10 w-full max-w-2xl mx-auto px-4 space-y-14">
+                    
+                    {/* 1. Suggestions */}
+                    <div className="text-[#f8fcdc]">
+                      <h4 className="text-sm mb-2 font-semibold">Suggestions</h4>
+                      <ul className="space-y-1 text-xs sm:text-sm" role="list">
+                        {suggestions.map((term, i) => {
+                          const offsetIndex = 1 + filtered.length + i;
+                          return (
+                            <li
+                              key={i}
+                              ref={(el) => {
+                                resultRefs.current[offsetIndex] = el;
+                              }}
+                              onClick={() => setSearchQuery(term)}
+                              className={`cursor-pointer transition-colors ${
+                                highlightIndex === offsetIndex
+                                  ? 'text-[#dc9e63]'
+                                  : 'text-[#f8fcdc]/70 hover:text-[#dc9e63]'
+                              }`}
+                              role="listitem"
+                            >
+                              {term}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+
+                    {/* 2. Products */}
+                    <div>
+                      <h4 className="text-sm mb-2 font-semibold text-[#f8fcdc]">Products</h4>
+                      {filtered.length === 0 ? (
+                        <div className="mt-1">
+                          <p className="text-xs text-[#f8fcdc]/40">No results found...</p>
+                          <p className="text-xs text-[#f8fcdc]/40 mt-[2px]">Try searching with different keywords.</p>
+                        </div>
+                      ) : (
+                        <div className="max-h-[240px] overflow-y-auto pr-2">
+                          <ul role="list" className="space-y-2 md:space-y-3">
+                            {filtered.map((item, i) => {
+                              const offsetIndex = i + 1;
+                              return (
+                                <li
+                                  key={item.id}
+                                  ref={(el: HTMLLIElement | null) => {
+                                    resultRefs.current[offsetIndex] = el;
+                                  }}
+                                  className={`flex items-center gap-2 md:gap-4 p-1.5 md:p-3 rounded-lg transition-colors cursor-pointer ${
+                                    highlightIndex === offsetIndex
+                                      ? 'bg-[#dc9e63]/10'
+                                      : 'hover:bg-[#dc9e63]/10'
+                                  }`}
+                                  role="listitem"
+                                >
+                                  <Link
+                                    href={item.url}
+                                    onClick={() => {
+                                      setSearchOpen(false);
+                                      const q = searchQuery.trim();
+                                      if (q.length > 0) {
+                                        setRecentSearches((prev) => {
+                                          const withoutDupes = prev.filter((t) => t !== q);
+                                          return [q, ...withoutDupes].slice(0, 5);
+                                        });
+                                      }
+                                    }}
+                                    className="flex items-center gap-2 md:gap-4 w-full"
+                                    aria-label={`${item.title} - ${item.subtitle}`}
+                                  >
+                                    <Image
+                                      src={item.image}
+                                      alt={item.title}
+                                      width={48}
+                                      height={48}
+                                      className="w-12 h-12 object-cover rounded"
+                                      loading="lazy"
+                                      quality={75}
+                                      sizes="48px"
+                                    />
+                                    <div className="flex flex-col">
+                                      <span className="text-sm font-medium text-[#f8fcdc]">
+                                        {item.title}
+                                      </span>
+                                      <span className="text-xs text-[#f8fcdc]/70">{item.subtitle}</span>
+                                      {item.price && (
+                                        typeof item.price === 'object' ? (
+                                          <div className="flex items-center gap-1 md:gap-2 text-xs mt-1">
+                                            <span className="line-through text-[#f8fcdc]/40">
+                                              ${item.price.original.toFixed(2)}
+                                            </span>
+                                            <span className="text-[#dc9e63]">
+                                              ${item.price.sale.toFixed(2)}
+                                            </span>
+                                          </div>
+                                        ) : (
+                                          <div className="text-xs text-[#dc9e63] mt-1">
+                                            ${item.price.toFixed(2)}
+                                          </div>
+                                        )
+                                      )}
+                                    </div>
+                                  </Link>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 3. Pages */}
+                    {pageMatches.length > 0 && (
+                      <div className="text-[#f8fcdc]">
+                        <h4 className="text-sm mb-2 font-semibold">Pages</h4>
+                        <ul className="space-y-1 text-xs sm:text-sm" role="list">
+                          {pageMatches.map((page, i) => {
+                            const offsetIndex = 1 + filtered.length + suggestions.length + i;
+                            return (
+                              <li
+                                key={i}
+                                ref={(el) => {
+                                  resultRefs.current[offsetIndex] = el;
+                                }}
+                                className={`transition-colors ${
+                                  highlightIndex === offsetIndex
+                                    ? 'text-[#dc9e63]'
+                                    : 'text-[#f8fcdc]/70 hover:text-[#dc9e63]'
+                                }`}
+                                role="listitem"
+                              >
+                                <Link
+                                  href={page.href}
+                                  onClick={() => setSearchOpen(false)}
+                                  className="block w-full"
+                                >
+                                  {page.title}
+                                </Link>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Desktop (1280px+): 2 คอลัมน์ */}
+                <div className="hidden xl:block">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 lg:gap-8 mt-6 w-full max-w-6xl mx-auto px-1 md:px-0">
+                    
+                    {/* Left Column: Suggestions + Pages */}
+                    <div className="space-y-12">
+                      {/* 1. Suggestions */}
+                      <div className="text-[#f8fcdc]">
+                        <h4 className="text-sm mb-2 font-semibold">Suggestions</h4>
+                        <ul className="space-y-1 text-xs sm:text-sm" role="list">
+                          {suggestions.map((term, i) => {
+                            const offsetIndex = 1 + filtered.length + i;
+                            return (
+                              <li
+                                key={i}
+                                ref={(el) => {
+                                  resultRefs.current[offsetIndex] = el;
+                                }}
+                                onClick={() => setSearchQuery(term)}
+                                className={`cursor-pointer transition-colors ${
+                                  highlightIndex === offsetIndex
+                                    ? 'text-[#dc9e63]'
+                                    : 'text-[#f8fcdc]/70 hover:text-[#dc9e63]'
+                                }`}
+                                role="listitem"
+                              >
+                                {term}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </div>
+
+                      {/* 3. Pages */}
+                      {pageMatches.length > 0 && (
+                        <div className="text-[#f8fcdc]">
+                          <h4 className="text-sm mb-2 font-semibold">Pages</h4>
+                          <ul className="space-y-1 text-xs sm:text-sm" role="list">
+                            {pageMatches.map((page, i) => {
+                              const offsetIndex = 1 + filtered.length + suggestions.length + i;
+                              return (
+                                <li
+                                  key={i}
+                                  ref={(el) => {
+                                    resultRefs.current[offsetIndex] = el;
+                                  }}
+                                  className={`transition-colors ${
+                                    highlightIndex === offsetIndex
+                                      ? 'text-[#dc9e63]'
+                                      : 'text-[#f8fcdc]/70 hover:text-[#dc9e63]'
+                                  }`}
+                                  role="listitem"
+                                >
+                                  <Link
+                                    href={page.href}
+                                    onClick={() => setSearchOpen(false)}
+                                    className="block w-full"
+                                  >
+                                    {page.title}
+                                  </Link>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right Column: Products Only */}
+                    <div>
+                      <h4 className="text-sm mb-2 font-semibold text-[#f8fcdc]">Products</h4>
+                      {filtered.length === 0 ? (
+                        <div className="mt-1">
+                          <p className="text-xs text-[#f8fcdc]/40">No results found...</p>
+                          <p className="text-xs text-[#f8fcdc]/40 mt-[2px]">Try searching with different keywords.</p>
+                        </div>
+                      ) : (
+                        <div className="max-h-[300px] overflow-y-auto pr-2">
+                          <ul role="list" className="space-y-3">
+                            {filtered.map((item, i) => {
+                              const offsetIndex = i + 1;
+                              return (
+                                <li
+                                  key={item.id}
+                                  ref={(el: HTMLLIElement | null) => {
+                                    resultRefs.current[offsetIndex] = el;
+                                  }}
+                                  className={`flex items-center gap-4 p-3 rounded-lg transition-colors cursor-pointer ${
+                                    highlightIndex === offsetIndex
+                                      ? 'bg-[#dc9e63]/10'
+                                      : 'hover:bg-[#dc9e63]/10'
+                                  }`}
+                                  role="listitem"
+                                >
+                                  <Link
+                                    href={item.url}
+                                    onClick={() => {
+                                      setSearchOpen(false);
+                                      const q = searchQuery.trim();
+                                      if (q.length > 0) {
+                                        setRecentSearches((prev) => {
+                                          const withoutDupes = prev.filter((t) => t !== q);
+                                          return [q, ...withoutDupes].slice(0, 5);
+                                        });
+                                      }
+                                    }}
+                                    className="flex items-center gap-4 w-full"
+                                    aria-label={`${item.title} - ${item.subtitle}`}
+                                  >
+                                    <Image
+                                      src={item.image}
+                                      alt={item.title}
+                                      width={48}
+                                      height={48}
+                                      className="w-12 h-12 object-cover rounded"
+                                      loading="lazy"
+                                      quality={75}
+                                      sizes="48px"
+                                    />
+                                    <div className="flex flex-col">
+                                      <span className="text-sm font-medium text-[#f8fcdc]">
+                                        {item.title}
+                                      </span>
+                                      <span className="text-xs text-[#f8fcdc]/70">{item.subtitle}</span>
+                                      {item.price && (
+                                        typeof item.price === 'object' ? (
+                                          <div className="flex items-center gap-2 text-xs mt-1">
+                                            <span className="line-through text-[#f8fcdc]/40">
+                                              ${item.price.original.toFixed(2)}
+                                            </span>
+                                            <span className="text-[#dc9e63]">
+                                              ${item.price.sale.toFixed(2)}
+                                            </span>
+                                          </div>
+                                        ) : (
+                                          <div className="text-xs text-[#dc9e63] mt-1">
+                                            ${item.price.toFixed(2)}
+                                          </div>
+                                        )
+                                      )}
+                                    </div>
+                                  </Link>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
