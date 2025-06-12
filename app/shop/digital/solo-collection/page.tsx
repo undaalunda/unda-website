@@ -70,9 +70,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function SoloCollectionRoute({ searchParams }: any) {
-  const filter = searchParams?.filter || 'all';
-  const instrument = searchParams?.instrument || 'all';
+export default async function SoloCollectionRoute({ searchParams }: any) {
+  const params = await searchParams;
+  const filter = params?.filter || 'all';
+  const instrument = params?.instrument || 'all';
 
   const soloCollectionSchema = {
     "@context": "https://schema.org",
