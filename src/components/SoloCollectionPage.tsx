@@ -9,17 +9,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { allItems } from './allItems';
 
-// Solo Collection configuration
+// Solo Collection configuration - อัพเดทจำนวนสินค้าเป็น 4 อย่าง
 const soloCollection = {
   slug: 'solo-collection',
   title: 'Solo Collection',
   subtitle: 'Guitar • Highlights',
   coverImage: '/solo-collection.webp',
-  totalPieces: 3,
-  totalProducts: 3,
+  totalPieces: 4, // เปลี่ยนจาก 3 เป็น 4
+  totalProducts: 4, // เปลี่ยนจาก 3 เป็น 4
   productBreakdown: {
     backingTracks: 0,
-    tabs: 3,
+    tabs: 4, // เปลี่ยนจาก 3 เป็น 4
     stems: 0
   },
   priceRange: '$3.95-$7.95',
