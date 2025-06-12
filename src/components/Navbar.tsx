@@ -129,18 +129,17 @@ export default function Navbar() {
   useEffect(() => {
     const body = document.body;
     if (searchOpen) {
+      // บันทึกตำแหน่ง scroll แต่ไม่ lock body
       scrollYRef.current = window.scrollY;
-      body.style.position = 'fixed';
-      body.style.top = `-${scrollYRef.current}px`;
-      body.style.width = '100%';
+      // แค่ซ่อน scrollbar ของ body
+      body.style.overflow = 'hidden';
     } else {
-      body.style.position = '';
-      body.style.top = '';
+      body.style.overflow = '';
+      // กลับไปตำแหน่งเดิมเมื่อปิด search
       window.scrollTo(0, scrollYRef.current);
     }
     return () => {
-      body.style.position = '';
-      body.style.top = '';
+      body.style.overflow = '';
     };
   }, [searchOpen]);
 
@@ -473,18 +472,19 @@ export default function Navbar() {
         </nav>
       )}
 
-      {/* ✅ Fixed SEARCH OPEN OVERLAY */}
+      {/* ✅ SEARCH OPEN OVERLAY - Full Page Scroll */}
       {searchOpen && (
         <div 
-          className="fixed inset-0 z-40 bg-[#0d0d0dea] flex items-start justify-center px-2 md:px-4 xl:px-6 pt-32 md:pt-36 xl:pt-40 animate-fadeIn"
+          className="fixed inset-0 z-40 bg-[#0d0d0dea] overflow-y-auto"
           role="dialog"
           aria-label="Search products"
           aria-modal="true"
         >
-          <div
-            ref={searchOverlayRef}
-            className="w-full max-w-6xl flex flex-col items-center fade-in-section"
-          >
+          <div className="min-h-screen flex flex-col items-center px-2 md:px-4 xl:px-6 pt-32 md:pt-36 xl:pt-40 pb-20">
+            <div
+              ref={searchOverlayRef}
+              className="w-full max-w-6xl flex flex-col items-center fade-in-section"
+            >
             {/* ✅ Fixed SEARCH INPUT - เอา outline ออก */}
             <form
               onSubmit={(e) => {
@@ -532,7 +532,7 @@ export default function Navbar() {
 
             {/* SEARCH RESULTS */}
             {delayedQuery.length === 0 ? (
-              <div className="overflow-y-auto max-h-[calc(100vh-200px)] w-full">
+              <div className="w-full">
                 {/* Mobile & Tablet (0-1279px): แนวตั้ง */}
                 <div className="xl:hidden">
                   <div className="flex flex-col mt-6 md:mt-10 w-full max-w-2xl mx-auto px-4 space-y-14">
@@ -656,7 +656,7 @@ export default function Navbar() {
                 </div>
               </div>
             ) : (
-              <div className="overflow-y-auto max-h-[calc(100vh-200px)] w-full">
+              <div className="w-full">
                 {/* Mobile & Tablet (0-1279px): แนวตั้ง */}
                 <div className="xl:hidden">
                   <div className="flex flex-col mt-6 md:mt-10 w-full max-w-2xl mx-auto px-4 space-y-14">
@@ -959,6 +959,7 @@ export default function Navbar() {
                 </div>
               </div>
             )}
+            </div>
           </div>
         </div>
       )}
