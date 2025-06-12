@@ -1,4 +1,4 @@
-/* AlbumHubPage.tsx - Complete Fixed Version */
+/* AlbumHubPage.tsx - Final Clean Version */
 
 'use client';
 
@@ -65,7 +65,7 @@ export default function AlbumHubPage({
 }: AlbumHubPageProps) {
   const router = useRouter();
   
-  // 🚀 Helper functions
+  // Helper functions
   const normalizeFilter = (filter?: string): FilterType => {
     return (filter === 'tabs' || filter === 'backing' || filter === 'stems') 
       ? filter as FilterType 
@@ -78,9 +78,8 @@ export default function AlbumHubPage({
       : 'all';
   };
 
-  // 🚀 Lazy Initial State to prevent flash (อ่าน sessionStorage ทันที)
+  // Initial state with sessionStorage support
   const getInitialStateFromContext = (): { filterType: FilterType; filterInstrument: InstrumentType } => {
-    // Helper functions
     const normalizeFilterLocal = (filter?: string): FilterType => {
       return (filter === 'tabs' || filter === 'backing' || filter === 'stems') 
         ? filter as FilterType 
@@ -93,7 +92,7 @@ export default function AlbumHubPage({
         : 'all';
     };
     
-    // Server-side: ใช้ props
+    // Server-side: use props
     if (typeof window === 'undefined') {
       return {
         filterType: normalizeFilterLocal(initialFilter),
@@ -101,12 +100,12 @@ export default function AlbumHubPage({
       };
     }
     
-    // Client-side: อ่าน sessionStorage ทันที
+    // Client-side: check sessionStorage first
     try {
       const navigationContext = sessionStorage.getItem('navigationContext');
+      
       if (navigationContext) {
         const context = JSON.parse(navigationContext);
-        sessionStorage.removeItem('navigationContext'); // Clear immediately
         
         const contextFilter = context.filter && ['tabs', 'backing', 'stems'].includes(context.filter)
           ? context.filter as FilterType
@@ -131,26 +130,29 @@ export default function AlbumHubPage({
     };
   };
 
-  // 🚀 Use lazy initial state to prevent hydration mismatch
+  // State with lazy initialization
   const [filterType, setFilterType] = useState<FilterType>(() => getInitialStateFromContext().filterType);
   const [filterInstrument, setFilterInstrument] = useState<InstrumentType>(() => getInitialStateFromContext().filterInstrument);
 
-  // 🎯 Pagination state
+  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
   
-  // 🚀 Track if this is initial mount
+  // Track initialization
   const [hasInitialized, setHasInitialized] = useState(false);
-  
-  // 🚀 Client-only mounting state
   const [isClientMounted, setIsClientMounted] = useState(false);
 
-  // 🚀 ✅ Fixed: Simple History Management - ใช้ replaceState แทน pushState
+  // Cleanup and initialization
   useEffect(() => {
     setIsClientMounted(true);
     
     if (typeof window !== 'undefined' && !hasInitialized) {
-      // ✅ ใช้ replaceState แทน pushState เพื่อไม่สร้าง history entry ใหม่
+      // Clean up sessionStorage after mount
+      if (sessionStorage.getItem('navigationContext')) {
+        sessionStorage.removeItem('navigationContext');
+      }
+      
+      // Set history state
       if (!window.history.state?.filters) {
         window.history.replaceState({ 
           filters: { filterType, filterInstrument }
@@ -159,11 +161,9 @@ export default function AlbumHubPage({
       
       setHasInitialized(true);
     }
-  }, []);
+  }, [filterType, filterInstrument]);
 
-  // 🚀 ✅ ลบการสร้าง artificial navigation stack ออกแล้ว
-
-  // 🚀 Browser Back/Forward Navigation Handler
+  // Browser back/forward navigation
   useEffect(() => {
     if (!hasInitialized) return;
     
@@ -172,7 +172,6 @@ export default function AlbumHubPage({
         setFilterType(event.state.filters.filterType || 'all');
         setFilterInstrument(event.state.filters.filterInstrument || 'all');
       }
-      // ✅ ให้ browser จัดการ navigation เอง
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -185,7 +184,7 @@ export default function AlbumHubPage({
   const allProducts = useMemo(() => getAlbumProducts(albumSlug), [albumSlug]);
   const currentAlbum = getCurrentAlbum(albumSlug);
 
-  // 🚀 Filter Change Handlers
+  // Filter change handlers
   const handleFilterTypeChange = (newFilterType: FilterType) => {
     setFilterType(newFilterType);
   };
@@ -237,13 +236,12 @@ export default function AlbumHubPage({
     });
   }, [allProducts, filterType, filterInstrument]);
 
-  // 🚀 ✅ Fixed: ใช้ replaceState สำหรับ filter changes
+  // Update history state when filters change
   useEffect(() => {
     if (!hasInitialized) return;
     
     setCurrentPage(1);
     
-    // ✅ ใช้ replaceState แทน pushState เพื่อไม่สร้าง history entries เพิ่ม
     if (typeof window !== 'undefined') {
       window.history.replaceState({ 
         filters: { filterType, filterInstrument } 
@@ -251,7 +249,7 @@ export default function AlbumHubPage({
     }
   }, [filterType, filterInstrument, hasInitialized]);
 
-  // 🎯 Calculate pagination
+  // Calculate pagination
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -266,11 +264,10 @@ export default function AlbumHubPage({
 
   const counts = getProductCounts();
 
-  // 🚀 ✅ Fixed: Smart Navigation ที่ไม่สร้าง history เพิ่ม
+  // Product click handler
   const handleProductClick = (product: any, e: React.MouseEvent) => {
     e.preventDefault();
     
-    // Only work on client side
     if (!isClientMounted) return;
     
     // Create navigation state with context
@@ -288,13 +285,11 @@ export default function AlbumHubPage({
       sessionStorage.setItem('navigationContext', JSON.stringify(navigationState));
     }
     
-    // ✅ Navigate ปกติ - ไม่ต้องจัดการ history พิเศษ
     router.push(product.url);
   };
 
-  // 🎯 Pagination component
+  // Pagination component
   const PaginationControls = () => {
-    // Client-only rendering to prevent hydration mismatch
     if (!isClientMounted) {
       return (
         <div className="flex justify-center items-center h-12">
@@ -382,7 +377,6 @@ export default function AlbumHubPage({
 
   return (
     <main className="min-h-screen flex flex-col justify-center items-center text-[#f8fcdc] font-[Cinzel] px-4 pt-32">
-      {/* Container for all content */}
       <div className="w-full max-w-6xl pb-4">
         
         {/* Breadcrumb */}

@@ -1,4 +1,4 @@
-// app/shop/digital/[album]/page.tsx - Updated with Temporary Query Params Support
+// app/shop/digital/[album]/page.tsx - Final Clean Version
 
 import AlbumHubPage from '@/components/AlbumHubPage';
 import SoloCollectionPage from '@/components/SoloCollectionPage';
@@ -133,10 +133,11 @@ export default async function AlbumPage({ params, searchParams }: any) {
     notFound();
   }
 
-  // 🚀 Support regular query params only (clean URLs)
-  const filter = searchParams?.filter || 'all';
-  const instrument = searchParams?.instrument || 'all';
-
+  // ✅ เปลี่ยนชื่อตัวแปรเพื่อไม่ให้ซ้ำ
+  const searchParamsData = await searchParams;
+  const filter = searchParamsData?.filter;
+  const instrument = searchParamsData?.instrument;
+ 
   // Generate different schemas based on collection type
   const albumSchema = album === 'solo-collection' ? {
     "@context": "https://schema.org",

@@ -1,4 +1,4 @@
-/* HomePage.tsx - Updated with Clean URLs */
+/* HomePage.tsx - Final Clean Version */
 
 'use client';
 
@@ -26,7 +26,7 @@ const homepageItems = allItems.filter(
 );
 
 export default function HomePage() {
-  const router = useRouter(); // 🚀 เพิ่ม router hook
+  const router = useRouter();
   const [isClient, setIsClient] = useState(false);
   const [showBandsintown, setShowBandsintown] = useState(false);
   
@@ -77,7 +77,7 @@ export default function HomePage() {
       
       // Store context and navigate with clean URL
       sessionStorage.setItem('navigationContext', JSON.stringify(navigationContext));
-      router.push(targetPath); // Clean URL only
+      router.push(targetPath);
     };
   };
 
@@ -95,7 +95,7 @@ export default function HomePage() {
             if (entry.target === musicMerchRef.current) setShowMerch(true);
             if (entry.target === tourRef.current) {
               setShowTour(true);
-              setShowBandsintown(true); // 🎯 โหลด widget ตอนเลื่อนมาถึง
+              setShowBandsintown(true);
             }
           }
         });
@@ -164,7 +164,7 @@ export default function HomePage() {
         <div className="after-hero-spacing" />
         <h2 className="sr-only">Shop by Category</h2>
 
-        {/* BUTTON GROUP - 🚀 Updated with Clean URLs */}
+        {/* BUTTON GROUP */}
         <div ref={buttonGroupRef} className={`button-group ${showButtons ? 'fade-in' : ''}`}>
           <Link 
             href="/shop/digital/dark-wonderful-world" 
@@ -225,7 +225,7 @@ export default function HomePage() {
           )}
         </section>
 
-        {/* TRANSCRIPTION SECTION - 🚀 Updated with Clean URLs */}
+        {/* TRANSCRIPTION SECTION */}
         <section className="transcription-section">
           <div ref={transcriptionRef} className={`fade-trigger ${showTranscriptions ? 'fade-in' : ''}`}>
             <p className="transcription-sub">LEARN THE MUSIC</p>
@@ -234,7 +234,19 @@ export default function HomePage() {
               {["guitar", "keys", "bass", "drums"].map((inst, i) => (
                 <Link 
                   href="/shop/digital/dark-wonderful-world" 
-                  onClick={createNavigationHandler('/shop/digital/dark-wonderful-world', 'tabs', inst)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    
+                    const context = {
+                      from: 'homepage',
+                      returnUrl: '/',
+                      filter: 'tabs',
+                      instrument: inst
+                    };
+                    
+                    sessionStorage.setItem('navigationContext', JSON.stringify(context));
+                    router.push('/shop/digital/dark-wonderful-world');
+                  }}
                   key={i} 
                   className="product-item product-label-link"
                 >
@@ -271,7 +283,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* STEMS SECTION - 🚀 Updated with Clean URLs */}
+        {/* STEMS SECTION */}
         <section className="stems-section">
           <div ref={stemsRef} className={`fade-trigger ${showStems ? 'fade-in' : ''}`}>
             <p className="stems-sub">JAM THE TRACKS</p>
@@ -279,18 +291,31 @@ export default function HomePage() {
             <div className="stems-row">
               {allItems
                 .filter((item) => {
-                  // 🎯 แสดงแค่ 8 สินค้าที่เลือกมาแล้ว
                   const selectedItems = [
-                    'anomic-drums',
-                    'jyy-guitars', 
-                    'atlantic-lead-guitar',
-                    'out-of-the-dark-drums',
-                    'feign-guitars',
-                    'the-dark-keys',
-                    'red-down-bass',
-                    'quietness-bass'
+                    'jyy-drums',
+                    'anomic-guitars-stem',
+                    'feign-keys-stem',
+                    'consonance-guitars',
+                    'the-dark-bass',
+                    'atlantic-guitars-stem',
+                    'red-down-keys',
+                    'dark-wonderful-world-drums-stem'
                   ];
-                  return item.category === 'Backing Track' && selectedItems.includes(item.id);
+                  
+                  return (item.category === 'Backing Track' || item.category === 'Stem') && selectedItems.includes(item.id);
+                })
+                .sort((a, b) => {
+                  const patternOrder = [
+                    'jyy-drums',
+                    'anomic-guitars-stem',
+                    'feign-keys-stem',
+                    'consonance-guitars',
+                    'the-dark-bass',
+                    'atlantic-guitars-stem',
+                    'red-down-keys',
+                    'dark-wonderful-world-drums-stem'
+                  ];
+                  return patternOrder.indexOf(a.id) - patternOrder.indexOf(b.id);
                 })
                 .map((item) => (
                   <Link
@@ -319,7 +344,7 @@ export default function HomePage() {
                       </p>
                       <span className="backing-line"></span>
                       <p className="stems-subtitle-tiny tracking-wide uppercase text-center backing-text">
-                        BACKING TRACK
+                        {item.category === 'Stem' ? 'STEM' : 'BACKING TRACK'}
                       </p>
                       <p className="stems-price">
                         $
@@ -334,7 +359,7 @@ export default function HomePage() {
             <div className="shopall-button-wrapper">
               <Link 
                 href="/shop/digital/dark-wonderful-world" 
-                onClick={createNavigationHandler('/shop/digital/dark-wonderful-world', 'all', 'all')}
+                onClick={createNavigationHandler('/shop/digital/dark-wonderful-world', 'backing', 'all')}
                 className="info-button"
               >
                 SHOP ALL
@@ -343,7 +368,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* MUSIC & MERCH - 🚀 Updated with Badge Pattern like Physical Shop */}
+        {/* MUSIC & MERCH */}
         <section className="stems-section">
           <div ref={musicMerchRef} className={`fade-trigger ${showMerch ? 'fade-in' : ''}`}>
             <p className="stems-sub">MUSIC IN YOUR HANDS</p>
@@ -384,8 +409,6 @@ export default function HomePage() {
                           ? `$${item.price.toFixed(2)}`
                           : null}
                     </p>
-                    
-
                   </div>
                 </Link>
               ))}
