@@ -129,17 +129,29 @@ export default function Navbar() {
   useEffect(() => {
     const body = document.body;
     if (searchOpen) {
-      // บันทึกตำแหน่ง scroll แต่ไม่ lock body
+      // เก็บตำแหน่ง scroll และ lock background
       scrollYRef.current = window.scrollY;
-      // แค่ซ่อน scrollbar ของ body
-      body.style.overflow = 'hidden';
+      body.style.position = 'fixed';
+      body.style.top = `-${scrollYRef.current}px`;  
+      body.style.left = '0';
+      body.style.right = '0';
+      body.style.width = '100%';
     } else {
-      body.style.overflow = '';
-      // กลับไปตำแหน่งเดิมเมื่อปิด search
+      // ปลดล็อค background และกลับไปตำแหน่งเดิม
+      body.style.position = '';
+      body.style.top = '';
+      body.style.left = '';
+      body.style.right = '';
+      body.style.width = '';
       window.scrollTo(0, scrollYRef.current);
     }
+    
     return () => {
-      body.style.overflow = '';
+      body.style.position = '';
+      body.style.top = '';
+      body.style.left = '';
+      body.style.right = '';  
+      body.style.width = '';
     };
   }, [searchOpen]);
 
