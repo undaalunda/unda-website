@@ -1,15 +1,18 @@
-// AboutClientComponent.tsx - Minimal SEO Changes 🎨
+// AboutClientComponent.tsx - Fixed TypeScript Errors 🎨
 
 'use client';
 
 import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import AppClientWrapper from '@/components/AppClientWrapper';
 
-// 🚀 Memoized animation variants (unchanged)
-const fadeInUp = {
-  hidden: { opacity: 0, y: 40 },
-  visible: (i = 1) => ({
+// 🚀 Fixed animation variants with proper types
+const fadeInUp: Variants = {
+  hidden: { 
+    opacity: 0, 
+    y: 40 
+  },
+  visible: (i: number = 1) => ({
     opacity: 1,
     y: 0,
     transition: {
@@ -20,8 +23,10 @@ const fadeInUp = {
   }),
 };
 
-const fadeInSection = {
-  hidden: { opacity: 0 },
+const fadeInSection: Variants = {
+  hidden: { 
+    opacity: 0 
+  },
   visible: {
     opacity: 1,
     transition: {
