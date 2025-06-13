@@ -1,4 +1,4 @@
-/* Navbar.tsx - Performance Optimized + Fixed Accessibility + Search in Menu */
+/* Navbar.tsx - Performance Optimized + Fixed Accessibility + Mobile Search Close Fix */
 
 'use client';
 
@@ -59,14 +59,21 @@ export default function Navbar() {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setSearchOpen(false);
     };
+    
+    // 🎯 Updated: Mobile-aware click outside handler
     const handleClickOutside = (e: MouseEvent) => {
       if (
         searchOverlayRef.current &&
         !searchOverlayRef.current.contains(e.target as Node)
       ) {
-        setSearchOpen(false);
+        // 📱 Only close on click outside for desktop/tablet (768px+)
+        const isMobile = window.innerWidth < 768;
+        if (!isMobile) {
+          setSearchOpen(false);
+        }
       }
     };
+    
     window.addEventListener('scroll', handleScroll);
     window.addEventListener('keydown', handleKey);
     document.addEventListener('mousedown', handleClickOutside);
@@ -344,12 +351,14 @@ export default function Navbar() {
           </div>
         )}
   
-        {/* 🚀 Logo กลาง - ปรับปรุงแล้ว ไม่ซ้ำ */}
+        {/* 🚀 Logo กลาง - ซ่อนตอนเปิด search บน mobile */}
         <div
           className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-[1200ms] ${
             menuOpen ? 'z-[60]' : 'z-40'
           } ${
-            scrolledDown || !isHomepage || menuOpen ? 'opacity-100' : 'opacity-0'
+            // ซ่อน logo เมื่อเปิด search บน mobile, แสดงปกติใน desktop/tablet
+            searchOpen ? 'md:opacity-100 opacity-0' : 
+            (scrolledDown || !isHomepage || menuOpen ? 'opacity-100' : 'opacity-0')
           }`}
         >
           <Link 
@@ -531,7 +540,7 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={() => setSearchOpen(false)}
-                  className="absolute top-1/2 right-4 -translate-y-1/2 text-[#f8fcdc] hover:text-[#dc9e63] transition"
+                  className="absolute top-1/2 right-4 -translate-y-1/2 text-[#f8fcdc] hover:text-[#dc9e63] transition cursor-pointer"
                   aria-label="Close search"
                 >
                   <X size={24} strokeWidth={1.4} aria-hidden="true" />
