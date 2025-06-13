@@ -560,8 +560,8 @@ export default function Navbar() {
                     
                     {/* MAIN MENU - Mobile/Tablet */}
                     <div className="px-1 md:px-0">
-                      <h4 className="text-sm mb-2 font-semibold text-[#f8fcdc]">Main Menu</h4>
-                      <ul className="space-y-1 text-xs sm:text-sm" role="list">
+                      <h4 className="text-sm mb-3 font-semibold text-[#f8fcdc] tracking-wide">Main Menu</h4>
+                      <ul className="space-y-2 text-xs sm:text-sm leading-relaxed" role="list">
                         {pageLinks.map((page, i) => {
                           const offsetIndex = 1 + i;
                           return (
@@ -593,8 +593,8 @@ export default function Navbar() {
                     {/* RECENT SEARCH - Mobile/Tablet */}
                     {recentSearches.length > 0 && (
                       <div className="px-1 md:px-0">
-                        <h4 className="text-sm mb-2 font-semibold text-[#f8fcdc]">Recent Searches</h4>
-                        <ul className="space-y-1 text-xs sm:text-sm" role="list">
+                        <h4 className="text-sm mb-3 font-semibold text-[#f8fcdc] tracking-wide">Recent Searches</h4>
+                        <ul className="space-y-2 text-xs sm:text-sm leading-relaxed" role="list">
                           {recentSearches.map((term, i) => (
                             <li
                               key={i}
@@ -619,8 +619,8 @@ export default function Navbar() {
                     <div className="space-y-12">
                       {/* MAIN MENU - Desktop Left Column */}
                       <div className="text-[#f8fcdc]">
-                        <h4 className="text-sm mb-2 font-semibold">Main Menu</h4>
-                        <ul className="space-y-1 text-xs sm:text-sm" role="list">
+                        <h4 className="text-sm mb-3 font-semibold tracking-wide">Main Menu</h4>
+                        <ul className="space-y-2 text-xs sm:text-sm leading-relaxed" role="list">
                           {pageLinks.map((page, i) => {
                             const offsetIndex = 1 + i;
                             return (
@@ -652,8 +652,8 @@ export default function Navbar() {
                       {/* RECENT SEARCHES - Desktop Left Column */}
                       {recentSearches.length > 0 && (
                         <div className="text-[#f8fcdc]">
-                          <h4 className="text-sm mb-2 font-semibold">Recent Searches</h4>
-                          <ul className="space-y-1 text-xs sm:text-sm" role="list">
+                          <h4 className="text-sm mb-3 font-semibold tracking-wide">Recent Searches</h4>
+                          <ul className="space-y-2 text-xs sm:text-sm leading-relaxed" role="list">
                             {recentSearches.map((term, i) => (
                               <li
                                 key={i}
@@ -684,8 +684,8 @@ export default function Navbar() {
                     
                     {/* 1. Suggestions */}
                     <div className="text-[#f8fcdc]">
-                      <h4 className="text-sm mb-2 font-semibold">Suggestions</h4>
-                      <ul className="space-y-1 text-xs sm:text-sm" role="list">
+                      <h4 className="text-sm mb-3 font-semibold tracking-wide">Suggestions</h4>
+                      <ul className="space-y-2 text-xs sm:text-sm leading-relaxed" role="list">
                         {suggestions.map((term, i) => {
                           const offsetIndex = 1 + filtered.length + i;
                           return (
@@ -711,7 +711,7 @@ export default function Navbar() {
 
                     {/* 2. Products */}
                     <div>
-                      <h4 className="text-sm mb-2 font-semibold text-[#f8fcdc]">Products</h4>
+                      <h4 className="text-sm mb-3 font-semibold text-[#f8fcdc] tracking-wide">Products</h4>
                       {filtered.length === 0 ? (
                         <div className="mt-1">
                           <p className="text-xs text-[#f8fcdc]/40">No results found...</p>
@@ -795,7 +795,7 @@ export default function Navbar() {
                     {pageMatches.length > 0 && (
                       <div className="text-[#f8fcdc]">
                         <h4 className="text-sm mb-2 font-semibold">Pages</h4>
-                        <ul className="space-y-1 text-xs sm:text-sm" role="list">
+                        <ul className="space-y-2 text-xs sm:text-sm leading-relaxed" role="list">
                           {pageMatches.map((page, i) => {
                             const offsetIndex = 1 + filtered.length + suggestions.length + i;
                             return (
@@ -835,8 +835,8 @@ export default function Navbar() {
                     <div className="space-y-12">
                       {/* 1. Suggestions */}
                       <div className="text-[#f8fcdc]">
-                        <h4 className="text-sm mb-2 font-semibold">Suggestions</h4>
-                        <ul className="space-y-1 text-xs sm:text-sm" role="list">
+                        <h4 className="text-sm mb-3 font-semibold tracking-wide">Suggestions</h4>
+                        <ul className="space-y-2 text-xs sm:text-sm leading-relaxed" role="list">
                           {suggestions.map((term, i) => {
                             const offsetIndex = 1 + filtered.length + i;
                             return (
@@ -864,7 +864,7 @@ export default function Navbar() {
                       {pageMatches.length > 0 && (
                         <div className="text-[#f8fcdc]">
                           <h4 className="text-sm mb-2 font-semibold">Pages</h4>
-                          <ul className="space-y-1 text-xs sm:text-sm" role="list">
+                          <ul className="space-y-2 text-xs sm:text-sm leading-relaxed" role="list">
                             {pageMatches.map((page, i) => {
                               const offsetIndex = 1 + filtered.length + suggestions.length + i;
                               return (
@@ -897,7 +897,7 @@ export default function Navbar() {
 
                     {/* Right Column: Products Only */}
                     <div>
-                      <h4 className="text-sm mb-2 font-semibold text-[#f8fcdc]">Products</h4>
+                      <h4 className="text-sm mb-3 font-semibold text-[#f8fcdc] tracking-wide">Products</h4>
                       {filtered.length === 0 ? (
                         <div className="mt-1">
                           <p className="text-xs text-[#f8fcdc]/40">No results found...</p>
