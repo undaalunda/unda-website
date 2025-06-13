@@ -1,8 +1,8 @@
-//src/components/DigitalShopContent.tsx - Updated with Cinematic Colors
+//src/components/DigitalShopContent.tsx - Updated with Interactive Touch Swipe
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -47,32 +47,55 @@ export default function DigitalShopContent() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const collections = [albums[0], soloCollection];
 
-  // Touch/swipe handling for mobile
+  // Enhanced touch/swipe handling
   const [touchStart, setTouchStart] = useState(0);
-  const [touchEnd, setTouchEnd] = useState(0);
+  const [touchCurrent, setTouchCurrent] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState(0);
+  const carouselRef = useRef<HTMLDivElement>(null);
 
   const minSwipeDistance = 50;
 
   const onTouchStart = (e: React.TouchEvent) => {
-    setTouchEnd(0); // otherwise the swipe is fired even with usual touch events
-    setTouchStart(e.targetTouches[0].clientX);
+    const touch = e.targetTouches[0].clientX;
+    setTouchStart(touch);
+    setTouchCurrent(touch);
+    setIsDragging(true);
+    setDragOffset(0);
   };
 
   const onTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
+    if (!isDragging) return;
+    
+    const touch = e.targetTouches[0].clientX;
+    const diff = touch - touchStart;
+    const maxDrag = carouselRef.current?.offsetWidth || 300;
+    
+    // Limit drag distance
+    const limitedDiff = Math.max(-maxDrag * 0.5, Math.min(maxDrag * 0.5, diff));
+    
+    setTouchCurrent(touch);
+    setDragOffset(limitedDiff);
   };
 
   const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    const distance = touchStart - touchEnd;
+    if (!isDragging) return;
+    
+    const distance = touchStart - touchCurrent;
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
 
-    if (isLeftSwipe) {
-      nextSlide();
-    } else if (isRightSwipe) {
-      prevSlide();
+    if (isLeftSwipe && currentSlide < collections.length - 1) {
+      setCurrentSlide(prev => prev + 1);
+    } else if (isRightSwipe && currentSlide > 0) {
+      setCurrentSlide(prev => prev - 1);
     }
+
+    // Reset drag state
+    setIsDragging(false);
+    setDragOffset(0);
+    setTouchStart(0);
+    setTouchCurrent(0);
   };
 
   const nextSlide = () => {
@@ -81,6 +104,13 @@ export default function DigitalShopContent() {
 
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + collections.length) % collections.length);
+  };
+
+  // Calculate transform based on current slide and drag offset
+  const getTransform = () => {
+    const baseTranslate = -currentSlide * 100;
+    const dragPercent = (dragOffset / (carouselRef.current?.offsetWidth || 300)) * 100;
+    return `translateX(${baseTranslate + dragPercent}%)`;
   };
   
   return (
@@ -272,7 +302,7 @@ export default function DigitalShopContent() {
             </div>
           </div>
 
-          {/* Mobile Layout - Carousel (767px and below) */}
+          {/* Mobile Layout - Interactive Touch Carousel (767px and below) */}
           <div className="md:hidden relative max-w-xs mx-auto">
             {/* Navigation Arrows */}
             <button
@@ -303,6 +333,7 @@ export default function DigitalShopContent() {
 
             {/* Carousel Container */}
             <div 
+              ref={carouselRef}
               className="relative overflow-hidden rounded-3xl select-none"
               style={{ touchAction: 'pan-y' }}
               onTouchStart={onTouchStart}
@@ -310,8 +341,8 @@ export default function DigitalShopContent() {
               onTouchEnd={onTouchEnd}
             >
               <div 
-                className="flex transition-transform duration-300 ease-in-out"
-                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                className={`flex ${isDragging ? '' : 'transition-transform duration-300 ease-out'}`}
+                style={{ transform: getTransform() }}
               >
                 {collections.map((collection, index) => (
                   <div key={index} className="w-full flex-shrink-0">

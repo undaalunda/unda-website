@@ -323,8 +323,8 @@ export default function PhysicalShopContent({ initialTab }: { initialTab?: Physi
         <div className="text-center mt-16 max-[927px]:mt-12 max-[696px]:mt-8">
           <Link 
             href="/shop" 
-            className="inline-flex items-center space-x-2 max-[696px]:space-x-1 text-[#dc9e63]/70 hover:text-[#fcc276] 
-                     transition-colors duration-300 text-base max-[927px]:text-sm max-[696px]:text-[10px]"
+            className="inline-flex items-center space-x-2 text-[#dc9e63]/70 hover:text-[#fcc276] 
+                     transition-colors duration-300 text-base max-[927px]:text-sm"
           >
             <span>←</span>
             <span>Back to Shop</span>
