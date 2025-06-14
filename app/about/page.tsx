@@ -1,4 +1,4 @@
-// app/about/page.tsx 🎨🎸
+// app/about/page.tsx
 
 import type { Metadata } from 'next';
 import AboutClientComponent from './AboutClientComponent';
