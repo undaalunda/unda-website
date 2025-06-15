@@ -1,4 +1,4 @@
-//PhysicalShopContent.tsx - Updated with Cinematic Colors
+//PhysicalShopContent.tsx - Updated with Cinematic Colors and Animations
 
 'use client';
 
@@ -6,6 +6,7 @@ import React, { useEffect, useLayoutEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 import { allItems } from './allItems';
 
 type PhysicalTabType = 'MERCH' | 'MUSIC' | 'BUNDLES';
@@ -24,6 +25,7 @@ export default function PhysicalShopContent({ initialTab }: { initialTab?: Physi
   const [activeTab, setActiveTab] = useState<PhysicalTabType>('MERCH');
   const [isInitialized, setIsInitialized] = useState(false);
   const [shouldRender, setShouldRender] = useState(false);
+  const [isClientMounted, setIsClientMounted] = useState(false);
 
   // 🚀 Ultra-Fast Client-Side Initialization (useLayoutEffect = before paint!)
   useLayoutEffect(() => {
@@ -111,6 +113,7 @@ export default function PhysicalShopContent({ initialTab }: { initialTab?: Physi
     // Mark as ready to render
     setIsInitialized(true);
     setShouldRender(true);
+    setIsClientMounted(true);
   }, []); // Run only once after mount
 
   // 🚀 Handle Browser Back/Forward Navigation
@@ -267,55 +270,68 @@ export default function PhysicalShopContent({ initialTab }: { initialTab?: Physi
           ))}
         </div>
 
-        {/* Products Section */}
-        <div className="w-full">
-          {itemsToRender.length === 0 ? (
+        {/* Products Section with Animation */}
+        <div className="w-full" suppressHydrationWarning={true}>
+          {!isClientMounted ? (
+            <div className="text-center text-lg text-[#d37142] opacity-60 mt-10">
+              Loading products...
+            </div>
+          ) : itemsToRender.length === 0 ? (
             <div>
               <p className="text-center text-lg text-[#d37142] opacity-60 mt-10">
                 There are currently no products available in this category.
               </p>
             </div>
           ) : (
-            <div className="stems-row">
-              {itemsToRender.map((item) => {
-                const displayPrice = isBundlePrice(item.price) ? (
-                  <>
-                    <span className="line-through text-[#f8fcdc] mr-1">
-                      ${item.price.original.toFixed(2)}
-                    </span>
-                    <span className="text-[#cc3f33]">${item.price.sale.toFixed(2)}</span>
-                  </>
-                ) : (
-                  <span>${(item.price as number).toFixed(2)}</span>
-                );
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab} // Key changes when tab changes, triggering animation
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="stems-row"
+              >
+                {itemsToRender.map((item) => {
+                  const displayPrice = isBundlePrice(item.price) ? (
+                    <>
+                      <span className="line-through text-[#f8fcdc] mr-1">
+                        ${item.price.original.toFixed(2)}
+                      </span>
+                      <span className="text-[#cc3f33]">${item.price.sale.toFixed(2)}</span>
+                    </>
+                  ) : (
+                    <span>${(item.price as number).toFixed(2)}</span>
+                  );
 
-                return (
-                  <div
-                    key={item.id}
-                    onClick={(e) => handleProductClick(item, e)}
-                    className="stems-item product-label-link cursor-pointer"
-                  >
-                    <Image
-                      src={item.image}
-                      alt={item.title}
-                      width={200}
-                      height={200}
-                      className="stems-image"
-                      loading="lazy"
-                      quality={75}
-                      sizes="(max-width: 480px) 140px, (max-width: 696px) 140px, (max-width: 927px) 160px, 180px"
-                      placeholder="blur"
-                      blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-                    />
-                    <div className="stems-label-group">
-                      <p className="stems-title-text text-[#d37142]">{item.title}</p>
-                      <p className="stems-subtitle-tiny">{item.subtitle}</p>
-                      <p className="stems-price">{displayPrice}</p>
+                  return (
+                    <div
+                      key={item.id}
+                      onClick={(e) => handleProductClick(item, e)}
+                      className="stems-item product-label-link cursor-pointer"
+                    >
+                      <Image
+                        src={item.image}
+                        alt={item.title}
+                        width={200}
+                        height={200}
+                        className="stems-image"
+                        loading="lazy"
+                        quality={75}
+                        sizes="(max-width: 480px) 140px, (max-width: 696px) 140px, (max-width: 927px) 160px, 180px"
+                        placeholder="blur"
+                        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                      />
+                      <div className="stems-label-group">
+                        <p className="stems-title-text text-[#d37142]">{item.title}</p>
+                        <p className="stems-subtitle-tiny">{item.subtitle}</p>
+                        <p className="stems-price">{displayPrice}</p>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </motion.div>
+            </AnimatePresence>
           )}
         </div>
 
