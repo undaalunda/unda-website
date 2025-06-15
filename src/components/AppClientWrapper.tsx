@@ -1,4 +1,4 @@
-// AppClientWrapper.tsx - Performance Optimized + FIXED Scroll Restoration
+// AppClientWrapper.tsx - Performance Optimized + Cookie Notice
 
 'use client';
 
@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import CartSuccessPopup from '@/components/CartSuccessPopup';
+import CookieNotice from '@/components/CookieNotice';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
@@ -205,6 +206,9 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
           </section>
         </div>
       </div>
+
+      {/* 🍪 Cookie Notice - ใส่ที่นี่เพื่อให้แสดงทุกหน้า */}
+      <CookieNotice />
     </>
   );
 }

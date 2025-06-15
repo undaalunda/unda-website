@@ -32,10 +32,10 @@ const soloCollection = {
   title: 'Solo Collection',
   subtitle: 'Guitar • Highlights',
   coverImage: '/solo-collection.webp',
-  totalProducts: 3,
+  totalProducts: 4,
   productBreakdown: {
     backingTracks: 0,
-    tabs: 3,
+    tabs: 4,
     stems: 0
   },
   priceRange: '$3.95 - $7.95',
