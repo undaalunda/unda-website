@@ -35,21 +35,21 @@ const CookieNotice: React.FC = () => {
           aria-label="Cookie consent banner"
         >
           <div className="max-w-6xl mx-auto">
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center justify-center md:justify-between gap-4 text-left md:text-center">
               
-              {/* Message - เปลี่ยนจาก text-center เป็น text-left */}
-              <div className="text-left">
+              {/* Message */}
+              <div className="md:block">
                 <p className="text-sm text-[#f8fcdc] font-[Cinzel]">
-                  This site uses cookies.
-                </p>
-                <p className="text-sm text-[#f8fcdc] font-[Cinzel]">
-                  <a
-                    href="/privacy-policy"
-                    className="text-[#dc9e63] hover:text-[#fcc276] underline transition-colors cursor-pointer"
-                  >
-                    Find out more
-                  </a>
-                  .
+                  This site uses cookies.{' '}
+                  <span className="block md:inline">
+                    <a
+                      href="/privacy-policy"
+                      className="text-[#dc9e63] hover:text-[#fcc276] underline transition-colors cursor-pointer"
+                    >
+                      Find out more
+                    </a>
+                    .
+                  </span>
                 </p>
               </div>
 
