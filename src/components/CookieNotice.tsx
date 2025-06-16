@@ -35,13 +35,13 @@ const CookieNotice: React.FC = () => {
           aria-label="Cookie consent banner"
         >
           <div className="max-w-6xl mx-auto">
-            <div className="flex items-center justify-center gap-4 text-left md:text-center">
+            <div className="flex items-center justify-center gap-4 text-left sm:text-center">
               
               {/* Message */}
               <div className="md:block">
                 <p className="text-sm text-[#f8fcdc] font-[Cinzel]">
                   This site uses cookies.{' '}
-                  <span className="block md:inline">
+                  <span className="block sm:inline">
                     <a
                       href="/privacy-policy"
                       className="text-[#dc9e63] hover:text-[#fcc276] underline transition-colors cursor-pointer"
