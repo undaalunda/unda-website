@@ -1,5 +1,4 @@
 // CookieNotice.tsx - Plini Style Minimal
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -36,19 +35,23 @@ const CookieNotice: React.FC = () => {
           aria-label="Cookie consent banner"
         >
           <div className="max-w-6xl mx-auto">
-            <div className="flex items-center justify-center gap-4 text-center">
+            <div className="flex items-center justify-between gap-4">
               
-              {/* Message */}
-              <p className="text-sm text-[#f8fcdc] font-[Cinzel]">
-                This site uses cookies.{' '}
-                <a
-                  href="/privacy-policy"
-                  className="text-[#dc9e63] hover:text-[#fcc276] underline transition-colors cursor-pointer"
-                >
-                  Find out more
-                </a>
-                .
-              </p>
+              {/* Message - เปลี่ยนจาก text-center เป็น text-left */}
+              <div className="text-left">
+                <p className="text-sm text-[#f8fcdc] font-[Cinzel]">
+                  This site uses cookies.
+                </p>
+                <p className="text-sm text-[#f8fcdc] font-[Cinzel]">
+                  <a
+                    href="/privacy-policy"
+                    className="text-[#dc9e63] hover:text-[#fcc276] underline transition-colors cursor-pointer"
+                  >
+                    Find out more
+                  </a>
+                  .
+                </p>
+              </div>
 
               {/* Action */}
               <button
