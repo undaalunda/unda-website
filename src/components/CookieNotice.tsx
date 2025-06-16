@@ -30,12 +30,12 @@ const CookieNotice: React.FC = () => {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
           transition={{ duration: 0.3, ease: 'easeOut' }}
-          className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-[#0d0000]/90 backdrop-blur-md shadow-2xl"
+          className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-[#0d0000]/60 backdrop-blur-md shadow-2xl"
           role="banner"
           aria-label="Cookie consent banner"
         >
           <div className="max-w-6xl mx-auto">
-            <div className="flex items-center justify-center md:justify-between gap-4 text-left md:text-center">
+            <div className="flex items-center justify-center gap-4 text-left md:text-center">
               
               {/* Message */}
               <div className="md:block">
