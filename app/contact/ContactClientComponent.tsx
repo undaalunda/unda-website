@@ -1,4 +1,4 @@
-// ContactClientComponent.tsx - REDESIGNED: Professional Contact Form with Product-style Responsive Design
+// ContactClientComponent.tsx - Final Version with Button + Modal
 
 'use client';
 
@@ -114,57 +114,49 @@ export default function ContactClientComponent() {
 
   return (
     <AppClientWrapper>
-      {/* 🚀 Responsive Container - matching ProductPageContent layout */}
+      {/* 🚀 Responsive Container */}
       <div className="min-h-screen flex flex-col justify-center items-center text-[#f8fcdc] font-[Cinzel] px-4 md:px-6 pt-32">
         
-        {/* Container for all content - matching product page max-width */}
-        <div className="w-full max-w-5xl pb-24">
+        {/* Container for all content */}
+        <div className="w-full max-w-3xl md:max-w-5xl pb-24">
           
           {/* 🚀 Main Content Wrapper */}
           <div className="flex flex-col items-center justify-center text-center">
             
-            {/* 🚀 Title - moved closer to description */}
-            <h1 className="text-4xl md:text-5xl xl:text-6xl font-bold text-[#dc9e63] mb-4 
-                         max-[927px]:text-3xl max-[696px]:text-2xl tracking-wide">
+            {/* 🚀 Title - 1 responsive only */}
+            <h1 className="text-4xl md:text-5xl xl:text-6xl font-bold text-[#dc9e63] mb-4 tracking-wide">
               CONTACT
             </h1>
             
-            {/* 🚀 Description - smaller text, responsive sizing */}
-            <p className="text-[#f8fcdc]/80 mb-8 max-w-2xl mx-auto leading-relaxed
-                        text-xs sm:text-sm md:text-base 
-                        max-[696px]:text-xs max-[696px]:mb-6
-                        max-[480px]:text-[11px] max-[480px]:leading-5">
-              Get in touch for bookings, collaborations, press inquiries, website support, or general questions.
+            {/* 🚀 Description - 1 responsive only */}
+            <p className="text-[#f8fcdc]/80 mb-8 max-w-lg md:max-w-2xl mx-auto leading-relaxed text-xs md:text-base">
+              Get in touch for bookings, collaborations, <br className="md:hidden" />
+              press inquiries, website support, or general questions.
             </p>
             
             {/* 🚀 Form/Success Message Container */}
             {submitted ? (
-              <div className="w-full max-w-xl text-center space-y-4">
-                <div className="text-[#dc9e63] text-xl font-semibold
-                              max-[696px]:text-lg max-[480px]:text-base">
+              <div className="w-full max-w-sm md:max-w-xl text-center space-y-4">
+                <div className="text-[#dc9e63] text-xl font-semibold">
                   ✓ Message sent successfully!
                 </div>
-                <p className="text-[#f8fcdc]/70 text-sm
-                             max-[696px]:text-xs">
+                <p className="text-[#f8fcdc]/70 text-sm">
                   Thank you for reaching out. We'll get back to you soon.
                 </p>
                 <button
                   onClick={() => setSubmitted(false)}
-                  className="text-[#dc9e63] hover:text-[#f8fcdc] underline text-sm
-                           max-[696px]:text-xs cursor-pointer"
+                  className="text-[#dc9e63] hover:text-[#f8fcdc] underline text-sm cursor-pointer"
                 >
                   Send another message
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="w-full max-w-xl space-y-6
-                                                      max-[696px]:space-y-4 max-[480px]:space-y-3">
+              <form onSubmit={handleSubmit} className="w-full max-w-sm md:max-w-xl space-y-6">
                 
                 {/* Name Field */}
                 <div>
-                  <label htmlFor="name" className="block mb-2 text-[#dc9e63] text-left
-                                                 text-sm md:text-base max-[696px]:text-xs max-[696px]:mb-1">
-                    Your name <span className="text-red-400">*</span>
+                  <label htmlFor="name" className="block mb-2 text-[#dc9e63] text-left text-sm md:text-base">
+                    Your name {errors.name && <span className="text-red-400">*</span>}
                   </label>
                   <input
                     type="text"
@@ -173,23 +165,20 @@ export default function ContactClientComponent() {
                     value={formData.name}
                     onChange={handleInputChange}
                     required
-                    className={`w-full px-4 py-2 bg-transparent border rounded-md focus:outline-none focus:ring-2 
-                              text-sm md:text-base max-[696px]:text-xs max-[696px]:px-3 max-[696px]:py-1.5
-                              max-[480px]:text-[11px] ${
+                    className={`w-full px-4 py-2 bg-transparent border rounded-md focus:outline-none focus:ring-2 text-sm md:text-base ${
                       errors.name 
                         ? 'border-red-500 focus:ring-red-500' 
                         : 'border-[#dc9e63] focus:ring-[#dc9e63]'
                     }`}
                     placeholder="Enter your name"
                   />
-                  {errors.name && <p className="text-red-400 text-xs mt-1 max-[480px]:text-[10px]">{errors.name}</p>}
+                  {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name}</p>}
                 </div>
 
                 {/* Email Field */}
                 <div>
-                  <label htmlFor="email" className="block mb-2 text-[#dc9e63] text-left
-                                                  text-sm md:text-base max-[696px]:text-xs max-[696px]:mb-1">
-                    Your email <span className="text-red-400">*</span>
+                  <label htmlFor="email" className="block mb-2 text-[#dc9e63] text-left text-sm md:text-base">
+                    Your email {errors.email && <span className="text-red-400">*</span>}
                   </label>
                   <input
                     type="email"
@@ -198,53 +187,55 @@ export default function ContactClientComponent() {
                     value={formData.email}
                     onChange={handleInputChange}
                     required
-                    className={`w-full px-4 py-2 bg-transparent border rounded-md focus:outline-none focus:ring-2 
-                              text-sm md:text-base max-[696px]:text-xs max-[696px]:px-3 max-[696px]:py-1.5
-                              max-[480px]:text-[11px] ${
+                    className={`w-full px-4 py-2 bg-transparent border rounded-md focus:outline-none focus:ring-2 text-sm md:text-base ${
                       errors.email 
                         ? 'border-red-500 focus:ring-red-500' 
                         : 'border-[#dc9e63] focus:ring-[#dc9e63]'
                     }`}
                     placeholder="Enter your email address"
                   />
-                  {errors.email && <p className="text-red-400 text-xs mt-1 max-[480px]:text-[10px]">{errors.email}</p>}
+                  {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
                 </div>
 
-                {/* Contact Type Field */}
+                {/* Contact Type Field - DROPDOWN VERSION */}
                 <div>
-                  <label htmlFor="contactType" className="block mb-2 text-[#dc9e63] text-left
-                                                        text-sm md:text-base max-[696px]:text-xs max-[696px]:mb-1">
-                    Contact Type <span className="text-red-400">*</span>
+                  <label htmlFor="contactType" className="block mb-2 text-[#dc9e63] text-left text-sm md:text-base">
+                    Contact Type {errors.contactType && <span className="text-red-400">*</span>}
                   </label>
-                  <select
-                    name="contactType"
-                    id="contactType"
-                    value={formData.contactType}
-                    onChange={handleInputChange}
-                    required
-                    className={`w-full px-4 py-2 bg-transparent border rounded-md focus:outline-none focus:ring-2 
-                              text-sm md:text-base max-[696px]:text-xs max-[696px]:px-3 max-[696px]:py-1.5
-                              max-[480px]:text-[11px] cursor-pointer ${
-                      errors.contactType 
-                        ? 'border-red-500 focus:ring-red-500' 
-                        : 'border-[#dc9e63] focus:ring-[#dc9e63]'
-                    }`}
-                  >
-                    <option value="" className="bg-[#1a1a2e] text-[#f8fcdc]">-- Please select --</option>
-                    <option value="booking" className="bg-[#1a1a2e] text-[#f8fcdc]">Booking Inquiry (Live Performance, Events, Tours)</option>
-                    <option value="collaboration" className="bg-[#1a1a2e] text-[#f8fcdc]">Collaboration Request (Features, Studio Work)</option>
-                    <option value="press" className="bg-[#1a1a2e] text-[#f8fcdc]">Press/Media Inquiry (Interviews, Reviews)</option>
-                    <option value="support" className="bg-[#1a1a2e] text-[#f8fcdc]">Website/Order Support (Digital/Physical Shop)</option>
-                    <option value="general" className="bg-[#1a1a2e] text-[#f8fcdc]">General Question</option>
-                  </select>
-                  {errors.contactType && <p className="text-red-400 text-xs mt-1 max-[480px]:text-[10px]">{errors.contactType}</p>}
+                  <div className="relative">
+                    <select
+                      name="contactType"
+                      id="contactType"
+                      value={formData.contactType}
+                      onChange={handleInputChange}
+                      required
+                      className={`w-full px-4 py-2 pr-10 bg-transparent border rounded-md focus:outline-none focus:ring-2 text-sm md:text-base cursor-pointer appearance-none ${
+                        errors.contactType 
+                          ? 'border-red-500 focus:ring-red-500' 
+                          : 'border-[#dc9e63] focus:ring-[#dc9e63]'
+                      }`}
+                    >
+                      <option value="" className="bg-[#1a1a2e] text-[#f8fcdc]">- Please select -</option>
+                      <option value="booking" className="bg-[#1a1a2e] text-[#f8fcdc]">Booking Inquiry (Live Performance, Events, Tours)</option>
+                      <option value="collaboration" className="bg-[#1a1a2e] text-[#f8fcdc]">Collaboration Request (Features, Studio Work)</option>
+                      <option value="press" className="bg-[#1a1a2e] text-[#f8fcdc]">Press/Media Inquiry (Interviews, Reviews)</option>
+                      <option value="support" className="bg-[#1a1a2e] text-[#f8fcdc]">Website/Order Support (Digital/Physical Shop)</option>
+                      <option value="general" className="bg-[#1a1a2e] text-[#f8fcdc]">General Question</option>
+                    </select>
+                    {/* Custom Arrow */}
+                    <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                      <svg className="w-4 h-4 text-[#dc9e63]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
+                  {errors.contactType && <p className="text-red-400 text-xs mt-1">{errors.contactType}</p>}
                 </div>
 
                 {/* Message Field */}
                 <div>
-                  <label htmlFor="message" className="block mb-2 text-[#dc9e63] text-left
-                                                    text-sm md:text-base max-[696px]:text-xs max-[696px]:mb-1">
-                    Your message <span className="text-red-400">*</span>
+                  <label htmlFor="message" className="block mb-2 text-[#dc9e63] text-left text-sm md:text-base">
+                    Your message {errors.message && <span className="text-red-400">*</span>}
                   </label>
                   <textarea
                     name="message"
@@ -254,17 +245,15 @@ export default function ContactClientComponent() {
                     onChange={handleInputChange}
                     required
                     maxLength={1200}
-                    className={`w-full px-4 py-2 bg-transparent border rounded-md focus:outline-none focus:ring-2 
-                              text-sm md:text-base max-[696px]:text-xs max-[696px]:px-3 max-[696px]:py-1.5
-                              max-[480px]:text-[11px] resize-vertical ${
+                    className={`w-full px-4 py-2 bg-transparent border rounded-md focus:outline-none focus:ring-2 text-sm md:text-base resize-vertical ${
                       errors.message 
                         ? 'border-red-500 focus:ring-red-500' 
                         : 'border-[#dc9e63] focus:ring-[#dc9e63]'
                     }`}
                     placeholder="Tell us how we can help you..."
                   />
-                  {errors.message && <p className="text-red-400 text-xs mt-1 max-[480px]:text-[10px]">{errors.message}</p>}
-                  <p className={`text-xs mt-1 text-right max-[480px]:text-[10px] ${
+                  {errors.message && <p className="text-red-400 text-xs mt-1">{errors.message}</p>}
+                  <p className={`text-xs mt-1 text-right ${
                     formData.message.length > 1100 ? 'text-yellow-400' : 'text-[#f8fcdc]/50'
                   }`}>
                     {formData.message.length}/1200 characters
@@ -275,9 +264,7 @@ export default function ContactClientComponent() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`w-full px-6 py-3 rounded-lg transition font-semibold
-                            text-sm md:text-base max-[696px]:text-xs max-[696px]:py-2 max-[696px]:px-4
-                            max-[480px]:text-[11px] max-[480px]:py-1.5 ${
+                  className={`w-full px-6 py-3 rounded-lg transition font-semibold text-sm md:text-base ${
                     isSubmitting
                       ? 'bg-[#dc9e63]/50 text-black/50 cursor-not-allowed'
                       : 'bg-[#dc9e63] text-black hover:bg-[#e6aa6f] cursor-pointer'
