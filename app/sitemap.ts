@@ -1,17 +1,17 @@
-// app/sitemap.ts - Perfect sync with allItems! 🎸
+// app/sitemap.ts - FIXED: Clean comments for social sharing
 
 import { MetadataRoute } from 'next'
 import { allItems } from '@/components/allItems'
 
-const BASE_URL = 'https://unda-website.vercel.app' // TODO: Change to undaalunda.com when ready
+const BASE_URL = 'https://unda-website.vercel.app'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  // 🎸 Get all 28 products from allItems (auto-sync!)
+  // Get all products from allItems (auto-sync!)
   const productUrls = allItems.map((item) => ({
     url: `${BASE_URL}/product/${item.id}`,
     lastModified: new Date('2025-06-02'),
     changeFrequency: 'weekly' as const,
-    // 🎯 Smart priority based on category & type
+    // Smart priority based on category & type
     priority: (() => {
       // Physical music products = highest priority
       if (item.category === 'Music' && item.type === 'physical') return 0.9
@@ -33,7 +33,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }))
 
   return [
-    // 🚀 MAIN PAGES - High Priority (exactly like your XML)
+    // MAIN PAGES - High Priority
     {
       url: BASE_URL,
       lastModified: new Date('2025-06-02'),
@@ -47,7 +47,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
 
-    // 🚀 SHOP PAGES (from your XML)
+    // SHOP PAGES
     {
       url: `${BASE_URL}/shop`,
       lastModified: new Date('2025-06-02'),
@@ -79,7 +79,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
 
-    // 🚀 TOUR & CONTACT
+    // TOUR & CONTACT
     {
       url: `${BASE_URL}/tour`,
       lastModified: new Date('2025-06-02'),
@@ -93,10 +93,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
 
-    // 🚀 ALL PRODUCT PAGES (auto-generated from allItems!)
+    // ALL PRODUCT PAGES (auto-generated from allItems!)
     ...productUrls,
 
-    // 🚀 LEGAL PAGES
+    // LEGAL PAGES
     {
       url: `${BASE_URL}/privacy-policy`,
       lastModified: new Date('2025-06-02'),
@@ -116,7 +116,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.5,
     },
 
-    // 🚀 UTILITY PAGES
+    // UTILITY PAGES
     {
       url: `${BASE_URL}/cart`,
       lastModified: new Date('2025-06-02'),
@@ -144,27 +144,27 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ]
 }
 
-// 🎯 Debug helper & stats (optional - ลบได้)
+// Debug helper & stats
 export const sitemapStats = {
-  totalProducts: allItems.length, // 28 products
+  totalProducts: allItems.length,
   categories: {
-    music: allItems.filter(item => item.category === 'Music').length,           // 6
-    merch: allItems.filter(item => item.category === 'Merch').length,           // 5  
-    bundles: allItems.filter(item => item.category === 'Bundles').length,       // 7
-    backingTracks: allItems.filter(item => item.category === 'Backing Track').length, // 8
+    music: allItems.filter(item => item.category === 'Music').length,
+    merch: allItems.filter(item => item.category === 'Merch').length,
+    bundles: allItems.filter(item => item.category === 'Bundles').length,
+    backingTracks: allItems.filter(item => item.category === 'Backing Track').length,
   },
   types: {
-    physical: allItems.filter(item => item.type === 'physical').length,         // 20
-    digital: allItems.filter(item => item.type === 'digital').length,           // 8
+    physical: allItems.filter(item => item.type === 'physical').length,
+    digital: allItems.filter(item => item.type === 'digital').length,
   },
   generated: new Date().toISOString(),
   
-  // 🎵 Featured products (for homepage linking)
+  // Featured products for homepage linking
   featuredProducts: [
-    'audio-digipak',     // Main album
-    'live-cd',           // Live performance  
-    'guitars-book',      // Guitar transcription
-    'dual-album-bundle', // Best value bundle
-    'anomic-drums',      // Popular backing track
+    'audio-digipak',
+    'live-cd',
+    'guitars-book',
+    'dual-album-bundle',
+    'anomic-drums',
   ]
 }

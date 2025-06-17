@@ -7,8 +7,8 @@ const BASE_URL = 'https://unda-website.vercel.app'; // TODO: Change to undaalund
 
 // 🚀 Artist-Focused SEO Metadata 
 export const metadata: Metadata = {
-  title: 'About Unda Alunda | Progressive Guitarist & Composer',
-  description: 'Meet Unda Alunda, progressive guitarist and composer. Creator of Dark Wonderful World album and Abasi Concepts endorser. Discover his musical journey from childhood sounds to instrumental rock artistry.',
+  title: 'About | Guitarist & Composer | UNDA ALUNDA',
+  description: 'Meet Unda Alunda, guitarist and composer. Creator of Dark Wonderful World album and Abasi Concepts endorser. Discover his musical journey from childhood sounds to instrumental rock artistry.',
   
   keywords: [
     'Unda Alunda',
@@ -33,8 +33,8 @@ export const metadata: Metadata = {
 
   // 🚀 Enhanced Open Graph
   openGraph: {
-    title: 'About Unda Alunda | Progressive Guitarist & Composer',
-    description: 'Progressive guitarist and composer, creator of Dark Wonderful World album. Abasi Concepts endorser.',
+    title: 'About | Guitarist & Composer | UNDA ALUNDA',
+    description: 'Guitarist and composer, creator of Dark Wonderful World album. Abasi Concepts endorser.',
     type: 'profile',
     url: `${BASE_URL}/about`,
     siteName: 'UNDA ALUNDA',
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
         url: `${BASE_URL}/catmoon-bg.jpeg`,
         width: 1200,
         height: 630,
-        alt: 'Unda Alunda - Progressive Guitarist & Composer',
+        alt: 'Unda Alunda - Guitarist & Composer',
       }
     ],
     locale: 'en_US',
@@ -52,8 +52,8 @@ export const metadata: Metadata = {
   // 🚀 Twitter Card
   twitter: {
     card: 'summary_large_image',
-    title: 'About Unda Alunda | Progressive Guitarist & Composer',
-    description: 'Progressive guitarist and composer, creator of Dark Wonderful World album. Abasi Concepts endorser.',
+    title: 'About | Guitarist & Composer | UNDA ALUNDA',
+    description: 'Guitarist and composer, creator of Dark Wonderful World album. Abasi Concepts endorser.',
     creator: '@undaalunda',
     images: [`${BASE_URL}/catmoon-bg.jpeg`],
   },
@@ -106,7 +106,7 @@ export default function AboutPage() {
             "@type": "Person",
             "@id": `${BASE_URL}/about#person`,
             "name": "Unda Alunda",
-            "description": "Progressive guitarist and composer, creator of Dark Wonderful World album. Abasi Concepts endorser specializing in instrumental rock and progressive metal.",
+            "description": "Guitarist and composer, creator of Dark Wonderful World album. Abasi Concepts endorser specializing in instrumental rock and progressive metal.",
             "url": `${BASE_URL}/about`,
             "image": [
               `${BASE_URL}/catmoon-bg.jpeg`
@@ -120,11 +120,11 @@ export default function AboutPage() {
             ],
             
             // 🎵 Primary Artist Identity
-            "jobTitle": "Progressive Guitarist & Composer",
+            "jobTitle": "Guitarist & Composer",
             "hasOccupation": {
               "@type": "Occupation",
               "name": "Musician",
-              "description": "Progressive guitarist and instrumental composer"
+              "description": "Guitarist and instrumental composer"
             },
             
             // 🎼 Main Creative Works (Focus)
@@ -232,7 +232,7 @@ export default function AboutPage() {
             "@type": "AboutPage",
             "@id": `${BASE_URL}/about#webpage`,
             "url": `${BASE_URL}/about`,
-            "name": "About Unda Alunda - Progressive Guitarist & Composer",
+            "name": "About | Guitarist & Composer | UNDA ALUNDA",
             "description": "Learn about Unda Alunda's musical journey and artistic vision. Discover the story behind Dark Wonderful World album and his approach to progressive guitar music.",
             "mainEntity": {
               "@id": `${BASE_URL}/about#person`
@@ -267,7 +267,7 @@ export default function AboutPage() {
             "@type": "MusicGroup",
             "@id": `${BASE_URL}/about#musicgroup`,
             "name": "Unda Alunda",
-            "description": "Progressive rock and instrumental music project featuring original compositions and guitar-driven soundscapes",
+            "description": "Instrumental music project featuring original compositions and guitar-driven soundscapes",
             "genre": ["Progressive Rock", "Instrumental Rock", "Progressive Metal"],
             "member": {
               "@type": "Person",

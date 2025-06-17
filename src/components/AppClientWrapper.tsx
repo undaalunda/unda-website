@@ -1,4 +1,4 @@
-// AppClientWrapper.tsx - Performance Optimized + Cookie Notice
+// AppClientWrapper.tsx - FIXED: Clean social icons alt text
 
 'use client';
 
@@ -11,14 +11,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 
-// 🚀 Lazy load heavy components
+// Lazy load heavy components
 const Navbar = dynamic(() => import('@/components/Navbar'), { ssr: false });
 const NewsletterForm = dynamic(() => import('@/components/NewsletterForm'), { 
   ssr: false,
   loading: () => <div style={{ height: '200px' }} />
 });
 
-// 🎯 SVG Social Icons - ลดขนาด bundle จาก Font Awesome
+// SVG Social Icons - unchanged for website design
 const FacebookIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
@@ -68,7 +68,7 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
     };
     window.addEventListener('toggle-menu', handler);
     
-    // 🔧 FIXED: เปลี่ยนเป็น 'auto' เพื่อให้ browser จัดการ scroll position เอง!
+    // FIXED: Keep scroll restoration as 'auto'
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'auto';
     }
@@ -98,23 +98,23 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
             <div className="footer-logo-social">
               <Image
                 src="/footer-logo-v7.webp"
-                alt="Unda Alunda Cat Logo"
+                alt="Unda Alunda Logo"
                 width={120}
                 height={120}
-                quality={100}      // ✅ คงไว้ชัดตามที่ต้องการ
+                quality={100}
                 loading="lazy"
-                unoptimized={true} // ✅ คงไว้ชัดตามที่ต้องการ
+                unoptimized={true}
                 sizes="120px"
                 className="glow-logo mx-auto mb-6"
               />
               
-              {/* ✅ Fixed Social Media Icons with proper aria-labels */}
+              {/* FIXED: Clean social media aria-labels */}
               <div className="social-icons mb-6" role="list" aria-label="Social media links">
                 <a 
                   href="https://www.facebook.com/UndaAlunda" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  aria-label="Follow Unda Alunda on Facebook"
+                  aria-label="Follow on Facebook"
                   role="listitem"
                 >
                   <FacebookIcon />
@@ -123,7 +123,7 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
                   href="https://www.youtube.com/@undaalunda" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  aria-label="Watch Unda Alunda on YouTube"
+                  aria-label="Watch on YouTube"
                   role="listitem"
                 >
                   <YoutubeIcon />
@@ -132,7 +132,7 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
                   href="https://www.instagram.com/undalunda" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  aria-label="Follow Unda Alunda on Instagram"
+                  aria-label="Follow on Instagram"
                   role="listitem"
                 >
                   <InstagramIcon />
@@ -141,7 +141,7 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
                   href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0?si=JsdyQRqGRCGYfxU_nB_qvQ" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  aria-label="Listen to Unda Alunda on Spotify"
+                  aria-label="Listen on Spotify"
                   role="listitem"
                 >
                   <SpotifyIcon />
@@ -150,7 +150,7 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
                   href="https://twitter.com/undaalunda" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  aria-label="Follow Unda Alunda on Twitter/X"
+                  aria-label="Follow on Twitter"
                   role="listitem"
                 >
                   <TwitterIcon />
@@ -159,7 +159,7 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
                   href="https://www.threads.net/@undalunda" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  aria-label="Follow Unda Alunda on Threads"
+                  aria-label="Follow on Threads"
                   role="listitem"
                 >
                   <ThreadsIcon />
@@ -172,7 +172,7 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
               <NewsletterForm />
             </div>
 
-            {/* ✅ Fixed Footer Links with proper structure */}
+            {/* Footer Links - unchanged for website design */}
             <div className="footer-bottom mt-5 text-center">
               <nav 
                 className="footer-links flex flex-wrap justify-center items-center gap-2 text-sm text-[#f8fcdc]/80 tracking-wide"
@@ -207,7 +207,7 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
         </div>
       </div>
 
-      {/* 🍪 Cookie Notice - ใส่ที่นี่เพื่อให้แสดงทุกหน้า */}
+      {/* Cookie Notice - unchanged for website design */}
       <CookieNotice />
     </>
   );

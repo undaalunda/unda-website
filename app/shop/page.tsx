@@ -1,32 +1,56 @@
-//app/shop/page.tsx
+// app/shop/page.tsx
 
 import ShopLandingContent from '@/components/ShopLandingContent';
 import AppClientWrapper from '@/components/AppClientWrapper';
 import type { Metadata } from 'next';
 
-const BASE_URL = 'https://unda-website.vercel.app'; // TODO: Change to 'https://www.undaalunda.com' when migrating
+const BASE_URL = 'https://unda-website.vercel.app';
 
-// Enhanced metadata for the new shop landing page
 export const metadata: Metadata = {
-  title: 'Shop | Physical & Digital Music Store | UNDA ALUNDA',
-  description: 'Shop exclusive Unda Alunda merchandise, physical albums, and digital content. Choose between physical products (merch, CDs, vinyl) or digital downloads (backing tracks, tabs, stems).',
+  title: 'Shop | Physical & Digital Products | UNDA ALUNDA',
+  description: 'Shop exclusive Unda Alunda products including physical merchandise, music albums, digital downloads, backing tracks, guitar tabs, and stems. Professional music content for musicians with worldwide shipping.',
   keywords: [
     'unda alunda shop',
     'progressive rock merchandise',
-    'backing tracks',
-    'guitar tabs',
-    'music stems',
-    'physical albums',
+    'physical shop',
     'digital downloads',
-    'musician merchandise',
+    'guitar tabs',
+    'backing tracks',
+    'music stems',
+    'progressive metal merch',
+    't-shirts',
+    'stickers',
+    'keychains',
+    'cd albums',
+    'vinyl records',
+    'transcription books',
+    'bundles',
+    'dark wonderful world',
+    'musician tools',
+    'professional backing tracks',
+    'guitar transcriptions',
+    'bass tabs',
+    'drums tabs',
+    'keys transcriptions',
     'thai progressive rock',
-    'official store'
+    'instrumental rock',
+    'guitar virtuoso',
+    'music education',
+    'practice tracks',
+    'official artist merchandise',
+    'worldwide shipping',
+    'digital music files',
+    'pdf transcriptions',
+    'wav files',
+    'music production',
+    'solo collection',
+    'guitar competition',
+    'contest entries'
   ],
   
-  // Open Graph
   openGraph: {
-    title: 'Shop | Physical & Digital Music Store | UNDA ALUNDA',
-    description: 'Shop exclusive Unda Alunda merchandise, physical albums, and digital content. Choose between physical products or digital downloads.',
+    title: 'Shop | Physical & Digital Products | UNDA ALUNDA',
+    description: 'Shop exclusive Unda Alunda products including physical merchandise, music albums, and professional digital downloads for musicians.',
     type: 'website',
     url: `${BASE_URL}/shop`,
     siteName: 'UNDA ALUNDA',
@@ -35,36 +59,23 @@ export const metadata: Metadata = {
         url: `${BASE_URL}/catmoon-bg.jpeg`,
         width: 1200,
         height: 630,
-        alt: 'Unda Alunda Official Shop',
+        alt: 'Unda Alunda Shop - Physical and Digital Products',
       },
     ],
   },
 
-  // Twitter Card
   twitter: {
     card: 'summary_large_image',
-    title: 'Shop | Physical & Digital Music Store | UNDA ALUNDA',
-    description: 'Shop exclusive Unda Alunda merchandise, physical albums, and digital content.',
+    title: 'Shop | Physical & Digital Products | UNDA ALUNDA',
+    description: 'Shop exclusive Unda Alunda products including physical merchandise, music albums, and professional digital downloads for musicians.',
     creator: '@undaalunda',
     images: [`${BASE_URL}/catmoon-bg.jpeg`],
   },
 
-  // Additional metadata
-  other: {
-    'og:title': 'Shop | Physical & Digital Music Store | UNDA ALUNDA',
-    'og:description': 'Shop exclusive Unda Alunda merchandise, physical albums, and digital content.',
-    'og:type': 'website',
-    'og:url': `${BASE_URL}/shop`,
-    'og:image': `${BASE_URL}/catmoon-bg.jpeg`,
-    'og:site_name': 'UNDA ALUNDA',
-  },
-
-  // Canonical URL
   alternates: {
     canonical: `${BASE_URL}/shop`,
   },
 
-  // Robots
   robots: {
     index: true,
     follow: true,
@@ -75,15 +86,19 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+
+  other: {
+    'theme-color': '#160000',
+    'color-scheme': 'dark',
+  },
 };
 
 export default function ShopPage() {
-  // Structured data for the shop landing page
   const shopSchema = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    "name": "Unda Alunda Official Shop",
-    "description": "Official store for Unda Alunda merchandise, music, and digital content",
+    "name": "Shop - Unda Alunda",
+    "description": "Official shop for Unda Alunda merchandise, music, and digital content",
     "url": `${BASE_URL}/shop`,
     "mainEntity": {
       "@type": "ItemList",
@@ -93,29 +108,130 @@ export default function ShopPage() {
         {
           "@type": "ListItem",
           "position": 1,
-          "name": "Physical Products",
-          "description": "Merchandise, CDs, vinyl, books, and bundles",
-          "url": `${BASE_URL}/shop/physical`
+          "name": "Physical Shop",
+          "description": "Official merchandise, music albums, and exclusive bundles with worldwide shipping",
+          "url": `${BASE_URL}/shop/physical`,
+          "image": `${BASE_URL}/catmoon-bg.jpeg`,
+          "mainEntity": {
+            "@type": "Store",
+            "name": "Unda Alunda Physical Store",
+            "description": "Physical merchandise and music products",
+            "hasOfferCatalog": {
+              "@type": "OfferCatalog",
+              "name": "Physical Products",
+              "itemListElement": [
+                {
+                  "@type": "OfferCatalog",
+                  "name": "Merchandise",
+                  "description": "T-shirts, stickers, keychains, and collectibles"
+                },
+                {
+                  "@type": "OfferCatalog", 
+                  "name": "Music Albums",
+                  "description": "CDs, vinyl records, and transcription books"
+                },
+                {
+                  "@type": "OfferCatalog",
+                  "name": "Bundle Packages", 
+                  "description": "Special deals combining music and merchandise"
+                }
+              ]
+            }
+          }
         },
         {
-          "@type": "ListItem", 
+          "@type": "ListItem",
           "position": 2,
-          "name": "Digital Products",
-          "description": "Backing tracks, tabs, stems, and digital downloads",
-          "url": `${BASE_URL}/shop/digital`
+          "name": "Digital Shop",
+          "description": "Professional high-quality backing tracks, tabs, and stems for musicians",
+          "url": `${BASE_URL}/shop/digital`,
+          "image": `${BASE_URL}/catmoon-bg.jpeg`,
+          "mainEntity": {
+            "@type": "DigitalDocument",
+            "name": "Unda Alunda Digital Content",
+            "description": "Professional music files and educational content for musicians",
+            "hasOfferCatalog": {
+              "@type": "OfferCatalog",
+              "name": "Digital Products",
+              "itemListElement": [
+                {
+                  "@type": "OfferCatalog",
+                  "name": "Dark Wonderful World Collection",
+                  "description": "Complete album collection with 141+ products including backing tracks, tabs, and stems",
+                  "numberOfItems": 141
+                },
+                {
+                  "@type": "OfferCatalog",
+                  "name": "Solo Collection",
+                  "description": "Guitar tabs from prestigious competition entries",
+                  "numberOfItems": 4
+                }
+              ]
+            }
+          }
         }
       ]
     },
     "provider": {
       "@type": "Organization",
       "name": "UNDA ALUNDA",
-      "url": BASE_URL
+      "url": BASE_URL,
+      "logo": `${BASE_URL}/unda-alunda-header.webp`,
+      "sameAs": [
+        "https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0",
+        "https://music.apple.com/us/artist/unda-alunda/1543677299",
+        "https://www.deezer.com/en/artist/115903802",
+        "https://tidal.com/browse/artist/22524871",
+        "https://music.amazon.com/artists/B08PVKFZDZ/unda-alunda"
+      ]
+    },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": `${BASE_URL}/shop?search={search_term_string}`
+      },
+      "query-input": "required name=search_term_string"
+    }
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": BASE_URL
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Shop",
+        "item": `${BASE_URL}/shop`
+      }
+    ]
+  };
+
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "UNDA ALUNDA",
+    "url": BASE_URL,
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": `${BASE_URL}/shop?search={search_term_string}`
+      },
+      "query-input": "required name=search_term_string"
     }
   };
 
   return (
     <>
-      {/* Structured data */}
+      {/* Schema.org structured data */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -123,28 +239,17 @@ export default function ShopPage() {
         }}
       />
 
-      {/* Breadcrumb Schema */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-              {
-                "@type": "ListItem",
-                "position": 1,
-                "name": "Home",
-                "item": BASE_URL
-              },
-              {
-                "@type": "ListItem",
-                "position": 2,
-                "name": "Shop",
-                "item": `${BASE_URL}/shop`
-              }
-            ]
-          })
+          __html: JSON.stringify(breadcrumbSchema)
+        }}
+      />
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(websiteSchema)
         }}
       />
 

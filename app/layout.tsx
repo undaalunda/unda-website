@@ -1,42 +1,72 @@
-// app/layout.tsx - Font Flash Fixed Version
+// app/layout.tsx - FINAL: Unified "Official website" Strategy
 
 import './globals.css';
 import type { Metadata } from 'next';
 import { CartProvider } from '@/context/CartContext';
 import { ReactNode } from 'react';
 
+const BASE_URL = 'https://unda-website.vercel.app';
+
 export const metadata: Metadata = {
   title: 'Unda Alunda | Official Website & Merch Store',
-  description: 'Official Website of Unda Alunda. The New Album Dark Wonderful World out July 1, 2025 — Purchase now!',
+  description: 'Official Website of Unda Alunda. New album "Dark Wonderful World" out August 26, 2025 — Purchase now!',
   keywords: [
     'Unda', 'Alunda', 'Unda Alunda', 'Dark Wonderful World',
-    'music', 'merch', 'Stems', 'Transcription', 'Tour date',
-    'Live in Thailand', 'jazz', 'Fusion', 'Progressive Rock', 'Progressive Metal', 'Instrumental Rock', 'Guitar Virtuoso'
+    'music', 'merch', 'stems', 'transcription', 'tour dates',
+    'live performances', 'instrumental rock', 'guitar virtuoso',
+    'backing tracks', 'guitar tabs', 'sonic landscapes',
+    'progressive rock guitarist', 'Thailand progressive metal', 'Thai musician',
+    'guitar music', 'instrumental guitar', 'melodic rock'
   ],
-  metadataBase: new URL('https://unda-website.vercel.app'),
+  metadataBase: new URL(BASE_URL),
+  
+  // 🎯 FIXED: Unified strategy - Social gets shorter version
+  openGraph: {
+    title: 'Unda Alunda | Official Website & Merch Store',
+    description: 'Official Website of Unda Alunda. New album "Dark Wonderful World" out August 26, 2025 — Purchase now!',
+    type: 'website',
+    url: BASE_URL,
+    siteName: 'UNDA ALUNDA',
+    images: [
+      {
+        url: `${BASE_URL}/catmoon-bg.jpeg`,
+        width: 1200,
+        height: 630,
+        alt: 'Unda Alunda - Dark Wonderful World',
+      },
+    ],
+  },
+  
   twitter: {
     card: 'summary_large_image',
-    title: 'Unda Alunda',
-    description: 'Official site and merch shop for Unda Alunda.',
-    images: ['/catmoon-bg.jpeg'],
+    title: 'Unda Alunda | Official Website & Merch Store',
+    description: 'Official Website of Unda Alunda. New album "Dark Wonderful World" out August 26, 2025 — Purchase now!',
     creator: '@undaalunda',
+    images: [`${BASE_URL}/catmoon-bg.jpeg`],
   },
+  
   icons: {
     icon: '/favicon.ico',
     shortcut: '/favicon-32x32.png',
     apple: '/apple-touch-icon.png',
   },
+  
+  // 🎯 FIXED: Unified meta tags for social
   other: {
     'og:title': 'Unda Alunda | Official Website & Merch Store',
-    'og:description': 'The New Album Dark Wonderful World out July 1, 2025 — Purchase now!',
-    'og:url': 'https://unda-website.vercel.app',
-    'og:site_name': 'Unda Alunda',
-    'og:image': 'https://unda-website.vercel.app/catmoon-bg.jpeg',
+    'og:description': 'Official Website of Unda Alunda. New album "Dark Wonderful World" out August 26, 2025 — Purchase now!',
+    'og:url': BASE_URL,
+    'og:site_name': 'UNDA ALUNDA',
+    'og:image': `${BASE_URL}/catmoon-bg.jpeg`,
+    'og:image:secure_url': `${BASE_URL}/catmoon-bg.jpeg`,
     'og:image:width': '1200',
     'og:image:height': '630',
-    'og:image:alt': 'Unda Alunda Hero Image',
-    'og:type': 'profile',
+    'og:image:alt': 'Unda Alunda - Dark Wonderful World',
+    'og:image:type': 'image/jpeg',
+    'og:type': 'website',
     'og:locale': 'en_US',
+    'twitter:image': `${BASE_URL}/catmoon-bg.jpeg`,
+    'twitter:image:alt': 'Unda Alunda - Dark Wonderful World',
   },
 };
 
@@ -44,19 +74,22 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
-        {/* 🚀 CRITICAL: Resource Hints - ลำดับความสำคัญสูงสุด */}
+        {/* 🚀 Resource Hints */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         
-        {/* 🎯 CRITICAL: Hero Images - Highest Priority */}
-        <link rel="preload" href="/text-hero-section.webp" as="image" type="image/webp" fetchPriority="high" />
+        {/* 🎯 FIXED: Catmoon-bg HIGHEST PRIORITY for Google/Social */}
+        <link rel="preload" href="/catmoon-bg.jpeg" as="image" type="image/jpeg" fetchPriority="high" />
         <link rel="preload" href="/catmoon-bg.webp" as="image" type="image/webp" fetchPriority="high" />
         
-        {/* 🚀 Secondary Priority - Product Images */}
+        {/* 🚀 Text hero = lower priority */}
+        <link rel="preload" href="/text-hero-section.webp" as="image" type="image/webp" />
+        
+        {/* 🚀 Product images = tertiary */}
         <link rel="preload" href="/product-guitar.webp" as="image" type="image/webp" />
         <link rel="preload" href="/product-keys.webp" as="image" type="image/webp" />
         
-        {/* 🚀 Enhanced DNS Prefetch */}
+        {/* DNS Prefetch */}
         <link rel="dns-prefetch" href="//widget.bandsintown.com" />
         <link rel="dns-prefetch" href="//www.youtube.com" />
         <link rel="dns-prefetch" href="//i.ytimg.com" />
@@ -65,20 +98,18 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="dns-prefetch" href="//fonts.gstatic.com" />
         
-        {/* 🎯 FIXED: Font Loading - No Flash Strategy */}
+        {/* Fonts */}
         <link 
           href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=block" 
           rel="stylesheet"
         />
         
-        {/* 🚀 FONT ANTI-FLASH: Critical CSS with proper font fallback */}
+        {/* Critical CSS - unchanged for website design */}
         <style dangerouslySetInnerHTML={{
           __html: `
-            /* 🎯 ANTI-FLASH: Prevent font switching */
             *{box-sizing:border-box}
             html{scroll-behavior:auto;-webkit-text-size-adjust:100%}
             
-            /* 🔧 FONT LOADING: Ensure consistent display */
             body{
               background-color:#190000;
               margin:0;
@@ -90,28 +121,22 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               visibility:visible !important;
             }
             
-            /* 🎯 Force Cinzel font family everywhere */
             * {
               font-family: 'Cinzel', Georgia, 'Times New Roman', serif !important;
             }
             
-            /* 🎯 ANTI-FLASH: Prevent layout shift during load */
             .hero-wrapper{opacity:1;position:relative;width:100vw;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-top:6rem;padding-bottom:6vh;z-index:0;margin-top:0;overflow:hidden}
             
-            /* 🚀 Catmoon background - ลบ will-change เพื่อประหยัด memory */
             .catmoon-background{position:absolute;inset:0;width:100%;height:100%;background-image:url('/catmoon-bg.webp');background-repeat:no-repeat;background-size:cover;background-position:center;z-index:-1;opacity:1}
             
-            /* 🎯 Hero text - Immediate position, controlled animation */
             .hero-text-image{position:absolute;top:10vh;left:50%;transform:translateX(-50%);width:80%;max-width:500px;z-index:10;pointer-events:none;opacity:0;margin-top:1rem;animation:fadeInHero 1.3s ease-out 0.2s forwards}
             
-            /* 🚀 ลด GPU acceleration เฉพาะที่จำเป็นจริงๆ */
             .hero-wrapper,
             .catmoon-background,
             .hero-text-image {
               backface-visibility: hidden;
             }
             
-            /* 🎯 Mobile optimizations */
             @media (max-width: 768px) {
               .catmoon-background {
                 background-attachment: scroll !important;
@@ -136,22 +161,19 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               }
             }
             
-            /* 🎯 Original animation - เหมือนเดิม */
             @keyframes fadeInHero{
               from{opacity:0;transform:translateX(-50%) translateY(20px)}
               to{opacity:1;transform:translateX(-50%) translateY(0)}
             }
             
-            /* Loading states */
             .section-loading{height:400px;background-color:#2a0808;display:flex;align-items:center;justify-content:center;color:#f8fcdc;contain:strict;content-visibility:auto}
             
-            /* 🎯 Prevent initial flicker */
             img{max-width:100%;height:auto;opacity:1}
             iframe{max-width:100%}
           `
         }} />
 
-        {/* 🔧 OPTIMIZED Scroll Restoration - เรียบง่ายขึ้น */}
+        {/* Scroll Restoration - unchanged */}
         <style dangerouslySetInnerHTML={{
           __html: `
             html { 
@@ -159,13 +181,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               scroll-padding-top: 96px;
             }
             
-            /* ป้องกัน layout shift ขณะโหลด */
             body {
               transition: none !important;
               scroll-behavior: smooth;
             }
             
-            /* ป้องกัน scroll jump ขณะ navigation */
             @media (prefers-reduced-motion: no-preference) {
               html {
                 scroll-behavior: auto;
@@ -174,70 +194,56 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           `
         }} />
 
-        {/* 🌟 NATURAL SCROLL RESTORATION - เหมือน navigation ปกติ */}
+        {/* Scroll Script - unchanged */}
         <script dangerouslySetInnerHTML={{
           __html: `
             (function() {
-              // บันทึก position อย่างเดียว
               function savePosition() {
                 sessionStorage.setItem('naturalScrollPos', window.scrollY);
               }
               
-              // กู้คืนแบบธรรมชาติ
               function naturalRestore() {
                 const savedPos = sessionStorage.getItem('naturalScrollPos');
                 
                 if (savedPos && parseInt(savedPos) > 0) {
                   const targetY = parseInt(savedPos);
                   
-                  // 🎯 ใช้ browser restoration mechanism เป็นหลัก
                   if ('scrollRestoration' in history) {
                     history.scrollRestoration = 'auto';
                   }
                   
-                  // 🌊 Gentle restore - ไม่ฝืน
                   function gentleScrollTo() {
                     const currentY = window.scrollY;
                     
-                    // ถ้าอยู่ใกล้ตำแหน่งเป้าหมายแล้ว ไม่ต้องทำอะไร
                     if (Math.abs(currentY - targetY) < 50) {
                       return;
                     }
                     
-                    // ใช้ smooth scroll ธรรมชาติ
                     window.scrollTo({
                       top: targetY,
-                      behavior: 'instant' // instant แต่ไม่ violent
+                      behavior: 'instant'
                     });
                   }
                   
-                  // ลอง restore ช้าๆ เหมือน page navigation
-                  setTimeout(gentleScrollTo, 50);   // ครั้งแรก
-                  setTimeout(gentleScrollTo, 150);  // ครั้งที่สอง
-                  setTimeout(gentleScrollTo, 300);  // ครั้งสุดท้าย
+                  setTimeout(gentleScrollTo, 50);
+                  setTimeout(gentleScrollTo, 150);
+                  setTimeout(gentleScrollTo, 300);
                 }
               }
               
-              // บันทึกทุกครั้งที่ scroll
               window.addEventListener('scroll', savePosition, { passive: true });
-              
-              // บันทึกก่อน refresh
               window.addEventListener('beforeunload', savePosition);
               
-              // กู้คืนเมื่อหน้าพร้อม
               if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', naturalRestore);
               } else {
                 naturalRestore();
               }
               
-              // กู้คืนหลัง load เสร็จ (เผื่อ images ช้า)
               window.addEventListener('load', naturalRestore);
               
-              // เคลียร์เมื่อไปหน้าใหม่
               let isNavigating = false;
               
-              // ตรวจจับการ navigate จริง
               window.addEventListener('click', function(e) {
                 const link = e.target.closest('a[href]');
                 if (link && link.href && !link.href.includes('#')) {
@@ -255,12 +261,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           `
         }} />
         
-        {/* 🎯 Viewport with Performance Hints */}
+        {/* Meta tags */}
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta httpEquiv="X-DNS-Prefetch-Control" content="on" />
         <meta name="format-detection" content="telephone=no" />
-        
-        {/* SEO & Verification */}
         <meta name="google-site-verification" content="l9-GepfNOG2FpwhTM3lKy6YjpQ0ifAmNbLsv1oqC2uo" />
         <meta name="robots" content="index, follow" />
         <meta name="author" content="Unda Alunda" />
@@ -271,52 +275,56 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <meta name="apple-mobile-web-app-title" content="Unda Alunda" />
         <meta name="application-name" content="Unda Alunda" />
         <meta name="copyright" content="Unda Alunda" />
-        <link rel="canonical" href="https://unda-website.vercel.app" />
+        <link rel="canonical" href={BASE_URL} />
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <meta property="music:musician" content="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0" />
 
-        {/* Social Media Images */}
-        <meta property="og:image" content="https://unda-website.vercel.app/catmoon-bg.jpeg" />
+        {/* 🎯 CRITICAL: Explicit social media images */}
+        <meta property="og:image" content={`${BASE_URL}/catmoon-bg.jpeg`} />
+        <meta property="og:image:secure_url" content={`${BASE_URL}/catmoon-bg.jpeg`} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content="Unda Alunda Hero Image" />
+        <meta property="og:image:alt" content="Unda Alunda - Dark Wonderful World" />
+        <meta property="og:image:type" content="image/jpeg" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content={`${BASE_URL}/catmoon-bg.jpeg`} />
 
-        {/* 🚀 OPTIMIZED Structured Data - ลดขนาดลงเล็กน้อย */}
+        {/* 🎯 FIXED: Structured Data - Website */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebSite",
-              "@id": "https://unda-website.vercel.app#website",
+              "@id": `${BASE_URL}#website`,
               "name": "Unda Alunda",
-              "url": "https://unda-website.vercel.app",
-              "author": { "@id": "https://unda-website.vercel.app#person" },
-              "publisher": { "@id": "https://unda-website.vercel.app#person" },
+              "url": BASE_URL,
+              "image": `${BASE_URL}/catmoon-bg.jpeg`,
+              "author": { "@id": `${BASE_URL}#person` },
+              "publisher": { "@id": `${BASE_URL}#person` },
               "potentialAction": {
                 "@type": "SearchAction",
-                "target": "https://unda-website.vercel.app/search?q={search_term_string}",
+                "target": `${BASE_URL}/search?q={search_term_string}`,
                 "query-input": "required name=search_term_string"
               }
             })
           }}
         />
 
-        {/* 🎯 Structured Data - Person - เก็บข้อมูลสำคัญ */}
+        {/* 🎯 FIXED: Structured Data - Person (GUITARIST!) */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Person",
-              "@id": "https://unda-website.vercel.app#person",
+              "@id": `${BASE_URL}#person`,
               "name": "Alunda Chantharattanachoke",
               "alternateName": "Unda Alunda",
-              "url": "https://unda-website.vercel.app",
-              "image": "https://unda-website.vercel.app/catmoon-bg.jpeg",
+              "url": BASE_URL,
+              "image": `${BASE_URL}/catmoon-bg.jpeg`,
               "sameAs": [
                 "https://www.instagram.com/undalunda",
                 "https://www.youtube.com/@undaalunda",
@@ -330,7 +338,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 "https://music.amazon.com/artists/B08PVKFZDZ"
               ],
               "jobTitle": "Guitarist, Composer",
-              "nationality": "Thai",
               "birthDate": "1999-10-11",
               "gender": "Male",
               "brand": {
@@ -352,30 +359,30 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           }}
         />
 
-        {/* 🚀 Structured Data - MusicGroup - เก็บข้อมูลสำคัญ */}
+        {/* 🎯 FIXED: Structured Data - MusicGroup */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "MusicGroup",
-              "@id": "https://unda-website.vercel.app#musicgroup",
+              "@id": `${BASE_URL}#musicgroup`,
               "name": "Unda Alunda",
-              "description": "Progressive Rock guitarist and composer from Thailand.",
-              "url": "https://unda-website.vercel.app",
+              "description": "Guitarist and composer creating beautiful instrumental guitar music and atmospheric compositions.",
+              "url": BASE_URL,
+              "image": `${BASE_URL}/catmoon-bg.jpeg`,
               "sameAs": [
                 "https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0",
                 "https://www.instagram.com/undalunda",
                 "https://www.youtube.com/@undaalunda"
               ],
-              "genre": ["Progressive Rock", "Progressive Metal", "Instrumental Rock"],
-              "foundingLocation": { "@type": "Place", "name": "Thailand" },
-              "member": { "@id": "https://unda-website.vercel.app#person" }
+              "genre": ["Instrumental Guitar", "Melodic Rock", "Atmospheric Music"],
+              "member": { "@id": `${BASE_URL}#person` }
             })
           }}
         />
 
-        {/* 🎯 Structured Data - Album */}
+        {/* 🎯 FIXED: Structured Data - Album */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -383,16 +390,17 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               "@context": "https://schema.org",
               "@type": "MusicAlbum",
               "name": "Dark Wonderful World",
-              "description": "The upcoming album by Unda Alunda, featuring progressive rock and metal compositions.",
-              "datePublished": "2025-07-01",
-              "byArtist": { "@id": "https://unda-website.vercel.app#person" },
+              "description": "The upcoming album by Unda Alunda, featuring beautiful instrumental guitar compositions.",
+              "image": `${BASE_URL}/catmoon-bg.jpeg`,
+              "datePublished": "2025-08-26",
+              "byArtist": { "@id": `${BASE_URL}#person` },
               "recordLabel": "Independent",
-              "genre": ["Progressive Rock", "Progressive Metal"]
+              "genre": ["Instrumental Guitar", "Melodic Rock"]
             })
           }}
         />
 
-        {/* 🚀 Performance & Security Headers */}
+        {/* Security Headers */}
         <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
         <meta httpEquiv="X-Frame-Options" content="DENY" />
         <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />
