@@ -21,7 +21,7 @@ export default function BandsinTownWidget() {
         className="bit-widget-initializer"
         data-artist-name="Unda Alunda"
         data-background-color="transparent"
-        data-limit="5" // 🎯 ลดเหลือ 5 รายการ (homepage ไม่ต้องเยอะ)
+        data-limit="5"
         data-separator-color="rgba(255,255,255,0.1)"
         data-text-color="#f8fcdc"
         data-link-color="#dc9e63"

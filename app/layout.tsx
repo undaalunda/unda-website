@@ -368,7 +368,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               "@type": "MusicGroup",
               "@id": `${BASE_URL}#musicgroup`,
               "name": "Unda Alunda",
-              "description": "Guitarist and composer creating beautiful instrumental guitar music and atmospheric compositions.",
+              "description": "Guitarist and composer creating beautiful instrumental guitar music",
               "url": BASE_URL,
               "image": `${BASE_URL}/catmoon-bg.jpeg`,
               "sameAs": [

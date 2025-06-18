@@ -6,7 +6,7 @@ import ContactClientComponent from './ContactClientComponent';
 const BASE_URL = 'https://unda-website.vercel.app';
 
 export const metadata: Metadata = {
-  title: 'Contact Unda Alunda | Booking & Collaboration Inquiries',
+  title: 'Contact | Booking & Collaboration Inquiries | UNDA ALUNDA',
   description: 'Get in touch with Unda Alunda for bookings, collaboration inquiries, press requests, and general questions.',
   keywords: [
     'Unda Alunda contact',
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   
   // 🎯 FIXED: Complete openGraph structure
   openGraph: {
-    title: 'Contact Unda Alunda | Booking & Collaboration Inquiries',
+    title: 'Contact | Booking & Collaboration Inquiries | UNDA ALUNDA',
     description: 'Get in touch with Unda Alunda for bookings and collaboration inquiries.',
     type: 'website',
     url: `${BASE_URL}/contact`,
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
   // 🎯 FIXED: Twitter Card
   twitter: {
     card: 'summary_large_image',
-    title: 'Contact Unda Alunda | Booking & Collaboration Inquiries',
+    title: 'Contact | Booking & Collaboration Inquiries | UNDA ALUNDA',
     description: 'Get in touch with Unda Alunda for bookings and collaboration inquiries.',
     creator: '@undaalunda',
     images: [`${BASE_URL}/catmoon-bg.jpeg`],
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
 
   // 🎯 FIXED: Other meta tags
   other: {
-    'og:title': 'Contact Unda Alunda | Booking & Collaboration Inquiries',
+    'og:title': 'Contact | Booking & Collaboration Inquiries | UNDA ALUNDA',
     'og:description': 'Get in touch with Unda Alunda for bookings and collaboration inquiries.',
     'og:type': 'website',
     'og:url': `${BASE_URL}/contact`,

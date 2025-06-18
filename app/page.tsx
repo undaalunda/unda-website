@@ -149,7 +149,7 @@ export default function Page() {
             "@context": "https://schema.org",
             "@type": "MusicAlbum",
             "name": "Dark Wonderful World",
-            "description": "The upcoming album by Unda Alunda featuring beautiful instrumental guitar compositions and atmospheric music",
+            "description": "The upcoming album by Unda Alunda featuring beautiful instrumental guitar compositions",
             "image": `${BASE_URL}/catmoon-bg.jpeg`,
             "datePublished": "2025-08-26",
             "byArtist": {
