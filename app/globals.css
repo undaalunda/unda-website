@@ -2105,3 +2105,18 @@ button svg,
   background: linear-gradient(135deg, rgba(255,107,53,0.15) 0%, rgba(230,57,70,0.12) 50%, rgba(214,40,40,0.08) 100%);
   border-left: 4px solid #ff6b35;
 }
+
+/* === แก้ hover ติดค้างบนมือถือ === */
+@media (pointer: coarse) {
+  *:hover {
+    transform: none !important;
+    background-color: inherit !important;
+    color: inherit !important;
+    opacity: inherit !important;
+    border-color: inherit !important;
+    box-shadow: inherit !important;
+    width: inherit !important;
+    stroke: inherit !important;
+    mix-blend-mode: inherit !important;
+  }
+}
