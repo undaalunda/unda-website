@@ -1,4 +1,4 @@
-/* Globals.css - Performance Optimized */
+/* Globals.css - Performance Optimized + Touch-Friendly */
 
 @import "tailwindcss";
 
@@ -202,18 +202,26 @@ button svg,
   transition: stroke 0.3s ease;
 }
 
-/* === NAVBAR ICONS === */
+/* === NAVBAR ICONS - TOUCH FRIENDLY === */
 .navbar-icon {
   color: #f8fcdc99;
   transition: color 0.3s ease, stroke 0.3s ease;
 }
 
-.navbar-icon:active {
-  color: #dc9e63;
+/* 🚀 Hover เฉพาะ mouse devices */
+@media (hover: hover) and (pointer: fine) {
+  .navbar-icon:hover {
+    color: #dc9e63;
+  }
+  
+  .navbar-icon:hover svg {
+    stroke: #dc9e63;
+  }
 }
 
-.navbar-icon svg {
-  transition: stroke 0.3s ease;
+/* 📱 Touch feedback */
+.navbar-icon:active {
+  color: #dc9e63;
 }
 
 .navbar-icon:active svg {
@@ -329,6 +337,7 @@ button svg,
   color: #dc9e63;
 }
 
+/* === HERO CTA LINKS - TOUCH FRIENDLY === */
 .hero-cta-link {
   color: #dc9e63;
   text-decoration: none;
@@ -336,7 +345,13 @@ button svg,
   transition: color 0.4s ease;
 }
 
-.hero-cta-link:hover {
+@media (hover: hover) and (pointer: fine) {
+  .hero-cta-link:hover {
+    color: #9a1d2e;
+  }
+}
+
+.hero-cta-link:active {
   color: #9a1d2e;
 }
 
@@ -403,7 +418,7 @@ button svg,
   }
 }
 
-/* === BUTTON GROUP === */
+/* === BUTTON GROUP - TOUCH FRIENDLY === */
 .button-group {
   display: flex;
   flex-wrap: wrap;
@@ -437,10 +452,20 @@ button svg,
   cursor: pointer;
 }
 
-.info-button:hover {
+/* 🚀 ใช้ @media (hover: hover) เพื่อจำกัด hover เฉพาะ devices ที่มี mouse */
+@media (hover: hover) and (pointer: fine) {
+  .info-button:hover {
+    background-color: #dc9e63;
+    color: #0d0d0d;
+    mix-blend-mode: difference;
+  }
+}
+
+/* 📱 สำหรับ touch devices ใช้ :active แทน :hover */
+.info-button:active {
   background-color: #dc9e63;
   color: #0d0d0d;
-  mix-blend-mode: difference;
+  transform: scale(0.98);
 }
 
 @media (max-width: 1279px) {
@@ -465,7 +490,7 @@ button svg,
   }
 }
 
-/* === SHOP PAGE TAB GROUP === */
+/* === SHOP PAGE TAB GROUP - TOUCH FRIENDLY === */
 .shop-tab-group {
   display: flex;
   flex-wrap: wrap;
@@ -488,9 +513,17 @@ button svg,
   white-space: nowrap;
 }
 
-.shop-tab-button:hover {
+@media (hover: hover) and (pointer: fine) {
+  .shop-tab-button:hover {
+    background-color: #dc9e63;
+    color: #0d0d0d;
+  }
+}
+
+.shop-tab-button:active {
   background-color: #dc9e63;
   color: #0d0d0d;
+  transform: scale(0.98);
 }
 
 .shop-tab-button.active-tab {
@@ -630,6 +663,7 @@ button svg,
   box-shadow: 0 0 0 2px rgba(220, 158, 99, 0.2);
 }
 
+/* === CONTACT SUBMIT BUTTON - TOUCH FRIENDLY === */
 .contact-submit-button {
   background-color: #dc9e63;
   color: #0f0f0f;
@@ -643,8 +677,15 @@ button svg,
   transition: background-color 0.3s ease;
 }
 
-.contact-submit-button:hover {
+@media (hover: hover) and (pointer: fine) {
+  .contact-submit-button:hover {
+    background-color: #e6aa6f;
+  }
+}
+
+.contact-submit-button:active {
   background-color: #e6aa6f;
+  transform: scale(0.98);
 }
 
 .since-note {
@@ -730,6 +771,7 @@ button svg,
   max-width: 200px;
 }
 
+/* === PRODUCT IMAGES - TOUCH FRIENDLY === */
 .product-image {
   width: 200px;
   height: auto;
@@ -756,8 +798,18 @@ button svg,
   }
 }
 
-.product-image:hover {
-  transform: scale(1.05);
+@media (hover: hover) and (pointer: fine) {
+  .product-image:hover {
+    transform: scale(1.05);
+  }
+  
+  .product-label-link:hover .product-image {
+    transform: scale(1.05);
+  }
+}
+
+.product-label-link:active .product-image {
+  transform: scale(0.98);
 }
 
 .product-label-link {
@@ -765,16 +817,6 @@ button svg,
   color: inherit;
   transition: all 0.3s ease;
   cursor: pointer;
-}
-
-.product-label-link:hover {
-  text-decoration: none;
-  color: inherit;
-  cursor: pointer;
-}
-
-.product-label-link:hover .product-image {
-  transform: scale(1.05);
 }
 
 .product-label-group {
@@ -906,16 +948,13 @@ button svg,
   max-width: 200px;
 }
 
+/* === STEMS IMAGES - TOUCH FRIENDLY === */
 .stems-image {
   width: 180px;
   height: auto;
   border-radius: 12px;
   object-fit: cover;
   transition: transform 0.3s ease;
-}
-
-.stems-image:hover {
-  transform: scale(1.05);
 }
 
 @media (max-width: 1279px) {
@@ -930,14 +969,24 @@ button svg,
   }
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .stems-image:hover {
+    transform: scale(1.05);
+  }
+  
+  .stems-item:hover .stems-image {
+    transform: scale(1.05);
+  }
+}
+
+.stems-item:active .stems-image {
+  transform: scale(0.98);
+}
+
 .stems-label-group {
   margin-top: 0.75rem;
   text-align: center;
   font-family: 'Cinzel', serif;
-}
-
-.stems-item:hover .stems-image {
-  transform: scale(1.05);
 }
 
 .stems-title-text {
@@ -974,6 +1023,7 @@ button svg,
   transition: color 0.3s ease;
 }
 
+/* === BACKING LINE - TOUCH FRIENDLY === */
 .backing-line {
   display: block;
   height: 1px;
@@ -983,8 +1033,10 @@ button svg,
   transition: width 0.6s ease;
 }
 
-.is-backing:hover .backing-line {
-  width: 70%;
+@media (hover: hover) and (pointer: fine) {
+  .is-backing:hover .backing-line {
+    width: 70%;
+  }
 }
 
 /* === FONT SIZE RESPONSIVE BREAKPOINTS === */
@@ -1185,7 +1237,7 @@ button svg,
           drop-shadow(0 0 12px #53371d);
 }
 
-/* Social footer logo */
+/* === SOCIAL ICONS - TOUCH FRIENDLY === */
 .social-icons {
   display: flex;
   justify-content: center;
@@ -1199,8 +1251,15 @@ button svg,
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-.social-icons a:hover {
-  transform: scale(1.2);
+@media (hover: hover) and (pointer: fine) {
+  .social-icons a:hover {
+    transform: scale(1.2);
+    opacity: 0.85;
+  }
+}
+
+.social-icons a:active {
+  transform: scale(1.1);
   opacity: 0.85;
 }
 
@@ -1309,6 +1368,7 @@ button svg,
   box-shadow: none;
 }
 
+/* === NEWSLETTER BUTTON - TOUCH FRIENDLY === */
 .newsletter-button {
   display: block;
   width: 100%;
@@ -1327,8 +1387,15 @@ button svg,
   font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; 
 }
 
-.newsletter-button:hover {
+@media (hover: hover) and (pointer: fine) {
+  .newsletter-button:hover {
+    opacity: 0.9;
+  }
+}
+
+.newsletter-button:active {
   opacity: 0.9;
+  transform: scale(0.98);
 }
 
 .newsletter-divider {
@@ -1362,12 +1429,19 @@ button svg,
   flex-wrap: wrap;
 }
 
+/* === FOOTER LINKS - TOUCH FRIENDLY === */
 .footer-links a {
   color: #dc9e63;
   text-decoration: none;
 }
 
-.footer-links a:hover {
+@media (hover: hover) and (pointer: fine) {
+  .footer-links a:hover {
+    opacity: 0.8;
+  }
+}
+
+.footer-links a:active {
   opacity: 0.8;
 }
 
@@ -1403,12 +1477,6 @@ button svg,
 .active-tab {
   background-color: #dc9e63;
   color: #0f0f0f;
-}
-
-.info-button:hover {
-  background-color: #dc9e63;
-  color: #0f0f0f;
-  mix-blend-mode: difference;
 }
 
 .shop-newsletter-wrapper .newsletter-section {
@@ -1506,6 +1574,7 @@ button svg,
   font-size: 0.875rem;
 }
 
+/* === ADD TO CART BUTTON - TOUCH FRIENDLY === */
 .add-to-cart-button {
   width: 180px;
   padding: 0.75rem;
@@ -1518,11 +1587,20 @@ button svg,
   text-align: center;
 }
 
-.add-to-cart-button:hover {
-  background-color: #f8fcdc;
-  color: #160000;
+@media (hover: hover) and (pointer: fine) {
+  .add-to-cart-button:hover {
+    background-color: #f8fcdc;
+    color: #160000;
+  }
 }
 
+.add-to-cart-button:active {
+  background-color: #f8fcdc;
+  color: #160000;
+  transform: scale(0.98);
+}
+
+/* === BACK TO SHOP LINK - TOUCH FRIENDLY === */
 .back-to-shop-link {
   margin-top: 2rem;
   font-size: 0.875rem;
@@ -1532,7 +1610,14 @@ button svg,
   transition: color 0.3s ease;
 }
 
-.back-to-shop-link:hover {
+@media (hover: hover) and (pointer: fine) {
+  .back-to-shop-link:hover {
+    color: #f8fcdc;
+    opacity: 1;
+  }
+}
+
+.back-to-shop-link:active {
   color: #f8fcdc;
   opacity: 1;
 }
@@ -1566,6 +1651,7 @@ button svg,
   align-items: center;
 }
 
+/* === RELATED PRODUCTS - TOUCH FRIENDLY === */
 .related-product-item img {
   width: 200px;
   height: auto;
@@ -1574,8 +1660,14 @@ button svg,
   transition: transform 0.3s ease;
 }
 
-.related-product-item:hover img {
-  transform: scale(1.05);
+@media (hover: hover) and (pointer: fine) {
+  .related-product-item:hover img {
+    transform: scale(1.05);
+  }
+}
+
+.related-product-item:active img {
+  transform: scale(0.98);
 }
 
 .related-product-title {
@@ -1835,7 +1927,7 @@ button svg,
   max-width: 360px;
 }
 
-/* 🔥 PHYSICAL SHOP CARD - Background removed for Tailwind control */
+/* === SHOP LANDING CARDS - TOUCH FRIENDLY === */
 .shop-landing-card {
   border: 1px solid rgba(211,113,66,0.1);
   border-radius: 1.5rem;
@@ -1849,21 +1941,32 @@ button svg,
   transition: all 0.15s ease;
 }
 
-.shop-landing-card:hover {
-  border-color: rgba(211,113,66,0.25);
-  box-shadow: 0 25px 50px rgba(211,113,66,0.25);
-  transform: translateY(-2px);
+@media (hover: hover) and (pointer: fine) {
+  .shop-landing-card:hover {
+    border-color: rgba(211,113,66,0.25);
+    box-shadow: 0 25px 50px rgba(211,113,66,0.25);
+    transform: translateY(-2px);
+  }
 }
 
-/* 🔥 DIGITAL SHOP CARD - Background removed for Tailwind control */
+.shop-landing-card:active {
+  transform: scale(0.99);
+}
+
 .shop-landing-digital-card {
   border: 1px solid rgba(37,60,80,0.4);
   transition: all 0.15s ease;
 }
 
-.shop-landing-digital-card:hover {
-  border-color: rgba(37,60,80,0.6);
-  box-shadow: 0 25px 50px rgba(37,60,80,0.25);
+@media (hover: hover) and (pointer: fine) {
+  .shop-landing-digital-card:hover {
+    border-color: rgba(37,60,80,0.6);
+    box-shadow: 0 25px 50px rgba(37,60,80,0.25);
+  }
+}
+
+.shop-landing-digital-card:active {
+  transform: scale(0.99);
 }
 
 .shop-landing-card-content {
@@ -1990,17 +2093,6 @@ button svg,
   .shop-landing-hero-section {
     margin-bottom: 3rem;
   }
-}
-
-/* === TERMS DELIVERY SECTIONS === */
-.terms-digital-delivery {
-  background: linear-gradient(135deg, rgba(2,48,71,0.15) 0%, rgba(18,103,130,0.12) 50%, rgba(33,158,188,0.08) 100%);
-  border-left: 4px solid #023047;
-}
-
-.terms-physical-delivery {
-  background: linear-gradient(135deg, rgba(255,107,53,0.15) 0%, rgba(230,57,70,0.12) 50%, rgba(214,40,40,0.08) 100%);
-  border-left: 4px solid #ff6b35;
 }
 
 /* === TERMS DELIVERY SECTIONS === */
