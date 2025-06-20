@@ -465,7 +465,6 @@ button svg,
 .info-button:active {
   background-color: #dc9e63;
   color: #0d0d0d;
-  transform: scale(0.98);
 }
 
 @media (max-width: 1279px) {
@@ -523,7 +522,6 @@ button svg,
 .shop-tab-button:active {
   background-color: #dc9e63;
   color: #0d0d0d;
-  transform: scale(0.98);
 }
 
 .shop-tab-button.active-tab {
@@ -685,7 +683,6 @@ button svg,
 
 .contact-submit-button:active {
   background-color: #e6aa6f;
-  transform: scale(0.98);
 }
 
 .since-note {
@@ -1395,7 +1392,6 @@ button svg,
 
 .newsletter-button:active {
   opacity: 0.9;
-  transform: scale(0.98);
 }
 
 .newsletter-divider {
@@ -1597,7 +1593,6 @@ button svg,
 .add-to-cart-button:active {
   background-color: #f8fcdc;
   color: #160000;
-  transform: scale(0.98);
 }
 
 /* === BACK TO SHOP LINK - TOUCH FRIENDLY === */
@@ -1667,7 +1662,6 @@ button svg,
 }
 
 .related-product-item:active img {
-  transform: scale(0.98);
 }
 
 .related-product-title {
@@ -1950,7 +1944,6 @@ button svg,
 }
 
 .shop-landing-card:active {
-  transform: scale(0.99);
 }
 
 .shop-landing-digital-card {
@@ -1966,7 +1959,6 @@ button svg,
 }
 
 .shop-landing-digital-card:active {
-  transform: scale(0.99);
 }
 
 .shop-landing-card-content {
