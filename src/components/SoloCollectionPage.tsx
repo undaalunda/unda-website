@@ -1,13 +1,27 @@
-/* SoloCollectionPage.tsx - Updated Layout to match AlbumHubPage */
+/* SoloCollectionPage.tsx - Full Performance Optimization - COMPLETE */
 
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { allItems } from './allItems';
+
+// 🚀 Import Optimized Image Components
+import { AlbumCover, ProductImage } from '@/components/OptimizedImage';
+
+// 🎯 Dynamic imports for heavy components
+import dynamic from 'next/dynamic';
+
+const MotionDiv = dynamic(
+  () => import('framer-motion').then(mod => ({ default: mod.motion.div })),
+  { ssr: false }
+);
+
+const AnimatePresence = dynamic(
+  () => import('framer-motion').then(mod => ({ default: mod.AnimatePresence })),
+  { ssr: false }
+);
 
 // Solo Collection configuration - อัพเดทจำนวนสินค้าเป็น 4 อย่าง
 const soloCollection = {
@@ -120,6 +134,14 @@ export default function SoloCollectionPage({
   
   // 🚀 Client-only mounting state
   const [isClientMounted, setIsClientMounted] = useState(false);
+  const [framerMotionLoaded, setFramerMotionLoaded] = useState(false);
+
+  // 🚀 Lazy load Framer Motion
+  useEffect(() => {
+    import('framer-motion').then(() => {
+      setFramerMotionLoaded(true);
+    });
+  }, []);
 
   // 🚀 ✅ Fixed: Simple History Management - ใช้ replaceState แทน pushState
   useEffect(() => {
@@ -156,6 +178,7 @@ export default function SoloCollectionPage({
     };
   }, [hasInitialized]);
 
+  // 🎯 Memoized product filtering
   const allProducts = useMemo(() => {
     return allItems.filter(item => 
       item.tags?.includes('contest') || 
@@ -206,20 +229,22 @@ export default function SoloCollectionPage({
     }
   }, [filterType, filterInstrument, hasInitialized]);
 
-  // 🎯 Calculate pagination
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentProducts = filteredProducts.slice(startIndex, endIndex);
+  // 🎯 Memoized pagination calculations
+  const paginationData = useMemo(() => {
+    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentProducts = filteredProducts.slice(startIndex, endIndex);
+    
+    return { totalPages, startIndex, endIndex, currentProducts };
+  }, [filteredProducts, currentPage, itemsPerPage]);
 
-  const getProductCounts = () => {
+  const getProductCounts = useMemo(() => {
     const tabs = allProducts.filter(p => p.category === 'Tabs').length;
     const backing = 0; // ไม่มี backing tracks
     const stems = 0;   // ไม่มี stems
     return { tabs, backing, stems, total: tabs };
-  };
-
-  const counts = getProductCounts();
+  }, [allProducts]);
 
   // 🚀 ✅ Fixed: Smart Navigation ที่ไม่สร้าง history เพิ่ม
   const handleProductClick = (product: any, e: React.MouseEvent) => {
@@ -245,7 +270,7 @@ export default function SoloCollectionPage({
     router.push(product.url);
   };
 
-  // 🎯 Pagination component
+  // 🎯 Optimized Pagination component
   const PaginationControls = () => {
     // Client-only rendering to prevent hydration mismatch
     if (!isClientMounted) {
@@ -256,7 +281,7 @@ export default function SoloCollectionPage({
       );
     }
 
-    if (totalPages <= 1) return (
+    if (paginationData.totalPages <= 1) return (
       <div className="flex justify-center items-center h-12">
         {/* Empty space to maintain layout consistency */}
       </div>
@@ -266,17 +291,17 @@ export default function SoloCollectionPage({
       const pages = [];
       const maxVisible = 5;
       
-      if (totalPages <= maxVisible) {
-        for (let i = 1; i <= totalPages; i++) {
+      if (paginationData.totalPages <= maxVisible) {
+        for (let i = 1; i <= paginationData.totalPages; i++) {
           pages.push(i);
         }
       } else {
         if (currentPage <= 3) {
-          pages.push(1, 2, 3, 4, '...', totalPages);
-        } else if (currentPage >= totalPages - 2) {
-          pages.push(1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+          pages.push(1, 2, 3, 4, '...', paginationData.totalPages);
+        } else if (currentPage >= paginationData.totalPages - 2) {
+          pages.push(1, '...', paginationData.totalPages - 3, paginationData.totalPages - 2, paginationData.totalPages - 1, paginationData.totalPages);
         } else {
-          pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+          pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', paginationData.totalPages);
         }
       }
       return pages;
@@ -319,10 +344,10 @@ export default function SoloCollectionPage({
 
         {/* Next button */}
         <button
-          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage(prev => Math.min(prev + 1, paginationData.totalPages))}
+          disabled={currentPage === paginationData.totalPages}
           className={`px-2 py-1 text-xs border border-[#dc9e63]/30 rounded ${
-            currentPage === totalPages 
+            currentPage === paginationData.totalPages 
               ? 'opacity-50 cursor-not-allowed text-[#f8fcdc]/50' 
               : 'text-[#f8fcdc] hover:border-[#dc9e63] hover:bg-[#dc9e63]/10 cursor-pointer'
           }`}
@@ -349,18 +374,17 @@ export default function SoloCollectionPage({
           <span className="text-[#dc9e63]">Solo Collection</span>
         </div>
 
-        {/* Solo Collection Header - Updated to match AlbumHub layout */}
+        {/* Solo Collection Header - 🚀 OPTIMIZED */}
         <div className="mb-10 xl:-mb-18 product-page-header">
           <div className="flex flex-col max-[1279px]:flex-col min-[1280px]:flex-row gap-4 max-[1279px]:gap-0 min-[1280px]:gap-8 max-[1279px]:items-center min-[1280px]:items-start">
-            {/* Cover Image */}
+            {/* Cover Image - 🎯 เปลี่ยนเป็น AlbumCover */}
             <div className="flex-shrink-0 mx-auto max-[1279px]:mx-auto min-[1280px]:mx-0 w-80 h-80 min-[769px]:w-[36rem] min-[769px]:h-[36rem] xl:w-80 xl:h-80">
-              <Image
+              <AlbumCover
                 src={soloCollection.coverImage}
                 alt={`${soloCollection.title} Cover`}
                 width={600}
                 height={600}
                 className="w-full h-full object-cover rounded-lg"
-                priority
                 quality={100}
               />
             </div>
@@ -376,7 +400,7 @@ export default function SoloCollectionPage({
               <div className="grid grid-cols-4 max-[928px]:grid-cols-2 max-[696px]:grid-cols-2 gap-6 max-[928px]:gap-4 max-[696px]:gap-3 text-sm max-[928px]:text-xs max-[696px]:text-[10px]">
                 <div>
                   <p className="text-[#dc9e63] font-semibold">Total Products</p>
-                  <p className="text-2xl max-[928px]:text-xl max-[696px]:text-lg font-bold">{counts.total}</p>
+                  <p className="text-2xl max-[928px]:text-xl max-[696px]:text-lg font-bold">{getProductCounts.total}</p>
                 </div>
                 <div>
                   <p className="text-[#dc9e63] font-semibold">Songs</p>
@@ -404,25 +428,25 @@ export default function SoloCollectionPage({
               onClick={() => handleFilterTypeChange('all')}
               className={`info-button cursor-pointer ${filterType === 'all' ? 'active-tab' : ''}`}
             >
-              ALL ({counts.total})
+              ALL ({getProductCounts.total})
             </button>
             <button
               onClick={() => handleFilterTypeChange('tabs')}
               className={`info-button cursor-pointer ${filterType === 'tabs' ? 'active-tab' : ''}`}
             >
-              TABS ({counts.tabs})
+              TABS ({getProductCounts.tabs})
             </button>
             <button
               onClick={() => handleFilterTypeChange('backing')}
               className={`info-button cursor-pointer ${filterType === 'backing' ? 'active-tab' : ''}`}
             >
-              BACKING TRACKS ({counts.backing})
+              BACKING TRACKS ({getProductCounts.backing})
             </button>
             <button
               onClick={() => handleFilterTypeChange('stems')}
               className={`info-button cursor-pointer ${filterType === 'stems' ? 'active-tab' : ''}`}
             >
-              STEMS ({counts.stems})
+              STEMS ({getProductCounts.stems})
             </button>
           </div>
 
@@ -485,8 +509,8 @@ export default function SoloCollectionPage({
         <div className="mb-6" suppressHydrationWarning={true}>
           {isClientMounted ? (
             <p className="text-center text-[#dc9e63]">
-              Showing {startIndex + 1}-{Math.min(endIndex, filteredProducts.length)} of {filteredProducts.length} products
-              {totalPages > 1 && ` (Page ${currentPage} of ${totalPages})`}
+              Showing {paginationData.startIndex + 1}-{Math.min(paginationData.endIndex, filteredProducts.length)} of {filteredProducts.length} products
+              {paginationData.totalPages > 1 && ` (Page ${currentPage} of ${paginationData.totalPages})`}
             </p>
           ) : (
             <p className="text-center text-[#dc9e63]">
@@ -495,7 +519,7 @@ export default function SoloCollectionPage({
           )}
         </div>
 
-        {/* Products Grid */}
+        {/* Products Grid - 🚀 OPTIMIZED */}
         <div suppressHydrationWarning={true}>
           {!isClientMounted ? (
             <div className="text-center text-lg text-[#dc9e63] opacity-60 mt-10">
@@ -507,16 +531,74 @@ export default function SoloCollectionPage({
             </p>
           ) : (
             <>
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={`${filterType}-${filterInstrument}-${currentPage}`}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                  className="stems-row min-h-[600px]"
-                >
-                  {currentProducts.map((product) => {
+              {/* 🎯 Conditional Animation Wrapper */}
+              {framerMotionLoaded ? (
+                <AnimatePresence mode="wait">
+                  <MotionDiv
+                    key={`${filterType}-${filterInstrument}-${currentPage}`}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="stems-row min-h-[600px]"
+                  >
+                    {paginationData.currentProducts.map((product) => {
+                      const isAvailable = product.available;
+                      
+                      return isAvailable ? (
+                        <div
+                          key={product.id}
+                          onClick={(e) => handleProductClick(product, e)}
+                          className="stems-item product-label-link is-backing cursor-pointer"
+                        >
+                          {/* 🚀 เปลี่ยนเป็น ProductImage */}
+                          <ProductImage
+                            src={product.image}
+                            alt={`${product.title} - ${product.subtitle}`}
+                            width={200}
+                            height={200}
+                            className="stems-image"
+                            quality={85}
+                            sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
+                          />
+                          <div className="stems-label-group">
+                            <p className="stems-title-text">{(product as any).song?.toUpperCase() || product.title}</p>
+                            <p className="stems-subtitle">{(product as any).instrument?.toUpperCase() || 'GUITAR'}</p>
+                            <span className="backing-line" />
+                            <p className="stems-subtitle-tiny">TABS</p>
+                            <p className="stems-price">${(product.price as number).toFixed(2)}</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div
+                          key={product.id}
+                          className="stems-item product-label-link is-backing opacity-60 cursor-not-allowed"
+                        >
+                          <ProductImage
+                            src={product.image}
+                            alt={`${product.title} - ${product.subtitle}`}
+                            width={200}
+                            height={200}
+                            className="stems-image"
+                            quality={85}
+                            sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
+                          />
+                          <div className="stems-label-group">
+                            <p className="stems-title-text">{(product as any).song?.toUpperCase() || product.title}</p>
+                            <p className="stems-subtitle">{(product as any).instrument?.toUpperCase() || 'GUITAR'}</p>
+                            <span className="backing-line" />
+                            <p className="stems-subtitle-tiny">TABS</p>
+                            <p className="stems-price">${(product.price as number).toFixed(2)}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </MotionDiv>
+                </AnimatePresence>
+              ) : (
+                // 🎯 Fallback without animation (จนกว่า Framer Motion จะโหลดเสร็จ)
+                <div className="stems-row min-h-[600px]">
+                  {paginationData.currentProducts.map((product) => {
                     const isAvailable = product.available;
                     
                     return isAvailable ? (
@@ -525,21 +607,15 @@ export default function SoloCollectionPage({
                         onClick={(e) => handleProductClick(product, e)}
                         className="stems-item product-label-link is-backing cursor-pointer"
                       >
-                        <Image
+                        {/* 🚀 เปลี่ยนเป็น ProductImage */}
+                        <ProductImage
                           src={product.image}
                           alt={`${product.title} - ${product.subtitle}`}
                           width={200}
                           height={200}
                           className="stems-image"
-                          loading="lazy"
-                          quality={75}
+                          quality={85}
                           sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
-                          placeholder="blur"
-                          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = '/catmoon-bg.jpeg';
-                          }}
                         />
                         <div className="stems-label-group">
                           <p className="stems-title-text">{(product as any).song?.toUpperCase() || product.title}</p>
@@ -554,21 +630,14 @@ export default function SoloCollectionPage({
                         key={product.id}
                         className="stems-item product-label-link is-backing opacity-60 cursor-not-allowed"
                       >
-                        <Image
+                        <ProductImage
                           src={product.image}
                           alt={`${product.title} - ${product.subtitle}`}
                           width={200}
                           height={200}
                           className="stems-image"
-                          loading="lazy"
-                          quality={75}
+                          quality={85}
                           sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
-                          placeholder="blur"
-                          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = '/catmoon-bg.jpeg';
-                          }}
                         />
                         <div className="stems-label-group">
                           <p className="stems-title-text">{(product as any).song?.toUpperCase() || product.title}</p>
@@ -580,8 +649,8 @@ export default function SoloCollectionPage({
                       </div>
                     );
                   })}
-                </motion.div>
-              </AnimatePresence>
+                </div>
+              )}
 
               {/* Pagination Controls */}
               <div className="mt-8 mb-4">

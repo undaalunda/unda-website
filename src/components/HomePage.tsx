@@ -1,14 +1,16 @@
-/* HomePage.tsx - Final Clean Version */
+/* HomePage.tsx - Optimized with Performance Images */
 
 'use client';
 
 import React, { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import Script from 'next/script';
 import { useRouter } from 'next/navigation';
 import { allItems } from '@/components/allItems';
 import AppClientWrapper from '@/components/AppClientWrapper';
+
+// 🚀 Import Optimized Image Components
+import { HeroImage, ProductImage } from '@/components/OptimizedImage';
 
 // 🚀 Lazy load heavy components
 const BandsinTownWidget = lazy(() => import('@/components/BandsinTownWidget'));
@@ -120,17 +122,18 @@ export default function HomePage() {
       <main className="homepage-main" style={{ overflow: 'visible' }}>
         <h1 className="sr-only">Unda Alunda | Official Website & Merch Store</h1>
 
-        {/* HERO SECTION */}
+        {/* HERO SECTION - 🚀 OPTIMIZED */}
         <div className="hero-wrapper">
           <div className="catmoon-background" />
           <div className="hero-text-image">
-            <Image
+            {/* 🎯 เปลี่ยนจาก Image เป็น HeroImage */}
+            <HeroImage
               src="/text-hero-section.webp"
               alt="Dark Wonderful World on Moon"
               height={400}
               width={600}
               quality={100}
-              priority
+              priority={true}
               unoptimized={true}
               sizes="(max-width: 480px) 300px, (max-width: 768px) 400px, 600px"
             />
@@ -225,7 +228,7 @@ export default function HomePage() {
           )}
         </section>
 
-        {/* TRANSCRIPTION SECTION */}
+        {/* TRANSCRIPTION SECTION - 🚀 OPTIMIZED */}
         <section className="transcription-section">
           <div ref={transcriptionRef} className={`fade-trigger ${showTranscriptions ? 'fade-in' : ''}`}>
             <p className="transcription-sub">LEARN THE MUSIC</p>
@@ -250,14 +253,14 @@ export default function HomePage() {
                   key={i} 
                   className="product-item product-label-link"
                 >
-                  <Image
+                  {/* 🎯 เปลี่ยนจาก Image เป็น ProductImage */}
+                  <ProductImage
                     src={`/product-${inst}.webp`}
                     alt={`${inst} Book`}
                     width={200}
                     height={200}
                     className="product-image"
-                    loading="lazy"
-                    quality={75}
+                    quality={95}
                     sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 200px"
                   />
                   <div className="product-label-group">
@@ -283,7 +286,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* STEMS SECTION */}
+        {/* STEMS SECTION - 🚀 OPTIMIZED */}
         <section className="stems-section">
           <div ref={stemsRef} className={`fade-trigger ${showStems ? 'fade-in' : ''}`}>
             <p className="stems-sub">JAM THE TRACKS</p>
@@ -323,14 +326,14 @@ export default function HomePage() {
                     key={item.id}
                     className="stems-item product-label-link is-backing"
                   >
-                    <Image
+                    {/* 🎯 เปลี่ยนจาก Image เป็น ProductImage */}
+                    <ProductImage
                       src={item.image}
                       alt={item.title}
                       width={200}
                       height={200}
                       className="stems-image"
-                      loading="lazy"
-                      quality={75}
+                      quality={95}
                       sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
                     />
                     <div className="stems-label-group">
@@ -368,7 +371,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* MUSIC & MERCH */}
+        {/* MUSIC & MERCH - 🚀 OPTIMIZED */}
         <section className="stems-section">
           <div ref={musicMerchRef} className={`fade-trigger ${showMerch ? 'fade-in' : ''}`}>
             <p className="stems-sub">MUSIC IN YOUR HANDS</p>
@@ -376,14 +379,14 @@ export default function HomePage() {
             <div className="stems-row">
               {homepageItems.map((item) => (
                 <Link href={item.url || `/product/${item.id}`} key={item.id} className="stems-item product-label-link">
-                  <Image 
+                  {/* 🎯 เปลี่ยนจาก Image เป็น ProductImage */}
+                  <ProductImage 
                     src={item.image} 
                     alt={item.title} 
                     width={200} 
                     height={200} 
                     className="stems-image"
-                    loading="lazy"
-                    quality={75}
+                    quality={95}
                     sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
                   />
                   <div className="stems-label-group">
