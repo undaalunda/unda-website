@@ -29,11 +29,11 @@ const soloCollection = {
   title: 'Solo Collection',
   subtitle: 'Guitar • Highlights',
   coverImage: '/solo-collection.webp',
-  totalPieces: 4, // เปลี่ยนจาก 3 เป็น 4
-  totalProducts: 4, // เปลี่ยนจาก 3 เป็น 4
+  totalPieces: 4,
+  totalProducts: 4,
   productBreakdown: {
     backingTracks: 0,
-    tabs: 4, // เปลี่ยนจาก 3 เป็น 4
+    tabs: 4,
     stems: 0
   },
   priceRange: '$3.95-$7.95',
