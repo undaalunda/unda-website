@@ -125,8 +125,8 @@ export default function HomePage() {
         {/* HERO SECTION - 🚀 OPTIMIZED */}
         <div className="hero-wrapper">
           <div className="catmoon-background" />
+          
           <div className="hero-text-image">
-            {/* 🎯 เปลี่ยนจาก Image เป็น HeroImage */}
             <HeroImage
               src="/text-hero-section.webp"
               alt="Dark Wonderful World on Moon"

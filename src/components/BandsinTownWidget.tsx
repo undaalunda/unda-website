@@ -15,6 +15,45 @@ export default function BandsinTownWidget() {
         onLoad={() => {
           setScriptLoaded(true);
           console.log('Bandsintown widget loaded lazily');
+          
+          // รอให้ script โหลดเสร็จแล้วค่อย init
+          setTimeout(() => {
+            try {
+              if (typeof window !== 'undefined' && (window as any).BIT?.Widget?.init) {
+                (window as any).BIT.Widget.init();
+                console.log('Widget initialized successfully');
+                
+                // Custom styling after widget loads
+                setTimeout(() => {
+                  // Make text smaller
+                  const widgetTexts = document.querySelectorAll('.bit-widget p, .bit-widget span, .bit-widget div');
+                  widgetTexts.forEach((el: any) => {
+                    if (el && !el.querySelector('button')) {
+                      el.style.fontSize = '12px';
+                      el.style.lineHeight = '1.4';
+                    }
+                  });
+                  
+                  // Make "No Upcoming" less prominent
+                  const noEventsText = document.querySelector('.bit-widget');
+                  if (noEventsText) {
+                    const textContent = noEventsText.textContent || '';
+                    if (textContent.includes('NO UPCOMING') || textContent.includes('No upcoming')) {
+                      const noEventElements = document.querySelectorAll('.bit-widget *');
+                      noEventElements.forEach((el: any) => {
+                        if (el.textContent && (el.textContent.includes('NO UPCOMING') || el.textContent.includes('No upcoming'))) {
+                          el.style.color = 'rgba(248, 252, 220, 0.4)';
+                          el.style.opacity = '0.6';
+                        }
+                      });
+                    }
+                  }
+                }, 2000);
+              }
+            } catch (error) {
+              console.error('Widget init failed:', error);
+            }
+          }, 1000);
         }}
       />
       
@@ -81,6 +120,34 @@ export default function BandsinTownWidget() {
           border: 1px solid #5d0000 !important;
           color: #f8fcdc !important;
           transform: scale(0.98) !important;
+        }
+
+        /* Bandsintown Widget Text Styling */
+        .bit-widget p {
+          font-size: 12px !important;
+          line-height: 1.4 !important;
+        }
+
+        /* Target all text elements in the widget */
+        .bit-widget * {
+          font-size: 12px !important;
+        }
+
+        /* Keep buttons at normal size */
+        .bit-widget button,
+        .bit-widget .bit-button,
+        .bit-widget .bit-button--solid {
+          font-size: 14px !important;
+        }
+
+        /* Make "No Upcoming Tour Dates" less prominent */
+        .bit-widget div:contains("NO UPCOMING"),
+        .bit-widget span:contains("NO UPCOMING"),
+        .bit-widget p:contains("NO UPCOMING"),
+        .bit-widget *[class*="no-events"],
+        .bit-widget *[class*="empty"] {
+          color: rgba(248, 252, 220, 0.4) !important;
+          opacity: 0.6 !important;
         }
       `}</style>
     </>
