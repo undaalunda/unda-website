@@ -1200,11 +1200,11 @@ button svg,
 
 @media (min-width: 480px) {
   .tour-widget-container {
-    max-width: 640px;
+    max-width: 500px;
   }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 769px) {
   .tour-widget-container {
     max-width: 600px;
   }
