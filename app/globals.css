@@ -116,46 +116,6 @@ main,
   z-index: 1;
 }
 
-.hero-text-image {
-  width: 80%;
-  max-width: 500px;
-  z-index: 10;
-  pointer-events: none;
-  opacity: 0;
-  animation: fadeInHero 1.3s ease-out 0.2s forwards;
-}
-
-@keyframes fadeInHero {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@media (max-width: 1279px) {
-  .hero-text-image {
-    width: 90%;
-    max-width: 470px;
-  }
-}
-
-@media (max-width: 768px) {
-  .hero-text-image {
-    width: 95%;
-    max-width: 430px;
-  }
-}
-
-@media (max-width: 480px) {
-  .hero-text-image {
-    width: 100%;
-    max-width: 400px;
-  }
-}
 /* === NAVBAR (Fading + Layout Fix) === */
 .navbar-inner-wrapper {
   transition: opacity 0.7s ease, transform 0.7s ease;
@@ -237,13 +197,21 @@ button svg,
   font-family: 'Cinzel', serif;
   color: #f8fcdc;
   padding: 3rem;
-  max-width: 90%;
+  max-width: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .hero-line1 {
   font-size: 16px;
   letter-spacing: 0.36em;
   line-height: 1.6;
+  white-space: nowrap;
+  text-align: center;
+  width: 100%;
 }
 
 .hero-line2 {
@@ -251,15 +219,20 @@ button svg,
   letter-spacing: 0.17em;
   line-height: 2.2;
   margin-top: 0.5rem;
+  white-space: nowrap;
+  text-align: center;
+  width: 100%;
 }
 
 @media (min-width: 1280px) {
   .hero-line1 {
     letter-spacing: 0.5em;
+    white-space: nowrap;
   }
 
   .hero-line2 {
     letter-spacing: 0.3em;
+    white-space: nowrap;
   }
 }
 
@@ -267,10 +240,12 @@ button svg,
   .hero-line1 {
     font-size: 14px;
     letter-spacing: 0.5em;
+    white-space: nowrap;
   }
   .hero-line2 {
     font-size: 11px;
-   letter-spacing: 0.3em;
+    letter-spacing: 0.3em;
+    white-space: nowrap;
   }
 }
 
@@ -278,10 +253,12 @@ button svg,
   .hero-line1 {
     font-size: 12px;
     letter-spacing: 0.34em;
+    white-space: nowrap; /* มือถือก็ให้อยู่บรรทัดเดียวกัน */
   }
   .hero-line2 {
     font-size: 9px;
     letter-spacing: 0.25em;
+    white-space: nowrap;
   }
 
   .hero-line2:last-child {

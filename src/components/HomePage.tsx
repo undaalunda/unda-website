@@ -45,6 +45,7 @@ export default function HomePage() {
   const [showButtons, setShowButtons] = useState(false);
   const [showMerch, setShowMerch] = useState(false);
   const [showTour, setShowTour] = useState(false);
+  const [heroImageStyles, setHeroImageStyles] = useState<React.CSSProperties>({});
 
   // 🚀 Smart Link Click Handlers - Clean URLs with sessionStorage
   const createNavigationHandler = (
@@ -83,8 +84,64 @@ export default function HomePage() {
     };
   };
 
+  // 🎯 Hero Text Image Styles - ย้ายมาจาก CSS
+  const updateHeroImageStyles = () => {
+    if (typeof window === 'undefined') return;
+    
+    const width = window.innerWidth;
+    
+    let imageWidth = '90%'; // เพิ่มจาก 80%
+    let maxWidth = '650px'; // เพิ่มจาก 500px
+    
+    if (width <= 480) {
+      imageWidth = '100%';
+      maxWidth = '400px';
+    } else if (width <= 768) {
+      imageWidth = '95%';
+      maxWidth = '430px';
+    } else if (width <= 1279) {
+      imageWidth = '95%'; // เพิ่มจาก 90%
+      maxWidth = '550px'; // เพิ่มจาก 470px
+    }
+
+    setHeroImageStyles({
+      width: imageWidth,
+      maxWidth: maxWidth,
+      zIndex: 10,
+      pointerEvents: 'none' as const,
+      opacity: 0,
+      animation: 'fadeInHero 1.3s ease-out 0.2s forwards',
+      display: 'block',
+      margin: '0 auto',
+      textAlign: 'center' as const
+    });
+  };
+
   useEffect(() => {
     setIsClient(true);
+    
+    // 🎯 เพิ่ม keyframes animation สำหรับ hero image
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fadeInHero {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // 🎯 ตั้งค่า hero image styles หลัง component mount
+    updateHeroImageStyles();
+    
+    // 🎯 เพิ่ม resize listener
+    const handleResize = () => updateHeroImageStyles();
+    window.addEventListener('resize', handleResize);
     
     const observer = new IntersectionObserver(
       (entries) => {
@@ -114,6 +171,9 @@ export default function HomePage() {
       refs.forEach((ref) => {
         if (ref.current) observer.unobserve(ref.current);
       });
+      // Cleanup style and resize listener
+      document.head.removeChild(style);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
@@ -123,10 +183,27 @@ export default function HomePage() {
         <h1 className="sr-only">Unda Alunda | Official Website & Merch Store</h1>
 
         {/* HERO SECTION - 🚀 OPTIMIZED */}
-        <div className="hero-wrapper">
+        <div className="hero-wrapper" style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          minHeight: '100vh',
+          paddingTop: '3rem' // ลดจาก 6rem
+        }}>
           <div className="catmoon-background" />
           
-          <div className="hero-text-image">
+          {/* Spacer เพื่อผลัก hero text image ไปตรงกลาง (ลดลงอีกเพื่อขยับขึ้น) */}
+          <div style={{ flex: 0.5 }} />
+          
+          {/* 🎯 Hero Text Image - อยู่ตรงกลาง */}
+          <div style={{
+            ...heroImageStyles,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%'
+          }}>
             <HeroImage
               src="/text-hero-section.webp"
               alt="Dark Wonderful World on Moon"
@@ -139,28 +216,34 @@ export default function HomePage() {
             />
           </div>
           
-          <div className="hero-text desktop-only">
-            <p className="hero-line1">
-              THE NEW ALBUM'S COMING <span className="highlight">August 26<sup style={{ fontSize: '0.6em', marginLeft: '-0.1em' }}>th</sup> 2025</span>
-            </p>
-            <p className="hero-line2">
-              AVAILABLE NOW TO <Link href="/shop/physical" onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'merch')} className="hero-cta-link">PRE-ORDER</Link> &{' '}
-              <a href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0" target="_blank" rel="noopener noreferrer" className="hero-cta-link">
-                PRE-SAVE
-              </a>
-            </p>
-          </div>
+          {/* Spacer เพื่อผลัก hero text ไปด้านล่าง (เพิ่มขึ้นเพื่อคงระยะ) */}
+          <div style={{ flex: 1.5 }} />
           
-          <div className="hero-text mobile-only">
-            <p className="hero-line1">THE NEW ALBUM'S COMING</p>
-            <p className="hero-line1"><span className="highlight">August 26<sup style={{ fontSize: '0.6em', marginLeft: '-0.1em' }}>th</sup> 2025</span></p>
-            <p className="hero-line2">AVAILABLE NOW TO</p>
-            <p className="hero-line2">
-              <Link href="/shop/physical" onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'merch')} className="hero-cta-link">PRE-ORDER</Link> &{' '}
-              <a href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0" target="_blank" rel="noopener noreferrer" className="hero-cta-link">
-                PRE-SAVE
-              </a>
-            </p>
+          {/* 🎯 Hero Text - อยู่ด้านล่างเหมือนเดิม */}
+          <div style={{ marginBottom: '0vh' }}>
+            <div className="hero-text desktop-only">
+              <p className="hero-line1">
+                THE NEW ALBUM'S COMING <span className="highlight">August 26<sup style={{ fontSize: '0.6em', marginLeft: '-0.1em' }}>th</sup> 2025</span>
+              </p>
+              <p className="hero-line2">
+                AVAILABLE NOW TO <Link href="/shop/physical" onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'merch')} className="hero-cta-link">PRE-ORDER</Link> &{' '}
+                <a href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0" target="_blank" rel="noopener noreferrer" className="hero-cta-link">
+                  PRE-SAVE
+                </a>
+              </p>
+            </div>
+            
+            <div className="hero-text mobile-only">
+              <p className="hero-line1">THE NEW ALBUM'S COMING</p>
+              <p className="hero-line1"><span className="highlight">August 26<sup style={{ fontSize: '0.6em', marginLeft: '-0.1em' }}>th</sup> 2025</span></p>
+              <p className="hero-line2">AVAILABLE NOW TO</p>
+              <p className="hero-line2">
+                <Link href="/shop/physical" onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'merch')} className="hero-cta-link">PRE-ORDER</Link> &{' '}
+                <a href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0" target="_blank" rel="noopener noreferrer" className="hero-cta-link">
+                  PRE-SAVE
+                </a>
+              </p>
+            </div>
           </div>
         </div>
 
@@ -253,7 +336,6 @@ export default function HomePage() {
                   key={i} 
                   className="product-item product-label-link"
                 >
-                  {/* 🎯 เปลี่ยนจาก Image เป็น ProductImage */}
                   <ProductImage
                     src={`/product-${inst}.webp`}
                     alt={`${inst} Book`}
@@ -326,7 +408,6 @@ export default function HomePage() {
                     key={item.id}
                     className="stems-item product-label-link is-backing"
                   >
-                    {/* 🎯 เปลี่ยนจาก Image เป็น ProductImage */}
                     <ProductImage
                       src={item.image}
                       alt={item.title}
@@ -379,7 +460,6 @@ export default function HomePage() {
             <div className="stems-row">
               {homepageItems.map((item) => (
                 <Link href={item.url || `/product/${item.id}`} key={item.id} className="stems-item product-label-link">
-                  {/* 🎯 เปลี่ยนจาก Image เป็น ProductImage */}
                   <ProductImage 
                     src={item.image} 
                     alt={item.title} 

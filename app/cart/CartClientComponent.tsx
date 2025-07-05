@@ -97,7 +97,7 @@ const CartItemComponent = memo(function CartItemComponent({
       </div>
 
       <div className="text-right">
-        <p className="text-[#cc3f33] font-semibold text-[13px] md:text-sm tracking-[.08em]">
+        <p className="text-[#cc3f33] font-semibold text-base md:text-lg tracking-[.08em]">
           $
           {(
             (typeof item.price === 'object' ? item.price.sale : item.price) *

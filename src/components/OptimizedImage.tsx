@@ -1,4 +1,5 @@
-// components/OptimizedImage.tsx - CLEAN VERSION ไม่มี placeholder
+
+// components/OptimizedImage.tsx - FIXED VERSION
 
 'use client';
 
@@ -110,10 +111,11 @@ export default function OptimizedImage({
   };
 
   return (
-    <div ref={imgRef} className={`${className || ''}`}>
+    <>
       {/* 🚀 Image - โหลดเมื่อเข้า viewport หรือเป็น critical */}
       {isInView && (
         <Image
+          ref={imgRef}
           src={src}
           alt={alt}
           width={width}
@@ -127,11 +129,11 @@ export default function OptimizedImage({
           unoptimized={unoptimized}
         />
       )}
-    </div>
+    </>
   );
 }
 
-// 🚀 Hero Image Component - CLEAN ไม่มี placeholder
+// 🚀 Hero Image Component - ไม่มี wrapper div
 export function HeroImage({ 
   className,
   quality = 100,
