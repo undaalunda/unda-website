@@ -84,24 +84,24 @@ export default function HomePage() {
     };
   };
 
-  // 🎯 Hero Text Image Styles - ย้ายมาจาก CSS
+  // 🎯 Hero Text Image Styles
   const updateHeroImageStyles = () => {
     if (typeof window === 'undefined') return;
     
     const width = window.innerWidth;
     
-    let imageWidth = '90%'; // เพิ่มจาก 80%
-    let maxWidth = '650px'; // เพิ่มจาก 500px
+    let imageWidth = '90%';
+    let maxWidth = '650px';
     
     if (width <= 480) {
       imageWidth = '100%';
       maxWidth = '400px';
     } else if (width <= 768) {
       imageWidth = '95%';
-      maxWidth = '430px';
+      maxWidth = '500px';
     } else if (width <= 1279) {
-      imageWidth = '95%'; // เพิ่มจาก 90%
-      maxWidth = '550px'; // เพิ่มจาก 470px
+      imageWidth = '95%';
+      maxWidth = '550px';
     }
 
     setHeroImageStyles({
@@ -189,11 +189,11 @@ export default function HomePage() {
           alignItems: 'center',
           justifyContent: 'space-between',
           minHeight: '100vh',
-          paddingTop: '3rem' // ลดจาก 6rem
+          paddingTop: '3rem'
         }}>
           <div className="catmoon-background" />
           
-          {/* Spacer เพื่อผลัก hero text image ไปตรงกลาง (ลดลงอีกเพื่อขยับขึ้น) */}
+          {/* Spacer เพื่อผลัก hero text image ไปตรงกลาง */}
           <div style={{ flex: 0.5 }} />
           
           {/* 🎯 Hero Text Image - อยู่ตรงกลาง */}
@@ -202,7 +202,8 @@ export default function HomePage() {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            width: '100%'
+            width: '100%',
+            paddingBottom: '10rem'
           }}>
             <HeroImage
               src="/text-hero-section.webp"
@@ -212,11 +213,11 @@ export default function HomePage() {
               quality={100}
               priority={true}
               unoptimized={true}
-              sizes="(max-width: 480px) 300px, (max-width: 768px) 400px, 600px"
+              sizes="(max-width: 480px) 300px, (max-width: 768px) 500px, 600px"
             />
           </div>
           
-          {/* Spacer เพื่อผลัก hero text ไปด้านล่าง (เพิ่มขึ้นเพื่อคงระยะ) */}
+          {/* Spacer เพื่อผลัก hero text ไปด้านล่าง */}
           <div style={{ flex: 1.5 }} />
           
           {/* 🎯 Hero Text - อยู่ด้านล่างเหมือนเดิม */}
