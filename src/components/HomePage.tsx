@@ -194,7 +194,7 @@ export default function HomePage() {
           <div className="catmoon-background" />
           
           {/* Spacer เพื่อผลัก hero text image ไปตรงกลาง */}
-          <div style={{ flex: 1.2 }} />
+          <div style={{ flex: 1.0 }} />
           
           {/* 🎯 Hero Text Image - อยู่ตรงกลาง */}
           <div style={{
@@ -203,7 +203,7 @@ export default function HomePage() {
             justifyContent: 'center',
             alignItems: 'center',
             width: '100%',
-            paddingBottom: '15rem'
+            paddingBottom: '12rem'
           }}>
             <HeroImage
               src="/text-hero-section.webp"
