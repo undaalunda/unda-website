@@ -1,4 +1,3 @@
-
 // components/OptimizedImage.tsx - FIXED VERSION
 
 'use client';
@@ -150,7 +149,7 @@ export function HeroImage({
   );
 }
 
-// 🎯 Album Cover Component
+// 🎯 Album Cover Component - ✅ FIXED: ให้โหลดทันทีแบบ Hero Image
 export function AlbumCover({ 
   className,
   quality = 100,
@@ -159,8 +158,8 @@ export function AlbumCover({
   return (
     <OptimizedImage
       {...props}
-      isCritical={false}
-      priority={false}
+      isCritical={true}  // ✅ เปลี่ยนเป็น true เพื่อให้โหลดทันที
+      priority={true}    // ✅ เปลี่ยนเป็น true เพื่อให้โหลดก่อน
       quality={quality}
       className={className}
     />

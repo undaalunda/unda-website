@@ -1,4 +1,4 @@
-/* AlbumHubPage.tsx - Full Performance Optimization */
+/* AlbumHubPage.tsx - Fixed Framer Motion Import */
 
 'use client';
 
@@ -10,18 +10,8 @@ import { allItems } from './allItems';
 // 🚀 Import Optimized Image Components
 import { AlbumCover, ProductImage } from '@/components/OptimizedImage';
 
-// 🎯 Dynamic imports for heavy components
-import dynamic from 'next/dynamic';
-
-const MotionDiv = dynamic(
-  () => import('framer-motion').then(mod => ({ default: mod.motion.div })),
-  { ssr: false }
-);
-
-const AnimatePresence = dynamic(
-  () => import('framer-motion').then(mod => ({ default: mod.AnimatePresence })),
-  { ssr: false }
-);
+// 🎯 Simple static import instead of dynamic import
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Album song list
 const albumSongs = [
@@ -155,14 +145,6 @@ export default function AlbumHubPage({
   // Track initialization
   const [hasInitialized, setHasInitialized] = useState(false);
   const [isClientMounted, setIsClientMounted] = useState(false);
-  const [framerMotionLoaded, setFramerMotionLoaded] = useState(false);
-
-  // 🚀 Lazy load Framer Motion
-  useEffect(() => {
-    import('framer-motion').then(() => {
-      setFramerMotionLoaded(true);
-    });
-  }, []);
 
   // Cleanup and initialization
   useEffect(() => {
@@ -572,104 +554,16 @@ export default function AlbumHubPage({
             </p>
           ) : (
             <>
-              {/* 🎯 Conditional Animation Wrapper */}
-              {framerMotionLoaded ? (
-                <AnimatePresence mode="wait">
-                  <MotionDiv
-                    key={`${filterType}-${filterInstrument}-${currentPage}`}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className="stems-row min-h-[600px]"
-                  >
-                    {paginationData.currentProducts.map((product) => {
-                      const isAvailable = product.available !== false;
-                      const isBackingTrack = product.category === 'Backing Track';
-                      const isTab = product.category === 'Tabs';
-                      
-                      const displayPrice = isBundlePrice(product.price) ? (
-                        <>
-                          <span className="line-through text-[#f8fcdc] mr-1">
-                            ${product.price.original.toFixed(2)}
-                          </span>
-                          <span className="text-[#cc3f33]">${product.price.sale.toFixed(2)}</span>
-                        </>
-                      ) : (
-                        <span>${(product.price as number).toFixed(2)}</span>
-                      );
-                      
-                      return isAvailable ? (
-                        <div
-                          key={product.id}
-                          onClick={(e) => handleProductClick(product, e)}
-                          className={`stems-item product-label-link cursor-pointer ${(isBackingTrack || isTab) ? 'is-backing' : ''}`}
-                        >
-                          {/* 🚀 เปลี่ยนเป็น ProductImage */}
-                          <ProductImage
-                            src={product.image}
-                            alt={`${product.title} - ${product.subtitle}`}
-                            width={200}
-                            height={200}
-                            className="stems-image"
-                            quality={85}
-                            sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
-                          />
-                          <div className="stems-label-group">
-                            <p className="stems-title-text">
-                              {(product as any).song?.toUpperCase() || product.title}
-                            </p>
-                            <p className="stems-subtitle">
-                              {isBackingTrack
-                                ? product.subtitle.replace(/BACKING TRACK/gi, '').trim()
-                                : ((product as any).instrument?.toUpperCase() || product.subtitle)}
-                            </p>
-                            <span className="backing-line" />
-                            <p className="stems-subtitle-tiny">
-                              {product.category === 'Backing Track' ? 'BACKING TRACK' : 
-                               product.category === 'Tabs' ? 'TABS' : 'STEM'}
-                            </p>
-                            <p className="stems-price">{displayPrice}</p>
-                          </div>
-                        </div>
-                      ) : (
-                        <div
-                          key={product.id}
-                          className={`stems-item product-label-link opacity-60 cursor-not-allowed ${
-                            isBackingTrack ? 'is-backing' : ''
-                          }`}
-                        >
-                          <ProductImage
-                            src={product.image}
-                            alt={`${product.title} - ${product.subtitle}`}
-                            width={200}
-                            height={200}
-                            className="stems-image"
-                            quality={85}
-                            sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
-                          />
-                          <div className="stems-label-group">
-                            <p className="stems-title-text">
-                              {(product as any).song?.toUpperCase() || product.title}
-                            </p>
-                            <p className="stems-subtitle">
-                              {(product as any).instrument?.toUpperCase() || product.subtitle}
-                            </p>
-                            <span className="backing-line" />
-                            <p className="stems-subtitle-tiny">
-                              {product.category === 'Backing Track' ? 'BACKING TRACK' : 
-                               product.category === 'Tabs' ? 'TABS' : 'STEM'}
-                            </p>
-                            <p className="stems-price">{displayPrice}</p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </MotionDiv>
-                </AnimatePresence>
-              ) : (
-                // 🎯 Fallback without animation (จนกว่า Framer Motion จะโหลดเสร็จ)
-                <div className="stems-row min-h-[600px]">
+              {/* 🎯 Simple Animation with static imports */}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`${filterType}-${filterInstrument}-${currentPage}`}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="stems-row min-h-[600px]"
+                >
                   {paginationData.currentProducts.map((product) => {
                     const isAvailable = product.available !== false;
                     const isBackingTrack = product.category === 'Backing Track';
@@ -752,8 +646,8 @@ export default function AlbumHubPage({
                       </div>
                     );
                   })}
-                </div>
-              )}
+                </motion.div>
+              </AnimatePresence>
 
               {/* Pagination Controls */}
               <div className="mt-8 mb-4">

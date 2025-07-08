@@ -1,4 +1,4 @@
-/* SoloCollectionPage.tsx - Full Performance Optimization - COMPLETE */
+/* SoloCollectionPage.tsx - Fixed Framer Motion Import */
 
 'use client';
 
@@ -10,18 +10,8 @@ import { allItems } from './allItems';
 // 🚀 Import Optimized Image Components
 import { AlbumCover, ProductImage } from '@/components/OptimizedImage';
 
-// 🎯 Dynamic imports for heavy components
-import dynamic from 'next/dynamic';
-
-const MotionDiv = dynamic(
-  () => import('framer-motion').then(mod => ({ default: mod.motion.div })),
-  { ssr: false }
-);
-
-const AnimatePresence = dynamic(
-  () => import('framer-motion').then(mod => ({ default: mod.AnimatePresence })),
-  { ssr: false }
-);
+// 🎯 Simple static import instead of dynamic import
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Solo Collection configuration - อัพเดทจำนวนสินค้าเป็น 4 อย่าง
 const soloCollection = {
@@ -134,14 +124,6 @@ export default function SoloCollectionPage({
   
   // 🚀 Client-only mounting state
   const [isClientMounted, setIsClientMounted] = useState(false);
-  const [framerMotionLoaded, setFramerMotionLoaded] = useState(false);
-
-  // 🚀 Lazy load Framer Motion
-  useEffect(() => {
-    import('framer-motion').then(() => {
-      setFramerMotionLoaded(true);
-    });
-  }, []);
 
   // 🚀 ✅ Fixed: Simple History Management - ใช้ replaceState แทน pushState
   useEffect(() => {
@@ -531,73 +513,16 @@ export default function SoloCollectionPage({
             </p>
           ) : (
             <>
-              {/* 🎯 Conditional Animation Wrapper */}
-              {framerMotionLoaded ? (
-                <AnimatePresence mode="wait">
-                  <MotionDiv
-                    key={`${filterType}-${filterInstrument}-${currentPage}`}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className="stems-row min-h-[600px]"
-                  >
-                    {paginationData.currentProducts.map((product) => {
-                      const isAvailable = product.available;
-                      
-                      return isAvailable ? (
-                        <div
-                          key={product.id}
-                          onClick={(e) => handleProductClick(product, e)}
-                          className="stems-item product-label-link is-backing cursor-pointer"
-                        >
-                          {/* 🚀 เปลี่ยนเป็น ProductImage */}
-                          <ProductImage
-                            src={product.image}
-                            alt={`${product.title} - ${product.subtitle}`}
-                            width={200}
-                            height={200}
-                            className="stems-image"
-                            quality={85}
-                            sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
-                          />
-                          <div className="stems-label-group">
-                            <p className="stems-title-text">{(product as any).song?.toUpperCase() || product.title}</p>
-                            <p className="stems-subtitle">{(product as any).instrument?.toUpperCase() || 'GUITAR'}</p>
-                            <span className="backing-line" />
-                            <p className="stems-subtitle-tiny">TABS</p>
-                            <p className="stems-price">${(product.price as number).toFixed(2)}</p>
-                          </div>
-                        </div>
-                      ) : (
-                        <div
-                          key={product.id}
-                          className="stems-item product-label-link is-backing opacity-60 cursor-not-allowed"
-                        >
-                          <ProductImage
-                            src={product.image}
-                            alt={`${product.title} - ${product.subtitle}`}
-                            width={200}
-                            height={200}
-                            className="stems-image"
-                            quality={85}
-                            sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
-                          />
-                          <div className="stems-label-group">
-                            <p className="stems-title-text">{(product as any).song?.toUpperCase() || product.title}</p>
-                            <p className="stems-subtitle">{(product as any).instrument?.toUpperCase() || 'GUITAR'}</p>
-                            <span className="backing-line" />
-                            <p className="stems-subtitle-tiny">TABS</p>
-                            <p className="stems-price">${(product.price as number).toFixed(2)}</p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </MotionDiv>
-                </AnimatePresence>
-              ) : (
-                // 🎯 Fallback without animation (จนกว่า Framer Motion จะโหลดเสร็จ)
-                <div className="stems-row min-h-[600px]">
+              {/* 🎯 Simple Animation with static imports */}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`${filterType}-${filterInstrument}-${currentPage}`}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="stems-row min-h-[600px]"
+                >
                   {paginationData.currentProducts.map((product) => {
                     const isAvailable = product.available;
                     
@@ -649,8 +574,8 @@ export default function SoloCollectionPage({
                       </div>
                     );
                   })}
-                </div>
-              )}
+                </motion.div>
+              </AnimatePresence>
 
               {/* Pagination Controls */}
               <div className="mt-8 mb-4">
