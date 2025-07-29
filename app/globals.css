@@ -112,7 +112,10 @@ main,
   content: '';
   position: absolute;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.4);
+  background: linear-gradient(to bottom,
+    rgba(0, 0, 0, 0.1) 0%,     /* บนสุดสว่าง */
+    rgba(0, 0, 0, 0.4) 35%,    /* เพิ่มจาก 20% เป็น 35% */
+    rgba(0, 0, 0, 0.4) 100%);  /* ส่วนที่เหลือทึบเหมือนเดิม */
   z-index: 1;
 }
 
@@ -1414,7 +1417,7 @@ button svg,
 
 .divider {
   padding: 0 0.3rem;
-  color: #dc9e63;
+  color: #f8fcdc;
 }
 
 @media (max-width: 768px) {
