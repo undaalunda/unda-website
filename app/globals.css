@@ -324,8 +324,8 @@ button svg,
   align-items: center;
   flex-direction: column;
   width: 100%;
-  padding: 2rem 1rem;
-  max-width: 960px;
+  padding: 4rem 2rem; /* เพิ่ม padding */
+  max-width: 1200px; /* ขยายจาก 960px */
   margin-left: auto;
   margin-right: auto;
   margin-top: 1rem;
@@ -337,29 +337,43 @@ button svg,
 }
 
 .youtube-frame {
-  width: 800px;
-  height: 450px;
+  width: 100%;
+  max-width: 900px; /* ขนาดใหญ่เท่า Plini */
+  aspect-ratio: 16/9; /* ใช้ aspect-ratio แทน height ตายตัว */
   border: none;
-  border-radius: 1%;
+  border-radius: 8px; /* เพิ่มความโค้งนิดหน่อย */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); /* เพิ่มเงา */
 }
 
 @media (max-width: 1279px) {
   .youtube-frame {
-    width: 640px;
-    height: 360px;
-    border-radius: 1%;
+    max-width: 700px; /* ลดขนาดนิดหน่อยบนหน้าจอกลาง */
+  }
+  
+  .video-section {
+    padding: 3rem 1.5rem;
   }
 }
 
 @media (max-width: 768px) {
   .video-section {
     margin-top: 0rem;
+    padding: 2rem 1rem;
   }
-
+  
   .youtube-frame {
-    width: 450px;
-    height: 280px;
-    border-radius: 1%;
+    max-width: 600px; /* ยังคงใหญ่บนแท็บเล็ต */
+  }
+}
+
+@media (max-width: 480px) {
+  .youtube-frame {
+    max-width: 100%; /* เต็มหน้าจอบนมือถือ */
+    margin: 0 1rem;
+  }
+  
+  .video-section {
+    padding: 1.5rem 0.5rem;
   }
 }
 
