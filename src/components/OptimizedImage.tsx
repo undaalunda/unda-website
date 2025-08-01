@@ -19,7 +19,10 @@ interface OptimizedImageProps {
 }
 
 // 🚀 Connection-aware quality (เก็บคุณภาพสูง แต่ปรับตามเน็ต)
-const getSmartQuality = (baseQuality: number = 100) => {
+const getSmartQuality = (baseQuality: number = 100, isCritical: boolean = false) => {
+  // 🎯 Critical images ใช้คุณภาพเต็มเสมอ!
+  if (isCritical) return baseQuality;
+  
   if (typeof window === 'undefined') return baseQuality;
   
   const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
@@ -100,8 +103,8 @@ export default function OptimizedImage({
     };
   }, [src, isCritical]);
 
-  // 🎯 Smart Quality
-  const finalQuality = getSmartQuality(quality);
+  // 🎯 Smart Quality - ส่ง isCritical เข้าไป
+  const finalQuality = getSmartQuality(quality, isCritical);
 
   // 🚀 Smart Sizes
   const getOptimalSizes = () => {

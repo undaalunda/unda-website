@@ -1,4 +1,4 @@
-/* HomePage.tsx - Optimized with Performance Images */
+/* HomePage.tsx - Added Header on Left Side */
 
 'use client';
 
@@ -6,6 +6,7 @@ import React, { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import Link from 'next/link';
 import Script from 'next/script';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { allItems } from '@/components/allItems';
 import AppClientWrapper from '@/components/AppClientWrapper';
 
@@ -27,10 +28,42 @@ const homepageItems = allItems.filter(
     !blacklist.includes(item.id)
 );
 
+// 🚀 Logo Component เดียวกับ Navbar - ใช้ร่วมกัน (2 responsive + mobile image)
+const LogoImage = ({ onClick }: { onClick?: () => void }) => (
+  <Image
+    src="/unda-alunda-header.webp"
+    alt="Unda Alunda Logo"
+    width={180}
+    height={45}
+    quality={100}
+    priority
+    unoptimized={true}
+    sizes="(max-width: 768px) 120px, 180px"
+    onClick={onClick}
+    className="logo-navbar-img"
+  />
+);
+
+// 🎯 Homepage Header ใช้ LogoImage component เดียวกับ Navbar
+const HomepageHeader = ({ isAtTop }: { isAtTop: boolean }) => (
+  <div 
+    className={`fixed top-0 left-0 w-full h-[70px] md:h-[85px] z-50 transition-opacity duration-[1200ms] ${
+      isAtTop ? 'opacity-100' : 'opacity-0 pointer-events-none'
+    }`}
+  >
+    <div className="relative flex items-center px-4 py-4 md:py-5 h-full">
+      <Link href="/" aria-label="Unda Alunda - Go to homepage">
+        <LogoImage />
+      </Link>
+    </div>
+  </div>
+);
+
 export default function HomePage() {
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
   const [showBandsintown, setShowBandsintown] = useState(false);
+  const [isAtTop, setIsAtTop] = useState(true); // 🎯 เพิ่ม state สำหรับตรวจสอบว่าอยู่บนสุดหรือไม่
   
   const videoRef = useRef<HTMLDivElement>(null);
   const transcriptionRef = useRef<HTMLDivElement>(null);
@@ -139,9 +172,16 @@ export default function HomePage() {
     // 🎯 ตั้งค่า hero image styles หลัง component mount
     updateHeroImageStyles();
     
+    // 🎯 เพิ่ม scroll listener สำหรับ homepage header
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      setIsAtTop(currentScrollY === 0);
+    };
+    
     // 🎯 เพิ่ม resize listener
     const handleResize = () => updateHeroImageStyles();
     window.addEventListener('resize', handleResize);
+    window.addEventListener('scroll', handleScroll);
     
     const observer = new IntersectionObserver(
       (entries) => {
@@ -174,11 +214,15 @@ export default function HomePage() {
       // Cleanup style and resize listener
       document.head.removeChild(style);
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
   return (
     <AppClientWrapper>
+      {/* 🎯 Homepage Header - แสดงเฉพาะเมื่ออยู่บนสุด */}
+      <HomepageHeader isAtTop={isAtTop} />
+
       <main className="homepage-main" style={{ overflow: 'visible' }}>
         <h1 className="sr-only">Unda Alunda | Official Website & Merch Store</h1>
 

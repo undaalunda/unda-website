@@ -1,4 +1,4 @@
-/* Navbar.tsx - Performance Optimized + Fixed Accessibility + Mobile Search Close Fix */
+/* Navbar.tsx - Header Left, Controls Right (Cart → Search → Hamburger) */
 
 'use client';
 
@@ -18,17 +18,17 @@ const pageLinks = [
   { title: 'Contact', href: '/contact' },
 ];
 
-// 🚀 สร้าง LogoImage component แยกเพื่อลดการซ้ำซ้อน
+// 🚀 Logo Component สำหรับ Navbar (2 responsive + mobile image)
 const LogoImage = ({ onClick }: { onClick?: () => void }) => (
   <Image
     src="/unda-alunda-header.webp"
     alt="Unda Alunda Logo"
-    width={200}
-    height={50}
+    width={180}
+    height={45}
     quality={100}
     priority
     unoptimized={true}
-    sizes="(max-width: 1279px) 150px, 200px"
+    sizes="(max-width: 768px) 120px, 180px"
     onClick={onClick}
     className="logo-navbar-img"
   />
@@ -38,6 +38,7 @@ export default function Navbar() {
   const [highlightIndex, setHighlightIndex] = useState<number>(-1);
   const resultRefs = useRef<(HTMLElement | null)[]>([]);
   const [scrolledDown, setScrolledDown] = useState(false);
+  const [isAtTop, setIsAtTop] = useState(true);
   const [hasMounted, setHasMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -55,7 +56,11 @@ export default function Navbar() {
 
   useEffect(() => {
     setHasMounted(true);
-    const handleScroll = () => setScrolledDown(window.scrollY > 10);
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      setScrolledDown(currentScrollY > 10);
+      setIsAtTop(currentScrollY === 0);
+    };
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setSearchOpen(false);
     };
@@ -222,6 +227,9 @@ export default function Navbar() {
   if (!hasMounted) return null;
   const isHomepage = pathname === '/';
 
+  // 🎯 ไม่ต้องซ่อน controls เลย - แสดงตลอดเวลา
+  // const shouldHideControls = isHomepage && isAtTop && !searchOpen;
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     const hasQuery = delayedQuery.length > 0;
     const productCount = filtered.length;
@@ -274,42 +282,29 @@ export default function Navbar() {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 h-[96px]">
-      <div className={`absolute inset-0 bg-[#160000] transition-opacity duration-[1200ms] pointer-events-none ${scrolledDown ? 'opacity-100' : 'opacity-0'}`} />
-      <div className="relative flex items-center justify-between px-4 py-8 h-full">
+    <header className="fixed top-0 left-0 w-full z-50 h-[70px] md:h-[85px]">
+      <div className={`absolute inset-0 bg-[#160000]/80 backdrop-blur-md transition-opacity duration-[1200ms] pointer-events-none ${scrolledDown ? 'opacity-100' : 'opacity-0'}`} />
+      <div className="relative flex items-center justify-between px-4 py-4 md:py-5 h-full">
         
-        {/* ✅ Fixed hamburger menu button - ซ่อน ตอน searchOpen === true */}
+        {/* 🎯 Logo/Header - แสดงตลอดเวลา */}
         {!searchOpen && (
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors z-50"
-            aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
-            aria-expanded={menuOpen}
-            aria-controls="main-navigation"
-          >
-            <div
-              className={`transition-transform duration-200 ease-in-out ${
-                menuOpen ? 'rotate-180 scale-100' : 'rotate-0 scale-100'
-              }`}
+          <div className="transition-all duration-[1200ms] z-40 opacity-100">
+            <Link 
+              href="/" 
+              className="block"
+              onClick={menuOpen ? () => setMenuOpen(false) : undefined}
+              aria-label="Unda Alunda - Go to homepage"
             >
-              {menuOpen ? (
-                <X size={28} strokeWidth={1.2} aria-hidden="true" />
-              ) : (
-                <Menu
-                  size={23}
-                  strokeWidth={1.2}
-                  className="transition-opacity duration-300 opacity-70 hover:opacity-100"
-                  aria-hidden="true"
-                />
-              )}
-            </div>
-          </button>
+              <LogoImage />
+            </Link>
+          </div>
         )}
   
-        {/* ✅ Updated: Cart และ Search buttons - แสดงตามเงื่อนไขใหม่ */}
+        {/* 🎯 Controls ทางขวา - เรียงลำดับ: Cart → Search → Hamburger - แสดงตลอดเวลา */}
         {!searchOpen && (
-          <div className="flex items-center gap-7 pr-3 z-40">
-            {/* Cart button - ซ่อนตอนเปิด menu */}
+          <div className="flex items-center gap-7 md:gap-9 pr-3 z-40 opacity-100">
+            
+            {/* 1. Cart button - ซ่อนตอนเปิด menu */}
             {!menuOpen && (
               <Link
                 href="/cart"
@@ -333,7 +328,7 @@ export default function Navbar() {
               </Link>
             )}
 
-            {/* Search button - แสดงทั้งตอนปกติ (desktop only) และตอนเปิด menu (ทุกอุปกรณ์) */}
+            {/* 2. Search button - แสดงใน desktop ปกติ และทุกอุปกรณ์เมื่อเปิด menu */}
             <button
               onClick={() => setSearchOpen(true)}
               className={`${
@@ -348,31 +343,37 @@ export default function Navbar() {
                 aria-hidden="true"
               />
             </button>
+
+            {/* 3. Hamburger menu button - ย้ายมาขวาสุด */}
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-all duration-[1200ms] z-50"
+              aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+              aria-expanded={menuOpen}
+              aria-controls="main-navigation"
+            >
+              <div
+                className={`transition-transform duration-200 ease-in-out ${
+                  menuOpen ? 'rotate-180 scale-100' : 'rotate-0 scale-100'
+                }`}
+              >
+                {menuOpen ? (
+                  <X size={28} strokeWidth={1.2} aria-hidden="true" />
+                ) : (
+                  <Menu
+                    size={23}
+                    strokeWidth={1.2}
+                    className="transition-opacity duration-300 opacity-70 hover:opacity-100"
+                    aria-hidden="true"
+                  />
+                )}
+              </div>
+            </button>
           </div>
         )}
-  
-        {/* 🚀 Logo กลาง - ซ่อนตอนเปิด search บน mobile */}
-        <div
-          className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-[1200ms] ${
-            menuOpen ? 'z-[60]' : 'z-40'
-          } ${
-            // ซ่อน logo เมื่อเปิด search บน mobile, แสดงปกติใน desktop/tablet
-            searchOpen ? 'md:opacity-100 opacity-0' : 
-            (scrolledDown || !isHomepage || menuOpen ? 'opacity-100' : 'opacity-0')
-          }`}
-        >
-          <Link 
-            href="/" 
-            className="block"
-            onClick={menuOpen ? () => setMenuOpen(false) : undefined}
-            aria-label="Unda Alunda - Go to homepage"
-          >
-            <LogoImage />
-          </Link>
-        </div>
       </div>
 
-      {/* ✅ Fixed MENU OPEN OVERLAY */}
+      {/* ✅ MENU OPEN OVERLAY */}
       {menuOpen && (
         <nav 
           id="main-navigation"
@@ -394,7 +395,7 @@ export default function Navbar() {
             SHOP
           </Link>
           
-          {/* ✅ Fixed MUSIC DROPDOWN MENU */}
+          {/* ✅ MUSIC DROPDOWN MENU */}
           <div className="flex flex-col items-center z-30 font-[Cinzel] w-full">
             <button
               onClick={() => setMusicDropdownOpen(!musicDropdownOpen)}
@@ -506,7 +507,7 @@ export default function Navbar() {
               ref={searchOverlayRef}
               className="w-full max-w-6xl flex flex-col items-center fade-in-section"
             >
-            {/* ✅ Fixed SEARCH INPUT - เอา outline ออก */}
+            {/* ✅ SEARCH INPUT */}
             <form
               onSubmit={(e) => {
                 e.preventDefault();

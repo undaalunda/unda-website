@@ -112,10 +112,7 @@ main,
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom,
-    rgba(0, 0, 0, 0.1) 0%,     /* บนสุดสว่าง */
-    rgba(0, 0, 0, 0.4) 35%,    /* เพิ่มจาก 20% เป็น 35% */
-    rgba(0, 0, 0, 0.4) 100%);  /* ส่วนที่เหลือทึบเหมือนเดิม */
+  background-color: rgba(0, 0, 0, 0.2);
   z-index: 1;
 }
 
@@ -167,28 +164,21 @@ button svg,
   stroke: #dc9e63;
 }
 
-/* === NAVBAR CENTER LOGO RESPONSIVE === */
+
+/* === NAVBAR LOGO RESPONSIVE - 2 BREAKPOINTS + MOBILE IMAGE === */
 .logo-navbar-img {
-  width: 220px;
+  width: 150px; 
   height: auto;
   object-fit: contain;
+  margin-left: 10px;
 }
 
-@media (max-width: 1279px) {
-  .logo-navbar-img {
-    width: 200px;
-  }
-}
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .logo-navbar-img {
-    width: 180px;
-  }
-}
-
-@media (max-width: 480px) {
-  .logo-navbar-img {
-    width: 160px;
+    width: 25px;
+    content: url('/header-mobile.webp'); /* เปลี่ยนรูปตอน mobile */
+    margin-left: 10;
   }
 }
 
