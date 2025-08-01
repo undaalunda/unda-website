@@ -283,7 +283,7 @@ export default function Navbar() {
 
   return (
     <header className="fixed top-0 left-0 w-full z-50 h-[70px] md:h-[85px]">
-      <div className={`absolute inset-0 bg-[#160000]/80 backdrop-blur-md transition-opacity duration-[1200ms] pointer-events-none ${scrolledDown ? 'opacity-100' : 'opacity-0'}`} />
+      <div className={`absolute inset-0 bg-[#160000] transition-opacity duration-[1200ms] pointer-events-none ${scrolledDown ? 'opacity-100' : 'opacity-0'}`} />
       <div className="relative flex items-center justify-between px-4 py-4 md:py-5 h-full">
         
         {/* 🎯 Logo/Header - แสดงตลอดเวลา */}
