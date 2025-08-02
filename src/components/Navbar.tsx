@@ -1,4 +1,4 @@
-/* Navbar.tsx - Header Left, Controls Right (Cart → Search → Hamburger) */
+/* Navbar.tsx - Combined: Normal (center logo) + Homepage Top (left layout) */
 
 'use client';
 
@@ -227,8 +227,11 @@ export default function Navbar() {
   if (!hasMounted) return null;
   const isHomepage = pathname === '/';
 
-  // 🎯 ไม่ต้องซ่อน controls เลย - แสดงตลอดเวลา
-  // const shouldHideControls = isHomepage && isAtTop && !searchOpen;
+  // 🎯 ตรวจสอบว่าควรซ่อน controls หรือไม่ (version แรก)
+  const shouldHideControls = isHomepage && isAtTop && !searchOpen;
+
+  // 🎯 ตรวจสอบว่าควรใช้ layout แบบซ้าย (version 2) หรือไม่
+  const shouldUseLeftLayout = isHomepage && isAtTop && !searchOpen;
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     const hasQuery = delayedQuery.length > 0;
@@ -282,94 +285,201 @@ export default function Navbar() {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 h-[70px] md:h-[85px]">
+    <header className="fixed top-0 left-0 w-full z-50 h-[96px]">
       <div className={`absolute inset-0 bg-[#160000] transition-opacity duration-[1200ms] pointer-events-none ${scrolledDown ? 'opacity-100' : 'opacity-0'}`} />
-      <div className="relative flex items-center justify-between px-4 py-4 md:py-5 h-full">
-        
-        {/* 🎯 Logo/Header - แสดงตลอดเวลา */}
-        {!searchOpen && (
-          <div className="transition-all duration-[1200ms] z-40 opacity-100">
-            <Link 
-              href="/" 
-              className="block"
-              onClick={menuOpen ? () => setMenuOpen(false) : undefined}
-              aria-label="Unda Alunda - Go to homepage"
-            >
-              <LogoImage />
-            </Link>
-          </div>
-        )}
-  
-        {/* 🎯 Controls ทางขวา - เรียงลำดับ: Cart → Search → Hamburger - แสดงตลอดเวลา */}
-        {!searchOpen && (
-          <div className="flex items-center gap-7 md:gap-9 pr-3 z-40 opacity-100">
-            
-            {/* 1. Cart button - ซ่อนตอนเปิด menu */}
-            {!menuOpen && (
-              <Link
-                href="/cart"
-                className="relative cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
-                aria-label={`Shopping cart with ${totalQuantity} ${totalQuantity === 1 ? 'item' : 'items'}`}
-              >
-                <ShoppingCart
-                  size={23}
-                  strokeWidth={1.2}
-                  className="transition-opacity duration-300 opacity-70 hover:opacity-100"
-                  aria-hidden="true"
-                />
-                {totalQuantity > 0 && (
-                  <span 
-                    className="absolute -top-2 -right-2 bg-[#dc9e63] text-[#160000] rounded-full w-5 h-5 flex items-center justify-center text-xs font-light"
-                    aria-hidden="true"
+      <div className="relative flex items-center justify-between px-4 py-8 h-full">
+
+        {/* 🎯 CONDITIONAL LAYOUT BASED ON HOMEPAGE TOP STATE */}
+        {shouldUseLeftLayout ? (
+          // 🔥 VERSION 2 LAYOUT: Homepage top - Left layout (Hamburger + Logo left, Controls right)
+          <>
+            {/* ฝั่งซ้าย: Hamburger + Logo */}
+            {!searchOpen && (
+              <div className="flex items-center gap-4 transition-all duration-[1200ms] z-40 opacity-100">
+                {/* Hamburger menu button - ซ้ายสุด */}
+                <button
+                  onClick={() => setMenuOpen(!menuOpen)}
+                  className="cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-all duration-[1200ms] z-50"
+                  aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+                  aria-expanded={menuOpen}
+                  aria-controls="main-navigation"
+                >
+                  <div
+                    className={`transition-transform duration-200 ease-in-out ${
+                      menuOpen ? 'rotate-180 scale-100' : 'rotate-0 scale-100'
+                    }`}
                   >
-                    {totalQuantity}
-                  </span>
-                )}
-              </Link>
+                    {menuOpen ? (
+                      <X size={28} strokeWidth={1.2} aria-hidden="true" />
+                    ) : (
+                      <Menu
+                        size={23}
+                        strokeWidth={1.2}
+                        className="transition-opacity duration-300 opacity-70 hover:opacity-100"
+                        aria-hidden="true"
+                      />
+                    )}
+                  </div>
+                </button>
+
+                {/* Logo/Header - ถัดจาก Hamburger */}
+                <Link 
+                  href="/" 
+                  className="block"
+                  onClick={menuOpen ? () => setMenuOpen(false) : undefined}
+                  aria-label="Unda Alunda - Go to homepage"
+                >
+                  <LogoImage />
+                </Link>
+              </div>
             )}
+            
+            {/* Controls ทางขวา - เรียงลำดับ: Cart → Search */}
+            {!searchOpen && (
+              <div className="flex items-center gap-7 md:gap-9 pr-3 z-40 opacity-100">
+                
+                {/* Cart button - ซ่อนตอนเปิด menu */}
+                {!menuOpen && (
+                  <Link
+                    href="/cart"
+                    className="relative cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
+                    aria-label={`Shopping cart with ${totalQuantity} ${totalQuantity === 1 ? 'item' : 'items'}`}
+                  >
+                    <ShoppingCart
+                      size={23}
+                      strokeWidth={1.2}
+                      className="transition-opacity duration-300 opacity-70 hover:opacity-100"
+                      aria-hidden="true"
+                    />
+                    {totalQuantity > 0 && (
+                      <span 
+                        className="absolute -top-2 -right-2 bg-[#dc9e63] text-[#160000] rounded-full w-5 h-5 flex items-center justify-center text-xs font-light"
+                        aria-hidden="true"
+                      >
+                        {totalQuantity}
+                      </span>
+                    )}
+                  </Link>
+                )}
 
-            {/* 2. Search button - แสดงใน desktop ปกติ และทุกอุปกรณ์เมื่อเปิด menu */}
-            <button
-              onClick={() => setSearchOpen(true)}
-              className={`${
-                menuOpen ? 'block z-[70]' : 'hidden md:block'
-              } cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors`}
-              aria-label="Open search"
-            >
-              <Search
-                size={23}
-                strokeWidth={1.2}
-                className="transition-opacity duration-300 opacity-70 hover:opacity-100"
-                aria-hidden="true"
-              />
-            </button>
-
-            {/* 3. Hamburger menu button - ย้ายมาขวาสุด */}
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-all duration-[1200ms] z-50"
-              aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
-              aria-expanded={menuOpen}
-              aria-controls="main-navigation"
-            >
-              <div
-                className={`transition-transform duration-200 ease-in-out ${
-                  menuOpen ? 'rotate-180 scale-100' : 'rotate-0 scale-100'
-                }`}
-              >
-                {menuOpen ? (
-                  <X size={28} strokeWidth={1.2} aria-hidden="true" />
-                ) : (
-                  <Menu
+                {/* Search button - แสดงใน desktop ปกติ และทุกอุปกรณ์เมื่อเปิด menu */}
+                <button
+                  onClick={() => setSearchOpen(true)}
+                  className={`${
+                    menuOpen ? 'block z-[70]' : 'hidden md:block'
+                  } cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors`}
+                  aria-label="Open search"
+                >
+                  <Search
                     size={23}
                     strokeWidth={1.2}
                     className="transition-opacity duration-300 opacity-70 hover:opacity-100"
                     aria-hidden="true"
                   />
-                )}
+                </button>
               </div>
-            </button>
-          </div>
+            )}
+          </>
+        ) : (
+          // 🔥 VERSION 1 LAYOUT: Normal layout (Center logo, side controls)
+          <>
+            {/* Hamburger menu button - fade พร้อมกับ navbar */}
+            {!searchOpen && (
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className={`cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-all duration-[1200ms] z-50 ${
+                  shouldHideControls ? 'opacity-0 pointer-events-none' : 'opacity-100'
+                }`}
+                aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+                aria-expanded={menuOpen}
+                aria-controls="main-navigation"
+              >
+                <div
+                  className={`transition-transform duration-200 ease-in-out ${
+                    menuOpen ? 'rotate-180 scale-100' : 'rotate-0 scale-100'
+                  }`}
+                >
+                  {menuOpen ? (
+                    <X size={28} strokeWidth={1.2} aria-hidden="true" />
+                  ) : (
+                    <Menu
+                      size={23}
+                      strokeWidth={1.2}
+                      className="transition-opacity duration-300 opacity-70 hover:opacity-100"
+                      aria-hidden="true"
+                    />
+                  )}
+                </div>
+              </button>
+            )}
+
+            {/* Cart และ Search buttons - fade พร้อมกับ navbar */}
+            {!searchOpen && (
+              <div className={`flex items-center gap-7 pr-3 z-40 transition-all duration-[1200ms] ${
+                shouldHideControls ? 'opacity-0 pointer-events-none' : 'opacity-100'
+              }`}>
+                {/* Cart button - ซ่อนตอนเปิด menu */}
+                {!menuOpen && (
+                  <Link
+                    href="/cart"
+                    className="relative cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
+                    aria-label={`Shopping cart with ${totalQuantity} ${totalQuantity === 1 ? 'item' : 'items'}`}
+                  >
+                    <ShoppingCart
+                      size={23}
+                      strokeWidth={1.2}
+                      className="transition-opacity duration-300 opacity-70 hover:opacity-100"
+                      aria-hidden="true"
+                    />
+                    {totalQuantity > 0 && (
+                      <span 
+                        className="absolute -top-2 -right-2 bg-[#dc9e63] text-[#160000] rounded-full w-5 h-5 flex items-center justify-center text-xs font-light"
+                        aria-hidden="true"
+                      >
+                        {totalQuantity}
+                      </span>
+                    )}
+                  </Link>
+                )}
+
+                {/* Search button - แสดงทั้งตอนปกติ (desktop only) และตอนเปิด menu (ทุกอุปกรณ์) */}
+                <button
+                  onClick={() => setSearchOpen(true)}
+                  className={`${
+                    menuOpen ? 'block z-[70]' : 'hidden md:block'
+                  } cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors`}
+                  aria-label="Open search"
+                >
+                  <Search
+                    size={23}
+                    strokeWidth={1.2}
+                    className="transition-opacity duration-300 opacity-70 hover:opacity-100"
+                    aria-hidden="true"
+                  />
+                </button>
+              </div>
+            )}
+
+            {/* Logo กลาง - ซ่อนตอนเปิด search บน mobile */}
+            <div
+              className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-[1200ms] ${
+                menuOpen ? 'z-[60]' : 'z-40'
+              } ${
+                // ซ่อน logo เมื่อเปิด search บน mobile, แสดงปกติใน desktop/tablet
+                searchOpen ? 'md:opacity-100 opacity-0' : 
+                (scrolledDown || !isHomepage || menuOpen ? 'opacity-100' : 'opacity-0')
+              }`}
+            >
+              <Link 
+                href="/" 
+                className="block"
+                onClick={menuOpen ? () => setMenuOpen(false) : undefined}
+                aria-label="Unda Alunda - Go to homepage"
+              >
+                <LogoImage />
+              </Link>
+            </div>
+          </>
         )}
       </div>
 
@@ -552,7 +662,7 @@ export default function Navbar() {
               </div>
             </form>
 
-            {/* SEARCH RESULTS */}
+            {/* SEARCH RESULTS - (keeping the same search results layout as version 1) */}
             {delayedQuery.length === 0 ? (
               <div className="w-full">
                 {/* Mobile & Tablet (0-1279px): แนวตั้ง */}

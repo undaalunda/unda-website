@@ -51,7 +51,7 @@ const HomepageHeader = ({ isAtTop }: { isAtTop: boolean }) => (
       isAtTop ? 'opacity-100' : 'opacity-0 pointer-events-none'
     }`}
   >
-    <div className="relative flex items-center px-4 py-4 md:py-5 h-full">
+    <div className="relative flex items-center justify-center px-4 py-4 md:py-5 h-full">
       <Link href="/" aria-label="Unda Alunda - Go to homepage">
         <LogoImage />
       </Link>
@@ -220,8 +220,6 @@ export default function HomePage() {
 
   return (
     <AppClientWrapper>
-      {/* 🎯 Homepage Header - แสดงเฉพาะเมื่ออยู่บนสุด */}
-      <HomepageHeader isAtTop={isAtTop} />
 
       <main className="homepage-main" style={{ overflow: 'visible' }}>
         <h1 className="sr-only">Unda Alunda | Official Website & Merch Store</h1>
