@@ -176,7 +176,7 @@ button svg,
 
 @media (max-width: 767px) {
   .logo-navbar-img {
-    width: 20px;
+    width: 23px;
     content: url('/header-mobile.webp'); /* เปลี่ยนรูปตอน mobile */
     margin-left: 10;
   }
@@ -2064,4 +2064,37 @@ button svg,
 .terms-physical-delivery {
   background: linear-gradient(135deg, rgba(255,107,53,0.15) 0%, rgba(230,57,70,0.12) 50%, rgba(214,40,40,0.08) 100%);
   border-left: 4px solid #ff6b35;
+}
+
+/* 🎭 NAVBAR DROPDOWN DARK OVERLAY - Neural DSP Style */
+
+/* ===== NAVBAR DROPDOWN DARK OVERLAY ===== */
+
+/* เมื่อไม่มี dropdown - ซ่อน overlay */
+.homepage-main::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 30;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease-out, visibility 0.4s ease-out;
+  pointer-events: none;
+}
+
+/* เมื่อมี dropdown - แสดง overlay ค่อยๆ */
+.homepage-main.dropdown-active::before {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* เบลอแค่ desktop ≥1280px เท่านั้น */
+@media (max-width: 1279px) {
+  .homepage-main::before {
+    display: none !important;
+  }
 }

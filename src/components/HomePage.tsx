@@ -1,4 +1,4 @@
-/* HomePage.tsx - Added Header on Left Side */
+/* HomePage.tsx - Added Blur Effect for Navbar Dropdown */
 
 'use client';
 
@@ -32,6 +32,7 @@ export default function HomePage() {
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
   const [showBandsintown, setShowBandsintown] = useState(false);
+  const [navbarDropdownOpen, setNavbarDropdownOpen] = useState(false); // 🆕 Blur state
   
   const videoRef = useRef<HTMLDivElement>(null);
   const transcriptionRef = useRef<HTMLDivElement>(null);
@@ -144,6 +145,13 @@ export default function HomePage() {
     const handleResize = () => updateHeroImageStyles();
     window.addEventListener('resize', handleResize);
     
+    // 🆕 Listen for navbar dropdown events
+    const handleNavbarDropdown = (e: CustomEvent) => {
+      setNavbarDropdownOpen(e.detail);
+    };
+    
+    window.addEventListener('navbar-dropdown-toggle', handleNavbarDropdown as EventListener);
+    
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -175,13 +183,16 @@ export default function HomePage() {
       // Cleanup style and resize listener
       document.head.removeChild(style);
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('navbar-dropdown-toggle', handleNavbarDropdown as EventListener);
     };
   }, []);
 
   return (
     <AppClientWrapper>
-
-      <main className="homepage-main" style={{ overflow: 'visible' }}>
+      <main 
+        className={`homepage-main ${navbarDropdownOpen ? 'dropdown-active' : ''}`} 
+        style={{ overflow: 'visible' }}
+      >
         <h1 className="sr-only">Unda Alunda | Official Website & Merch Store</h1>
 
         {/* HERO SECTION - 🚀 OPTIMIZED */}
