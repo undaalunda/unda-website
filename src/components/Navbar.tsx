@@ -69,7 +69,7 @@ export default function Navbar() {
     setHasMounted(true);
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      setScrolledDown(currentScrollY > 50);
+      setScrolledDown(currentScrollY > 120);
       setIsAtTop(currentScrollY === 0);
     };
     const handleKey = (e: KeyboardEvent) => {
@@ -200,6 +200,20 @@ export default function Navbar() {
       return () => clearTimeout(handler);
     }
   }, [searchQuery]);
+  
+useEffect(() => {
+  const handleMenuToggle = (e: CustomEvent) => {
+    console.log('Navbar received menu toggle:', e.detail);
+    setMenuOpen(e.detail);
+  };
+  
+  window.addEventListener('toggle-menu', handleMenuToggle as EventListener);
+  
+  return () => {
+    window.removeEventListener('toggle-menu', handleMenuToggle as EventListener);
+  };
+}, []);
+  
 
   const filtered = useMemo(() => {
     const q = delayedQuery.toLowerCase().trim();
@@ -248,9 +262,6 @@ export default function Navbar() {
 
   if (!hasMounted) return null;
   const isHomepage = pathname === '/';
-
-  // 🎯 ตรวจสอบว่าควรใช้ layout แบบซ้าย หรือกลาง - sync กับ navbar background
-  const shouldUseLeftLayout = isHomepage && !searchOpen && !scrolledDown;
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     const hasQuery = delayedQuery.length > 0;
@@ -304,161 +315,23 @@ export default function Navbar() {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 h-[96px]">
+    <header className={`fixed top-0 left-0 w-full z-50 h-[96px] ${menuOpen ? 'hidden' : ''}`}>
       <div className={`absolute inset-0 bg-[#160000] transition-opacity duration-[1200ms] pointer-events-none ${scrolledDown ? 'opacity-100' : 'opacity-0'}`} />
       <div className="relative flex items-center justify-between px-4 py-8 h-full">
 
         {/* 🔥 DESKTOP NAVIGATION - ≥1280px */}
         <div className="hidden xl:flex items-center justify-between w-full">
-          {/* LEFT LAYOUT - Homepage Top (fade out เมื่อ scroll ลง) */}
-          <div className={`absolute inset-0 flex items-center justify-between px-4 transition-opacity duration-[800ms] ${
-            shouldUseLeftLayout && !searchOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          }`}>
-            {/* Left side: Logo + Navigation */}
-            <div className="flex items-center gap-8">
-              {/* Logo */}
-              <Link 
-                href="/" 
-                className="block"
-                aria-label="Unda Alunda - Go to homepage"
-              >
-                <LogoImage />
-              </Link>
-
-              {/* Desktop Navigation Menu */}
-<nav className="flex items-center gap-6 ml-2" style={{ transform: 'translateY(2px)' }} aria-label="Main navigation">
-                <Link 
-                  href="/" 
-                  className="nav-link text-[#f8fcdc]/70 hover:text-[#dc9e63] transition-colors duration-300 text-[10px] font-medium uppercase"
-                  style={{ letterSpacing: '0.25em' }}
-                >
-                  HOME
-                </Link>
-                <Link 
-                  href="/shop" 
-                  className="nav-link text-[#f8fcdc]/70 hover:text-[#dc9e63] transition-colors duration-300 text-[10px] font-medium uppercase"
-                  style={{ letterSpacing: '0.25em' }}
-                >
-                  SHOP
-                </Link>
-                
-                {/* Music Dropdown */}
-                <div 
-                  ref={desktopMusicRef}
-                  className="relative"
-                  onMouseEnter={() => {
-                    setDesktopMusicDropdownOpen(true);
-                    // 🆕 ส่ง signal ไป HomePage
-                    window.dispatchEvent(new CustomEvent('navbar-dropdown-toggle', { detail: true }));
-                  }}
-                  onMouseLeave={() => {
-                    setDesktopMusicDropdownOpen(false);
-                    // 🆕 ส่ง signal ไป HomePage
-                    window.dispatchEvent(new CustomEvent('navbar-dropdown-toggle', { detail: false }));
-                  }}
-                >
-                  <button
-                    className="nav-link text-[#f8fcdc]/70 hover:text-[#dc9e63] transition-colors duration-300 text-[10px] font-medium uppercase cursor-pointer"
-                    style={{ letterSpacing: '0.25em', transform: 'translateY(-2px)' }}
-                    aria-expanded={desktopMusicDropdownOpen}
-                    aria-controls="desktop-music-submenu"
-                  >
-                    MUSIC
-                  </button>
-
-                  {/* Dropdown Menu */}
-                  <div
-                    id="desktop-music-submenu"
-                    className={`absolute top-full left-0 mt-2 bg-[#3a1515]/60 backdrop-blur-md rounded-lg shadow-2xl overflow-hidden transition-all duration-300 z-50 ${
-                      desktopMusicDropdownOpen ? 'opacity-100 visible transform translate-y-0' : 'opacity-0 invisible transform translate-y-2'
-                    }`}
-                    style={{ minWidth: '140px' }}
-                  >
-                    {musicLinks.map((link, index) => (
-                      <a
-                        key={index}
-                        href={link.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block px-5 py-3 text-[#f8fcdc] hover:text-[#dc9e63] hover:bg-[#dc9e63]/15 transition-all duration-200 text-xs font-normal border-b border-[#f8fcdc]/10 last:border-b-0"
-                      >
-                        {link.title}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-
-                <Link 
-                  href="/about" 
-                  className="nav-link text-[#f8fcdc]/70 hover:text-[#dc9e63] transition-colors duration-300 text-[10px] font-medium uppercase"
-                  style={{ letterSpacing: '0.25em' }}
-                >
-                  ABOUT
-                </Link>
-                <Link 
-                  href="/tour" 
-                  className="nav-link text-[#f8fcdc]/70 hover:text-[#dc9e63] transition-colors duration-300 text-[10px] font-medium uppercase"
-                  style={{ letterSpacing: '0.25em' }}
-                >
-                  TOUR
-                </Link>
-                <Link 
-                  href="/contact" 
-                  className="nav-link text-[#f8fcdc]/70 hover:text-[#dc9e63] transition-colors duration-300 text-[10px] font-medium uppercase"
-                  style={{ letterSpacing: '0.25em' }}
-                >
-                  CONTACT
-                </Link>
-              </nav>
-            </div>
-
-            {/* Right side: Cart + Search */}
-            <div className="flex items-center gap-7 xl:gap-9 -translate-x-4">
-              {/* Cart button */}
-              <Link
-                href="/cart"
-                className="relative cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
-                aria-label={`Shopping cart with ${totalQuantity} ${totalQuantity === 1 ? 'item' : 'items'}`}
-              >
-                <ShoppingCart
-                  size={23}
-                  strokeWidth={1.2}
-                  className="transition-opacity duration-300 opacity-70 hover:opacity-100"
-                  aria-hidden="true"
-                />
-                {totalQuantity > 0 && (
-                  <span 
-                    className="absolute -top-2 -right-2 bg-[#dc9e63] text-[#160000] rounded-full w-5 h-5 flex items-center justify-center text-xs font-light"
-                    aria-hidden="true"
-                  >
-                    {totalQuantity}
-                  </span>
-                )}
-              </Link>
-
-              {/* Search button */}
-              <button
-                onClick={() => setSearchOpen(true)}
-                className="cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
-                aria-label="Open search"
-              >
-                <Search
-                  size={23}
-                  strokeWidth={1.2}
-                  className="transition-opacity duration-300 opacity-70 hover:opacity-100"
-                  aria-hidden="true"
-                />
-              </button>
-            </div>
-          </div>
+        
 
           {/* CENTER LAYOUT - Normal layout (fade in เมื่อ scroll ลง) */}
           <div className={`absolute inset-0 flex items-center justify-between px-4 transition-opacity duration-[800ms] ${
-            !shouldUseLeftLayout ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          }`}>
+  !isHomepage || scrolledDown || menuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+}`}>
             {/* Left side: Navigation menu only */}
-            {!searchOpen && (
-              <nav className="flex items-center gap-8 ml-6" style={{ transform: 'translateY(2px)' }} aria-label="Main navigation">
+{!searchOpen && (
+  <nav className={`flex items-center gap-8 ml-6 transition-opacity duration-[800ms] ${
+    !isHomepage ? 'opacity-100' : (scrolledDown ? 'opacity-100' : 'opacity-0 pointer-events-none')
+  }`} style={{ transform: 'translateY(2px)' }} aria-label="Main navigation">
                 <Link 
                   href="/" 
                   className="nav-link text-[#f8fcdc]/70 hover:text-[#dc9e63] transition-colors duration-300 text-[10px] font-medium uppercase"
@@ -545,8 +418,9 @@ export default function Navbar() {
             )}
 
             {/* Logo กลาง */}
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-              <Link 
+<div className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-[800ms] ${
+  !isHomepage || scrolledDown || menuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+}`}>      <Link 
                 href="/" 
                 className="block"
                 aria-label="Unda Alunda - Go to homepage"
@@ -557,7 +431,9 @@ export default function Navbar() {
 
             {/* Right side: Cart + Search */}
             {!searchOpen && (
-              <div className="flex items-center gap-7 xl:gap-9 -translate-x-4">
+  <div className={`flex items-center gap-7 xl:gap-9 -translate-x-4 transition-opacity duration-[800ms] ${
+    !isHomepage ? 'opacity-100' : (scrolledDown ? 'opacity-100' : 'opacity-0 pointer-events-none')
+  }`}>
                 {/* Cart button */}
                 <Link
                   href="/cart"
@@ -600,65 +476,23 @@ export default function Navbar() {
 
         {/* 🔥 MOBILE/TABLET LAYOUT - <1280px */}
         <div className="xl:hidden w-full">
-          {/* LEFT LAYOUT - Homepage Top (fade out เมื่อ scroll ลง) */}
-          <div className={`absolute inset-0 flex items-center justify-between px-4 transition-opacity duration-[800ms] ${
-            shouldUseLeftLayout && !menuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          }`}>
-            {/* ฝั่งซ้าย: Hamburger + Logo */}
-            {!searchOpen && (
-              <div className="flex items-center gap-4 z-40">
-                {/* Hamburger menu button - ซ้ายสุด */}
-                <button
-                  onClick={() => setMenuOpen(!menuOpen)}
-                  className="cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-all duration-[1200ms] z-50"
-                  aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
-                  aria-expanded={menuOpen}
-                  aria-controls="main-navigation"
-                >
-                  <div
-                    className={`transition-transform duration-200 ease-in-out ${
-                      menuOpen ? 'rotate-180 scale-100' : 'rotate-0 scale-100'
-                    }`}
-                  >
-                    {menuOpen ? (
-                      <X size={28} strokeWidth={1.2} aria-hidden="true" />
-                    ) : (
-                      <Menu
-                        size={23}
-                        strokeWidth={1.2}
-                        className="transition-opacity duration-300 opacity-70 hover:opacity-100"
-                        aria-hidden="true"
-                      />
-                    )}
-                  </div>
-                </button>
-
-                {/* Logo/Header - ถัดจาก Hamburger */}
-                <Link 
-                  href="/" 
-                  className="block"
-                  onClick={menuOpen ? () => setMenuOpen(false) : undefined}
-                  aria-label="Unda Alunda - Go to homepage"
-                >
-                  <LogoImage />
-                </Link>
-              </div>
-            )}
-          </div>
+          
 
           {/* CENTER LAYOUT - Normal layout (fade in เมื่อ scroll ลง) */}
           <div className={`absolute inset-0 flex items-center justify-between px-4 transition-opacity duration-[800ms] ${
-            !shouldUseLeftLayout ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          }`}>
+  !isHomepage || scrolledDown || menuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+}`}>
             {/* Hamburger menu button - ซ้าย */}
             {!searchOpen && (
-              <button
-                onClick={() => setMenuOpen(!menuOpen)}
-                className="cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-all duration-[1200ms] z-50"
-                aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
-                aria-expanded={menuOpen}
-                aria-controls="main-navigation"
-              >
+  <button 
+    onClick={() => setMenuOpen(!menuOpen)}
+    className={`cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-all duration-[1200ms] z-50 transition-opacity duration-[800ms] ${
+      !isHomepage ? 'opacity-100' : (scrolledDown ? 'opacity-100' : 'opacity-0 pointer-events-none')
+    }`}
+    aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+    aria-expanded={menuOpen}
+    aria-controls="main-navigation"
+  >
                 <div
                   className={`transition-transform duration-200 ease-in-out ${
                     menuOpen ? 'rotate-180 scale-100' : 'rotate-0 scale-100'
@@ -680,10 +514,9 @@ export default function Navbar() {
 
             {/* 🎯 FIXED: Logo กลาง - แสดงเสมอเมื่อเปิด menu */}
             <div
-              className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-[800ms] z-40 ${
-                // ✅ แสดง logo เสมอเมื่อเปิด menu หรือไม่ได้เปิด search
-                menuOpen ? 'opacity-100' : searchOpen ? 'md:opacity-100 opacity-0' : 'opacity-100'
-              }`}
+             className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-[800ms] z-40 ${
+  menuOpen ? 'opacity-100' : searchOpen ? 'md:opacity-100 opacity-0' : (!isHomepage ? 'opacity-100' : (isHomepage && !scrolledDown) ? 'opacity-0 pointer-events-none' : 'opacity-100')
+}`}
             >
               <Link 
                 href="/" 
@@ -706,61 +539,11 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* 🚀 MENU OPEN STATE - แสดง hamburger button และ logo เสมอเมื่อเปิด menu */}
-          {menuOpen && !searchOpen && (
-            <div className="absolute inset-0 flex items-center justify-between px-4 z-60">
-              {/* Hamburger button เมื่อเปิด menu (กากบาท) */}
-              <button
-                onClick={() => setMenuOpen(false)}
-                className="cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-all duration-[1200ms] z-70"
-                aria-label="Close navigation menu"
-                aria-expanded={true}
-                aria-controls="main-navigation"
-              >
-                <X size={28} strokeWidth={1.2} aria-hidden="true" />
-              </button>
-
-              {/* Logo กลางเมื่อเปิด menu */}
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-60">
-                <Link 
-                  href="/" 
-                  className="block"
-                  onClick={() => setMenuOpen(false)}
-                  aria-label="Unda Alunda - Go to homepage"
-                >
-                  <Image
-                    src="/unda-alunda-header.webp"
-                    alt="Unda Alunda Logo"
-                    width={180}
-                    height={45}
-                    quality={100}
-                    priority
-                    unoptimized={true}
-                    sizes="(max-width: 768px) 120px, 180px"
-                    className="w-[150px] md:w-[180px] h-auto object-contain"
-                  />
-                </Link>
-              </div>
-
-              {/* ปุ่ม Search ขวามือเมื่อเปิด menu */}
-              <button
-                onClick={() => setSearchOpen(true)}
-                className="cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors z-70"
-                aria-label="Open search"
-              >
-                <Search
-                  size={23}
-                  strokeWidth={1.2}
-                  className="transition-opacity duration-300 opacity-70 hover:opacity-100"
-                  aria-hidden="true"
-                />
-              </button>
-            </div>
-          )}
-
           {/* 🔥 CART & SEARCH - แสดงตลอดไม่ fade (ซ่อนเมื่อเปิด menu) - 🎯 gap เหมือนกันทุก responsive */}
           {!searchOpen && !menuOpen && (
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-7 -translate-x-4 z-40">
+ <div className={`absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-7 -translate-x-4 z-40 transition-opacity duration-[800ms] ${
+  !isHomepage ? 'opacity-100' : (scrolledDown ? 'opacity-100' : 'opacity-0 pointer-events-none')
+}`}>
               {/* Cart button */}
               <Link
                 href="/cart"
@@ -800,92 +583,6 @@ export default function Navbar() {
           )}
         </div>
       </div>
-
-      {/* ✅ MENU OPEN OVERLAY - Only for mobile/tablet */}
-      {menuOpen && (
-        <div className="xl:hidden">
-          <nav 
-            id="main-navigation"
-            className="fixed inset-0 bg-transparent flex flex-col items-center justify-center text-[#f8fcdc] text-lg font-semibold tracking-widest space-y-6 z-30 backdrop-blur-none font-[Cinzel]"
-            aria-label="Main navigation"
-          >
-            <Link 
-              href="/" 
-              onClick={() => setMenuOpen(false)} 
-              className="hover:text-[#dc9e63]"
-            >
-              HOME
-            </Link>
-            <Link 
-              href="/shop" 
-              onClick={() => setMenuOpen(false)} 
-              className="hover:text-[#dc9e63]"
-            >
-              SHOP
-            </Link>
-            
-            {/* ✅ MUSIC DROPDOWN MENU */}
-            <div className="flex flex-col items-center z-30 font-[Cinzel] w-full">
-              <button
-                onClick={() => setMusicDropdownOpen(!musicDropdownOpen)}
-                className="hover:text-[#dc9e63] text-[#f8fcdc] text-lg font-semibold tracking-widest cursor-pointer"
-                aria-expanded={musicDropdownOpen}
-                aria-controls="music-submenu"
-                aria-label="Music streaming platforms"
-              >
-                MUSIC
-              </button>
-
-              <div
-                id="music-submenu"
-                className={`
-                  overflow-hidden transition-all duration-500 ease-in-out
-                  flex flex-col items-center text-sm font-thin text-[#f8fcdc]/60 space-y-1
-                  ${musicDropdownOpen ? 'max-h-60 mt-2' : 'max-h-0'}
-                `}
-                role="menu"
-                aria-labelledby="music-button"
-              >
-                {musicLinks.map((link, index) => (
-                  <a 
-                    key={index}
-                    href={link.href} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="hover:text-[#dc9e63]"
-                    role="menuitem"
-                    aria-label={`Listen on ${link.title}`}
-                  >
-                    {link.title}
-                  </a>
-                ))}
-              </div>
-            </div>
-            
-            <Link 
-              href="/about" 
-              onClick={() => setMenuOpen(false)} 
-              className="hover:text-[#dc9e63]"
-            >
-              ABOUT
-            </Link>
-            <Link 
-              href="/tour" 
-              onClick={() => setMenuOpen(false)} 
-              className="hover:text-[#dc9e63]"
-            >
-              TOUR
-            </Link>
-            <Link 
-              href="/contact" 
-              onClick={() => setMenuOpen(false)} 
-              className="hover:text-[#dc9e63]"
-            >
-              CONTACT
-            </Link>
-          </nav>
-        </div>
-      )}
 
       {/* ✅ SEARCH OPEN OVERLAY - Full Page Scroll */}
       {searchOpen && (

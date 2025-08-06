@@ -1,15 +1,17 @@
-// AppClientWrapper.tsx - FIXED: Clean social icons alt text
+// AppClientWrapper.tsx - เพิ่ม Scrolling Navbar ให้ Homepage
 
 'use client';
 
-import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { useEffect, useState, useRef, useMemo } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import CartSuccessPopup from '@/components/CartSuccessPopup';
 import CookieNotice from '@/components/CookieNotice';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
+import { Menu, ShoppingCart, Search, X, ChevronDown } from 'lucide-react';
+import { allItems } from '@/components/allItems';
 
 // Lazy load heavy components
 const Navbar = dynamic(() => import('@/components/Navbar'), { ssr: false });
@@ -17,6 +19,24 @@ const NewsletterForm = dynamic(() => import('@/components/NewsletterForm'), {
   ssr: false,
   loading: () => <div style={{ height: '200px' }} />
 });
+
+// Page links for search
+const pageLinks = [
+  { title: 'Home', href: '/' },
+  { title: 'Shop', href: '/shop' },
+  { title: 'About', href: '/about' },
+  { title: 'Tour', href: '/tour' },
+  { title: 'Contact', href: '/contact' },
+];
+
+// Music streaming platforms
+const musicLinks = [
+  { title: 'Spotify', href: 'https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0' },
+  { title: 'Apple', href: 'https://music.apple.com/us/artist/unda-alunda/1543677299' },
+  { title: 'Deezer', href: 'https://www.deezer.com/en/artist/115903802' },
+  { title: 'Tidal', href: 'https://tidal.com/browse/artist/22524871' },
+  { title: 'Amazon', href: 'https://music.amazon.com/artists/B08PVKFZDZ/unda-alunda' },
+];
 
 // SVG Social Icons - unchanged for website design
 const FacebookIcon = () => (
@@ -30,6 +50,7 @@ const YoutubeIcon = () => (
     <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
   </svg>
 );
+
 
 const InstagramIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -58,7 +79,71 @@ const ThreadsIcon = () => (
 export default function AppClientWrapper({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
-  const { setLastActionItem } = useCart();
+  const router = useRouter();
+  const { setLastActionItem, cartItems } = useCart();
+  
+  // 🔥 เพิ่ม states สำหรับระบบเสิร์ชแบบเดียวกับ Navbar
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [delayedQuery, setDelayedQuery] = useState('');
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [highlightIndex, setHighlightIndex] = useState<number>(-1);
+  const resultRefs = useRef<(HTMLElement | null)[]>([]); 
+  const searchOverlayRef = useRef<HTMLDivElement>(null);
+  const [musicDropdownOpen, setMusicDropdownOpen] = useState(false);
+  const [desktopMusicDropdownOpen, setDesktopMusicDropdownOpen] = useState(false);
+  const [navbarDropdownOpen, setNavbarDropdownOpen] = useState(false);
+  
+  const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const desktopMusicRef = useRef<HTMLDivElement>(null);
+
+  // Check if we're on homepage to avoid duplicate navbar
+  const isHomepage = pathname === '/';
+
+  // 🔥 เพิ่ม search logic แบบเดียวกับ Navbar
+const filtered = useMemo(() => {
+  const q = delayedQuery.toLowerCase().trim();
+  const queryWords = q.split(/\s+/);
+
+  return q.length > 0
+    ? allItems.filter((item) => {
+        const fields = [
+          item.title,
+          item.subtitle,
+          item.category,
+          item.description,
+          ...(item.tags || []),
+          typeof item.price === 'number'
+            ? item.price.toString()
+            : `${item.price?.original || ''} ${item.price?.sale || ''}`
+        ]
+          .filter(Boolean)
+          .map((val) => String(val).toLowerCase());
+
+        return queryWords.every((word) =>
+          fields.some((field) => field.includes(word))
+        );
+      })
+    : [];
+}, [delayedQuery]);
+
+const suggestions = useMemo(() => {
+  const q = delayedQuery.toLowerCase();
+  const tags = allItems.flatMap((item) => item.tags).filter(Boolean);
+  const titles = allItems.map((item) => item.title);
+  const allTerms = [...tags, ...titles];
+  const unique = Array.from(new Set(allTerms));
+  return q.length > 0
+    ? unique.filter((term) => term.toLowerCase().startsWith(q)).slice(0, 6)
+    : [];
+}, [delayedQuery]);
+
+const pageMatches = useMemo(() => {
+  const q = delayedQuery.toLowerCase();
+  return q.length > 0
+    ? pageLinks.filter((page) => page.title.toLowerCase().includes(q))
+    : [];
+}, [delayedQuery]);
 
   useEffect(() => {
     const handler = (e: any) => {
@@ -68,7 +153,7 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
     };
     window.addEventListener('toggle-menu', handler);
     
-    // FIXED: Keep scroll restoration as 'auto'
+    // Keep scroll restoration as 'auto'
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'auto';
     }
@@ -80,15 +165,1054 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
     setLastActionItem(null);
   }, [pathname]);
 
+  // 🔥 เพิ่ม search effects แบบเดียวกับ Navbar
+useEffect(() => {
+  if (searchQuery === '') {
+    setDelayedQuery('');
+  } else {
+    const handler = setTimeout(() => {
+      setDelayedQuery(searchQuery);
+      setHighlightIndex(0);
+    }, 300);
+    return () => clearTimeout(handler);
+  }
+}, [searchQuery]);
+
+useEffect(() => {
+  if (searchOpen && resultRefs.current[highlightIndex]) {
+    resultRefs.current[highlightIndex]?.scrollIntoView({ block: 'nearest' });
+  }
+}, [highlightIndex, searchOpen]);
+
+useEffect(() => {
+  if (searchOpen) {
+    setHighlightIndex(0);
+  }
+}, [searchOpen]);
+
+  // Handle navbar states and body scroll lock
+  useEffect(() => {
+    // Listen for navbar dropdown events
+    const handleNavbarDropdown = (e: CustomEvent) => {
+      setNavbarDropdownOpen(e.detail);
+    };
+    
+    window.addEventListener('navbar-dropdown-toggle', handleNavbarDropdown as EventListener);
+
+    // Handle menu body scroll lock
+    const body = document.body;
+    if (menuOpen) {
+      body.style.position = 'fixed';
+      body.style.width = '100%';
+    } else {
+      body.style.position = '';
+      body.style.width = '';
+      setMusicDropdownOpen(false); // Close mobile music dropdown when menu closes
+    }
+
+    // Handle search body scroll lock
+    if (searchOpen) {
+      body.style.position = 'fixed';
+      body.style.width = '100%';
+    } else if (!menuOpen) {
+      body.style.position = '';
+      body.style.width = '';
+    }
+
+    // Keyboard handlers
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSearchOpen(false);
+        setDesktopMusicDropdownOpen(false);
+      }
+    };
+
+    // Click outside handlers
+    const handleClickOutside = (e: MouseEvent) => {
+      // Desktop music dropdown click outside
+      if (
+        desktopMusicRef.current &&
+        !desktopMusicRef.current.contains(e.target as Node)
+      ) {
+        setDesktopMusicDropdownOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('mousedown', handleClickOutside);
+    
+    return () => {
+      window.removeEventListener('navbar-dropdown-toggle', handleNavbarDropdown as EventListener);
+      window.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('mousedown', handleClickOutside);
+      body.style.position = '';
+      body.style.width = '';
+    };
+  }, [menuOpen, searchOpen]);
+
+  // เพิ่มหลัง useEffect อื่นๆ
+useEffect(() => {
+  console.log('AppClient sending menu toggle:', menuOpen);
+  const event = new CustomEvent('toggle-menu', { detail: menuOpen });
+  window.dispatchEvent(event);
+}, [menuOpen]);
+
+// 🔥 เพิ่ม keyboard handler สำหรับเสิร์ช
+const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const hasQuery = delayedQuery.length > 0;
+  const productCount = filtered.length;
+  const suggestionCount = suggestions.length;
+  const pageCount = pageMatches.length;
+  const recentCount = recentSearches.length;
+  const menuCount = pageLinks.length;
+
+  const totalCount = hasQuery
+    ? 1 + productCount + suggestionCount + pageCount + recentCount
+    : 1 + menuCount;
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    setHighlightIndex((prev) => {
+      const next = prev + 1;
+      if (next >= totalCount) {
+        return 1;
+      }
+      return next;
+    });
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    setHighlightIndex((prev) => {
+      const next = prev - 1;
+      if (next < 1) {
+        return totalCount - 1;
+      }
+      return next;
+    });
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    const el = resultRefs.current[highlightIndex];
+    if (el) {
+      const q = searchQuery.trim();
+      if (q.length > 0) {
+        setRecentSearches((prev) => {
+          const withoutDupes = prev.filter((t) => t !== q);
+          return [q, ...withoutDupes].slice(0, 5);
+        });
+      }
+      const link = el.querySelector('a');
+      if (link) {
+        (link as HTMLElement).click();
+      } else {
+        el.click();
+      }
+    }
+  }
+};
+
   return (
     <>
+      {/* 🔥 แสดง Navbar ทุกหน้า รวมทั้ง homepage */}
       <Navbar />
+
+      {/* 🔥 GLOBAL STATIC NAVBAR - Desktop ≥1280px (Shows on HOMEPAGE only) - ซ่อนเมื่อเปิด menu */}
+{isHomepage && !menuOpen && !searchOpen && (
+  <div className="absolute top-0 left-0 right-0 h-[96px] z-[9999] hidden xl:flex items-center justify-between px-4" style={{ pointerEvents: 'auto' }}>
+        {/* Left side: Logo + Navigation */}
+        <div className="flex items-center gap-8" style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10000 }}>
+          {/* Logo */}
+          <Link 
+            href="/" 
+            className="block"
+            aria-label="Unda Alunda - Go to homepage"
+          >
+            <Image
+              src="/unda-alunda-header.webp"
+              alt="Unda Alunda Logo"
+              width={180}
+              height={45}
+              quality={100}
+              priority
+              unoptimized={true}
+              sizes="180px"
+              className={`logo-navbar-img ${menuOpen ? 'hamburger-logo' : ''}`}
+            />
+          </Link>
+
+          {/* Desktop Navigation Menu */}
+          <nav className="flex items-center gap-6 ml-2" style={{ transform: 'translateY(2px)', position: 'relative', zIndex: 70 }} aria-label="Main navigation">
+            <Link 
+              href="/" 
+              className="nav-link text-[#f8fcdc]/70 hover:text-[#dc9e63] transition-colors duration-300 text-[10px] font-medium uppercase"
+              style={{ letterSpacing: '0.25em' }}
+            >
+              HOME
+            </Link>
+            <Link 
+              href="/shop" 
+              className="nav-link text-[#f8fcdc]/70 hover:text-[#dc9e63] transition-colors duration-300 text-[10px] font-medium uppercase"
+              style={{ letterSpacing: '0.25em' }}
+            >
+              SHOP
+            </Link>
+            
+            {/* Music Dropdown */}
+            <div 
+              ref={desktopMusicRef}
+              className="relative"
+              onMouseEnter={() => {
+                setDesktopMusicDropdownOpen(true);
+                window.dispatchEvent(new CustomEvent('navbar-dropdown-toggle', { detail: true }));
+              }}
+              onMouseLeave={() => {
+                setDesktopMusicDropdownOpen(false);
+                window.dispatchEvent(new CustomEvent('navbar-dropdown-toggle', { detail: false }));
+              }}
+            >
+              <button
+                className="nav-link text-[#f8fcdc]/70 hover:text-[#dc9e63] transition-colors duration-300 text-[10px] font-medium uppercase cursor-pointer"
+                style={{ letterSpacing: '0.25em', transform: 'translateY(-2px)' }}
+                aria-expanded={desktopMusicDropdownOpen}
+                aria-controls="desktop-music-submenu"
+              >
+                MUSIC
+              </button>
+
+              {/* Dropdown Menu */}
+              <div
+                id="desktop-music-submenu"
+                className={`absolute top-full left-0 mt-2 bg-[#3a1515]/60 backdrop-blur-md rounded-lg shadow-2xl overflow-hidden transition-all duration-300 z-50 ${
+                  desktopMusicDropdownOpen ? 'opacity-100 visible transform translate-y-0' : 'opacity-0 invisible transform translate-y-2'
+                }`}
+                style={{ minWidth: '140px' }}
+              >
+                {musicLinks.map((link, index) => (
+                  <a
+                    key={index}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block px-5 py-3 text-[#f8fcdc] hover:text-[#dc9e63] hover:bg-[#dc9e63]/15 transition-all duration-200 text-xs font-normal border-b border-[#f8fcdc]/10 last:border-b-0"
+                  >
+                    {link.title}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            <Link 
+              href="/about" 
+              className="nav-link text-[#f8fcdc]/70 hover:text-[#dc9e63] transition-colors duration-300 text-[10px] font-medium uppercase"
+              style={{ letterSpacing: '0.25em' }}
+            >
+              ABOUT
+            </Link>
+            <Link 
+              href="/tour" 
+              className="nav-link text-[#f8fcdc]/70 hover:text-[#dc9e63] transition-colors duration-300 text-[10px] font-medium uppercase"
+              style={{ letterSpacing: '0.25em' }}
+            >
+              TOUR
+            </Link>
+            <Link 
+              href="/contact" 
+              className="nav-link text-[#f8fcdc]/70 hover:text-[#dc9e63] transition-colors duration-300 text-[10px] font-medium uppercase"
+              style={{ letterSpacing: '0.25em' }}
+            >
+              CONTACT
+            </Link>
+          </nav>
+        </div>
+
+        {/* Right side: Cart + Search */}
+        <div className="flex items-center gap-7 xl:gap-9 -translate-x-4" style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10000 }}>
+          {/* Cart button */}
+          <Link
+            href="/cart"
+            className="relative cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
+            aria-label={`Shopping cart with ${totalQuantity} ${totalQuantity === 1 ? 'item' : 'items'}`}
+          >
+            <ShoppingCart
+              size={23}
+              strokeWidth={1.2}
+              className="transition-opacity duration-300 opacity-70 hover:opacity-100"
+              aria-hidden="true"
+            />
+            {totalQuantity > 0 && (
+              <span 
+                className="absolute -top-2 -right-2 bg-[#dc9e63] text-[#160000] rounded-full w-5 h-5 flex items-center justify-center text-xs font-light"
+                aria-hidden="true"
+              >
+                {totalQuantity}
+              </span>
+            )}
+          </Link>
+
+          {/* Search button */}
+          <button
+            onClick={() => setSearchOpen(true)}
+            className="cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
+            aria-label="Open search"
+          >
+            <Search
+              size={23}
+              strokeWidth={1.2}
+              className="transition-opacity duration-300 opacity-70 hover:opacity-100"
+              aria-hidden="true"
+            />
+          </button>
+        </div>
+      </div>
+      )}
+
+      {/* 🔥 GLOBAL STATIC NAVBAR - Mobile/Tablet <1280px (Shows on HOMEPAGE only) - ซ่อนเมื่อเปิด menu */}
+{isHomepage && !menuOpen && !searchOpen && (
+  <div className="absolute top-0 left-0 right-0 h-[96px] z-50 xl:hidden">
+        <div className="relative flex items-center justify-between px-4 py-8 h-full">
+          
+          {/* LEFT LAYOUT - Standard Style (Hamburger + Logo ทางซ้าย) */}
+          {!searchOpen && (
+            <div className="flex items-center gap-4 z-40">
+              {/* Hamburger menu button - ซ้ายสุด */}
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-all duration-[1200ms] z-50"
+                aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+                aria-expanded={menuOpen}
+                aria-controls="main-navigation"
+              >
+                <div
+                  className={`transition-transform duration-200 ease-in-out ${
+                    menuOpen ? 'rotate-180 scale-100' : 'rotate-0 scale-100'
+                  }`}
+                >
+                  {menuOpen ? (
+                    <X size={28} strokeWidth={1.2} aria-hidden="true" />
+                  ) : (
+                    <Menu
+                      size={23}
+                      strokeWidth={1.2}
+                      className="transition-opacity duration-300 opacity-70 hover:opacity-100"
+                      aria-hidden="true"
+                    />
+                  )}
+                </div>
+              </button>
+
+              {/* Logo/Header - ถัดจาก Hamburger */}
+              <Link 
+                href="/" 
+                className="block"
+                onClick={menuOpen ? () => setMenuOpen(false) : undefined}
+                aria-label="Unda Alunda - Go to homepage"
+              >
+                <Image
+                  src="/unda-alunda-header.webp"
+                  alt="Unda Alunda Logo"
+                  width={180}
+                  height={45}
+                  quality={100}
+                  priority
+                  unoptimized={true}
+                  sizes="(max-width: 768px) 120px, 180px"
+                  className={`logo-navbar-img ${menuOpen ? 'hamburger-logo' : ''}`}
+                />
+              </Link>
+            </div>
+          )}
+
+          {/* CART & SEARCH - แสดงตลอดไม่ fade (ซ่อนเมื่อเปิด menu) */}
+          {!searchOpen && !menuOpen && (
+  <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-7 -translate-x-4 z-40">
+              {/* Cart button */}
+              <Link
+                href="/cart"
+                className="relative cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
+                aria-label={`Shopping cart with ${totalQuantity} ${totalQuantity === 1 ? 'item' : 'items'}`}
+              >
+                <ShoppingCart
+                  size={23}
+                  strokeWidth={1.2}
+                  className="transition-opacity duration-300 opacity-70 hover:opacity-100"
+                  aria-hidden="true"
+                />
+                {totalQuantity > 0 && (
+                  <span 
+                    className="absolute -top-2 -right-2 bg-[#dc9e63] text-[#160000] rounded-full w-5 h-5 flex items-center justify-center text-xs font-light"
+                    aria-hidden="true"
+                  >
+                    {totalQuantity}
+                  </span>
+                )}
+              </Link>
+
+              {/* Search button - desktop only เมื่อไม่เปิด menu */}
+              <button
+                onClick={() => setSearchOpen(true)}
+                className="hidden md:block cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors"
+                aria-label="Open search"
+              >
+                <Search
+                  size={23}
+                  strokeWidth={1.2}
+                  className="transition-opacity duration-300 opacity-70 hover:opacity-100"
+                  aria-hidden="true"
+                />
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+      )}
+
+      {/* 🔥 MENU OPEN HEADER - All screen sizes */}
+      {menuOpen && !searchOpen && (
+        <div className="absolute top-0 left-0 right-0 h-[96px] z-60">
+          <div className="relative flex items-center justify-between px-4 py-8 h-full">
+            {/* Hamburger button เมื่อเปิด menu (กากบาท) */}
+            <button
+              onClick={() => setMenuOpen(false)}
+              className="cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-all duration-[1200ms] z-70"
+              aria-label="Close navigation menu"
+              aria-expanded={true}
+              aria-controls="main-navigation"
+            >
+              <X size={28} strokeWidth={1.2} aria-hidden="true" />
+            </button>
+
+            {/* Logo กลางเมื่อเปิด menu */}
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-60">
+              <Link 
+                href="/" 
+                className="block"
+                onClick={() => setMenuOpen(false)}
+                aria-label="Unda Alunda - Go to homepage"
+              >
+                <Image
+                  src="/unda-alunda-header.webp"
+                  alt="Unda Alunda Logo"
+                  width={180}
+                  height={45}
+                  quality={100}
+                  priority
+                  unoptimized={true}
+                  sizes="(max-width: 768px) 120px, 180px"
+                  className={`logo-navbar-img ${menuOpen ? 'hamburger-logo' : ''}`}
+                />
+              </Link>
+            </div>
+
+            {/* ปุ่ม Search ขวามือเมื่อเปิด menu */}
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors z-70 mr-4"
+              aria-label="Open search"
+            >
+              <Search
+                size={23}
+                strokeWidth={1.2}
+                className="transition-opacity duration-300 opacity-70 hover:opacity-100"
+                aria-hidden="true"
+              />
+            </button>
+          </div>
+        </div>
+      )}
+
+
+
+      {/* MENU OPEN OVERLAY - Only for mobile/tablet - แค่ลิงก์ที่กดได้เท่านั้น */}
+      {menuOpen && !searchOpen && (
+        <div className="fixed inset-0 bg-transparent z-30 backdrop-blur-none">
+          {/* Menu Header - เหมือนรูปที่ 2 */}
+          <div className="absolute top-0 left-0 right-0 h-[96px] z-60">
+            <div className="relative flex items-center justify-between px-4 py-8 h-full">
+              {/* X ซ้าย */}
+              <button
+                onClick={() => setMenuOpen(false)}
+                className="cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors z-70"
+              >
+                <X size={28} strokeWidth={1.2} />
+              </button>
+
+              {/* Logo กลาง */}
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-60">
+                <Link href="/" onClick={() => setMenuOpen(false)}>
+                  <Image
+                    src="/unda-alunda-header.webp"
+                    alt="Unda Alunda Logo"
+                    width={180}
+                    height={45}
+                    quality={100}
+                    priority
+                    unoptimized={true}
+                    sizes="(max-width: 768px) 120px, 180px"
+                    className={`logo-navbar-img ${menuOpen ? 'hamburger-logo' : ''}`}
+                  />
+                </Link>
+              </div>
+
+              {/* 🔍 ขวา */}
+              <button
+                onClick={() => setSearchOpen(true)}
+                className="cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors z-70 -translate-x-4"
+              >
+                <Search size={23} strokeWidth={1.2} />
+              </button>
+            </div>
+          </div>
+
+          {/* Menu Content */}
+          <div className="flex flex-col items-center justify-center text-[#f8fcdc] text-lg font-semibold tracking-widest space-y-6 font-[Cinzel] min-h-screen">
+            <nav 
+              id="main-navigation"
+              className="flex flex-col items-center space-y-6"
+              aria-label="Main navigation"
+            >
+              <Link 
+                href="/" 
+                onClick={() => setMenuOpen(false)} 
+                className="hover:text-[#dc9e63] transition-colors duration-300"
+              >
+                HOME
+              </Link>
+              <Link 
+                href="/shop" 
+                onClick={() => setMenuOpen(false)} 
+                className="hover:text-[#dc9e63] transition-colors duration-300"
+              >
+                SHOP
+              </Link>
+              
+              {/* MUSIC DROPDOWN - เฉพาะลิงก์ที่กดได้ */}
+              <div className="flex flex-col items-center z-30 font-[Cinzel] w-full">
+                <button
+                  onClick={() => setMusicDropdownOpen(!musicDropdownOpen)}
+                  className="hover:text-[#dc9e63] text-[#f8fcdc] text-lg font-semibold tracking-widest cursor-pointer transition-colors duration-300"
+                  aria-expanded={musicDropdownOpen}
+                  aria-controls="music-submenu"
+                  aria-label="Music streaming platforms"
+                >
+                  MUSIC
+                </button>
+
+                <div
+                  id="music-submenu"
+                  className={`
+                    overflow-hidden transition-all duration-500 ease-in-out
+                    flex flex-col items-center text-sm font-thin text-[#f8fcdc]/60 space-y-1
+                    ${musicDropdownOpen ? 'max-h-60 mt-2' : 'max-h-0'}
+                  `}
+                  role="menu"
+                  aria-labelledby="music-button"
+                >
+                  {musicLinks.map((link, index) => (
+                    <a 
+                      key={index}
+                      href={link.href} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="hover:text-[#dc9e63] transition-colors duration-300 cursor-pointer"
+                      role="menuitem"
+                      aria-label={`Listen on ${link.title}`}
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      {link.title}
+                    </a>
+                  ))}
+                </div>
+              </div>
+              
+              <Link 
+                href="/about" 
+                onClick={() => setMenuOpen(false)} 
+                className="hover:text-[#dc9e63] transition-colors duration-300"
+              >
+                ABOUT
+              </Link>
+              <Link 
+                href="/tour" 
+                onClick={() => setMenuOpen(false)} 
+                className="hover:text-[#dc9e63] transition-colors duration-300"
+              >
+                TOUR
+              </Link>
+              <Link 
+                href="/contact" 
+                onClick={() => setMenuOpen(false)} 
+                className="hover:text-[#dc9e63] transition-colors duration-300"
+              >
+                CONTACT
+              </Link>
+            </nav>
+          </div>
+        </div>
+      )}
+      
+      {/* 🔥 SEARCH OVERLAY - ใช้ระบบเดียวกับ Navbar.tsx */}
+{searchOpen && (
+  <div 
+    className="fixed inset-0 z-40 bg-[#0d0d0dea] overflow-y-auto"
+    role="dialog"
+    aria-label="Search products"
+    aria-modal="true"
+  >
+    <div className="min-h-screen flex flex-col items-center px-2 md:px-4 xl:px-6 pt-32 md:pt-36 xl:pt-40 pb-20">
+      <div
+        ref={searchOverlayRef}
+        className="w-full max-w-6xl flex flex-col items-center fade-in-section"
+      >
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const q = searchQuery.trim();
+            if (q.length > 0) {
+              setRecentSearches((prev) => {
+                const withoutDupes = prev.filter((t) => t !== q);
+                return [q, ...withoutDupes].slice(0, 5);
+              });
+            }
+          }}
+          className="relative w-full max-w-xl"
+          role="search"
+        >
+          <div className="relative">
+            <span className="absolute top-1/2 left-4 -translate-y-1/2 text-[#f8fcdc]/50" aria-hidden="true">
+              <Search size={20} />
+            </span>
+            <label htmlFor="search-input" className="sr-only">Search products</label>
+            <input
+              id="search-input"
+              type="text"
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => handleKeyDown(e)} 
+              autoFocus
+              className="w-full pl-12 pr-12 py-2 text-base text-[#f8fcdc] caret-[#dc9e63] bg-transparent border border-[#dc9e63] rounded-md placeholder:text-[#777] outline-none focus:ring-0 focus:outline-none"
+              aria-describedby="search-instructions"
+            />
+            <button
+              type="button"
+              onClick={() => setSearchOpen(false)}
+              className="absolute top-1/2 right-4 -translate-y-1/2 text-[#f8fcdc] hover:text-[#dc9e63] transition cursor-pointer"
+              aria-label="Close search"
+            >
+              <X size={24} strokeWidth={1.4} aria-hidden="true" />
+            </button>
+          </div>
+          <div id="search-instructions" className="sr-only">
+            Use arrow keys to navigate search results, Enter to select
+          </div>
+        </form>
+
+        {/* แสดงผลลัพธ์เหมือนกับ Navbar.tsx ทุกประการ */}
+        {delayedQuery.length === 0 ? (
+          <div className="w-full">
+            <div className="xl:hidden">
+              <div className="flex flex-col mt-6 md:mt-10 w-full max-w-2xl mx-auto px-4 space-y-14">
+                <div className="px-1 md:px-0">
+                  <h4 className="text-sm mb-3 font-semibold text-[#f8fcdc] tracking-wide">Main Menu</h4>
+                  <ul className="space-y-2 text-xs sm:text-sm leading-relaxed" role="list">
+                    {pageLinks.map((page, i) => {
+                      const offsetIndex = 1 + i;
+                      return (
+                        <li
+                          key={i}
+                          ref={(el) => {
+                            resultRefs.current[offsetIndex] = el;
+                          }}
+                          className={`transition-colors ${
+                            highlightIndex === offsetIndex
+                              ? 'text-[#dc9e63]'
+                              : 'text-[#f8fcdc]/70 hover:text-[#dc9e63]'
+                          }`}
+                          role="listitem"
+                        >
+                          <Link
+                            href={page.href}
+                            onClick={() => setSearchOpen(false)}
+                            className="block w-full"
+                          >
+                            {page.title}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+                {recentSearches.length > 0 && (
+                  <div className="px-1 md:px-0">
+                    <h4 className="text-sm mb-3 font-semibold text-[#f8fcdc] tracking-wide">Recent Searches</h4>
+                    <ul className="space-y-2 text-xs sm:text-sm leading-relaxed" role="list">
+                      {recentSearches.map((term, i) => (
+                        <li
+                          key={i}
+                          className="cursor-pointer text-[#f8fcdc]/70 hover:text-[#dc9e63]"
+                          onClick={() => setSearchQuery(term)}
+                          role="listitem"
+                        >
+                          {term}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="hidden xl:block">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 lg:gap-8 mt-6 w-full max-w-6xl mx-auto px-1 md:px-0">
+                <div className="space-y-12">
+                  <div className="text-[#f8fcdc]">
+                    <h4 className="text-sm mb-3 font-semibold tracking-wide">Main Menu</h4>
+                    <ul className="space-y-2 text-xs sm:text-sm leading-relaxed" role="list">
+                      {pageLinks.map((page, i) => {
+                        const offsetIndex = 1 + i;
+                        return (
+                          <li
+                            key={i}
+                            ref={(el) => {
+                              resultRefs.current[offsetIndex] = el;
+                            }}
+                            className={`transition-colors ${
+                              highlightIndex === offsetIndex
+                                ? 'text-[#dc9e63]'
+                                : 'text-[#f8fcdc]/70 hover:text-[#dc9e63]'
+                            }`}
+                            role="listitem"
+                          >
+                            <Link
+                              href={page.href}
+                              onClick={() => setSearchOpen(false)}
+                              className="block w-full"
+                            >
+                              {page.title}
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                  {recentSearches.length > 0 && (
+                    <div className="text-[#f8fcdc]">
+                      <h4 className="text-sm mb-3 font-semibold tracking-wide">Recent Searches</h4>
+                      <ul className="space-y-2 text-xs sm:text-sm leading-relaxed" role="list">
+                        {recentSearches.map((term, i) => (
+                          <li
+                            key={i}
+                            className="cursor-pointer text-[#f8fcdc]/70 hover:text-[#dc9e63]"
+                            onClick={() => setSearchQuery(term)}
+                            role="listitem"
+                          >
+                            {term}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+                <div></div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="w-full">
+            <div className="xl:hidden">
+              <div className="flex flex-col mt-6 md:mt-10 w-full max-w-2xl mx-auto px-4 space-y-14">
+                <div className="text-[#f8fcdc]">
+                  <h4 className="text-sm mb-3 font-semibold tracking-wide">Suggestions</h4>
+                  <ul className="space-y-2 text-xs sm:text-sm leading-relaxed" role="list">
+                    {suggestions.map((term, i) => {
+                      const offsetIndex = 1 + filtered.length + i;
+                      return (
+                        <li
+                          key={i}
+                          ref={(el) => {
+                            resultRefs.current[offsetIndex] = el;
+                          }}
+                          onClick={() => setSearchQuery(term)}
+                          className={`cursor-pointer transition-colors ${
+                            highlightIndex === offsetIndex
+                              ? 'text-[#dc9e63]'
+                              : 'text-[#f8fcdc]/70 hover:text-[#dc9e63]'
+                          }`}
+                          role="listitem"
+                        >
+                          {term}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="text-sm mb-3 font-semibold text-[#f8fcdc] tracking-wide">Products</h4>
+                  {filtered.length === 0 ? (
+                    <div className="mt-1">
+                      <p className="text-xs text-[#f8fcdc]/40">No results found...</p>
+                      <p className="text-xs text-[#f8fcdc]/40 mt-[2px]">Try searching with different keywords.</p>
+                    </div>
+                  ) : (
+                    <div className="max-h-[240px] overflow-y-auto pr-2">
+                      <ul role="list" className="space-y-2 md:space-y-3">
+                        {filtered.map((item, i) => {
+                          const offsetIndex = i + 1;
+                          return (
+                            <li
+                              key={item.id}
+                              ref={(el) => {
+                                resultRefs.current[offsetIndex] = el;
+                              }}
+                              className={`flex items-center gap-2 md:gap-4 p-1.5 md:p-3 rounded-lg transition-colors cursor-pointer ${
+                                highlightIndex === offsetIndex
+                                  ? 'bg-[#dc9e63]/10'
+                                  : 'hover:bg-[#dc9e63]/10'
+                              }`}
+                              role="listitem"
+                            >
+                              <Link
+                                href={item.url}
+                                onClick={() => {
+                                  setSearchOpen(false);
+                                  const q = searchQuery.trim();
+                                  if (q.length > 0) {
+                                    setRecentSearches((prev) => {
+                                      const withoutDupes = prev.filter((t) => t !== q);
+                                      return [q, ...withoutDupes].slice(0, 5);
+                                    });
+                                  }
+                                }}
+                                className="flex items-center gap-2 md:gap-4 w-full"
+                              >
+                                <Image
+                                  src={item.image}
+                                  alt={item.title}
+                                  width={48}
+                                  height={48}
+                                  className="w-12 h-12 object-cover rounded"
+                                  loading="lazy"
+                                  quality={75}
+                                  sizes="48px"
+                                />
+                                <div className="flex flex-col">
+                                  <span className="text-sm font-medium text-[#f8fcdc]">
+                                    {item.title}
+                                  </span>
+                                  <span className="text-xs text-[#f8fcdc]/70">{item.subtitle}</span>
+                                  {item.price && (
+                                    typeof item.price === 'object' ? (
+                                      <div className="flex items-center gap-1 md:gap-2 text-xs mt-1">
+                                        <span className="line-through text-[#f8fcdc]/40">
+                                          ${item.price.original.toFixed(2)}
+                                        </span>
+                                        <span className="text-[#dc9e63]">
+                                          ${item.price.sale.toFixed(2)}
+                                        </span>
+                                      </div>
+                                    ) : (
+                                      <div className="text-xs text-[#dc9e63] mt-1">
+                                        ${item.price.toFixed(2)}
+                                      </div>
+                                    )
+                                  )}
+                                </div>
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+                {pageMatches.length > 0 && (
+                  <div className="text-[#f8fcdc]">
+                    <h4 className="text-sm mb-2 font-semibold">Pages</h4>
+                    <ul className="space-y-2 text-xs sm:text-sm leading-relaxed" role="list">
+                      {pageMatches.map((page, i) => {
+                        const offsetIndex = 1 + filtered.length + suggestions.length + i;
+                        return (
+                          <li
+                            key={i}
+                            ref={(el) => {
+                              resultRefs.current[offsetIndex] = el;
+                            }}
+                            className={`transition-colors ${
+                              highlightIndex === offsetIndex
+                                ? 'text-[#dc9e63]'
+                                : 'text-[#f8fcdc]/70 hover:text-[#dc9e63]'
+                            }`}
+                            role="listitem"
+                          >
+                            <Link
+                              href={page.href}
+                              onClick={() => setSearchOpen(false)}
+                              className="block w-full"
+                            >
+                              {page.title}
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="hidden xl:block">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 lg:gap-8 mt-6 w-full max-w-6xl mx-auto px-1 md:px-0">
+                <div className="space-y-12">
+                  <div className="text-[#f8fcdc]">
+                    <h4 className="text-sm mb-3 font-semibold tracking-wide">Suggestions</h4>
+                    <ul className="space-y-2 text-xs sm:text-sm leading-relaxed" role="list">
+                      {suggestions.map((term, i) => {
+                        const offsetIndex = 1 + filtered.length + i;
+                        return (
+                          <li
+                            key={i}
+                            ref={(el) => {
+                              resultRefs.current[offsetIndex] = el;
+                            }}
+                            onClick={() => setSearchQuery(term)}
+                            className={`cursor-pointer transition-colors ${
+                              highlightIndex === offsetIndex
+                                ? 'text-[#dc9e63]'
+                                : 'text-[#f8fcdc]/70 hover:text-[#dc9e63]'
+                            }`}
+                            role="listitem"
+                          >
+                            {term}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                  {pageMatches.length > 0 && (
+                    <div className="text-[#f8fcdc]">
+                      <h4 className="text-sm mb-2 font-semibold">Pages</h4>
+                      <ul className="space-y-2 text-xs sm:text-sm leading-relaxed" role="list">
+                        {pageMatches.map((page, i) => {
+                          const offsetIndex = 1 + filtered.length + suggestions.length + i;
+                          return (
+                            <li
+                              key={i}
+                              ref={(el) => {
+                                resultRefs.current[offsetIndex] = el;
+                              }}
+                              className={`transition-colors ${
+                                highlightIndex === offsetIndex
+                                  ? 'text-[#dc9e63]'
+                                  : 'text-[#f8fcdc]/70 hover:text-[#dc9e63]'
+                              }`}
+                              role="listitem"
+                            >
+                              <Link
+                                href={page.href}
+                                onClick={() => setSearchOpen(false)}
+                                className="block w-full"
+                              >
+                                {page.title}
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <h4 className="text-sm mb-3 font-semibold text-[#f8fcdc] tracking-wide">Products</h4>
+                  {filtered.length === 0 ? (
+                    <div className="mt-1">
+                      <p className="text-xs text-[#f8fcdc]/40">No results found...</p>
+                      <p className="text-xs text-[#f8fcdc]/40 mt-[2px]">Try searching with different keywords.</p>
+                    </div>
+                  ) : (
+                    <div className="max-h-[300px] overflow-y-auto pr-2">
+                      <ul role="list" className="space-y-3">
+                        {filtered.map((item, i) => {
+                          const offsetIndex = i + 1;
+                          return (
+                            <li
+                              key={item.id}
+                              ref={(el) => {
+                                resultRefs.current[offsetIndex] = el;
+                              }}
+                              className={`flex items-center gap-4 p-3 rounded-lg transition-colors cursor-pointer ${
+                                highlightIndex === offsetIndex
+                                  ? 'bg-[#dc9e63]/10'
+                                  : 'hover:bg-[#dc9e63]/10'
+                              }`}
+                              role="listitem"
+                            >
+                              <Link
+                                href={item.url}
+                                onClick={() => {
+                                  setSearchOpen(false);
+                                  const q = searchQuery.trim();
+                                  if (q.length > 0) {
+                                    setRecentSearches((prev) => {
+                                      const withoutDupes = prev.filter((t) => t !== q);
+                                      return [q, ...withoutDupes].slice(0, 5);
+                                    });
+                                  }
+                                }}
+                                className="flex items-center gap-4 w-full"
+                              >
+                                <Image
+                                  src={item.image}
+                                  alt={item.title}
+                                  width={48}
+                                  height={48}
+                                  className="w-12 h-12 object-cover rounded"
+                                  loading="lazy"
+                                  quality={75}
+                                  sizes="48px"
+                                />
+                                <div className="flex flex-col">
+                                  <span className="text-sm font-medium text-[#f8fcdc]">
+                                    {item.title}
+                                  </span>
+                                  <span className="text-xs text-[#f8fcdc]/70">{item.subtitle}</span>
+                                  {item.price && (
+                                    typeof item.price === 'object' ? (
+                                      <div className="flex items-center gap-2 text-xs mt-1">
+                                        <span className="line-through text-[#f8fcdc]/40">
+                                          ${item.price.original.toFixed(2)}
+                                        </span>
+                                        <span className="text-[#dc9e63]">
+                                          ${item.price.sale.toFixed(2)}
+                                        </span>
+                                      </div>
+                                    ) : (
+                                      <div className="text-xs text-[#dc9e63] mt-1">
+                                        ${item.price.toFixed(2)}
+                                      </div>
+                                    )
+                                  )}
+                                </div>
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+)}
 
       <div
         id="__layout"
         className={`min-h-screen w-full relative transition-opacity duration-500 ${
           menuOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'
-        }`}
+        } ${navbarDropdownOpen ? 'dropdown-active' : ''}`}
+        style={{ 
+  overflow: 'visible'
+}}
       >
         {children}
         <CartSuccessPopup />
@@ -108,7 +1232,7 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
                 className="glow-logo mx-auto mb-6"
               />
               
-              {/* FIXED: Clean social media aria-labels */}
+              {/* Clean social media aria-labels */}
               <div className="social-icons mb-6" role="list" aria-label="Social media links">
                 <a 
                   href="https://www.facebook.com/UndaAlunda" 
@@ -172,7 +1296,7 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
               <NewsletterForm />
             </div>
 
-            {/* Footer Links - unchanged for website design */}
+            {/* Footer Links */}
             <div className="footer-bottom mt-5 text-center">
               <nav 
                 className="footer-links flex flex-wrap justify-center items-center gap-2 text-sm text-[#f8fcdc]/80 tracking-wide"
@@ -209,6 +1333,15 @@ export default function AppClientWrapper({ children }: { children: React.ReactNo
 
       {/* Cookie Notice - unchanged for website design */}
       <CookieNotice />
-    </>
+
+      {/* Navigation Hover Overlay - ค่อยๆ fade มืด */}
+     <div 
+        className="fixed inset-0 bg-black transition-all duration-700 ease-in-out z-40 pointer-events-none"
+        style={{ 
+           opacity: navbarDropdownOpen ? 0.75 : 0,
+        visibility: navbarDropdownOpen ? 'visible' : 'hidden'
+         }}
+      />
+     </>
   );
-}
+ }

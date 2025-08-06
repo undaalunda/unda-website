@@ -113,7 +113,7 @@ main,
   position: absolute;
   inset: 0;
   background-color: rgba(0, 0, 0, 0.2);
-  z-index: 1;
+  z-index: -1;
 }
 
 /* === NAVBAR (Fading + Layout Fix) === */
@@ -173,6 +173,17 @@ button svg,
   margin-left: 10px;
 }
 
+/* แก้ไข: hamburger menu ใช้ logo เดียวกับ tablet */
+.hamburger-logo {
+  content: url('/unda-alunda-header.webp') !important;
+  width: 150px !important; /* mobile */
+}
+
+@media (min-width: 768px) {
+  .hamburger-logo {
+    width: 180px !important; /* tablet+ ใหญ่ขึ้น */
+  }
+}
 
 @media (max-width: 767px) {
   .logo-navbar-img {
