@@ -1,4 +1,4 @@
-/* HomePage.tsx - แก้ไข padding สำหรับ Scrolling Navbar */
+/* HomePage.tsx */
 
 'use client';
 

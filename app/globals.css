@@ -170,7 +170,7 @@ button svg,
   width: 150px; 
   height: auto;
   object-fit: contain;
-  margin-left: 10px;
+  margin-left: 0px;
 }
 
 /* แก้ไข: hamburger menu ใช้ logo เดียวกับ tablet */
@@ -189,7 +189,7 @@ button svg,
   .logo-navbar-img {
     width: 23px;
     content: url('/header-mobile.webp'); /* เปลี่ยนรูปตอน mobile */
-    margin-left: 10;
+    margin-left: 0;
   }
 }
 
@@ -2077,8 +2077,6 @@ button svg,
   border-left: 4px solid #ff6b35;
 }
 
-/* 🎭 NAVBAR DROPDOWN DARK OVERLAY - Neural DSP Style */
-
 /* ===== NAVBAR DROPDOWN DARK OVERLAY ===== */
 
 /* เมื่อไม่มี dropdown - ซ่อน overlay */
@@ -2109,3 +2107,4 @@ button svg,
     display: none !important;
   }
 }
+

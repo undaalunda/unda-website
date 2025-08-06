@@ -1,4 +1,4 @@
-// AppClientWrapper.tsx - เพิ่ม Scrolling Navbar ให้ Homepage
+// AppClientWrapper.tsx
 
 'use client';
 
@@ -316,7 +316,7 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 
       {/* 🔥 GLOBAL STATIC NAVBAR - Desktop ≥1280px (Shows on HOMEPAGE only) - ซ่อนเมื่อเปิด menu */}
 {isHomepage && !menuOpen && !searchOpen && (
-  <div className="absolute top-0 left-0 right-0 h-[96px] z-[9999] hidden xl:flex items-center justify-between px-4" style={{ pointerEvents: 'auto' }}>
+  <div className="absolute top-0 left-2 right-0 h-[96px] z-[9999] hidden xl:flex items-center justify-between px-4" style={{ pointerEvents: 'auto' }}>
         {/* Left side: Logo + Navigation */}
         <div className="flex items-center gap-8" style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10000 }}>
           {/* Logo */}
@@ -564,63 +564,7 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       </div>
       )}
 
-      {/* 🔥 MENU OPEN HEADER - All screen sizes */}
-      {menuOpen && !searchOpen && (
-        <div className="absolute top-0 left-0 right-0 h-[96px] z-60">
-          <div className="relative flex items-center justify-between px-4 py-8 h-full">
-            {/* Hamburger button เมื่อเปิด menu (กากบาท) */}
-            <button
-              onClick={() => setMenuOpen(false)}
-              className="cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-all duration-[1200ms] z-70"
-              aria-label="Close navigation menu"
-              aria-expanded={true}
-              aria-controls="main-navigation"
-            >
-              <X size={28} strokeWidth={1.2} aria-hidden="true" />
-            </button>
-
-            {/* Logo กลางเมื่อเปิด menu */}
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-60">
-              <Link 
-                href="/" 
-                className="block"
-                onClick={() => setMenuOpen(false)}
-                aria-label="Unda Alunda - Go to homepage"
-              >
-                <Image
-                  src="/unda-alunda-header.webp"
-                  alt="Unda Alunda Logo"
-                  width={180}
-                  height={45}
-                  quality={100}
-                  priority
-                  unoptimized={true}
-                  sizes="(max-width: 768px) 120px, 180px"
-                  className={`logo-navbar-img ${menuOpen ? 'hamburger-logo' : ''}`}
-                />
-              </Link>
-            </div>
-
-            {/* ปุ่ม Search ขวามือเมื่อเปิด menu */}
-            <button
-              onClick={() => setSearchOpen(true)}
-              className="cursor-pointer text-[#f8fcdc]/60 hover:text-[#dc9e63] transition-colors z-70 mr-4"
-              aria-label="Open search"
-            >
-              <Search
-                size={23}
-                strokeWidth={1.2}
-                className="transition-opacity duration-300 opacity-70 hover:opacity-100"
-                aria-hidden="true"
-              />
-            </button>
-          </div>
-        </div>
-      )}
-
-
-
-      {/* MENU OPEN OVERLAY - Only for mobile/tablet - แค่ลิงก์ที่กดได้เท่านั้น */}
+      {/* MENU OPEN OVERLAY - Only for mobile/tablet */}
       {menuOpen && !searchOpen && (
         <div className="fixed inset-0 bg-transparent z-30 backdrop-blur-none">
           {/* Menu Header - เหมือนรูปที่ 2 */}
