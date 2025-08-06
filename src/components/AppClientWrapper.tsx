@@ -312,7 +312,7 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
   return (
     <>
       {/* 🔥 แสดง Navbar ทุกหน้า รวมทั้ง homepage */}
-      <Navbar />
+      {!isHomepage && <Navbar />}
 
       {/* 🔥 GLOBAL STATIC NAVBAR - Desktop ≥1280px (Shows on HOMEPAGE only) - ซ่อนเมื่อเปิด menu */}
 {isHomepage && !menuOpen && !searchOpen && (
@@ -481,10 +481,11 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
                 aria-controls="main-navigation"
               >
                 <div
-                  className={`transition-transform duration-200 ease-in-out ${
-                    menuOpen ? 'rotate-180 scale-100' : 'rotate-0 scale-100'
-                  }`}
-                >
+  style={{
+    transform: menuOpen ? 'rotate(180deg) scale(1)' : 'rotate(0deg) scale(1)',
+    transition: 'transform 0.2s ease-in-out'
+  }}
+>
                   {menuOpen ? (
                     <X size={28} strokeWidth={1.2} aria-hidden="true" />
                   ) : (
