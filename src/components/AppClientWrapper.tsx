@@ -312,7 +312,7 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
   return (
     <>
       {/* 🔥 แสดง Navbar ทุกหน้า รวมทั้ง homepage */}
-      {!isHomepage && <Navbar />}
+      <Navbar />
 
       {/* 🔥 GLOBAL STATIC NAVBAR - Desktop ≥1280px (Shows on HOMEPAGE only) - ซ่อนเมื่อเปิด menu */}
 {isHomepage && !menuOpen && !searchOpen && (
