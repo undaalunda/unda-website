@@ -69,7 +69,7 @@ export default function Navbar() {
     setHasMounted(true);
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      setScrolledDown(currentScrollY > 120);
+      setScrolledDown(currentScrollY > 80);
       setIsAtTop(currentScrollY === 0);
     };
     const handleKey = (e: KeyboardEvent) => {

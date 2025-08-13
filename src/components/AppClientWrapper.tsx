@@ -78,6 +78,8 @@ const ThreadsIcon = () => (
 
 export default function AppClientWrapper({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolledDown, setScrolledDown] = useState(false);
+  const [isAtTop, setIsAtTop] = useState(true);
   const pathname = usePathname();
   const router = useRouter();
   const { setLastActionItem, cartItems } = useCart();
@@ -144,6 +146,17 @@ const pageMatches = useMemo(() => {
     ? pageLinks.filter((page) => page.title.toLowerCase().includes(q))
     : [];
 }, [delayedQuery]);
+
+useEffect(() => {
+  const handleScroll = () => {
+    const currentScrollY = window.scrollY;
+    setScrolledDown(currentScrollY > 80);
+    setIsAtTop(currentScrollY === 0);
+  };
+
+  window.addEventListener('scroll', handleScroll);
+  return () => window.removeEventListener('scroll', handleScroll);
+}, []);
 
   useEffect(() => {
     const handler = (e: any) => {
@@ -316,7 +329,7 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 
       {/* 🔥 GLOBAL STATIC NAVBAR - Desktop ≥1280px (Shows on HOMEPAGE only) - ซ่อนเมื่อเปิด menu */}
 {isHomepage && !menuOpen && !searchOpen && (
-  <div className="absolute top-0 left-2 right-0 h-[96px] z-[9999] hidden xl:flex items-center justify-between px-4" style={{ pointerEvents: 'auto' }}>
+  <div className={`absolute top-0 left-2 right-0 h-[96px] z-[9999] hidden xl:flex items-center justify-between px-4 transition-opacity duration-[800ms] ${scrolledDown ? 'opacity-0 pointer-events-none' : 'opacity-100'}`} style={{ pointerEvents: scrolledDown ? 'none' : 'auto' }}>
         {/* Left side: Logo + Navigation */}
         <div className="flex items-center gap-8" style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10000 }}>
           {/* Logo */}
@@ -466,7 +479,7 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 
       {/* 🔥 GLOBAL STATIC NAVBAR - Mobile/Tablet <1280px (Shows on HOMEPAGE only) - ซ่อนเมื่อเปิด menu */}
 {isHomepage && !menuOpen && !searchOpen && (
-  <div className="absolute top-0 left-0 right-0 h-[96px] z-50 xl:hidden">
+  <div className={`absolute top-0 left-0 right-0 h-[96px] z-50 xl:hidden transition-opacity duration-[800ms] ${scrolledDown ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
         <div className="relative flex items-center justify-between px-4 py-8 h-full">
           
           {/* LEFT LAYOUT - Standard Style (Hamburger + Logo ทางซ้าย) */}
