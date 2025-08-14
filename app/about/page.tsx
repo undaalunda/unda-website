@@ -7,7 +7,7 @@ const BASE_URL = 'https://unda-website.vercel.app'; // TODO: Change to undaalund
 
 // 🚀 Artist-Focused SEO Metadata 
 export const metadata: Metadata = {
-  title: 'About | Guitarist & Composer | UNDA ALUNDA',
+  title: 'About | UNDA ALUNDA',
   description: 'Meet Unda Alunda, guitarist and composer. Creator of Dark Wonderful World album and Abasi Concepts endorser. Discover his musical journey from childhood sounds to instrumental rock artistry.',
   
   keywords: [
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 
   // 🚀 Enhanced Open Graph
   openGraph: {
-    title: 'About | Guitarist & Composer | UNDA ALUNDA',
+    title: 'About | UNDA ALUNDA',
     description: 'Guitarist and composer, creator of Dark Wonderful World album. Abasi Concepts endorser.',
     type: 'profile',
     url: `${BASE_URL}/about`,
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
   // 🚀 Twitter Card
   twitter: {
     card: 'summary_large_image',
-    title: 'About | Guitarist & Composer | UNDA ALUNDA',
+    title: 'About | UNDA ALUNDA',
     description: 'Guitarist and composer, creator of Dark Wonderful World album. Abasi Concepts endorser.',
     creator: '@undaalunda',
     images: [`${BASE_URL}/catmoon-bg.jpeg`],
@@ -232,7 +232,7 @@ export default function AboutPage() {
             "@type": "AboutPage",
             "@id": `${BASE_URL}/about#webpage`,
             "url": `${BASE_URL}/about`,
-            "name": "About | Guitarist & Composer | UNDA ALUNDA",
+            "name": "About | UNDA ALUNDA",
             "description": "Learn about Unda Alunda's musical journey and artistic vision. Discover the story behind Dark Wonderful World album and his approach to progressive guitar music.",
             "mainEntity": {
               "@id": `${BASE_URL}/about#person`
