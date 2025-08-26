@@ -491,7 +491,7 @@ export default function HomePage() {
                             </span>
                           </>
                         : typeof item.price === 'number'
-                          ? `${item.price.toFixed(2)}`
+                          ? `$${item.price.toFixed(2)}`
                           : null}
                     </p>
                   </div>
