@@ -10,7 +10,6 @@ export default function TourClientComponent() {
   const [events, setEvents] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
-  const [retryCount, setRetryCount] = useState(0);
   const maxRetries = 3;
 
   // ฟังก์ชัน fetch events
@@ -30,7 +29,6 @@ export default function TourClientComponent() {
       
       if (attempt < maxRetries) {
         setTimeout(() => {
-          setRetryCount(attempt);
           fetchEvents(attempt + 1);
         }, 2000 * attempt);
       } else {
@@ -63,9 +61,6 @@ export default function TourClientComponent() {
             <h3 className="text-3xl md:text-4xl font-bold mb-8 text-[#dc9e63] uppercase tracking-wide">
               Tour Dates
             </h3>
-            <div className="mb-6 text-[#f8fcdc] opacity-70">
-              <p>Loading...</p>
-            </div>
           </section>
         </main>
       </AppClientWrapper>
@@ -129,16 +124,6 @@ export default function TourClientComponent() {
           <h3 className="text-3xl md:text-4xl font-bold mb-8 text-[#dc9e63] uppercase tracking-wide">
             Tour Dates
           </h3>
-          
-          {/* Loading State */}
-          {isLoading && (
-            <div className="mb-6 text-[#f8fcdc] opacity-70">
-              <p>
-                Loading tour dates...{' '}
-                {retryCount > 0 && `(Attempt ${retryCount + 1})`}
-              </p>
-            </div>
-          )}
           
           {/* JSON-LD */}
           {jsonLd}

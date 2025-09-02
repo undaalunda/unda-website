@@ -29,7 +29,6 @@ const homepageItems = allItems.filter(
 
 export default function HomePage() {
   const router = useRouter();
-  const [isClient, setIsClient] = useState(false);
   const [showBandsintown, setShowBandsintown] = useState(false);
   
   const videoRef = useRef<HTMLDivElement>(null);
@@ -45,8 +44,6 @@ export default function HomePage() {
   const [showButtons, setShowButtons] = useState(false);
   const [showMerch, setShowMerch] = useState(false);
   const [showTour, setShowTour] = useState(false);
-  const [heroImageStyles, setHeroImageStyles] = useState<React.CSSProperties>({});
-
   // 🚀 Smart Link Click Handlers - Clean URLs with sessionStorage
   const createNavigationHandler = (
     targetPath: string, 
@@ -84,65 +81,7 @@ export default function HomePage() {
     };
   };
 
-  // 🎯 Hero Text Image Styles
-  const updateHeroImageStyles = () => {
-    if (typeof window === 'undefined') return;
-    
-    const width = window.innerWidth;
-    
-    let imageWidth = '90%';
-    let maxWidth = '650px';
-    
-    if (width <= 480) {
-      imageWidth = '100%';
-      maxWidth = '400px';
-    } else if (width <= 768) {
-      imageWidth = '95%';
-      maxWidth = '500px';
-    } else if (width <= 1279) {
-      imageWidth = '95%';
-      maxWidth = '550px';
-    }
-
-    setHeroImageStyles({
-      width: imageWidth,
-      maxWidth: maxWidth,
-      zIndex: 10,
-      pointerEvents: 'none' as const,
-      opacity: 0,
-      animation: 'fadeInHero 1.3s ease-out 0.2s forwards',
-      display: 'block',
-      margin: '0 auto',
-      textAlign: 'center' as const
-    });
-  };
-
   useEffect(() => {
-    setIsClient(true);
-    
-    // 🎯 เพิ่ม keyframes animation สำหรับ hero image
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes fadeInHero {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-    `;
-    document.head.appendChild(style);
-    
-    // 🎯 ตั้งค่า hero image styles หลัง component mount
-    updateHeroImageStyles();
-    
-    // 🎯 เพิ่ม resize listener
-    const handleResize = () => updateHeroImageStyles();
-    window.addEventListener('resize', handleResize);
-    
     // Intersection Observer for fade-in animations
     const observer = new IntersectionObserver(
       (entries) => {
@@ -172,9 +111,6 @@ export default function HomePage() {
       refs.forEach((ref) => {
         if (ref.current) observer.unobserve(ref.current);
       });
-      // Cleanup
-      document.head.removeChild(style);
-      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
@@ -198,14 +134,7 @@ export default function HomePage() {
           <div style={{ flex: 1.0 }} />
           
           {/* 🎯 Hero Text Image - อยู่ตรงกลาง */}
-          <div style={{
-            ...heroImageStyles,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: '100%',
-            paddingBottom: '12rem'
-          }}>
+          <div className="hero-image-container">
             <HeroImage
               src="/text-hero-section.webp"
               alt="Dark Wonderful World on Moon"
