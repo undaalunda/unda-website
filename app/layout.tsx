@@ -12,7 +12,8 @@ export const metadata: Metadata = {
   description: 'Official Website of Unda Alunda. New album "Dark Wonderful World" out August 26, 2025 — Purchase now!',
   keywords: [
     'Unda', 'Alunda', 'Unda Alunda', 'Dark Wonderful World',
-    'music', 'merch', 'stems', 'transcription', 'tour dates',
+    'tosin Abasi', 'animals as leaders', 'plini', 'intervals', 'panzerbullett', 'tigran hamasyan',
+    'music', 'merch', 'stems', 'transcription', 'tour dates', 'matteo mancuso', 'baxty',
     'live performances', 'instrumental rock', 'guitar virtuoso',
     'backing tracks', 'guitar tabs', 'sonic landscapes',
     'progressive rock guitarist', 'Thailand progressive metal', 'Thai musician',
