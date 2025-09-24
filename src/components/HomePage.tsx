@@ -88,7 +88,7 @@ export default function HomePage() {
     };
   };
 
-  // 🎬 Handle video loading - ALWAYS LOAD VIDEO WHEN IN VIDEO MODE
+  // 🎬 Handle video loading - AGGRESSIVE MOBILE LOADING
   useEffect(() => {
     const video = videoRef.current;
     if (video && isVideoMode) {
@@ -101,51 +101,80 @@ export default function HomePage() {
         setVideoLoaded(false);
         setVideoError(true);
       };
+      const handleCanPlay = () => {
+        setVideoLoaded(true);
+        setVideoError(false);
+      };
 
-      // Always reset and load video when switching to video mode
+      // Reset states
       setVideoLoaded(false);
       setVideoError(false);
       
       video.addEventListener('loadeddata', handleLoadedData);
+      video.addEventListener('canplay', handleCanPlay);
       video.addEventListener('error', handleError);
       
-      // Force video to load immediately
+      // Force video to load immediately - MULTIPLE ATTEMPTS
       video.load();
       
-      // Attempt to play (for mobile browsers)
-      const playPromise = video.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(() => {
-          console.warn('Autoplay prevented, but video should still load');
-        });
-      }
+      // Try multiple play attempts with different timings
+      const attemptPlay = async () => {
+        try {
+          await video.play();
+          setVideoLoaded(true);
+        } catch (error) {
+          console.warn('Play attempt failed:', error);
+          // Try again after a short delay
+          setTimeout(async () => {
+            try {
+              await video.play();
+              setVideoLoaded(true);
+            } catch (secondError) {
+              console.warn('Second play attempt failed');
+            }
+          }, 500);
+        }
+      };
+
+      // Immediate attempt
+      attemptPlay();
       
-      // If video is already ready, trigger load
-      if (video.readyState >= 3) {
-        handleLoadedData();
+      // If video is already ready
+      if (video.readyState >= 2) {
+        handleCanPlay();
       }
 
       return () => {
         video.removeEventListener('loadeddata', handleLoadedData);
+        video.removeEventListener('canplay', handleCanPlay);
         video.removeEventListener('error', handleError);
       };
     }
   }, [isVideoMode]);
 
-  // 🎬 Initial video load on mount
+  // 🎬 AGGRESSIVE Initial video load on mount
   useEffect(() => {
-    // Force initial video load when component mounts (since isVideoMode starts as true)
     const video = videoRef.current;
     if (video) {
+      // Multiple load attempts with different timing
       setTimeout(() => {
         video.load();
-        const playPromise = video.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(() => {
-            console.warn('Initial autoplay prevented');
-          });
-        }
-      }, 100);
+        video.play().catch(() => {
+          console.warn('Initial play blocked by browser');
+        });
+      }, 50);
+      
+      setTimeout(() => {
+        video.play().catch(() => {
+          console.warn('Second initial play blocked');
+        });
+      }, 200);
+      
+      setTimeout(() => {
+        video.play().catch(() => {
+          console.warn('Third initial play blocked');
+        });
+      }, 1000);
     }
   }, []);
 
@@ -211,7 +240,10 @@ export default function HomePage() {
                 x5-playsinline="true"
                 x5-video-player-type="h5"
                 x5-video-player-fullscreen="true"
+                x-webkit-airplay="deny"
+                disablePictureInPicture
                 controls={false}
+                poster=""
                 style={{
                   position: 'absolute',
                   inset: 0,
@@ -225,11 +257,12 @@ export default function HomePage() {
                   WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 65%, rgba(0, 0, 0, 0.5) 85%, rgba(0, 0, 0, 0) 100%)'
                 }}
                 onLoadedData={() => setVideoLoaded(true)}
+                onCanPlay={() => setVideoLoaded(true)}
                 onError={() => {
                   console.warn('Hero video failed to load, falling back to catmoon background');
                   setVideoLoaded(false);
                   setVideoError(true);
-                }}
+}}
               >
                 <source src="/hero-video.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
