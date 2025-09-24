@@ -1,4 +1,4 @@
-/* HomePage.tsx */
+/* HomePage.tsx - Updated with Larger Hero Video Toggle Dots */
 
 'use client';
 
@@ -31,7 +31,13 @@ export default function HomePage() {
   const router = useRouter();
   const [showBandsintown, setShowBandsintown] = useState(false);
   
-  const videoRef = useRef<HTMLDivElement>(null);
+  // 🎬 Hero Video Toggle State
+  const [isVideoMode, setIsVideoMode] = useState(true); // เริ่มต้นแสดงวิดีโอ
+  const [videoLoaded, setVideoLoaded] = useState(false);
+  const [videoError, setVideoError] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  
+  const videoSectionRef = useRef<HTMLDivElement>(null);
   const transcriptionRef = useRef<HTMLDivElement>(null);
   const stemsRef = useRef<HTMLDivElement>(null);
   const buttonGroupRef = useRef<HTMLDivElement>(null);
@@ -44,6 +50,7 @@ export default function HomePage() {
   const [showButtons, setShowButtons] = useState(false);
   const [showMerch, setShowMerch] = useState(false);
   const [showTour, setShowTour] = useState(false);
+
   // 🚀 Smart Link Click Handlers - Clean URLs with sessionStorage
   const createNavigationHandler = (
     targetPath: string, 
@@ -81,13 +88,46 @@ export default function HomePage() {
     };
   };
 
+  // 🎬 Handle video loading
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video && isVideoMode) {
+      const handleLoadedData = () => {
+        setVideoLoaded(true);
+        setVideoError(false);
+      };
+      const handleError = () => {
+        console.warn('Hero video failed to load');
+        setVideoLoaded(false);
+        setVideoError(true);
+      };
+
+      // Reset states when switching to video mode
+      setVideoLoaded(false);
+      setVideoError(false);
+      
+      video.addEventListener('loadeddata', handleLoadedData);
+      video.addEventListener('error', handleError);
+      
+      // Force load if video is ready
+      if (video.readyState >= 3) {
+        handleLoadedData();
+      }
+
+      return () => {
+        video.removeEventListener('loadeddata', handleLoadedData);
+        video.removeEventListener('error', handleError);
+      };
+    }
+  }, [isVideoMode]);
+
   useEffect(() => {
     // Intersection Observer for fade-in animations
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            if (entry.target === videoRef.current) setShowVideo(true);
+            if (entry.target === videoSectionRef.current) setShowVideo(true);
             if (entry.target === transcriptionRef.current) setShowTranscriptions(true);
             if (entry.target === stemsRef.current) setShowStems(true);
             if (entry.target === buttonGroupRef.current) setShowButtons(true);
@@ -102,7 +142,7 @@ export default function HomePage() {
       { threshold: 0.01 }
     );
 
-    const refs = [videoRef, transcriptionRef, stemsRef, buttonGroupRef, musicMerchRef, tourRef];
+    const refs = [videoSectionRef, transcriptionRef, stemsRef, buttonGroupRef, musicMerchRef, tourRef];
     refs.forEach((ref) => {
       if (ref.current) observer.observe(ref.current);
     });
@@ -119,33 +159,148 @@ export default function HomePage() {
       <main className="homepage-main" style={{ overflow: 'visible' }}>
         <h1 className="sr-only">Unda Alunda | Official Website & Merch Store</h1>
 
-        {/* HERO SECTION - 🚀 OPTIMIZED */}
+        {/* HERO SECTION - 🎬 WITH VIDEO TOGGLE */}
         <div className="hero-wrapper" style={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'space-between',
           minHeight: '100vh',
-          paddingTop: '3rem'
+          paddingTop: '7rem'
         }}>
-          <div className="catmoon-background" />
+          
+          {/* 🎬 Hero Video Background */}
+          {isVideoMode && (
+            <>
+              <video
+                ref={videoRef}
+                autoPlay
+                loop
+                muted
+                playsInline
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  zIndex: -2,
+                  opacity: videoLoaded || !videoError ? 1 : 0,
+                  transition: 'opacity 0.5s ease',
+                  maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 65%, rgba(0, 0, 0, 0.5) 85%, rgba(0, 0, 0, 0) 100%)',
+                  WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 65%, rgba(0, 0, 0, 0.5) 85%, rgba(0, 0, 0, 0) 100%)'
+                }}
+                onLoadedData={() => setVideoLoaded(true)}
+                onError={() => {
+                  console.warn('Hero video failed to load, falling back to catmoon background');
+                  setVideoLoaded(false);
+                  setVideoError(true);
+                }}
+              >
+                <source src="/hero-video.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+              
+              {/* Dark Overlay ทำให้วิดีโอมืดลง */}
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                  zIndex: -1,
+                  opacity: videoLoaded || !videoError ? 1 : 0,
+                  transition: 'opacity 0.5s ease'
+                }}
+              />
+            </>
+          )}
+
+          {/* 🌙 Catmoon Background (เดิม) */}
+          <div 
+            className="catmoon-background" 
+            style={{
+              opacity: isVideoMode ? 0 : 1,
+              transition: 'opacity 0.5s ease'
+            }}
+          />
           
           {/* Spacer เพื่อผลัก hero text image ไปตรงกลาง */}
           <div style={{ flex: 1.0 }} />
           
-          {/* 🎯 Hero Text Image - อยู่ตรงกลาง */}
-          <div className="hero-image-container">
-            <HeroImage
-              src="/text-hero-section.webp"
-              alt="Dark Wonderful World on Moon"
-              height={400}
-              width={600}
-              quality={100}
-              priority={true}
-              unoptimized={true}
-              sizes="(max-width: 480px) 300px, (max-width: 768px) 500px, 600px"
-            />
-          </div>
+          {/* 🎯 Hero Text Image - แสดงตามโหมด */}
+          {isVideoMode ? (
+            // แสดง unda-alunda-header.webp ตอนเป็น video mode
+            <div>
+              <div className="hero-image-container hero-video-large">
+                <HeroImage
+                  src="/unda-alunda-header.webp"
+                  alt="Unda Alunda"
+                  height={800}
+                  width={1200}
+                  quality={100}
+                  priority={true}
+                  unoptimized={true}
+                  sizes="(max-width: 480px) 600px, (max-width: 768px) 900px, 1200px"
+                />
+              </div>
+              
+              {/* YouTube Button - ใต้โลโก้ */}
+              <div style={{ 
+                textAlign: 'center', 
+                marginTop: '-10rem', // ขึ้นไปอีก
+                paddingBottom: '18rem',
+                zIndex: 10,
+                position: 'relative'
+              }}>
+                {/* Concert Title Text */}
+                <p className="hero-concert-title">
+                  Dark Wonderful World<br />
+                  <strong>Live in Thailand (2024) Full Concert</strong>
+                </p>
+                
+                <button
+                  onClick={() => window.open('https://www.youtube.com/watch?v=ZwXeCx8cAIM', '_blank')}
+                  className="hero-youtube-button"
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = '#f8fcdc';
+                    e.currentTarget.style.borderColor = '#f8fcdc';
+                    e.currentTarget.style.color = '#0d0d0d';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.borderColor = 'rgba(248, 252, 220, 0.3)';
+                    e.currentTarget.style.color = 'rgba(248, 252, 220, 0.8)';
+                  }}
+                >
+                  <svg 
+                    className="hero-youtube-icon"
+                    viewBox="0 0 24 24" 
+                    fill="currentColor" 
+                    stroke="none"
+                  >
+                    <polygon points="5,3 19,12 5,21"/>
+                  </svg>
+                  WATCH FULL VIDEO
+                </button>
+              </div>
+            </div>
+          ) : (
+            // แสดง text-hero-section.webp ตอนเป็น catmoon mode
+            <div className="hero-image-container">
+              <HeroImage
+                src="/text-hero-section.webp"
+                alt="Dark Wonderful World on Moon"
+                height={400}
+                width={600}
+                quality={100}
+                priority={true}
+                unoptimized={true}
+                sizes="(max-width: 480px) 300px, (max-width: 768px) 500px, 600px"
+              />
+            </div>
+          )}
           
           {/* Spacer เพื่อผลัก hero text ไปด้านล่าง */}
           <div style={{ flex: 1.5 }} />
@@ -154,7 +309,7 @@ export default function HomePage() {
           <div style={{ marginBottom: '0vh' }}>
             <div className="hero-text desktop-only">
               <p className="hero-line1">
-                THE NEW ALBUM'S COMING <span className="highlight">August 26<sup style={{ fontSize: '0.6em', marginLeft: '-0.1em' }}>th</sup> 2025</span>
+                THE NEW ALBUM'S COMING <span className="highlight">November 26<sup style={{ fontSize: '0.6em', marginLeft: '-0.1em' }}>th</sup> 2025</span>
               </p>
               <p className="hero-line2">
                 AVAILABLE NOW TO <Link href="/shop/physical" onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'merch')} className="hero-cta-link">PRE-ORDER</Link> &{' '}
@@ -166,7 +321,7 @@ export default function HomePage() {
             
             <div className="hero-text mobile-only">
               <p className="hero-line1">THE NEW ALBUM'S COMING</p>
-              <p className="hero-line1"><span className="highlight">August 26<sup style={{ fontSize: '0.6em', marginLeft: '-0.1em' }}>th</sup> 2025</span></p>
+              <p className="hero-line1"><span className="highlight">November 26<sup style={{ fontSize: '0.6em', marginLeft: '-0.1em' }}>th</sup> 2025</span></p>
               <p className="hero-line2">AVAILABLE NOW TO</p>
               <p className="hero-line2">
                 <Link href="/shop/physical" onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'merch')} className="hero-cta-link">PRE-ORDER</Link> &{' '}
@@ -174,6 +329,65 @@ export default function HomePage() {
                   PRE-SAVE
                 </a>
               </p>
+            </div>
+
+            {/* 🔘 Hero Mode Dots - Larger & More Spacing */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '12px', // เพิ่มจาก 8px เป็น 12px
+              marginTop: '1.5rem',
+              zIndex: 10
+            }}>
+              {/* Video Dot */}
+              <button
+                onClick={() => setIsVideoMode(true)}
+                style={{
+                  width: '10px',
+                  height: '10px',
+                  borderRadius: '50%',
+                  border: 'none',
+                  background: isVideoMode ? '#f8fcdc' : 'rgba(248, 252, 220, 0.25)',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isVideoMode) {
+                    e.currentTarget.style.background = 'rgba(248, 252, 220, 0.5)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isVideoMode) {
+                    e.currentTarget.style.background = 'rgba(248, 252, 220, 0.25)';
+                  }
+                }}
+                title="Video Background"
+              />
+              
+              {/* Image Dot */}
+              <button
+                onClick={() => setIsVideoMode(false)}
+                style={{
+                  width: '10px',
+                  height: '10px',
+                  borderRadius: '50%',
+                  border: 'none',
+                  background: !isVideoMode ? '#f8fcdc' : 'rgba(248, 252, 220, 0.25)',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  if (isVideoMode) {
+                    e.currentTarget.style.background = 'rgba(248, 252, 220, 0.5)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (isVideoMode) {
+                    e.currentTarget.style.background = 'rgba(248, 252, 220, 0.25)';
+                  }
+                }}
+                title="Moon Background"
+              />
             </div>
           </div>
         </div>
@@ -221,26 +435,6 @@ export default function HomePage() {
           </a>
         </div>
         <p className="since-note">Delivering Worldwide Since 2025</p>
-
-        {/* VIDEO SECTION */}
-        <section ref={videoRef} className={`video-section ${showVideo ? 'fade-in' : ''}`}>
-          <h2 className="sr-only">Watch on YouTube</h2>
-          {showVideo ? (
-            <iframe
-              className="youtube-frame"
-              src="https://www.youtube.com/embed/ZwXeCx8cAIM"
-              title="YouTube video player"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              loading="lazy"
-            />
-          ) : (
-            <div className="youtube-frame" style={{ backgroundColor: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ color: '#fff' }}>Loading video...</span>
-            </div>
-          )}
-        </section>
 
         {/* TRANSCRIPTION SECTION - 🚀 OPTIMIZED */}
         <section className="transcription-section">
