@@ -166,7 +166,7 @@ export default function HomePage() {
           alignItems: 'center',
           justifyContent: 'space-between',
           minHeight: '100vh',
-          paddingTop: '6rem'
+          paddingTop: '7rem'
         }}>
           
           {/* 🎬 Hero Video Background */}
@@ -178,6 +178,11 @@ export default function HomePage() {
                 loop
                 muted
                 playsInline
+                preload="auto"
+                webkit-playsinline="true"
+                x5-playsinline="true"
+                x5-video-player-type="h5"
+                x5-video-player-fullscreen="true"
                 style={{
                   position: 'absolute',
                   inset: 0,
@@ -249,8 +254,7 @@ export default function HomePage() {
               {/* YouTube Button - ใต้โลโก้ */}
               <div style={{ 
                 textAlign: 'center', 
-                marginTop: '-10rem', // ขึ้นไปอีก
-                paddingBottom: '15rem',
+                marginTop: '-11rem', // ขึ้นไปอีก
                 zIndex: 10,
                 position: 'relative'
               }}>
@@ -309,7 +313,7 @@ export default function HomePage() {
           <div style={{ marginBottom: '0vh' }}>
             <div className="hero-text desktop-only">
               <p className="hero-line1">
-                THE NEW ALBUM'S COMING <span className="highlight">November 26<sup style={{ fontSize: '0.6em', marginLeft: '-0.1em' }}>th</sup> 2025</span>
+                THE NEW ALBUM'S COMING <span className="highlight">August 26<sup style={{ fontSize: '0.6em', marginLeft: '-0.1em' }}>th</sup> 2025</span>
               </p>
               <p className="hero-line2">
                 AVAILABLE NOW TO <Link href="/shop/physical" onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'merch')} className="hero-cta-link">PRE-ORDER</Link> &{' '}
@@ -321,7 +325,7 @@ export default function HomePage() {
             
             <div className="hero-text mobile-only">
               <p className="hero-line1">THE NEW ALBUM'S COMING</p>
-              <p className="hero-line1"><span className="highlight">November 26<sup style={{ fontSize: '0.6em', marginLeft: '-0.1em' }}>th</sup> 2025</span></p>
+              <p className="hero-line1"><span className="highlight">August 26<sup style={{ fontSize: '0.6em', marginLeft: '-0.1em' }}>th</sup> 2025</span></p>
               <p className="hero-line2">AVAILABLE NOW TO</p>
               <p className="hero-line2">
                 <Link href="/shop/physical" onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'merch')} className="hero-cta-link">PRE-ORDER</Link> &{' '}
@@ -336,7 +340,7 @@ export default function HomePage() {
               display: 'flex',
               justifyContent: 'center',
               gap: '12px', // เพิ่มจาก 8px เป็น 12px
-              marginTop: '2rem',
+              marginTop: '1.5rem',
               zIndex: 10
             }}>
               {/* Video Dot */}
@@ -435,6 +439,26 @@ export default function HomePage() {
           </a>
         </div>
         <p className="since-note">Delivering Worldwide Since 2025</p>
+
+        {/* VIDEO SECTION */}
+        <section ref={videoSectionRef} className={`video-section ${showVideo ? 'fade-in' : ''}`}>
+          <h2 className="sr-only">Watch on YouTube</h2>
+          {showVideo ? (
+            <iframe
+              className="youtube-frame"
+              src="https://www.youtube.com/embed/ZwXeCx8cAIM"
+              title="YouTube video player"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              loading="lazy"
+            />
+          ) : (
+            <div className="youtube-frame" style={{ backgroundColor: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ color: '#fff' }}>Loading video...</span>
+            </div>
+          )}
+        </section>
 
         {/* TRANSCRIPTION SECTION - 🚀 OPTIMIZED */}
         <section className="transcription-section">

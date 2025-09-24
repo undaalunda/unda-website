@@ -2321,20 +2321,6 @@ button svg,
   }
 }
 
-@media (max-width: 480px) {
-  .hero-youtube-button {
-    padding: 0.5rem 1rem;
-    font-size: 9px;
-    letter-spacing: 0.08rem;
-    gap: 5px;
-  }
-  
-  .hero-youtube-icon {
-    width: 10px;
-    height: 10px;
-  }
-}
-
 @media (hover: hover) and (pointer: fine) {
   .hero-youtube-button:hover {
     background: #f8fcdc;
