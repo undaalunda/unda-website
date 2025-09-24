@@ -2208,7 +2208,7 @@ button svg,
 
 @media (max-width: 480px) {
   .hero-image-container.hero-video-large img {
-    max-width: 400px !important;
+    max-width: 350px !important;
   }
 }
 
@@ -2247,7 +2247,7 @@ button svg,
   .hero-concert-title {
     font-size: 24px;
     letter-spacing: 0.1rem;
-    margin-bottom: 1.1rem;
+    margin-bottom: 1.8rem;
   }
   
   .hero-concert-title strong {
@@ -2257,9 +2257,9 @@ button svg,
 
 @media (max-width: 480px) {
   .hero-concert-title {
-    font-size: 26px;
+    font-size: 22px;
     letter-spacing: 0.08rem;
-    margin-bottom: 1.3rem;
+    margin-bottom: 1.8rem;
     line-height: 1.5;
   }
   

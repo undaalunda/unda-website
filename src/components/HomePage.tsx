@@ -166,7 +166,7 @@ export default function HomePage() {
           alignItems: 'center',
           justifyContent: 'space-between',
           minHeight: '100vh',
-          paddingTop: '7rem'
+          paddingTop: '6rem'
         }}>
           
           {/* 🎬 Hero Video Background */}
@@ -250,7 +250,7 @@ export default function HomePage() {
               <div style={{ 
                 textAlign: 'center', 
                 marginTop: '-10rem', // ขึ้นไปอีก
-                paddingBottom: '18rem',
+                paddingBottom: '15rem',
                 zIndex: 10,
                 position: 'relative'
               }}>
@@ -336,7 +336,7 @@ export default function HomePage() {
               display: 'flex',
               justifyContent: 'center',
               gap: '12px', // เพิ่มจาก 8px เป็น 12px
-              marginTop: '1.5rem',
+              marginTop: '2rem',
               zIndex: 10
             }}>
               {/* Video Dot */}
