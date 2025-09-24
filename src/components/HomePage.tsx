@@ -1,4 +1,4 @@
-/* HomePage.tsx - Fixed Mobile Video & Touch-Friendly Dots */
+/* HomePage.tsx - Fixed Mobile Touch & Video Loading */
 
 'use client';
 
@@ -88,7 +88,7 @@ export default function HomePage() {
     };
   };
 
-  // 🎬 Handle video loading with mobile optimizations
+  // 🎬 Handle video loading - ALWAYS LOAD VIDEO WHEN IN VIDEO MODE
   useEffect(() => {
     const video = videoRef.current;
     if (video && isVideoMode) {
@@ -102,25 +102,25 @@ export default function HomePage() {
         setVideoError(true);
       };
 
-      // Reset states when switching to video mode
+      // Always reset and load video when switching to video mode
       setVideoLoaded(false);
       setVideoError(false);
       
       video.addEventListener('loadeddata', handleLoadedData);
       video.addEventListener('error', handleError);
       
-      // Force video load for mobile
+      // Force video to load immediately
       video.load();
       
-      // Try to play video (required for some mobile browsers)
+      // Attempt to play (for mobile browsers)
       const playPromise = video.play();
       if (playPromise !== undefined) {
         playPromise.catch(() => {
-          console.warn('Autoplay failed, but video should still work');
+          console.warn('Autoplay prevented, but video should still load');
         });
       }
       
-      // Force load if video is ready
+      // If video is already ready, trigger load
       if (video.readyState >= 3) {
         handleLoadedData();
       }
@@ -131,6 +131,23 @@ export default function HomePage() {
       };
     }
   }, [isVideoMode]);
+
+  // 🎬 Initial video load on mount
+  useEffect(() => {
+    // Force initial video load when component mounts (since isVideoMode starts as true)
+    const video = videoRef.current;
+    if (video) {
+      setTimeout(() => {
+        video.load();
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            console.warn('Initial autoplay prevented');
+          });
+        }
+      }, 100);
+    }
+  }, []);
 
   useEffect(() => {
     // Intersection Observer for fade-in animations
@@ -286,8 +303,8 @@ export default function HomePage() {
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.background = 'transparent';
-                    e.currentTarget.style.borderColor = 'rgba(248, 252, 220, 0.25)';
-                    e.currentTarget.style.color = 'rgba(248, 252, 220, 0.6)';
+                    e.currentTarget.style.borderColor = 'rgba(248, 252, 220, 0.3)';
+                    e.currentTarget.style.color = 'rgba(248, 252, 220, 0.8)';
                   }}
                 >
                   <svg 
@@ -346,7 +363,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* 🔘 Hero Mode Dots - Touch Optimized */}
+            {/* 🔘 Hero Mode Dots - TOUCH FRIENDLY WITHOUT SIZE CHANGE */}
             <div style={{
               display: 'flex',
               justifyContent: 'center',
@@ -357,7 +374,7 @@ export default function HomePage() {
               {/* Video Dot */}
               <button
                 onClick={() => setIsVideoMode(true)}
-                onTouchStart={() => setIsVideoMode(true)}
+                onTouchEnd={() => setIsVideoMode(true)}
                 style={{
                   width: '10px',
                   height: '10px',
@@ -365,8 +382,19 @@ export default function HomePage() {
                   border: 'none',
                   background: isVideoMode ? '#f8fcdc' : 'rgba(248, 252, 220, 0.25)',
                   cursor: 'pointer',
-                  padding: '10px',
-                  WebkitTapHighlightColor: 'transparent'
+                  transition: 'all 0.3s ease',
+                  WebkitTapHighlightColor: 'rgba(248, 252, 220, 0.2)',
+                  touchAction: 'manipulation'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isVideoMode) {
+                    e.currentTarget.style.background = 'rgba(248, 252, 220, 0.5)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isVideoMode) {
+                    e.currentTarget.style.background = 'rgba(248, 252, 220, 0.25)';
+                  }
                 }}
                 title="Video Background"
               />
@@ -374,7 +402,7 @@ export default function HomePage() {
               {/* Image Dot */}
               <button
                 onClick={() => setIsVideoMode(false)}
-                onTouchStart={() => setIsVideoMode(false)}
+                onTouchEnd={() => setIsVideoMode(false)}
                 style={{
                   width: '10px',
                   height: '10px',
@@ -382,8 +410,19 @@ export default function HomePage() {
                   border: 'none',
                   background: !isVideoMode ? '#f8fcdc' : 'rgba(248, 252, 220, 0.25)',
                   cursor: 'pointer',
-                  padding: '10px',
-                  WebkitTapHighlightColor: 'transparent'
+                  transition: 'all 0.3s ease',
+                  WebkitTapHighlightColor: 'rgba(248, 252, 220, 0.2)',
+                  touchAction: 'manipulation'
+                }}
+                onMouseEnter={(e) => {
+                  if (isVideoMode) {
+                    e.currentTarget.style.background = 'rgba(248, 252, 220, 0.5)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (isVideoMode) {
+                    e.currentTarget.style.background = 'rgba(248, 252, 220, 0.25)';
+                  }
                 }}
                 title="Moon Background"
               />
