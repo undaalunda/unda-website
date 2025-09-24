@@ -1,4 +1,4 @@
-/* HomePage.tsx - Fixed Mobile Touch & Video Loading */
+/* HomePage.tsx - Fixed Mobile Video Loading */
 
 'use client';
 
@@ -31,10 +31,11 @@ export default function HomePage() {
   const router = useRouter();
   const [showBandsintown, setShowBandsintown] = useState(false);
   
-  // 🎬 Hero Video Toggle State
+  // 🎬 Hero Video Toggle State - เพิ่ม state สำหรับ track การโหลด
   const [isVideoMode, setIsVideoMode] = useState(true);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  const [videoInitialized, setVideoInitialized] = useState(false); // NEW: track ว่า video เตรียมแล้วยังไง
   const videoRef = useRef<HTMLVideoElement>(null);
   
   const videoSectionRef = useRef<HTMLDivElement>(null);
@@ -88,95 +89,176 @@ export default function HomePage() {
     };
   };
 
-  // 🎬 Handle video loading - AGGRESSIVE MOBILE LOADING
+  // 🎬 FIXED: Enhanced Video Loading - แก้ปัญหาการโหลดบน mobile
   useEffect(() => {
     const video = videoRef.current;
     if (video && isVideoMode) {
       const handleLoadedData = () => {
         setVideoLoaded(true);
         setVideoError(false);
+        setVideoInitialized(true);
+        console.log('Video loadeddata event fired');
       };
-      const handleError = () => {
-        console.warn('Hero video failed to load');
-        setVideoLoaded(false);
-        setVideoError(true);
-      };
+      
       const handleCanPlay = () => {
         setVideoLoaded(true);
         setVideoError(false);
+        setVideoInitialized(true);
+        console.log('Video canplay event fired');
       };
 
-      // Reset states
+      const handleError = (e: Event) => {
+        console.warn('Hero video failed to load:', e);
+        setVideoLoaded(false);
+        setVideoError(true);
+        setVideoInitialized(false);
+      };
+
+      const handleLoadStart = () => {
+        console.log('Video loading started');
+        setVideoLoaded(false);
+        setVideoError(false);
+      };
+
+      const handleLoadedMetadata = () => {
+        console.log('Video metadata loaded');
+        // พยายามเล่นทันทีที่ metadata โหลดเสร็จ
+        attemptPlay();
+      };
+
+      // Reset states when switching to video mode
       setVideoLoaded(false);
       setVideoError(false);
+      setVideoInitialized(false);
       
+      // Add all event listeners
       video.addEventListener('loadeddata', handleLoadedData);
       video.addEventListener('canplay', handleCanPlay);
       video.addEventListener('error', handleError);
+      video.addEventListener('loadstart', handleLoadStart);
+      video.addEventListener('loadedmetadata', handleLoadedMetadata);
       
-      // Force video to load immediately - MULTIPLE ATTEMPTS
-      video.load();
-      
-      // Try multiple play attempts with different timings
+      // Force video to load immediately with multiple strategies
       const attemptPlay = async () => {
+        if (!video) return;
+        
         try {
-          await video.play();
-          setVideoLoaded(true);
+          // Set video properties first
+          video.currentTime = 0;
+          
+          // Attempt to play
+          const playPromise = video.play();
+          if (playPromise !== undefined) {
+            await playPromise;
+            setVideoLoaded(true);
+            setVideoInitialized(true);
+            console.log('Video playing successfully');
+          }
         } catch (error) {
           console.warn('Play attempt failed:', error);
-          // Try again after a short delay
-          setTimeout(async () => {
-            try {
-              await video.play();
+          
+          // Try alternative approach - set video ready but don't auto-play
+          if (video.readyState >= 2) {
+            setVideoLoaded(true);
+            setVideoInitialized(true);
+          }
+          
+          // Retry after user interaction (passive)
+          const retryOnInteraction = () => {
+            video.play().then(() => {
               setVideoLoaded(true);
-            } catch (secondError) {
-              console.warn('Second play attempt failed');
-            }
-          }, 500);
+              setVideoInitialized(true);
+              console.log('Video playing after user interaction');
+            }).catch(retryError => {
+              console.warn('Retry failed:', retryError);
+            });
+            
+            // Remove listeners after first attempt
+            document.removeEventListener('touchstart', retryOnInteraction);
+            document.removeEventListener('click', retryOnInteraction);
+          };
+          
+          document.addEventListener('touchstart', retryOnInteraction, { once: true });
+          document.addEventListener('click', retryOnInteraction, { once: true });
         }
       };
 
-      // Immediate attempt
-      attemptPlay();
+      // Initial load
+      video.load();
       
-      // If video is already ready
+      // Multiple attempts with different timings
+      setTimeout(() => attemptPlay(), 100);
+      setTimeout(() => attemptPlay(), 500);
+      setTimeout(() => attemptPlay(), 1000);
+      
+      // Check if video is already ready
       if (video.readyState >= 2) {
         handleCanPlay();
+        attemptPlay();
       }
 
       return () => {
         video.removeEventListener('loadeddata', handleLoadedData);
         video.removeEventListener('canplay', handleCanPlay);
         video.removeEventListener('error', handleError);
+        video.removeEventListener('loadstart', handleLoadStart);
+        video.removeEventListener('loadedmetadata', handleLoadedMetadata);
       };
     }
   }, [isVideoMode]);
 
-  // 🎬 AGGRESSIVE Initial video load on mount
+  // 🎬 Initial video setup on mount - ปรับปรุงให้รอบคอบมากขึ้น
   useEffect(() => {
     const video = videoRef.current;
     if (video) {
-      // Multiple load attempts with different timing
-      setTimeout(() => {
-        video.load();
-        video.play().catch(() => {
-          console.warn('Initial play blocked by browser');
-        });
-      }, 50);
+      // เพิ่ม attributes ที่จำเป็นสำหรับ mobile
+      video.setAttribute('playsinline', 'true');
+      video.setAttribute('webkit-playsinline', 'true');
+      video.setAttribute('x5-playsinline', 'true');
+      video.muted = true;
+      video.defaultMuted = true;
       
-      setTimeout(() => {
-        video.play().catch(() => {
-          console.warn('Second initial play blocked');
-        });
-      }, 200);
-      
-      setTimeout(() => {
-        video.play().catch(() => {
-          console.warn('Third initial play blocked');
-        });
-      }, 1000);
+      const initializeVideo = async () => {
+        try {
+          // Load video first
+          video.load();
+          
+          // Wait a bit then try to play
+          setTimeout(async () => {
+            try {
+              await video.play();
+              setVideoLoaded(true);
+              setVideoInitialized(true);
+            } catch (error) {
+              console.warn('Initial auto-play blocked, will play on user interaction');
+              // Set as loaded but not playing - this removes the play button
+              if (video.readyState >= 2) {
+                setVideoLoaded(true);
+                setVideoInitialized(true);
+              }
+            }
+          }, 200);
+          
+        } catch (error) {
+          console.warn('Video initialization failed:', error);
+        }
+      };
+
+      initializeVideo();
     }
   }, []);
+
+  // 🎬 Enhanced mode switching - ให้การเปลี่ยนโหมดราบรื่นขึ้น
+  const handleModeSwitch = (newVideoMode: boolean) => {
+    setIsVideoMode(newVideoMode);
+    
+    // ถ้าเปลี่ยนเป็น video mode ให้ reset states
+    if (newVideoMode) {
+      setVideoLoaded(false);
+      setVideoError(false);
+      setVideoInitialized(false);
+    }
+  };
 
   useEffect(() => {
     // Intersection Observer for fade-in animations
@@ -216,7 +298,7 @@ export default function HomePage() {
       <main className="homepage-main" style={{ overflow: 'visible' }}>
         <h1 className="sr-only">Unda Alunda | Official Website & Merch Store</h1>
 
-        {/* HERO SECTION - 🎬 WITH VIDEO TOGGLE */}
+        {/* HERO SECTION - 🎬 WITH FIXED VIDEO TOGGLE */}
         <div className="hero-wrapper" style={{
           display: 'flex',
           flexDirection: 'column',
@@ -226,7 +308,7 @@ export default function HomePage() {
           paddingTop: '6rem'
         }}>
           
-          {/* 🎬 Hero Video Background - MOBILE OPTIMIZED */}
+          {/* 🎬 Hero Video Background - FIXED MOBILE LOADING */}
           {isVideoMode && (
             <>
               <video
@@ -243,7 +325,7 @@ export default function HomePage() {
                 x-webkit-airplay="deny"
                 disablePictureInPicture
                 controls={false}
-                poster=""
+                poster="" // เอา poster ออกเพื่อไม่ให้แสดง play button
                 style={{
                   position: 'absolute',
                   inset: 0,
@@ -251,18 +333,43 @@ export default function HomePage() {
                   height: '100%',
                   objectFit: 'cover',
                   zIndex: -2,
-                  opacity: videoLoaded || !videoError ? 1 : 0,
+                  // แสดงวิดิโอเมื่อโหลดเสร็จหรือ initialized แล้ว
+                  opacity: videoLoaded || videoInitialized ? 1 : 0,
                   transition: 'opacity 0.5s ease',
                   maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 65%, rgba(0, 0, 0, 0.5) 85%, rgba(0, 0, 0, 0) 100%)',
                   WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 65%, rgba(0, 0, 0, 0.5) 85%, rgba(0, 0, 0, 0) 100%)'
                 }}
-                onLoadedData={() => setVideoLoaded(true)}
-                onCanPlay={() => setVideoLoaded(true)}
+                onLoadedData={() => {
+                  setVideoLoaded(true);
+                  setVideoInitialized(true);
+                }}
+                onCanPlay={() => {
+                  setVideoLoaded(true);
+                  setVideoInitialized(true);
+                }}
                 onError={() => {
                   console.warn('Hero video failed to load, falling back to catmoon background');
                   setVideoLoaded(false);
                   setVideoError(true);
-}}
+                  setVideoInitialized(false);
+                }}
+                // เพิ่ม event สำหรับ track การเล่น
+                onPlay={() => {
+                  setVideoLoaded(true);
+                  setVideoInitialized(true);
+                  console.log('Video started playing');
+                }}
+                onPause={() => {
+                  // ถ้า video หยุดโดยไม่ได้ตั้งใจ ให้เล่นต่อ
+                  const video = videoRef.current;
+                  if (video && isVideoMode && !video.ended) {
+                    setTimeout(() => {
+                      video.play().catch(() => {
+                        console.warn('Auto-resume failed');
+                      });
+                    }, 100);
+                  }
+                }}
               >
                 <source src="/hero-video.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
@@ -277,7 +384,7 @@ export default function HomePage() {
                   height: '100%',
                   backgroundColor: 'rgba(0, 0, 0, 0.3)',
                   zIndex: -1,
-                  opacity: videoLoaded || !videoError ? 1 : 0,
+                  opacity: videoLoaded || videoInitialized ? 1 : 0,
                   transition: 'opacity 0.5s ease'
                 }}
               />
@@ -396,7 +503,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* 🔘 Hero Mode Dots - TOUCH FRIENDLY WITHOUT SIZE CHANGE */}
+            {/* 🔘 Hero Mode Dots - FIXED TOUCH SWITCHING */}
             <div style={{
               display: 'flex',
               justifyContent: 'center',
@@ -406,8 +513,8 @@ export default function HomePage() {
             }}>
               {/* Video Dot */}
               <button
-                onClick={() => setIsVideoMode(true)}
-                onTouchEnd={() => setIsVideoMode(true)}
+                onClick={() => handleModeSwitch(true)}
+                onTouchEnd={() => handleModeSwitch(true)}
                 style={{
                   width: '10px',
                   height: '10px',
@@ -434,8 +541,8 @@ export default function HomePage() {
               
               {/* Image Dot */}
               <button
-                onClick={() => setIsVideoMode(false)}
-                onTouchEnd={() => setIsVideoMode(false)}
+                onClick={() => handleModeSwitch(false)}
+                onTouchEnd={() => handleModeSwitch(false)}
                 style={{
                   width: '10px',
                   height: '10px',
@@ -685,7 +792,7 @@ export default function HomePage() {
                             </span>
                           </>
                         : typeof item.price === 'number'
-                          ? `$${item.price.toFixed(2)}`
+                          ? `${item.price.toFixed(2)}`
                           : null}
                     </p>
                   </div>
