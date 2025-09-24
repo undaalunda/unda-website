@@ -1,4 +1,4 @@
-/* HomePage.tsx - Updated with Larger Hero Video Toggle Dots */
+/* HomePage.tsx - Fixed Mobile Video & Touch-Friendly Dots */
 
 'use client';
 
@@ -32,7 +32,7 @@ export default function HomePage() {
   const [showBandsintown, setShowBandsintown] = useState(false);
   
   // 🎬 Hero Video Toggle State
-  const [isVideoMode, setIsVideoMode] = useState(true); // เริ่มต้นแสดงวิดีโอ
+  const [isVideoMode, setIsVideoMode] = useState(true);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -88,7 +88,7 @@ export default function HomePage() {
     };
   };
 
-  // 🎬 Handle video loading
+  // 🎬 Handle video loading with mobile optimizations
   useEffect(() => {
     const video = videoRef.current;
     if (video && isVideoMode) {
@@ -108,6 +108,17 @@ export default function HomePage() {
       
       video.addEventListener('loadeddata', handleLoadedData);
       video.addEventListener('error', handleError);
+      
+      // Force video load for mobile
+      video.load();
+      
+      // Try to play video (required for some mobile browsers)
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          console.warn('Autoplay failed, but video should still work');
+        });
+      }
       
       // Force load if video is ready
       if (video.readyState >= 3) {
@@ -169,7 +180,7 @@ export default function HomePage() {
           paddingTop: '6rem'
         }}>
           
-          {/* 🎬 Hero Video Background */}
+          {/* 🎬 Hero Video Background - MOBILE OPTIMIZED */}
           {isVideoMode && (
             <>
               <video
@@ -178,6 +189,12 @@ export default function HomePage() {
                 loop
                 muted
                 playsInline
+                preload="auto"
+                webkit-playsinline="true"
+                x5-playsinline="true"
+                x5-video-player-type="h5"
+                x5-video-player-fullscreen="true"
+                controls={false}
                 style={{
                   position: 'absolute',
                   inset: 0,
@@ -201,7 +218,7 @@ export default function HomePage() {
                 Your browser does not support the video tag.
               </video>
               
-              {/* Dark Overlay ทำให้วิดีโอมืดลง */}
+              {/* Dark Overlay */}
               <div
                 style={{
                   position: 'absolute',
@@ -217,7 +234,7 @@ export default function HomePage() {
             </>
           )}
 
-          {/* 🌙 Catmoon Background (เดิม) */}
+          {/* 🌙 Catmoon Background */}
           <div 
             className="catmoon-background" 
             style={{
@@ -226,12 +243,11 @@ export default function HomePage() {
             }}
           />
           
-          {/* Spacer เพื่อผลัก hero text image ไปตรงกลาง */}
+          {/* Spacer */}
           <div style={{ flex: 1.0 }} />
           
-          {/* 🎯 Hero Text Image - แสดงตามโหมด */}
+          {/* 🎯 Hero Text Image */}
           {isVideoMode ? (
-            // แสดง unda-alunda-header.webp ตอนเป็น video mode
             <div>
               <div className="hero-image-container hero-video-large">
                 <HeroImage
@@ -246,11 +262,11 @@ export default function HomePage() {
                 />
               </div>
               
-              {/* YouTube Button - ใต้โลโก้ */}
+              {/* YouTube Content */}
               <div style={{ 
                 textAlign: 'center', 
-                marginTop: '-10rem', // ขึ้นไปอีก
-                paddingBottom: '15rem',
+                marginTop: '-10rem',
+                paddingBottom: '14rem',
                 zIndex: 10,
                 position: 'relative'
               }}>
@@ -270,8 +286,8 @@ export default function HomePage() {
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.background = 'transparent';
-                    e.currentTarget.style.borderColor = 'rgba(248, 252, 220, 0.3)';
-                    e.currentTarget.style.color = 'rgba(248, 252, 220, 0.8)';
+                    e.currentTarget.style.borderColor = 'rgba(248, 252, 220, 0.25)';
+                    e.currentTarget.style.color = 'rgba(248, 252, 220, 0.6)';
                   }}
                 >
                   <svg 
@@ -287,7 +303,6 @@ export default function HomePage() {
               </div>
             </div>
           ) : (
-            // แสดง text-hero-section.webp ตอนเป็น catmoon mode
             <div className="hero-image-container">
               <HeroImage
                 src="/text-hero-section.webp"
@@ -302,10 +317,10 @@ export default function HomePage() {
             </div>
           )}
           
-          {/* Spacer เพื่อผลัก hero text ไปด้านล่าง */}
+          {/* Spacer */}
           <div style={{ flex: 1.5 }} />
           
-          {/* 🎯 Hero Text - อยู่ด้านล่างเหมือนเดิม */}
+          {/* 🎯 Hero Text */}
           <div style={{ marginBottom: '0vh' }}>
             <div className="hero-text desktop-only">
               <p className="hero-line1">
@@ -331,17 +346,18 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* 🔘 Hero Mode Dots - Larger & More Spacing */}
+            {/* 🔘 Hero Mode Dots - Touch Optimized */}
             <div style={{
               display: 'flex',
               justifyContent: 'center',
-              gap: '12px', // เพิ่มจาก 8px เป็น 12px
+              gap: '12px',
               marginTop: '2rem',
               zIndex: 10
             }}>
               {/* Video Dot */}
               <button
                 onClick={() => setIsVideoMode(true)}
+                onTouchStart={() => setIsVideoMode(true)}
                 style={{
                   width: '10px',
                   height: '10px',
@@ -349,17 +365,8 @@ export default function HomePage() {
                   border: 'none',
                   background: isVideoMode ? '#f8fcdc' : 'rgba(248, 252, 220, 0.25)',
                   cursor: 'pointer',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  if (!isVideoMode) {
-                    e.currentTarget.style.background = 'rgba(248, 252, 220, 0.5)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isVideoMode) {
-                    e.currentTarget.style.background = 'rgba(248, 252, 220, 0.25)';
-                  }
+                  padding: '10px',
+                  WebkitTapHighlightColor: 'transparent'
                 }}
                 title="Video Background"
               />
@@ -367,6 +374,7 @@ export default function HomePage() {
               {/* Image Dot */}
               <button
                 onClick={() => setIsVideoMode(false)}
+                onTouchStart={() => setIsVideoMode(false)}
                 style={{
                   width: '10px',
                   height: '10px',
@@ -374,17 +382,8 @@ export default function HomePage() {
                   border: 'none',
                   background: !isVideoMode ? '#f8fcdc' : 'rgba(248, 252, 220, 0.25)',
                   cursor: 'pointer',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  if (isVideoMode) {
-                    e.currentTarget.style.background = 'rgba(248, 252, 220, 0.5)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (isVideoMode) {
-                    e.currentTarget.style.background = 'rgba(248, 252, 220, 0.25)';
-                  }
+                  padding: '10px',
+                  WebkitTapHighlightColor: 'transparent'
                 }}
                 title="Moon Background"
               />
