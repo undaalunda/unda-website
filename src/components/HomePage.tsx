@@ -434,7 +434,7 @@ export default function HomePage() {
                 loop
                 muted
                 playsInline
-                preload="auto"
+                preload="metadata" // เปลี่ยนจาก "auto" เป็น "metadata" ให้โหลดเฉพาะ metadata ก่อน
                 webkit-playsinline="true"
                 x5-playsinline="true"
                 x5-video-player-type="h5"
@@ -452,7 +452,7 @@ export default function HomePage() {
                   zIndex: -2,
                   // แสดงวิดิโอเมื่อโหลดเสร็จหรือ initialized แล้ว
                   opacity: videoLoaded || videoInitialized ? 1 : 0,
-                  transition: 'opacity 0.5s ease',
+                  transition: 'opacity 0.3s ease', // ลด transition time
                   maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 65%, rgba(0, 0, 0, 0.5) 85%, rgba(0, 0, 0, 0) 100%)',
                   WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 65%, rgba(0, 0, 0, 0.5) 85%, rgba(0, 0, 0, 0) 100%)'
                 }}
@@ -488,6 +488,8 @@ export default function HomePage() {
                   }
                 }}
               >
+                {/* เพิ่ม multiple video sources สำหรับ compatibility */}
+                <source src="/hero-video.webm" type="video/webm" />
                 <source src="/hero-video.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
