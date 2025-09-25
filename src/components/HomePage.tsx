@@ -52,6 +52,49 @@ export default function HomePage() {
   const [showMerch, setShowMerch] = useState(false);
   const [showTour, setShowTour] = useState(false);
 
+  // 🔘 Touch-Friendly Button Utility - สำหรับปุ่มเล็กๆ ที่ต้องการ touch area ใหญ่
+  const createTouchFriendlyButton = (
+    isActive: boolean,
+    onClick: () => void,
+    title: string,
+    visualSize: number = 10,
+    touchSize: number = 36 // ลดจาก 44 เป็น 36
+  ) => (
+    <button
+      onClick={onClick}
+      onTouchEnd={onClick}
+      title={title}
+      style={{
+        // Large invisible touch area
+        width: `${touchSize}px`,
+        height: `${touchSize}px`,
+        borderRadius: '50%',
+        border: 'none',
+        background: 'transparent',
+        cursor: 'pointer',
+        transition: 'all 0.3s ease',
+        WebkitTapHighlightColor: 'transparent',
+        touchAction: 'manipulation',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative'
+      }}
+    >
+      {/* Actual visible dot */}
+      <div
+        style={{
+          width: `${visualSize}px`,
+          height: `${visualSize}px`,
+          borderRadius: '50%',
+          background: isActive ? '#f8fcdc' : 'rgba(248, 252, 220, 0.25)',
+          transition: 'all 0.3s ease',
+          pointerEvents: 'none'
+        }}
+      />
+    </button>
+  );
+
   // 🚀 Smart Link Click Handlers - Clean URLs with sessionStorage
   const createNavigationHandler = (
     targetPath: string, 
@@ -89,7 +132,36 @@ export default function HomePage() {
     };
   };
 
-  // 🎬 FIXED: Enhanced Video Loading - แก้ปัญหาการโหลดบน mobile
+  // 🎬 AGGRESSIVE: Force video to hide poster and show video element immediately
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      // Force remove poster attribute immediately
+      video.removeAttribute('poster');
+      
+      // Set as ready to prevent play button overlay
+      const forceVideoReady = () => {
+        setVideoInitialized(true);
+        // Try to remove any potential overlay or poster
+        if (video.parentElement) {
+          const overlays = video.parentElement.querySelectorAll('[class*="poster"], [class*="play"], [class*="control"]');
+          overlays.forEach(overlay => {
+            if (overlay !== video) {
+              overlay.remove();
+            }
+          });
+        }
+      };
+
+      // Multiple timing attempts
+      forceVideoReady();
+      setTimeout(forceVideoReady, 50);
+      setTimeout(forceVideoReady, 200);
+      setTimeout(forceVideoReady, 500);
+    }
+  }, []);
+
+  // 🎬 ENHANCED: More aggressive video loading with better mobile handling
   useEffect(() => {
     const video = videoRef.current;
     if (video && isVideoMode) {
@@ -116,37 +188,55 @@ export default function HomePage() {
 
       const handleLoadStart = () => {
         console.log('Video loading started');
+        // Set as initialized immediately to prevent play button
+        setVideoInitialized(true);
         setVideoLoaded(false);
         setVideoError(false);
       };
 
       const handleLoadedMetadata = () => {
         console.log('Video metadata loaded');
-        // พยายามเล่นทันทีที่ metadata โหลดเสร็จ
+        setVideoInitialized(true);
         attemptPlay();
+      };
+
+      const handleSuspend = () => {
+        console.log('Video suspended - attempting to resume');
+        setVideoInitialized(true); // Keep showing video element
+        attemptPlay();
+      };
+
+      const handleWaiting = () => {
+        console.log('Video waiting - keeping element visible');
+        setVideoInitialized(true); // Keep showing video element
       };
 
       // Reset states when switching to video mode
       setVideoLoaded(false);
       setVideoError(false);
-      setVideoInitialized(false);
+      setVideoInitialized(true); // Set immediately to prevent play button
       
-      // Add all event listeners
+      // Add comprehensive event listeners
       video.addEventListener('loadeddata', handleLoadedData);
       video.addEventListener('canplay', handleCanPlay);
       video.addEventListener('error', handleError);
       video.addEventListener('loadstart', handleLoadStart);
       video.addEventListener('loadedmetadata', handleLoadedMetadata);
+      video.addEventListener('suspend', handleSuspend);
+      video.addEventListener('waiting', handleWaiting);
       
-      // Force video to load immediately with multiple strategies
+      // Enhanced play attempt function
       const attemptPlay = async () => {
         if (!video) return;
         
         try {
-          // Set video properties first
+          // Ensure video properties are set
           video.currentTime = 0;
+          video.muted = true;
+          video.defaultMuted = true;
+          video.removeAttribute('poster');
           
-          // Attempt to play
+          // Multiple play strategies
           const playPromise = video.play();
           if (playPromise !== undefined) {
             await playPromise;
@@ -157,14 +247,29 @@ export default function HomePage() {
         } catch (error) {
           console.warn('Play attempt failed:', error);
           
-          // Try alternative approach - set video ready but don't auto-play
-          if (video.readyState >= 2) {
-            setVideoLoaded(true);
-            setVideoInitialized(true);
-          }
+          // Even if play fails, show video element (not poster)
+          setVideoInitialized(true);
           
-          // Retry after user interaction (passive)
-          const retryOnInteraction = () => {
+          // Set up intersection observer for viewport-based autoplay
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting && entry.target === video) {
+                video.play().then(() => {
+                  setVideoLoaded(true);
+                  setVideoInitialized(true);
+                  console.log('Video playing after intersection');
+                }).catch(() => {
+                  console.warn('Intersection play failed');
+                });
+                observer.unobserve(video);
+              }
+            });
+          }, { threshold: 0.1 });
+          
+          observer.observe(video);
+          
+          // Also set up user interaction listeners
+          const retryOnInteraction = (event: Event) => {
             video.play().then(() => {
               setVideoLoaded(true);
               setVideoInitialized(true);
@@ -176,25 +281,35 @@ export default function HomePage() {
             // Remove listeners after first attempt
             document.removeEventListener('touchstart', retryOnInteraction);
             document.removeEventListener('click', retryOnInteraction);
+            document.removeEventListener('scroll', retryOnInteraction);
           };
           
           document.addEventListener('touchstart', retryOnInteraction, { once: true });
           document.addEventListener('click', retryOnInteraction, { once: true });
+          document.addEventListener('scroll', retryOnInteraction, { once: true });
         }
       };
 
-      // Initial load
+      // Force immediate initialization to prevent play button
+      video.removeAttribute('poster');
+      setVideoInitialized(true);
+      
+      // Initial load with multiple attempts
       video.load();
       
-      // Multiple attempts with different timings
+      // Staggered play attempts
+      setTimeout(() => attemptPlay(), 10);
       setTimeout(() => attemptPlay(), 100);
-      setTimeout(() => attemptPlay(), 500);
-      setTimeout(() => attemptPlay(), 1000);
+      setTimeout(() => attemptPlay(), 300);
+      setTimeout(() => attemptPlay(), 800);
+      setTimeout(() => attemptPlay(), 1500);
       
       // Check if video is already ready
       if (video.readyState >= 2) {
         handleCanPlay();
         attemptPlay();
+      } else if (video.readyState >= 1) {
+        handleLoadedMetadata();
       }
 
       return () => {
@@ -203,6 +318,8 @@ export default function HomePage() {
         video.removeEventListener('error', handleError);
         video.removeEventListener('loadstart', handleLoadStart);
         video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+        video.removeEventListener('suspend', handleSuspend);
+        video.removeEventListener('waiting', handleWaiting);
       };
     }
   }, [isVideoMode]);
@@ -503,69 +620,27 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* 🔘 Hero Mode Dots - FIXED TOUCH SWITCHING */}
+            {/* 🔘 Hero Mode Dots - USING TOUCH-FRIENDLY UTILITY */}
             <div style={{
               display: 'flex',
               justifyContent: 'center',
-              gap: '12px',
+              gap: '0px', // เอา gap ออก ให้ปุ่มชิดกัน
               marginTop: '2rem',
               zIndex: 10
             }}>
               {/* Video Dot */}
-              <button
-                onClick={() => handleModeSwitch(true)}
-                onTouchEnd={() => handleModeSwitch(true)}
-                style={{
-                  width: '10px',
-                  height: '10px',
-                  borderRadius: '50%',
-                  border: 'none',
-                  background: isVideoMode ? '#f8fcdc' : 'rgba(248, 252, 220, 0.25)',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  WebkitTapHighlightColor: 'rgba(248, 252, 220, 0.2)',
-                  touchAction: 'manipulation'
-                }}
-                onMouseEnter={(e) => {
-                  if (!isVideoMode) {
-                    e.currentTarget.style.background = 'rgba(248, 252, 220, 0.5)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isVideoMode) {
-                    e.currentTarget.style.background = 'rgba(248, 252, 220, 0.25)';
-                  }
-                }}
-                title="Video Background"
-              />
+              {createTouchFriendlyButton(
+                isVideoMode,
+                () => handleModeSwitch(true),
+                "Video Background"
+              )}
               
               {/* Image Dot */}
-              <button
-                onClick={() => handleModeSwitch(false)}
-                onTouchEnd={() => handleModeSwitch(false)}
-                style={{
-                  width: '10px',
-                  height: '10px',
-                  borderRadius: '50%',
-                  border: 'none',
-                  background: !isVideoMode ? '#f8fcdc' : 'rgba(248, 252, 220, 0.25)',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  WebkitTapHighlightColor: 'rgba(248, 252, 220, 0.2)',
-                  touchAction: 'manipulation'
-                }}
-                onMouseEnter={(e) => {
-                  if (isVideoMode) {
-                    e.currentTarget.style.background = 'rgba(248, 252, 220, 0.5)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (isVideoMode) {
-                    e.currentTarget.style.background = 'rgba(248, 252, 220, 0.25)';
-                  }
-                }}
-                title="Moon Background"
-              />
+              {createTouchFriendlyButton(
+                !isVideoMode,
+                () => handleModeSwitch(false),
+                "Moon Background"
+              )}
             </div>
           </div>
         </div>
