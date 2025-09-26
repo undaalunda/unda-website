@@ -2192,6 +2192,7 @@ button svg,
 /* สำหรับ Video Mode (unda-alunda-header.webp) - ใหญ่กว่า */
 .hero-image-container.hero-video-large img {
   max-width: 900px !important;
+  padding-top: 1.5rem !important;
 }
 
 @media (max-width: 1279px) {
