@@ -1,4 +1,4 @@
-/* HomePage.tsx - Fixed Mobile Video Loading */
+/* HomePage.tsx - Enhanced Video Fallback with Static Image */
 
 'use client';
 
@@ -35,7 +35,9 @@ export default function HomePage() {
   const [isVideoMode, setIsVideoMode] = useState(true);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [videoError, setVideoError] = useState(false);
-  const [videoInitialized, setVideoInitialized] = useState(false); // NEW: track ว่า video เตรียมแล้วยังไง
+  const [videoInitialized, setVideoInitialized] = useState(false);
+  const [showFallbackImage, setShowFallbackImage] = useState(false); // NEW: สำหรับแสดง fallback image
+  const [fallbackImageLoaded, setFallbackImageLoaded] = useState(false); // NEW: track fallback image loading
   const videoRef = useRef<HTMLVideoElement>(null);
   
   const videoSectionRef = useRef<HTMLDivElement>(null);
@@ -132,6 +134,16 @@ export default function HomePage() {
     };
   };
 
+  // 🎬 NEW: Preload fallback image
+  useEffect(() => {
+    if (isVideoMode) {
+      const img = document.createElement('img') as HTMLImageElement;
+      img.onload = () => setFallbackImageLoaded(true);
+      img.onerror = () => console.warn('Fallback image failed to load');
+      img.src = '/hero-video-fallback.webp';
+    }
+  }, [isVideoMode]);
+
   // 🎬 AGGRESSIVE: Force video to hide poster and show video element immediately
   useEffect(() => {
     const video = videoRef.current;
@@ -161,7 +173,7 @@ export default function HomePage() {
     }
   }, []);
 
-  // 🎬 ENHANCED: More aggressive video loading with better mobile handling
+  // 🎬 ENHANCED: More aggressive video loading with better mobile handling and fallback
   useEffect(() => {
     const video = videoRef.current;
     if (video && isVideoMode) {
@@ -169,6 +181,7 @@ export default function HomePage() {
         setVideoLoaded(true);
         setVideoError(false);
         setVideoInitialized(true);
+        setShowFallbackImage(false); // Hide fallback when video loads
         console.log('Video loadeddata event fired');
       };
       
@@ -176,6 +189,7 @@ export default function HomePage() {
         setVideoLoaded(true);
         setVideoError(false);
         setVideoInitialized(true);
+        setShowFallbackImage(false); // Hide fallback when video can play
         console.log('Video canplay event fired');
       };
 
@@ -184,6 +198,7 @@ export default function HomePage() {
         setVideoLoaded(false);
         setVideoError(true);
         setVideoInitialized(false);
+        setShowFallbackImage(true); // Show fallback on error
       };
 
       const handleLoadStart = () => {
@@ -192,6 +207,10 @@ export default function HomePage() {
         setVideoInitialized(true);
         setVideoLoaded(false);
         setVideoError(false);
+        // Show fallback while loading if it's ready
+        if (fallbackImageLoaded) {
+          setShowFallbackImage(true);
+        }
       };
 
       const handleLoadedMetadata = () => {
@@ -203,18 +222,38 @@ export default function HomePage() {
       const handleSuspend = () => {
         console.log('Video suspended - attempting to resume');
         setVideoInitialized(true); // Keep showing video element
+        // Show fallback during suspend if video isn't loaded
+        if (!videoLoaded && fallbackImageLoaded) {
+          setShowFallbackImage(true);
+        }
         attemptPlay();
       };
 
       const handleWaiting = () => {
         console.log('Video waiting - keeping element visible');
         setVideoInitialized(true); // Keep showing video element
+        // Show fallback during waiting if available
+        if (!videoLoaded && fallbackImageLoaded) {
+          setShowFallbackImage(true);
+        }
+      };
+
+      const handleStalled = () => {
+        console.log('Video stalled - showing fallback');
+        if (fallbackImageLoaded) {
+          setShowFallbackImage(true);
+        }
       };
 
       // Reset states when switching to video mode
       setVideoLoaded(false);
       setVideoError(false);
       setVideoInitialized(true); // Set immediately to prevent play button
+      
+      // Show fallback initially if available
+      if (fallbackImageLoaded) {
+        setShowFallbackImage(true);
+      }
       
       // Add comprehensive event listeners
       video.addEventListener('loadeddata', handleLoadedData);
@@ -224,6 +263,7 @@ export default function HomePage() {
       video.addEventListener('loadedmetadata', handleLoadedMetadata);
       video.addEventListener('suspend', handleSuspend);
       video.addEventListener('waiting', handleWaiting);
+      video.addEventListener('stalled', handleStalled);
       
       // Enhanced play attempt function
       const attemptPlay = async () => {
@@ -242,6 +282,7 @@ export default function HomePage() {
             await playPromise;
             setVideoLoaded(true);
             setVideoInitialized(true);
+            setShowFallbackImage(false); // Hide fallback when playing
             console.log('Video playing successfully');
           }
         } catch (error) {
@@ -250,6 +291,11 @@ export default function HomePage() {
           // Even if play fails, show video element (not poster)
           setVideoInitialized(true);
           
+          // Show fallback if video fails to play
+          if (fallbackImageLoaded) {
+            setShowFallbackImage(true);
+          }
+          
           // Set up intersection observer for viewport-based autoplay
           const observer = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
@@ -257,9 +303,13 @@ export default function HomePage() {
                 video.play().then(() => {
                   setVideoLoaded(true);
                   setVideoInitialized(true);
+                  setShowFallbackImage(false);
                   console.log('Video playing after intersection');
                 }).catch(() => {
                   console.warn('Intersection play failed');
+                  if (fallbackImageLoaded) {
+                    setShowFallbackImage(true);
+                  }
                 });
                 observer.unobserve(video);
               }
@@ -273,9 +323,13 @@ export default function HomePage() {
             video.play().then(() => {
               setVideoLoaded(true);
               setVideoInitialized(true);
+              setShowFallbackImage(false);
               console.log('Video playing after user interaction');
             }).catch(retryError => {
               console.warn('Retry failed:', retryError);
+              if (fallbackImageLoaded) {
+                setShowFallbackImage(true);
+              }
             });
             
             // Remove listeners after first attempt
@@ -297,12 +351,20 @@ export default function HomePage() {
       // Initial load with multiple attempts
       video.load();
       
-      // Staggered play attempts
+      // Staggered play attempts with fallback timeout
       setTimeout(() => attemptPlay(), 10);
       setTimeout(() => attemptPlay(), 100);
       setTimeout(() => attemptPlay(), 300);
       setTimeout(() => attemptPlay(), 800);
       setTimeout(() => attemptPlay(), 1500);
+      
+      // Fallback timeout - show image if video doesn't load within 3 seconds
+      const fallbackTimeout = setTimeout(() => {
+        if (!videoLoaded && fallbackImageLoaded) {
+          console.log('Video loading timeout - showing fallback image');
+          setShowFallbackImage(true);
+        }
+      }, 3000);
       
       // Check if video is already ready
       if (video.readyState >= 2) {
@@ -313,6 +375,7 @@ export default function HomePage() {
       }
 
       return () => {
+        clearTimeout(fallbackTimeout);
         video.removeEventListener('loadeddata', handleLoadedData);
         video.removeEventListener('canplay', handleCanPlay);
         video.removeEventListener('error', handleError);
@@ -320,9 +383,10 @@ export default function HomePage() {
         video.removeEventListener('loadedmetadata', handleLoadedMetadata);
         video.removeEventListener('suspend', handleSuspend);
         video.removeEventListener('waiting', handleWaiting);
+        video.removeEventListener('stalled', handleStalled);
       };
     }
-  }, [isVideoMode]);
+  }, [isVideoMode, fallbackImageLoaded]);
 
   // 🎬 Initial video setup on mount - ปรับปรุงให้รอบคอบมากขึ้น
   useEffect(() => {
@@ -346,24 +410,31 @@ export default function HomePage() {
               await video.play();
               setVideoLoaded(true);
               setVideoInitialized(true);
+              setShowFallbackImage(false);
             } catch (error) {
               console.warn('Initial auto-play blocked, will play on user interaction');
               // Set as loaded but not playing - this removes the play button
               if (video.readyState >= 2) {
                 setVideoLoaded(true);
                 setVideoInitialized(true);
+                setShowFallbackImage(false);
+              } else if (fallbackImageLoaded) {
+                setShowFallbackImage(true);
               }
             }
           }, 200);
           
         } catch (error) {
           console.warn('Video initialization failed:', error);
+          if (fallbackImageLoaded) {
+            setShowFallbackImage(true);
+          }
         }
       };
 
       initializeVideo();
     }
-  }, []);
+  }, [fallbackImageLoaded]);
 
   // 🎬 Enhanced mode switching - ให้การเปลี่ยนโหมดราบรื่นขึ้น
   const handleModeSwitch = (newVideoMode: boolean) => {
@@ -374,6 +445,10 @@ export default function HomePage() {
       setVideoLoaded(false);
       setVideoError(false);
       setVideoInitialized(false);
+      setShowFallbackImage(false);
+    } else {
+      // ถ้าเปลี่ยนเป็น image mode ให้ซ่อน fallback
+      setShowFallbackImage(false);
     }
   };
 
@@ -415,7 +490,7 @@ export default function HomePage() {
       <main className="homepage-main" style={{ overflow: 'visible' }}>
         <h1 className="sr-only">Unda Alunda | Official Website & Merch Store</h1>
 
-        {/* HERO SECTION - 🎬 WITH FIXED VIDEO TOGGLE */}
+        {/* HERO SECTION - 🎬 WITH FIXED VIDEO TOGGLE AND FALLBACK */}
         <div className="hero-wrapper" style={{
           display: 'flex',
           flexDirection: 'column',
@@ -425,16 +500,37 @@ export default function HomePage() {
           paddingTop: '6rem'
         }}>
           
-          {/* 🎬 Hero Video Background - FIXED MOBILE LOADING */}
+          {/* 🎬 Hero Video Background with Fallback - FIXED MOBILE LOADING */}
           {isVideoMode && (
             <>
+              {/* Fallback Image - แสดงขณะวิดีโอกำลังโหลดหรือเกิดข้อผิดพลาด */}
+              {showFallbackImage && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    zIndex: -3,
+                    opacity: 1,
+                    transition: 'opacity 0.5s ease',
+                    backgroundImage: 'url(/hero-video-fallback.webp)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
+                    maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 65%, rgba(0, 0, 0, 0.5) 85%, rgba(0, 0, 0, 0) 100%)',
+                    WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 65%, rgba(0, 0, 0, 0.5) 85%, rgba(0, 0, 0, 0) 100%)'
+                  }}
+                />
+              )}
+
               <video
                 ref={videoRef}
                 autoPlay
                 loop
                 muted
                 playsInline
-                preload="auto" // กลับไปใช้ "auto" เพื่อให้โหลดทันที
+                preload="auto"
                 webkit-playsinline="true"
                 x5-playsinline="true"
                 x5-video-player-type="h5"
@@ -442,7 +538,8 @@ export default function HomePage() {
                 x-webkit-airplay="deny"
                 disablePictureInPicture
                 controls={false}
-                poster="" // เอา poster ออกเพื่อไม่ให้แสดง play button
+                poster=""
+                src="/hero-video.mp4"
                 style={{
                   position: 'absolute',
                   inset: 0,
@@ -450,8 +547,8 @@ export default function HomePage() {
                   height: '100%',
                   objectFit: 'cover',
                   zIndex: -2,
-                  // แสดงวิดิโอเมื่อโหลดเสร็จหรือ initialized แล้ว
-                  opacity: videoLoaded || videoInitialized ? 1 : 0,
+                  // แสดงวิดีโอเมื่อโหลดเสร็จ หรือซ่อนเมื่อแสดง fallback
+                  opacity: (videoLoaded && !showFallbackImage) ? 1 : 0,
                   transition: 'opacity 0.3s ease',
                   maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 65%, rgba(0, 0, 0, 0.5) 85%, rgba(0, 0, 0, 0) 100%)',
                   WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 65%, rgba(0, 0, 0, 0.5) 85%, rgba(0, 0, 0, 0) 100%)'
@@ -459,21 +556,24 @@ export default function HomePage() {
                 onLoadedData={() => {
                   setVideoLoaded(true);
                   setVideoInitialized(true);
+                  setShowFallbackImage(false);
                 }}
                 onCanPlay={() => {
                   setVideoLoaded(true);
                   setVideoInitialized(true);
+                  setShowFallbackImage(false);
                 }}
                 onError={() => {
-                  console.warn('Hero video failed to load, falling back to catmoon background');
+                  console.warn('Hero video failed to load, showing fallback image');
                   setVideoLoaded(false);
                   setVideoError(true);
                   setVideoInitialized(false);
+                  setShowFallbackImage(true);
                 }}
-                // เพิ่ม event สำหรับ track การเล่น
                 onPlay={() => {
                   setVideoLoaded(true);
                   setVideoInitialized(true);
+                  setShowFallbackImage(false);
                   console.log('Video started playing');
                 }}
                 onPause={() => {
@@ -481,16 +581,18 @@ export default function HomePage() {
                   const video = videoRef.current;
                   if (video && isVideoMode && !video.ended) {
                     setTimeout(() => {
-                      video.play().catch(() => {
+                      video.play().then(() => {
+                        setShowFallbackImage(false);
+                      }).catch(() => {
                         console.warn('Auto-resume failed');
+                        if (fallbackImageLoaded) {
+                          setShowFallbackImage(true);
+                        }
                       });
                     }, 100);
                   }
                 }}
-              >
-                {/* เพิ่ม multiple video sources สำหรับ compatibility - WebM ก่อนเพราะเล็กกว่า */}
-                <source src="/hero-video.mp4" type="video/mp4" />
-              </video>
+              />
               
               {/* Dark Overlay */}
               <div
@@ -501,7 +603,7 @@ export default function HomePage() {
                   height: '100%',
                   backgroundColor: 'rgba(0, 0, 0, 0.3)',
                   zIndex: -1,
-                  opacity: videoLoaded || videoInitialized ? 1 : 0,
+                  opacity: (videoLoaded && !showFallbackImage) || showFallbackImage ? 1 : 0,
                   transition: 'opacity 0.5s ease'
                 }}
               />
