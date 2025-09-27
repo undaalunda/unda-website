@@ -44,6 +44,26 @@ export default function HomePage() {
   const [showButtons, setShowButtons] = useState(false);
   const [showMerch, setShowMerch] = useState(false);
   const [showTour, setShowTour] = useState(false);
+
+  // Hero video states - เพิ่มแค่นี้
+  const [showHeroVideo, setShowHeroVideo] = useState(true);
+  const [currentHeroSlide, setCurrentHeroSlide] = useState(0); // 0 = video, 1 = image
+  const heroVideoRef = useRef<HTMLVideoElement>(null);
+
+  // Hero slide functions
+  const goToHeroSlide = (slideIndex: number) => {
+    setCurrentHeroSlide(slideIndex);
+    if (slideIndex === 0) {
+      setShowHeroVideo(true);
+      if (heroVideoRef.current) {
+        heroVideoRef.current.currentTime = 0;
+        heroVideoRef.current.play();
+      }
+    } else {
+      setShowHeroVideo(false);
+    }
+  };
+
   // 🚀 Smart Link Click Handlers - Clean URLs with sessionStorage
   const createNavigationHandler = (
     targetPath: string, 
@@ -119,7 +139,7 @@ export default function HomePage() {
       <main className="homepage-main" style={{ overflow: 'visible' }}>
         <h1 className="sr-only">Unda Alunda | Official Website & Merch Store</h1>
 
-        {/* HERO SECTION - 🚀 OPTIMIZED */}
+        {/* HERO SECTION - เปลี่ยน BACKGROUND เป็น VIDEO */}
         <div className="hero-wrapper" style={{
           display: 'flex',
           flexDirection: 'column',
@@ -128,13 +148,45 @@ export default function HomePage() {
           minHeight: '100vh',
           paddingTop: '3rem'
         }}>
-          <div className="catmoon-background" />
+          {/* Hero Video Background */}
+          {showHeroVideo ? (
+            <video
+              ref={heroVideoRef}
+              muted
+              autoPlay
+              playsInline
+              onEnded={() => {
+                setShowHeroVideo(false);
+                setCurrentHeroSlide(1);
+              }}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                zIndex: -1,
+                pointerEvents: 'none',
+                maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 65%, rgba(0, 0, 0, 0.5) 85%, rgba(0, 0, 0, 0) 100%)',
+                WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 65%, rgba(0, 0, 0, 0.5) 85%, rgba(0, 0, 0, 0) 100%)'
+              }}
+            >
+              <source src="/hero-video.mp4" type="video/mp4" />
+            </video>
+          ) : (
+            <div className="catmoon-background" />
+          )}
           
           {/* Spacer เพื่อผลัก hero text image ไปตรงกลาง */}
           <div style={{ flex: 1.0 }} />
           
           {/* 🎯 Hero Text Image - อยู่ตรงกลาง */}
-          <div className="hero-image-container">
+          <div 
+            className="hero-image-container"
+            style={{
+              visibility: showHeroVideo ? 'hidden' : 'visible'
+            }}
+          >
             <HeroImage
               src="/text-hero-section.webp"
               alt="Dark Wonderful World on Moon"
@@ -145,6 +197,68 @@ export default function HomePage() {
               unoptimized={true}
               sizes="(max-width: 480px) 300px, (max-width: 768px) 500px, 600px"
             />
+          </div>
+
+          {/* 🎯 Video Hero Overlay - วางทับตอน video เล่น */}
+          <div 
+            className="video-hero-overlay"
+            style={{
+              display: showHeroVideo ? 'block' : 'none',
+              position: 'absolute',
+              top: '35%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              textAlign: 'center',
+              zIndex: 10
+            }}
+          >
+            {/* Logo */}
+            <div className="video-hero-logo" style={{ 
+              marginBottom: '2rem',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+              <HeroImage
+                src="/unda-alunda-header.webp"
+                alt="Unda Alunda Logo"
+                height={80}
+                width={400}
+                quality={100}
+                priority={true}
+                unoptimized={true}
+                sizes="(max-width: 480px) 400px, (max-width: 768px) 500px, (max-width: 1279px) 550px, 650px"
+              />
+            </div>
+
+            {/* Dark Wonderful World */}
+            <h2 className="video-hero-title" style={{ fontWeight: '300' }}>
+              Dark Wonderful World
+            </h2>
+
+            {/* Live in Thailand */}
+            <p className="video-hero-subtitle">
+              Live in Thailand (2024) Full Concert
+            </p>
+
+            {/* Watch Full Video Button */}
+            <a
+              href="https://www.youtube.com/watch?v=ZwXeCx8cAIM"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="video-hero-button"
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(248, 252, 220, 0.1)';
+                e.currentTarget.style.borderColor = '#f8fcdc';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.borderColor = 'rgba(248, 252, 220, 0.6)';
+              }}
+            >
+              <span>▶</span>
+              WATCH FULL VIDEO
+            </a>
           </div>
           
           {/* Spacer เพื่อผลัก hero text ไปด้านล่าง */}
@@ -174,6 +288,71 @@ export default function HomePage() {
                   PRE-SAVE
                 </a>
               </p>
+            </div>
+
+            {/* Hero Navigation Dots */}
+            <div className="hero-dots" style={{ 
+              position: 'absolute', 
+              bottom: '2rem', 
+              left: '50%', 
+              transform: 'translateX(-50%)',
+              display: 'flex', 
+              justifyContent: 'center', 
+              gap: '0px',
+              zIndex: 10
+            }}>
+              <button 
+                className={`hero-dot ${currentHeroSlide === 0 ? 'active' : ''}`}
+                onClick={() => goToHeroSlide(0)}
+                aria-label="Show hero video"
+                style={{
+                  position: 'relative',
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '20px', // พื้นที่กดใหญ่
+                  margin: '0'
+                }}
+              >
+                <div style={{
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  border: '1px solid rgba(248, 252, 220, 0.6)',
+                  backgroundColor: currentHeroSlide === 0 ? '#f8fcdc' : 'transparent',
+                  transition: 'all 0.3s ease',
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)'
+                }} />
+              </button>
+              <button 
+                className={`hero-dot ${currentHeroSlide === 1 ? 'active' : ''}`}
+                onClick={() => goToHeroSlide(1)}
+                aria-label="Show hero image"
+                style={{
+                  position: 'relative',
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '20px', // พื้นที่กดใหญ่
+                  margin: '0'
+                }}
+              >
+                <div style={{
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  border: '1px solid rgba(248, 252, 220, 0.6)',
+                  backgroundColor: currentHeroSlide === 1 ? '#f8fcdc' : 'transparent',
+                  transition: 'all 0.3s ease',
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)'
+                }} />
+              </button>
             </div>
           </div>
         </div>
