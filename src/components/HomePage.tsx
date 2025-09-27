@@ -256,7 +256,7 @@ export default function HomePage() {
                 e.currentTarget.style.borderColor = 'rgba(248, 252, 220, 0.6)';
               }}
             >
-              <span>▶</span>
+              <span style={{ fontFamily: 'monospace', fontSize: 'inherit' }}>&#9654;</span>
               WATCH FULL VIDEO
             </a>
           </div>
