@@ -2181,8 +2181,8 @@ button svg,
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.6rem 1.6rem;
-  border: 1px solid rgba(248, 252, 220, 0.4);
+  padding: 1rem 2.3rem;
+  border: 0.5px solid rgba(248, 252, 220, 0.3);
   background-color: transparent;
   color: #f8fcdc;
   text-decoration: none;
@@ -2214,14 +2214,14 @@ button svg,
   
   .video-hero-button {
     font-size: 0.75rem;
-    padding: 0.55rem 1.4rem;
+    padding: 0.8rem 1.4rem;
   }
 }
 
 @media (max-width: 768px) {
   .video-hero-overlay {
     width: 95%;
-    max-width: 600px;
+    max-width: 550px;
   }
   
   .video-hero-overlay .video-hero-logo img {
@@ -2230,7 +2230,7 @@ button svg,
   }
   
   .video-hero-title {
-    font-size: 1.9rem;
+    font-size: 1.7rem;
   }
   
   .video-hero-subtitle {
@@ -2239,32 +2239,7 @@ button svg,
   
   .video-hero-button {
     font-size: 0.7rem;
-    padding: 0.5rem 1.2rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .video-hero-overlay {
-    width: 100%;
-    max-width: 350px;
-  }
-  
-  .video-hero-overlay .video-hero-logo img {
-    width: 100%;
-    max-width: 480px;
-  }
-  
-  .video-hero-title {
-    font-size: 1.2rem;
-  }
-  
-  .video-hero-subtitle {
-    font-size: 0.55rem;
-  }
-  
-  .video-hero-button {
-    font-size: 0.65rem;
-    padding: 0.45rem 1rem;
+    padding: 0.6rem 1.2rem;
   }
 }
 

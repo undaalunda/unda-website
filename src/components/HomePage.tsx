@@ -172,6 +172,18 @@ export default function HomePage() {
               }}
             >
               <source src="/hero-video.mp4" type="video/mp4" />
+              <div 
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  backgroundImage: 'url(/hero-video-fallback.webp)',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  zIndex: -1
+                }}
+              />
             </video>
           ) : (
             <div className="catmoon-background" />
@@ -247,13 +259,20 @@ export default function HomePage() {
               target="_blank"
               rel="noopener noreferrer"
               className="video-hero-button"
+              style={{ 
+                fontWeight: '100',
+                letterSpacing: '0.08em',
+                opacity: '0.7'
+              }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(248, 252, 220, 0.1)';
-                e.currentTarget.style.borderColor = '#f8fcdc';
+                e.currentTarget.style.backgroundColor = '#dc9e63';
+                e.currentTarget.style.color = '#0d0d0d';
+                e.currentTarget.style.borderColor = '#dc9e63';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.borderColor = 'rgba(248, 252, 220, 0.6)';
+                e.currentTarget.style.color = '#f8fcdc';
+                e.currentTarget.style.borderColor = 'rgba(248, 252, 220, 0.3)';
               }}
             >
               <span style={{ fontFamily: 'monospace', fontSize: 'inherit' }}>&#9654;</span>
