@@ -268,18 +268,20 @@ export default function HomePage() {
                 e.currentTarget.style.backgroundColor = '#dc9e63';
                 e.currentTarget.style.color = '#0d0d0d';
                 e.currentTarget.style.borderColor = '#dc9e63';
+                const svg = e.currentTarget.querySelector('svg');
+                if (svg) svg.style.fill = '#0d0d0d';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = 'transparent';
                 e.currentTarget.style.color = '#f8fcdc';
                 e.currentTarget.style.borderColor = 'rgba(248, 252, 220, 0.3)';
+                const svg = e.currentTarget.querySelector('svg');
+                if (svg) svg.style.fill = '#f8fcdc';
               }}
             >
-              <span style={{ 
-                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                fontSize: 'inherit',
-                fontVariantEmoji: 'text'
-              }}>▶</span>
+              <svg width="10" height="12" viewBox="0 0 10 12" fill="#f8fcdc" style={{ marginRight: '0.5rem', transition: 'fill 0.3s ease' }}>
+                <path d="M0 0L10 6L0 12V0Z"/>
+              </svg>
               WATCH FULL VIDEO
             </a>
           </div>
