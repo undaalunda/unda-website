@@ -44,6 +44,7 @@ export default function HomePage() {
   const [showButtons, setShowButtons] = useState(false);
   const [showMerch, setShowMerch] = useState(false);
   const [showTour, setShowTour] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
 
   // Hero video states - เพิ่มแค่นี้
   const [showHeroVideo, setShowHeroVideo] = useState(true);
@@ -55,6 +56,7 @@ export default function HomePage() {
     setCurrentHeroSlide(slideIndex);
     if (slideIndex === 0) {
       setShowHeroVideo(true);
+      setVideoReady(false);
       if (heroVideoRef.current) {
         heroVideoRef.current.currentTime = 0;
         heroVideoRef.current.play();
@@ -63,6 +65,34 @@ export default function HomePage() {
       setShowHeroVideo(false);
     }
   };
+
+  // Check video ready state on mount and when switching to video
+  useEffect(() => {
+    if (showHeroVideo && heroVideoRef.current) {
+      const video = heroVideoRef.current;
+      
+      const checkReady = () => {
+        if (video.readyState >= 3) {
+          setVideoReady(true);
+        }
+      };
+      
+      const handleLoadedData = () => {
+        setVideoReady(true);
+      };
+      
+      // Check immediately
+      checkReady();
+      
+      video.addEventListener('loadeddata', handleLoadedData);
+      video.addEventListener('canplay', checkReady);
+      
+      return () => {
+        video.removeEventListener('loadeddata', handleLoadedData);
+        video.removeEventListener('canplay', checkReady);
+      };
+    }
+  }, [showHeroVideo]);
 
   // 🚀 Smart Link Click Handlers - Clean URLs with sessionStorage
   const createNavigationHandler = (
@@ -148,56 +178,86 @@ export default function HomePage() {
           minHeight: '100vh',
           paddingTop: '3rem'
         }}>
-          {/* Hero Video Background */}
-          {showHeroVideo ? (
-            <video
-              ref={heroVideoRef}
-              muted
-              autoPlay
-              playsInline
-              onEnded={() => {
-                setShowHeroVideo(false);
-                setCurrentHeroSlide(1);
-              }}
-              style={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                zIndex: -1,
-                pointerEvents: 'none',
-                maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 65%, rgba(0, 0, 0, 0.5) 85%, rgba(0, 0, 0, 0) 100%)',
-                WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 65%, rgba(0, 0, 0, 0.5) 85%, rgba(0, 0, 0, 0) 100%)'
-              }}
-            >
-              <source src="/hero-video.mp4" type="video/mp4" />
-              <div 
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  width: '100%',
-                  height: '100%',
-                  backgroundImage: 'url(/hero-video-fallback.webp)',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  zIndex: -1
-                }}
-              />
-            </video>
-          ) : (
-            <div className="catmoon-background" />
-          )}
+          
+         {/* Hero Video Background */}
+          <>
+            {showHeroVideo && (
+              <>
+                <video
+                  ref={heroVideoRef}
+                  muted
+                  autoPlay
+                  playsInline
+                  onEnded={() => {
+                    setShowHeroVideo(false);
+                    setCurrentHeroSlide(1);
+                  }}
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    zIndex: -1,
+                    pointerEvents: 'none',
+                    opacity: videoReady ? 1 : 0,
+                    transition: 'opacity 0.8s ease',
+                    maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.2) 98%, rgba(0, 0, 0, 0) 100%)',
+                    WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.2) 98%, rgba(0, 0, 0, 0) 100%)',
+                    filter: 'brightness(0.8)'
+                  }}
+                >
+                  <source src="/hero-video.mp4" type="video/mp4" />
+                </video>
+                <div 
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    backgroundImage: 'url(/hero-video-fallback.webp)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    zIndex: -2,
+                    opacity: videoReady ? 0 : 1,
+                    transition: 'opacity 0.5s ease',
+                    maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.2) 98%, rgba(0, 0, 0, 0) 100%)',
+                    WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.2) 98%, rgba(0, 0, 0, 0) 100%)',
+                    filter: 'brightness(0.8)'
+                  }}
+                />
+                {/* Dark overlay for video */}
+                <div 
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                    zIndex: -1,
+                    pointerEvents: 'none',
+                    maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.2) 98%, rgba(0, 0, 0, 0) 100%)',
+                    WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.2) 98%, rgba(0, 0, 0, 0) 100%)'
+                  }}
+                />
+              </>
+            )}
+            <div 
+              className="catmoon-background" 
+              style={{ opacity: showHeroVideo ? 0 : 1 }}
+            />
+          </>
           
           {/* Spacer เพื่อผลัก hero text image ไปตรงกลาง */}
           <div style={{ flex: 1.0 }} />
           
           {/* 🎯 Hero Text Image - อยู่ตรงกลาง */}
-          <div 
-            className="hero-image-container"
-            style={{
-              visibility: showHeroVideo ? 'hidden' : 'visible'
-            }}
+         <div 
+  className="hero-image-container"
+  style={{
+    visibility: showHeroVideo ? 'hidden' : 'visible',
+    opacity: showHeroVideo ? 0 : 1
+  }}
           >
             <HeroImage
               src="/text-hero-section.webp"
@@ -213,9 +273,10 @@ export default function HomePage() {
 
           {/* 🎯 Video Hero Overlay - วางทับตอน video เล่น */}
           <div 
-            className="video-hero-overlay"
-            style={{
-              display: showHeroVideo ? 'block' : 'none',
+  className="video-hero-overlay"
+  style={{
+    display: showHeroVideo ? 'block' : 'none',
+    opacity: showHeroVideo ? 1 : 0,
               position: 'absolute',
               top: '35%',
               left: '50%',
@@ -256,29 +317,14 @@ export default function HomePage() {
             {/* Watch Full Video Button */}
             <a
               href="https://www.youtube.com/watch?v=ZwXeCx8cAIM"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="video-hero-button"
-              style={{ 
-                fontWeight: '100',
-                letterSpacing: '0.08em',
-                opacity: '0.7'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#dc9e63';
-                e.currentTarget.style.color = '#0d0d0d';
-                e.currentTarget.style.borderColor = '#dc9e63';
-                const svg = e.currentTarget.querySelector('svg');
-                if (svg) svg.style.fill = '#0d0d0d';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.color = '#f8fcdc';
-                e.currentTarget.style.borderColor = 'rgba(248, 252, 220, 0.3)';
-                const svg = e.currentTarget.querySelector('svg');
-                if (svg) svg.style.fill = '#f8fcdc';
-              }}
-            >
+  target="_blank"
+  rel="noopener noreferrer"
+  className="video-hero-button"
+  style={{ 
+    fontWeight: '100',
+    letterSpacing: '0.08em'
+  }}
+>
               <svg width="10" height="12" viewBox="0 0 10 12" fill="#f8fcdc" style={{ marginRight: '0.5rem', transition: 'fill 0.3s ease' }}>
                 <path d="M0 0L10 6L0 12V0Z"/>
               </svg>
@@ -335,7 +381,7 @@ export default function HomePage() {
                   backgroundColor: 'transparent',
                   border: 'none',
                   cursor: 'pointer',
-                  padding: '20px', // พื้นที่กดใหญ่
+                  padding: '20px',
                   margin: '0'
                 }}
               >
@@ -343,8 +389,8 @@ export default function HomePage() {
                   width: '8px',
                   height: '8px',
                   borderRadius: '50%',
-                  border: '1px solid rgba(248, 252, 220, 0.6)',
-                  backgroundColor: currentHeroSlide === 0 ? '#f8fcdc' : 'transparent',
+                  border: currentHeroSlide === 0 ? 'none' : '1px solid rgba(248, 252, 220, 0.6)',
+                  backgroundColor: currentHeroSlide === 0 ? '#dc9e63' : 'transparent',
                   transition: 'all 0.3s ease',
                   position: 'absolute',
                   top: '50%',
@@ -361,7 +407,7 @@ export default function HomePage() {
                   backgroundColor: 'transparent',
                   border: 'none',
                   cursor: 'pointer',
-                  padding: '20px', // พื้นที่กดใหญ่
+                  padding: '20px',
                   margin: '0'
                 }}
               >
@@ -369,8 +415,8 @@ export default function HomePage() {
                   width: '8px',
                   height: '8px',
                   borderRadius: '50%',
-                  border: '1px solid rgba(248, 252, 220, 0.6)',
-                  backgroundColor: currentHeroSlide === 1 ? '#f8fcdc' : 'transparent',
+                  border: currentHeroSlide === 1 ? 'none' : '1px solid rgba(248, 252, 220, 0.6)',
+                  backgroundColor: currentHeroSlide === 1 ? '#dc9e63' : 'transparent',
                   transition: 'all 0.3s ease',
                   position: 'absolute',
                   top: '50%',
@@ -425,26 +471,6 @@ export default function HomePage() {
           </a>
         </div>
         <p className="since-note">Delivering Worldwide Since 2025</p>
-
-        {/* VIDEO SECTION */}
-        <section ref={videoRef} className={`video-section ${showVideo ? 'fade-in' : ''}`}>
-          <h2 className="sr-only">Watch on YouTube</h2>
-          {showVideo ? (
-            <iframe
-              className="youtube-frame"
-              src="https://www.youtube.com/embed/ZwXeCx8cAIM"
-              title="YouTube video player"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              loading="lazy"
-            />
-          ) : (
-            <div className="youtube-frame" style={{ backgroundColor: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ color: '#fff' }}>Loading video...</span>
-            </div>
-          )}
-        </section>
 
         {/* TRANSCRIPTION SECTION - 🚀 OPTIMIZED */}
         <section className="transcription-section">
