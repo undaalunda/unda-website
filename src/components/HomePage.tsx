@@ -316,7 +316,7 @@ export default function HomePage() {
 
             {/* Watch Full Video Button */}
             <a
-              href="https://www.youtube.com/watch?v=ZwXeCx8cAIM"
+              href="https://www.youtube.com/watch?v=ZxudWBd_0KQ&t=939s"
   target="_blank"
   rel="noopener noreferrer"
   className="video-hero-button"
