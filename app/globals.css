@@ -2243,6 +2243,31 @@ button svg,
   }
 }
 
+@media (max-width: 480px) {
+  .video-hero-overlay {
+    width: 95%;
+    max-width: 550px;
+  }
+  
+  .video-hero-overlay .video-hero-logo img {
+    width: 95%;
+    max-width: 580px;
+  }
+  
+  .video-hero-title {
+    font-size: 1.5rem;
+  }
+  
+  .video-hero-subtitle {
+    font-size: 0.6rem;
+  }
+  
+  .video-hero-button {
+    font-size: 0.7rem;
+    padding: 0.6rem 1.2rem;
+  }
+}
+
 /* Remove all animations/transitions */
 .video-hero-overlay * {
   transition: none !important;
