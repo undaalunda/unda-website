@@ -275,7 +275,11 @@ export default function HomePage() {
                 e.currentTarget.style.borderColor = 'rgba(248, 252, 220, 0.3)';
               }}
             >
-              <span style={{ fontFamily: 'monospace', fontSize: 'inherit' }}>&#9654;</span>
+              <span style={{ 
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                fontSize: 'inherit',
+                fontVariantEmoji: 'text'
+              }}>▶</span>
               WATCH FULL VIDEO
             </a>
           </div>
