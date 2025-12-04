@@ -339,7 +339,7 @@ export default function HomePage() {
           <div style={{ marginBottom: '0vh' }}>
             <div className="hero-text desktop-only">
               <p className="hero-line1">
-                THE NEW ALBUM'S COMING <span className="highlight">August 26<sup style={{ fontSize: '0.6em', marginLeft: '-0.1em' }}>th</sup> 2025</span>
+                THE NEW ALBUM'S COMING <span className="highlight">December 31<sup style={{ fontSize: '0.6em', marginLeft: '-0.1em' }}>st</sup> 2025</span>
               </p>
               <p className="hero-line2">
                 AVAILABLE NOW TO <Link href="/shop/physical" onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'merch')} className="hero-cta-link">PRE-ORDER</Link> &{' '}
@@ -351,7 +351,7 @@ export default function HomePage() {
             
             <div className="hero-text mobile-only">
               <p className="hero-line1">THE NEW ALBUM'S COMING</p>
-              <p className="hero-line1"><span className="highlight">August 26<sup style={{ fontSize: '0.6em', marginLeft: '-0.1em' }}>th</sup> 2025</span></p>
+              <p className="hero-line1"><span className="highlight">December 31<sup style={{ fontSize: '0.6em', marginLeft: '-0.1em' }}>st</sup> 2025</span></p>
               <p className="hero-line2">AVAILABLE NOW TO</p>
               <p className="hero-line2">
                 <Link href="/shop/physical" onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'merch')} className="hero-cta-link">PRE-ORDER</Link> &{' '}
