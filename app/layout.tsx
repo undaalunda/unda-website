@@ -9,7 +9,7 @@ const BASE_URL = 'https://unda-website.vercel.app';
 
 export const metadata: Metadata = {
   title: 'Unda Alunda | Official Website & Merch Store',
-  description: 'Official Website of Unda Alunda. New album "Dark Wonderful World" out August 26, 2025 — Purchase now!',
+  description: 'Official Website of Unda Alunda. New album "Dark Wonderful World" out December 31, 2025 — Purchase now!',
   keywords: [
     'Unda', 'Alunda', 'Unda Alunda', 'Dark Wonderful World',
     'tosin Abasi', 'animals as leaders', 'plini', 'intervals', 'panzerbullett', 'tigran hamasyan',
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   // 🎯 FIXED: Unified strategy - Social gets shorter version
   openGraph: {
     title: 'Unda Alunda | Official Website & Merch Store',
-    description: 'Official Website of Unda Alunda. New album "Dark Wonderful World" out August 26, 2025 — Purchase now!',
+    description: 'Official Website of Unda Alunda. New album "Dark Wonderful World" out December 31, 2025 — Purchase now!',
     type: 'website',
     url: BASE_URL,
     siteName: 'UNDA ALUNDA',
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Unda Alunda | Official Website & Merch Store',
-    description: 'Official Website of Unda Alunda. New album "Dark Wonderful World" out August 26, 2025 — Purchase now!',
+    description: 'Official Website of Unda Alunda. New album "Dark Wonderful World" out December 31, 2025 — Purchase now!',
     creator: '@undaalunda',
     images: [`${BASE_URL}/catmoon-bg.jpeg`],
   },
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
   // 🎯 FIXED: Unified meta tags for social
   other: {
     'og:title': 'Unda Alunda | Official Website & Merch Store',
-    'og:description': 'Official Website of Unda Alunda. New album "Dark Wonderful World" out August 26, 2025 — Purchase now!',
+    'og:description': 'Official Website of Unda Alunda. New album "Dark Wonderful World" out December 31, 2025 — Purchase now!',
     'og:url': BASE_URL,
     'og:site_name': 'UNDA ALUNDA',
     'og:image': `${BASE_URL}/catmoon-bg.jpeg`,
@@ -393,7 +393,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               "name": "Dark Wonderful World",
               "description": "The upcoming album by Unda Alunda, featuring beautiful instrumental guitar compositions.",
               "image": `${BASE_URL}/catmoon-bg.jpeg`,
-              "datePublished": "2025-08-26",
+              "datePublished": "2025-12-31",
               "byArtist": { "@id": `${BASE_URL}#person` },
               "recordLabel": "Independent",
               "genre": ["Instrumental Guitar", "Melodic Rock"]

@@ -7,7 +7,7 @@ const BASE_URL = 'https://unda-website.vercel.app';
 
 export const metadata: Metadata = {
   title: 'Unda Alunda | Official Website & Merch Store',
-  description: 'Official website of Unda Alunda. New album "Dark Wonderful World" coming November 26, 2025. Shop exclusive music, merch, backing tracks and more.',
+  description: 'Official website of Unda Alunda. New album "Dark Wonderful World" coming December 31, 2025. Shop exclusive music, merch, backing tracks and more.',
   keywords: [
     'Unda Alunda',
     'Dark Wonderful World',
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   // 🎯 FIXED: Unified strategy - Same "Official website" start
   openGraph: {
     title: 'Unda Alunda | Official Website & Merch Store',
-    description: 'Official website of Unda Alunda. New album "Dark Wonderful World" coming November 26, 2025.',
+    description: 'Official website of Unda Alunda. New album "Dark Wonderful World" coming December 31, 2025.',
     type: 'website',
     url: BASE_URL,
     siteName: 'UNDA ALUNDA',
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Unda Alunda | Official Website & Merch Store',
-    description: 'Official website of Unda Alunda. New album "Dark Wonderful World" coming November 26, 2025.',
+    description: 'Official website of Unda Alunda. New album "Dark Wonderful World" coming December 31, 2025.',
     creator: '@undaalunda',
     images: [`${BASE_URL}/catmoon-bg.jpeg`],
   },
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
   // 🎯 FIXED: Unified meta tags for social
   other: {
     'og:title': 'Unda Alunda | Official Website & Merch Store',
-    'og:description': 'Official website of Unda Alunda. New album "Dark Wonderful World" coming November 26, 2025.',
+    'og:description': 'Official website of Unda Alunda. New album "Dark Wonderful World" coming December 31, 2025.',
     'og:type': 'website',
     'og:url': BASE_URL,
     'og:image': `${BASE_URL}/catmoon-bg.jpeg`,
@@ -151,7 +151,7 @@ export default function Page() {
             "name": "Dark Wonderful World",
             "description": "The upcoming album by Unda Alunda featuring beautiful instrumental guitar compositions",
             "image": `${BASE_URL}/catmoon-bg.jpeg`,
-            "datePublished": "2025-08-26",
+            "datePublished": "2025-12-31",
             "byArtist": {
               "@id": `${BASE_URL}#person`
             },
@@ -175,7 +175,7 @@ export default function Page() {
             "url": `${BASE_URL}/shop/merch`,
             "availability": "https://schema.org/PreOrder",
             "validFrom": "2025-01-01T00:00:00Z",
-            "validThrough": "2025-08-26T00:00:00Z",
+            "validThrough": "2025-12-31T00:00:00Z",
             "seller": {
               "@type": "Organization",
               "name": "UNDA ALUNDA",
