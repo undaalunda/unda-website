@@ -165,29 +165,9 @@ export default function HomePage() {
   }, []);
 
   return (
-  <AppClientWrapper>
-    <style jsx global>{`
-      video::-webkit-media-controls {
-        display: none !important;
-      }
-      video::-webkit-media-controls-enclosure {
-        display: none !important;
-      }
-      video::-webkit-media-controls-panel {
-        display: none !important;
-      }
-      video::-webkit-media-controls-play-button {
-        display: none !important;
-      }
-      video::-webkit-media-controls-start-playback-button {
-        display: none !important;
-      }
-      video::-moz-media-controls {
-        display: none !important;
-      }
-    `}</style>
-    <main className="homepage-main" style={{ overflow: 'visible' }}>
-      <h1 className="sr-only">Unda Alunda | Official Website & Merch Store</h1>
+    <AppClientWrapper>
+      <main className="homepage-main" style={{ overflow: 'visible' }}>
+        <h1 className="sr-only">Unda Alunda | Official Website & Merch Store</h1>
 
         {/* HERO SECTION - เปลี่ยน BACKGROUND เป็น VIDEO */}
         <div className="hero-wrapper" style={{

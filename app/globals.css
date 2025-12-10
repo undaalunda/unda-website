@@ -2329,3 +2329,46 @@ button svg,
 .video-hero-button svg {
   transition: all 0.3s ease !important;
 }
+
+/* ========================================
+   🎬 Hide Video Controls - Hero Section
+   ======================================== */
+
+video::-webkit-media-controls {
+  display: none !important;
+}
+
+video::-webkit-media-controls-enclosure {
+  display: none !important;
+}
+
+video::-webkit-media-controls-panel {
+  display: none !important;
+}
+
+video::-webkit-media-controls-play-button {
+  display: none !important;
+}
+
+video::-webkit-media-controls-start-playback-button {
+  display: none !important;
+}
+
+video::-webkit-media-controls-overlay-play-button {
+  display: none !important;
+}
+
+video::-moz-media-controls {
+  display: none !important;
+}
+
+video {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+/* Force hide all video controls */
+video::part(controls) {
+  display: none !important;
+}
