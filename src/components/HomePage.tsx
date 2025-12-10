@@ -278,6 +278,7 @@ export default function HomePage() {
                   ref={heroVideoRef}
                   muted
                   autoPlay
+                  loop
                   playsInline
                   webkit-playsinline="true"
                   x5-playsinline="true"
@@ -286,10 +287,6 @@ export default function HomePage() {
                   disableRemotePlayback
                   preload="auto"
                   poster="/hero-video-fallback.webp"
-                  onEnded={() => {
-                    setShowHeroVideo(false);
-                    setCurrentHeroSlide(1);
-                  }}
                   onError={() => {
                     setVideoReady(false);
                   }}
