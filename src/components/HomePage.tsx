@@ -46,9 +46,10 @@ export default function HomePage() {
   const [showTour, setShowTour] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
 
-  // Hero video states - เพิ่มแค่นี้
+  // Hero video states
   const [showHeroVideo, setShowHeroVideo] = useState(true);
-  const [currentHeroSlide, setCurrentHeroSlide] = useState(0); // 0 = video, 1 = image
+  const [currentHeroSlide, setCurrentHeroSlide] = useState(0);
+  const [userInteracted, setUserInteracted] = useState(false);
   const heroVideoRef = useRef<HTMLVideoElement>(null);
 
   // Hero slide functions
@@ -66,44 +67,64 @@ export default function HomePage() {
     }
   };
 
-  // Check video ready state on mount and when switching to video
-useEffect(() => {
-  if (showHeroVideo && heroVideoRef.current) {
-    const video = heroVideoRef.current;
-    
-    const checkReady = () => {
-      if (video.readyState >= 3) {
-        setVideoReady(true);
+  // Detect user interaction for autoplay
+  useEffect(() => {
+    const handleInteraction = () => {
+      setUserInteracted(true);
+      if (heroVideoRef.current && showHeroVideo) {
+        heroVideoRef.current.play().catch(err => console.log('Play failed:', err));
       }
     };
-    
-    const handleLoadedData = () => {
-      setVideoReady(true);
-      video.play().catch(err => console.log('Autoplay prevented:', err));
-    };
-    
-    const handleCanPlay = () => {
-      checkReady();
-      video.play().catch(err => console.log('Autoplay prevented:', err));
-    };
-    
-    // Check immediately
-    checkReady();
-    
-    // Try to play immediately if ready
-    if (video.readyState >= 3) {
-      video.play().catch(err => console.log('Autoplay prevented:', err));
-    }
-    
-    video.addEventListener('loadeddata', handleLoadedData);
-    video.addEventListener('canplay', handleCanPlay);
-    
+
+    document.addEventListener('touchstart', handleInteraction, { once: true });
+    document.addEventListener('click', handleInteraction, { once: true });
+
     return () => {
-      video.removeEventListener('loadeddata', handleLoadedData);
-      video.removeEventListener('canplay', handleCanPlay);
+      document.removeEventListener('touchstart', handleInteraction);
+      document.removeEventListener('click', handleInteraction);
     };
-  }
-}, [showHeroVideo]);
+  }, [showHeroVideo]);
+
+  // Check video ready state on mount and when switching to video
+  useEffect(() => {
+    if (showHeroVideo && heroVideoRef.current) {
+      const video = heroVideoRef.current;
+      
+      const checkReady = () => {
+        if (video.readyState >= 3) {
+          setVideoReady(true);
+        }
+      };
+      
+      const handleLoadedData = () => {
+        setVideoReady(true);
+        if (userInteracted || currentHeroSlide !== 0) {
+          video.play().catch(err => console.log('Autoplay prevented:', err));
+        }
+      };
+      
+      const handleCanPlay = () => {
+        checkReady();
+        if (userInteracted || currentHeroSlide !== 0) {
+          video.play().catch(err => console.log('Autoplay prevented:', err));
+        }
+      };
+      
+      checkReady();
+      
+      if (video.readyState >= 3 && (userInteracted || currentHeroSlide !== 0)) {
+        video.play().catch(err => console.log('Autoplay prevented:', err));
+      }
+      
+      video.addEventListener('loadeddata', handleLoadedData);
+      video.addEventListener('canplay', handleCanPlay);
+      
+      return () => {
+        video.removeEventListener('loadeddata', handleLoadedData);
+        video.removeEventListener('canplay', handleCanPlay);
+      };
+    }
+  }, [showHeroVideo, userInteracted, currentHeroSlide]);
 
   // 🚀 Smart Link Click Handlers - Clean URLs with sessionStorage
   const createNavigationHandler = (
