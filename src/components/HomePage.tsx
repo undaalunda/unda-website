@@ -184,15 +184,19 @@ export default function HomePage() {
             {showHeroVideo && (
               <>
                 <video
-                  ref={heroVideoRef}
-                  muted
-                  autoPlay
-                  playsInline
-                  onEnded={() => {
-                    setShowHeroVideo(false);
-                    setCurrentHeroSlide(1);
-                  }}
-                  style={{
+  ref={heroVideoRef}
+  muted
+  autoPlay
+  playsInline
+  poster="/hero-video-fallback.webp"
+  onEnded={() => {
+    setShowHeroVideo(false);
+    setCurrentHeroSlide(1);
+  }}
+  onError={() => {
+    setVideoReady(false);
+  }}
+  style={{
                     position: 'absolute',
                     inset: 0,
                     width: '100%',
@@ -202,8 +206,8 @@ export default function HomePage() {
                     pointerEvents: 'none',
                     opacity: videoReady ? 1 : 0,
                     transition: 'opacity 0.8s ease',
-                    maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.2) 98%, rgba(0, 0, 0, 0) 100%)',
-                    WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.2) 98%, rgba(0, 0, 0, 0) 100%)',
+                    maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 85%, rgba(0, 0, 0, 0.7) 95%, rgba(0, 0, 0, 0.4) 100%)',
+                    WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 85%, rgba(0, 0, 0, 0.7) 95%, rgba(0, 0, 0, 0.4) 100%)',
                     filter: 'brightness(0.8)'
                   }}
                 >
@@ -221,11 +225,12 @@ export default function HomePage() {
                     zIndex: -2,
                     opacity: videoReady ? 0 : 1,
                     transition: 'opacity 0.5s ease',
-                    maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.2) 98%, rgba(0, 0, 0, 0) 100%)',
-                    WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.2) 98%, rgba(0, 0, 0, 0) 100%)',
+                    maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 85%, rgba(0, 0, 0, 0.7) 95%, rgba(0, 0, 0, 0.4) 100%)',
+                    WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 85%, rgba(0, 0, 0, 0.7) 95%, rgba(0, 0, 0, 0.4) 100%)',
                     filter: 'brightness(0.8)'
                   }}
                 />
+
                 {/* Dark overlay for video */}
                 <div 
                   style={{

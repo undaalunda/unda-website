@@ -92,14 +92,14 @@ main,
   z-index: -1;
   mask-image: linear-gradient(to bottom,
     rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 1) 80%,
-    rgba(0, 0, 0, 0.6) 98%,
-    rgba(0, 0, 0, 0) 100%);
+    rgba(0, 0, 0, 1) 85%,
+    rgba(0, 0, 0, 0.7) 95%,
+    rgba(0, 0, 0, 0.4) 100%);
   -webkit-mask-image: linear-gradient(to bottom,
     rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 1) 80%,
-    rgba(0, 0, 0, 0.6) 98%,
-    rgba(0, 0, 0, 0) 100%);
+    rgba(0, 0, 0, 1) 85%,
+    rgba(0, 0, 0, 0.7) 95%,
+    rgba(0, 0, 0, 0.4) 100%);
   transition: opacity 0.8s ease;
 }
 
