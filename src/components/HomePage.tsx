@@ -79,6 +79,24 @@ export default function HomePage() {
     document.addEventListener('touchstart', handleInteraction, { once: true });
     document.addEventListener('click', handleInteraction, { once: true });
 
+    // Try to play immediately on mount (for browsers that allow it)
+    if (heroVideoRef.current && showHeroVideo) {
+      const attemptPlay = () => {
+        heroVideoRef.current?.play().catch(err => {
+          console.log('Initial autoplay prevented, waiting for user interaction:', err);
+        });
+      };
+      
+      // Attempt play after a short delay
+      const timer = setTimeout(attemptPlay, 100);
+      
+      return () => {
+        clearTimeout(timer);
+        document.removeEventListener('touchstart', handleInteraction);
+        document.removeEventListener('click', handleInteraction);
+      };
+    }
+
     return () => {
       document.removeEventListener('touchstart', handleInteraction);
       document.removeEventListener('click', handleInteraction);
@@ -220,6 +238,12 @@ export default function HomePage() {
                   muted
                   autoPlay
                   playsInline
+                  webkit-playsinline="true"
+                  x5-playsinline="true"
+                  controls={false}
+                  disablePictureInPicture
+                  disableRemotePlayback
+                  preload="auto"
                   poster="/hero-video-fallback.webp"
                   onEnded={() => {
                     setShowHeroVideo(false);
