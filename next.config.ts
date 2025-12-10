@@ -3,7 +3,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // ✅ คงไว้ settings เดิมของคุณ
   allowedDevOrigins: [
     "http://localhost:3000",
     "http://192.168.0.197:3000",
@@ -27,7 +26,6 @@ const nextConfig: NextConfig = {
 
   output: "standalone",
 
-  // 🚀 SUPERCHARGED Image Optimization
   images: {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
@@ -37,11 +35,9 @@ const nextConfig: NextConfig = {
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 
-  // 🚀 ENHANCED Compression
   compress: true,
   poweredByHeader: false,
   
-  // 🚀 ADVANCED Experimental Features
   experimental: {
     webpackBuildWorker: true,
     optimizePackageImports: [
@@ -54,7 +50,6 @@ const nextConfig: NextConfig = {
     forceSwcTransforms: false,
   },
 
-  // 🚀 SUPERCHARGED Headers with Security
   async headers() {
     return [
       {
@@ -125,20 +120,6 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // 🚀 Simplified Webpack Config
-  webpack: (config, { isServer, dev }) => {
-    if (!isServer) {
-      config.resolve.fallback = {
-        fs: false,
-        net: false,
-        tls: false,
-      };
-    }
-
-    return config;
-  },
-
-  // 🚀 TypeScript optimization
   typescript: {
     ignoreBuildErrors: false,
   },
