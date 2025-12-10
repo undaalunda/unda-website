@@ -29,22 +29,21 @@ const nextConfig: NextConfig = {
 
   // 🚀 SUPERCHARGED Image Optimization
   images: {
-    formats: ['image/avif', 'image/webp'], // 🎯 AVIF first (เล็กกว่า WebP 30%)
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920], // 🎯 ปรับให้ตรงกับ mobile breakpoints
-    imageSizes: [16, 32, 48, 64, 96, 128, 256], // 🎯 ลบ 384 ที่ไม่ค่อยใช้
-    minimumCacheTTL: 31536000, // 1 year cache
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256],
+    minimumCacheTTL: 31536000,
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 
   // 🚀 ENHANCED Compression
   compress: true,
-  poweredByHeader: false, // 🔒 Security + Performance
+  poweredByHeader: false,
   
   // 🚀 ADVANCED Experimental Features
   experimental: {
     webpackBuildWorker: true,
-    // 🚀 NEW: Bundle optimization
     optimizePackageImports: [
       'lucide-react',
       '@/components',
@@ -52,14 +51,12 @@ const nextConfig: NextConfig = {
       'next/image',
       'react'
     ],
-    // 🔧 แก้ปัญหา swc
     forceSwcTransforms: false,
   },
 
   // 🚀 SUPERCHARGED Headers with Security
   async headers() {
     return [
-      // 🎯 Static Assets - Ultra Aggressive Caching
       {
         source: '/:all*(svg|jpg|jpeg|png|webp|avif|gif|ico|woff|woff2|eot|ttf)',
         headers: [
@@ -73,7 +70,6 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      // 🎯 Next.js Static Files
       {
         source: '/_next/static/:path*',
         headers: [
@@ -83,7 +79,6 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      // 🎯 Fonts Optimization
       {
         source: '/fonts/:path*',
         headers: [
@@ -97,17 +92,15 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      // 🚀 NEW: API Routes Caching
       {
         source: '/api/:path*',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=300, stale-while-revalidate=600', // 5 min cache
+            value: 'public, max-age=300, stale-while-revalidate=600',
           },
         ],
       },
-      // 🚀 NEW: Security Headers
       {
         source: '/:path*',
         headers: [
@@ -134,7 +127,6 @@ const nextConfig: NextConfig = {
 
   // 🚀 Simplified Webpack Config
   webpack: (config, { isServer, dev }) => {
-    // 🎯 Client-side optimizations
     if (!isServer) {
       config.resolve.fallback = {
         fs: false,
@@ -146,14 +138,9 @@ const nextConfig: NextConfig = {
     return config;
   },
 
-  // 🚀 NEW: TypeScript optimization
+  // 🚀 TypeScript optimization
   typescript: {
-    ignoreBuildErrors: false, // 🔒 Force type safety - ปลอดภัยสำหรับ E-commerce
-  },
-
-  // 🚀 NEW: ESLint optimization  
-  eslint: {
-    ignoreDuringBuilds: false, // 🔒 Force code quality - ป้องกัน bugs
+    ignoreBuildErrors: false,
   },
 };
 
