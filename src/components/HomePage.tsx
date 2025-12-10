@@ -67,32 +67,43 @@ export default function HomePage() {
   };
 
   // Check video ready state on mount and when switching to video
-  useEffect(() => {
-    if (showHeroVideo && heroVideoRef.current) {
-      const video = heroVideoRef.current;
-      
-      const checkReady = () => {
-        if (video.readyState >= 3) {
-          setVideoReady(true);
-        }
-      };
-      
-      const handleLoadedData = () => {
+useEffect(() => {
+  if (showHeroVideo && heroVideoRef.current) {
+    const video = heroVideoRef.current;
+    
+    const checkReady = () => {
+      if (video.readyState >= 3) {
         setVideoReady(true);
-      };
-      
-      // Check immediately
+      }
+    };
+    
+    const handleLoadedData = () => {
+      setVideoReady(true);
+      video.play().catch(err => console.log('Autoplay prevented:', err));
+    };
+    
+    const handleCanPlay = () => {
       checkReady();
-      
-      video.addEventListener('loadeddata', handleLoadedData);
-      video.addEventListener('canplay', checkReady);
-      
-      return () => {
-        video.removeEventListener('loadeddata', handleLoadedData);
-        video.removeEventListener('canplay', checkReady);
-      };
+      video.play().catch(err => console.log('Autoplay prevented:', err));
+    };
+    
+    // Check immediately
+    checkReady();
+    
+    // Try to play immediately if ready
+    if (video.readyState >= 3) {
+      video.play().catch(err => console.log('Autoplay prevented:', err));
     }
-  }, [showHeroVideo]);
+    
+    video.addEventListener('loadeddata', handleLoadedData);
+    video.addEventListener('canplay', handleCanPlay);
+    
+    return () => {
+      video.removeEventListener('loadeddata', handleLoadedData);
+      video.removeEventListener('canplay', handleCanPlay);
+    };
+  }
+}, [showHeroVideo]);
 
   // 🚀 Smart Link Click Handlers - Clean URLs with sessionStorage
   const createNavigationHandler = (
