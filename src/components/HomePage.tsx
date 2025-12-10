@@ -216,6 +216,47 @@ export default function HomePage() {
 
   return (
     <AppClientWrapper>
+      <style jsx global>{`
+        /* Aggressively hide ALL video controls */
+        video::-webkit-media-controls {
+          display: none !important;
+          opacity: 0 !important;
+          pointer-events: none !important;
+        }
+        video::-webkit-media-controls-enclosure {
+          display: none !important;
+        }
+        video::-webkit-media-controls-panel {
+          display: none !important;
+        }
+        video::-webkit-media-controls-play-button {
+          display: none !important;
+        }
+        video::-webkit-media-controls-start-playback-button {
+          display: none !important;
+        }
+        video::-webkit-media-controls-overlay-play-button {
+          display: none !important;
+        }
+        video::-moz-media-controls {
+          display: none !important;
+        }
+        video::part(controls) {
+          display: none !important;
+        }
+        /* Target hero video specifically */
+        .hero-wrapper video {
+          pointer-events: none !important;
+        }
+        .hero-wrapper video::-webkit-media-controls {
+          display: none !important;
+          visibility: hidden !important;
+        }
+        .hero-wrapper video::-webkit-media-controls-enclosure {
+          display: none !important;
+          visibility: hidden !important;
+        }
+      `}</style>
       <main className="homepage-main" style={{ overflow: 'visible' }}>
         <h1 className="sr-only">Unda Alunda | Official Website & Merch Store</h1>
 
@@ -264,8 +305,11 @@ export default function HomePage() {
                     transition: 'opacity 0.8s ease',
                     maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.85) 88%, rgba(0, 0, 0, 0.6) 94%, rgba(0, 0, 0, 0.3) 98%, rgba(0, 0, 0, 0.15) 100%)',
                     WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.85) 88%, rgba(0, 0, 0, 0.6) 94%, rgba(0, 0, 0, 0.3) 98%, rgba(0, 0, 0, 0.15) 100%)',
-                    filter: 'brightness(0.8)'
-                  }}
+                    filter: 'brightness(0.8)',
+                    // @ts-ignore - Aggressive controls hiding
+                    WebkitAppearance: 'none',
+                    MozAppearance: 'none'
+                  } as React.CSSProperties}
                 >
                   <source src="/hero-video.mp4" type="video/mp4" />
                 </video>
