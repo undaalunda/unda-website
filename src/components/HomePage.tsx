@@ -50,58 +50,77 @@ export default function HomePage() {
   const [showHeroVideo, setShowHeroVideo] = useState(true);
   const [currentHeroSlide, setCurrentHeroSlide] = useState(0);
   const [userInteracted, setUserInteracted] = useState(false);
+  const [videoStarted, setVideoStarted] = useState(false);
   const heroVideoRef = useRef<HTMLVideoElement>(null);
 
   // Hero slide functions
   const goToHeroSlide = (slideIndex: number) => {
-    setCurrentHeroSlide(slideIndex);
-    if (slideIndex === 0) {
-      setShowHeroVideo(true);
-      setVideoReady(false);
-      if (heroVideoRef.current) {
-        heroVideoRef.current.currentTime = 0;
-        heroVideoRef.current.play();
-      }
-    } else {
-      setShowHeroVideo(false);
+  setCurrentHeroSlide(slideIndex);
+  if (slideIndex === 0) {
+    setShowHeroVideo(true);
+    setVideoReady(false);
+    setVideoStarted(false);
+    if (heroVideoRef.current) {
+      heroVideoRef.current.currentTime = 0;
+      heroVideoRef.current.play().catch(err => console.log('Play failed:', err));
+      setVideoStarted(true);
+    }
+  } else {
+    setShowHeroVideo(false);
+  }
+};
+
+  useEffect(() => {
+  const handleInteraction = () => {
+    setUserInteracted(true);
+    setVideoStarted(true);
+    
+    if (heroVideoRef.current && showHeroVideo) {
+      heroVideoRef.current.play().catch(err => {
+        console.log('Play failed:', err);
+      });
     }
   };
 
-  // Detect user interaction for autoplay
-  useEffect(() => {
-    const handleInteraction = () => {
-      setUserInteracted(true);
-      if (heroVideoRef.current && showHeroVideo) {
-        heroVideoRef.current.play().catch(err => console.log('Play failed:', err));
+  document.addEventListener('touchstart', handleInteraction, { once: true, passive: true });
+  document.addEventListener('click', handleInteraction, { once: true });
+  document.addEventListener('scroll', handleInteraction, { once: true, passive: true });
+  document.addEventListener('touchmove', handleInteraction, { once: true, passive: true });
+
+  if (heroVideoRef.current && showHeroVideo) {
+    const attemptPlay = () => {
+      const playPromise = heroVideoRef.current?.play();
+      
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setVideoStarted(true);
+            setUserInteracted(true);
+          })
+          .catch(err => {
+            console.log('Initial autoplay prevented, waiting for user interaction');
+          });
       }
     };
-
-    document.addEventListener('touchstart', handleInteraction, { once: true });
-    document.addEventListener('click', handleInteraction, { once: true });
-
-    // Try to play immediately on mount (for browsers that allow it)
-    if (heroVideoRef.current && showHeroVideo) {
-      const attemptPlay = () => {
-        heroVideoRef.current?.play().catch(err => {
-          console.log('Initial autoplay prevented, waiting for user interaction:', err);
-        });
-      };
-      
-      // Attempt play after a short delay
-      const timer = setTimeout(attemptPlay, 100);
-      
-      return () => {
-        clearTimeout(timer);
-        document.removeEventListener('touchstart', handleInteraction);
-        document.removeEventListener('click', handleInteraction);
-      };
-    }
-
+    
+    const timer = setTimeout(attemptPlay, 100);
+    
     return () => {
+      clearTimeout(timer);
       document.removeEventListener('touchstart', handleInteraction);
       document.removeEventListener('click', handleInteraction);
+      document.removeEventListener('scroll', handleInteraction);
+      document.removeEventListener('touchmove', handleInteraction);
     };
-  }, [showHeroVideo]);
+  }
+
+  return () => {
+    document.removeEventListener('touchstart', handleInteraction);
+    document.removeEventListener('click', handleInteraction);
+    document.removeEventListener('scroll', handleInteraction);
+    document.removeEventListener('touchmove', handleInteraction);
+  };
+}, [showHeroVideo]);
 
   // Check video ready state on mount and when switching to video
   useEffect(() => {
@@ -115,34 +134,52 @@ export default function HomePage() {
       };
       
       const handleLoadedData = () => {
-        setVideoReady(true);
-        if (userInteracted || currentHeroSlide !== 0) {
-          video.play().catch(err => console.log('Autoplay prevented:', err));
-        }
-      };
+  setVideoReady(true);
+  if (userInteracted || currentHeroSlide !== 0) {
+    video.play().then(() => {
+      setVideoStarted(true);
+    }).catch(err => console.log('Autoplay prevented:', err));
+  }
+};
       
       const handleCanPlay = () => {
-        checkReady();
-        if (userInteracted || currentHeroSlide !== 0) {
-          video.play().catch(err => console.log('Autoplay prevented:', err));
-        }
-      };
+  checkReady();
+  if (userInteracted || currentHeroSlide !== 0) {
+    video.play().then(() => {
+      setVideoStarted(true);
+    }).catch(err => console.log('Autoplay prevented:', err));
+  }
+};
+
+const handleCanPlayThrough = () => {
+  setVideoReady(true);
+  if (!videoStarted && userInteracted && video.paused) {
+    video.play().then(() => {
+      setVideoStarted(true);
+    }).catch(err => console.log('Autoplay prevented:', err));
+  }
+};
       
       checkReady();
       
       if (video.readyState >= 3 && (userInteracted || currentHeroSlide !== 0)) {
-        video.play().catch(err => console.log('Autoplay prevented:', err));
-      }
+  video.play().then(() => {
+    setVideoStarted(true);
+  }).catch(err => console.log('Autoplay prevented:', err));
+}
       
       video.addEventListener('loadeddata', handleLoadedData);
-      video.addEventListener('canplay', handleCanPlay);
-      
-      return () => {
-        video.removeEventListener('loadeddata', handleLoadedData);
-        video.removeEventListener('canplay', handleCanPlay);
-      };
+video.addEventListener('canplay', handleCanPlay);
+video.addEventListener('canplaythrough', handleCanPlayThrough);
+
+return () => {
+  video.removeEventListener('loadeddata', handleLoadedData);
+  video.removeEventListener('canplay', handleCanPlay);
+  video.removeEventListener('canplaythrough', handleCanPlayThrough);
+};
     }
-  }, [showHeroVideo, userInteracted, currentHeroSlide]);
+    
+  }, [showHeroVideo, userInteracted, currentHeroSlide, videoStarted]);
 
   // 🚀 Smart Link Click Handlers - Clean URLs with sessionStorage
   const createNavigationHandler = (
@@ -275,58 +312,62 @@ export default function HomePage() {
             {showHeroVideo && (
               <>
                 <video
-                  ref={heroVideoRef}
-                  muted
-                  autoPlay
-                  loop
-                  playsInline
-                  webkit-playsinline="true"
-                  x5-playsinline="true"
-                  controls={false}
-                  disablePictureInPicture
-                  disableRemotePlayback
-                  preload="auto"
-                  poster="/hero-video-fallback.webp"
-                  onError={() => {
-                    setVideoReady(false);
-                  }}
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    zIndex: -1,
-                    pointerEvents: 'none',
-                    opacity: videoReady ? 1 : 0,
-                    transition: 'opacity 0.8s ease',
-                    maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.85) 88%, rgba(0, 0, 0, 0.6) 94%, rgba(0, 0, 0, 0.3) 98%, rgba(0, 0, 0, 0.15) 100%)',
-                    WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.85) 88%, rgba(0, 0, 0, 0.6) 94%, rgba(0, 0, 0, 0.3) 98%, rgba(0, 0, 0, 0.15) 100%)',
-                    filter: 'brightness(0.8)',
-                    // @ts-ignore - Aggressive controls hiding
-                    WebkitAppearance: 'none',
-                    MozAppearance: 'none'
-                  } as React.CSSProperties}
-                >
+  ref={heroVideoRef}
+  muted
+  playsInline
+  webkit-playsinline="true"
+  x5-playsinline="true"
+  x-webkit-airplay="deny"
+  controls={false}
+  disablePictureInPicture
+  disableRemotePlayback
+  preload="auto"
+  poster="/hero-video-fallback.webp"
+  loop={videoStarted}
+  autoPlay={false}
+  onError={() => {
+    setVideoReady(false);
+  }}
+  onPlay={() => {
+    setVideoStarted(true);
+  }}
+  style={{
+    position: 'absolute',
+    inset: 0,
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    zIndex: -1,
+    pointerEvents: 'none',
+    opacity: videoReady && videoStarted ? 1 : 0,
+    transition: 'opacity 0.8s ease',
+    maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.85) 88%, rgba(0, 0, 0, 0.6) 94%, rgba(0, 0, 0, 0.3) 98%, rgba(0, 0, 0, 0.15) 100%)',
+    WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.85) 88%, rgba(0, 0, 0, 0.6) 94%, rgba(0, 0, 0, 0.3) 98%, rgba(0, 0, 0, 0.15) 100%)',
+    filter: 'brightness(0.8)',
+    // @ts-ignore
+    WebkitAppearance: 'none',
+    MozAppearance: 'none'
+  } as React.CSSProperties}
+>
                   <source src="/hero-video.mp4" type="video/mp4" />
                 </video>
                 <div 
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    width: '100%',
-                    height: '100%',
-                    backgroundImage: 'url(/hero-video-fallback.webp)',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    zIndex: -2,
-                    opacity: videoReady ? 0 : 1,
-                    transition: 'opacity 0.5s ease',
-                    maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.85) 88%, rgba(0, 0, 0, 0.6) 94%, rgba(0, 0, 0, 0.3) 98%, rgba(0, 0, 0, 0.15) 100%)',
-                    WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.85) 88%, rgba(0, 0, 0, 0.6) 94%, rgba(0, 0, 0, 0.3) 98%, rgba(0, 0, 0, 0.15) 100%)',
-                    filter: 'brightness(0.8)'
-                  }}
-                />
+  style={{
+    position: 'absolute',
+    inset: 0,
+    width: '100%',
+    height: '100%',
+    backgroundImage: 'url(/hero-video-fallback.webp)',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    zIndex: -2,
+    opacity: (!videoStarted || !videoReady) ? 1 : 0,
+    transition: 'opacity 0.5s ease',
+    maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.85) 88%, rgba(0, 0, 0, 0.6) 94%, rgba(0, 0, 0, 0.3) 98%, rgba(0, 0, 0, 0.15) 100%)',
+    WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.85) 88%, rgba(0, 0, 0, 0.6) 94%, rgba(0, 0, 0, 0.3) 98%, rgba(0, 0, 0, 0.15) 100%)',
+    filter: 'brightness(0.8)'
+  }}
+/>
 
                 {/* Dark overlay for video */}
                 <div 

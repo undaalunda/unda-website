@@ -2372,3 +2372,75 @@ video {
 video::part(controls) {
   display: none !important;
 }
+
+/* ========================================
+   🔥 AGGRESSIVE MOBILE VIDEO FIX
+   ======================================== */
+
+/* Hide ALL video controls */
+video::-webkit-media-controls,
+video::-webkit-media-controls-enclosure,
+video::-webkit-media-controls-panel,
+video::-webkit-media-controls-play-button,
+video::-webkit-media-controls-start-playback-button,
+video::-webkit-media-controls-overlay-play-button,
+video::-webkit-media-controls-timeline,
+video::-webkit-media-controls-current-time-display,
+video::-webkit-media-controls-time-remaining-display,
+video::-webkit-media-controls-fullscreen-button,
+video::-webkit-media-controls-mute-button,
+video::-webkit-media-controls-toggle-closed-captions-button,
+video::-webkit-media-controls-volume-slider {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+}
+
+video::-moz-media-controls {
+  display: none !important;
+}
+
+video::part(controls) {
+  display: none !important;
+}
+
+/* Target hero video specifically */
+.hero-wrapper video,
+.hero-wrapper video[poster] {
+  -webkit-media-controls: none !important;
+  -moz-media-controls: none !important;
+  -o-media-controls: none !important;
+  -ms-media-controls: none !important;
+  pointer-events: none !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+}
+
+/* iOS Safari specific */
+@supports (-webkit-touch-callout: none) {
+  .hero-wrapper video {
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+  }
+}
+
+/* Android Chrome specific */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  .hero-wrapper video {
+    -webkit-media-controls-start-playback-button: none !important;
+  }
+}
+
+.hero-wrapper {
+  pointer-events: auto;
+}
+
+.hero-wrapper > *:not(video) {
+  pointer-events: auto;
+}
