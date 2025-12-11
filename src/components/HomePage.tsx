@@ -29,13 +29,7 @@ const homepageItems = allItems.filter(
 
 export default function HomePage() {
   const router = useRouter();
-const [showBandsintown, setShowBandsintown] = useState(false);
-
-// 🎯 เพิ่ม 4 บรรทัดนี้:
-const [isMobile, setIsMobile] = useState(false);
-useEffect(() => {
-  setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
-}, []);
+  const [showBandsintown, setShowBandsintown] = useState(false);
   
   const videoRef = useRef<HTMLDivElement>(null);
   const transcriptionRef = useRef<HTMLDivElement>(null);
@@ -317,72 +311,59 @@ return () => {
           <>
             {showHeroVideo && (
               <>
-                {isMobile ? (
-  <div
-    style={{
-      position: 'absolute',
-      inset: 0,
-      width: '100%',
-      height: '100%',
-      backgroundImage: 'url(/hero-video-loop.webp)',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
-      zIndex: -1,
-      maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.85) 88%, rgba(0, 0, 0, 0.6) 94%, rgba(0, 0, 0, 0.3) 98%, rgba(0, 0, 0, 0.15) 100%)',
-      WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.85) 88%, rgba(0, 0, 0, 0.6) 94%, rgba(0, 0, 0, 0.3) 98%, rgba(0, 0, 0, 0.15) 100%)',
-      filter: 'brightness(0.8)'
-    }}
-  />
-) : (
-  <video
-    ref={heroVideoRef}
-    muted
-    autoPlay
-    loop
-    playsInline
-    webkit-playsinline="true"
-    x5-playsinline="true"
-    controls={false}
-    disablePictureInPicture
-    disableRemotePlayback
-    preload="auto"
-    poster="/hero-video-fallback.webp"
-    style={{
-      position: 'absolute',
-      inset: 0,
-      width: '100%',
-      height: '100%',
-      objectFit: 'cover',
-      zIndex: -1,
-      pointerEvents: 'none',
-      maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.85) 88%, rgba(0, 0, 0, 0.6) 94%, rgba(0, 0, 0, 0.3) 98%, rgba(0, 0, 0, 0.15) 100%)',
-      WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.85) 88%, rgba(0, 0, 0, 0.6) 94%, rgba(0, 0, 0, 0.3) 98%, rgba(0, 0, 0, 0.15) 100%)',
-      filter: 'brightness(0.8)',
-      WebkitAppearance: 'none',
-      MozAppearance: 'none'
-    }}
-  >
-    <source src="/hero-video.mp4" type="video/mp4" />
-  </video>
-)}
+                <video
+                  ref={heroVideoRef}
+                  muted
+                  autoPlay
+                  loop
+                  playsInline
+                  webkit-playsinline="true"
+                  x5-playsinline="true"
+                  controls={false}
+                  disablePictureInPicture
+                  disableRemotePlayback
+                  preload="auto"
+                  poster="/hero-video-fallback.webp"
+                  onError={() => {
+                    setVideoReady(false);
+                  }}
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    zIndex: -1,
+                    pointerEvents: 'none',
+                    opacity: videoReady ? 1 : 0,
+                    transition: 'opacity 0.8s ease',
+                    maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.85) 88%, rgba(0, 0, 0, 0.6) 94%, rgba(0, 0, 0, 0.3) 98%, rgba(0, 0, 0, 0.15) 100%)',
+                    WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.85) 88%, rgba(0, 0, 0, 0.6) 94%, rgba(0, 0, 0, 0.3) 98%, rgba(0, 0, 0, 0.15) 100%)',
+                    filter: 'brightness(0.8)',
+                    // @ts-ignore - Aggressive controls hiding
+                    WebkitAppearance: 'none',
+                    MozAppearance: 'none'
+                  } as React.CSSProperties}
+                >
+                  <source src="/hero-video.mp4" type="video/mp4" />
+                </video>
                 <div 
-  style={{
-    position: 'absolute',
-    inset: 0,
-    width: '100%',
-    height: '100%',
-    backgroundImage: 'url(/hero-video-fallback.webp)',
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    zIndex: -2,
-    opacity: (!videoStarted || !videoReady) ? 1 : 0,
-    transition: 'opacity 0.5s ease',
-    maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.85) 88%, rgba(0, 0, 0, 0.6) 94%, rgba(0, 0, 0, 0.3) 98%, rgba(0, 0, 0, 0.15) 100%)',
-    WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.85) 88%, rgba(0, 0, 0, 0.6) 94%, rgba(0, 0, 0, 0.3) 98%, rgba(0, 0, 0, 0.15) 100%)',
-    filter: 'brightness(0.8)'
-  }}
-/>
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    backgroundImage: 'url(/hero-video-fallback.webp)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    zIndex: -2,
+                    opacity: videoReady ? 0 : 1,
+                    transition: 'opacity 0.5s ease',
+                    maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.85) 88%, rgba(0, 0, 0, 0.6) 94%, rgba(0, 0, 0, 0.3) 98%, rgba(0, 0, 0, 0.15) 100%)',
+                    WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.85) 88%, rgba(0, 0, 0, 0.6) 94%, rgba(0, 0, 0, 0.3) 98%, rgba(0, 0, 0, 0.15) 100%)',
+                    filter: 'brightness(0.8)'
+                  }}
+                />
 
                 {/* Dark overlay for video */}
                 <div 
