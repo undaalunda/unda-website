@@ -1,4 +1,4 @@
-/* ProductPageContent.tsx - Fixed Related Products Display */
+/* ProductPageContent.tsx - Fixed Related Products with Coming Soon Support */
 
 'use client';
 
@@ -211,16 +211,18 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
               <h1 className="product-title-detail capitalize whitespace-nowrap overflow-hidden text-ellipsis">{product.title}</h1>
               <p className="product-subtitle-detail capitalize whitespace-nowrap overflow-hidden text-ellipsis" style={{ color: '#f8fcdc' }}>{product.subtitle}</p>
 
-              <div className="product-price-detail">
-                {isBundle(product.price) ? (
-                  <>
-                    <span className="line-through text-[#f8fcdc]/40 mr-2">${product.price.original.toFixed(2)}</span>
-                    <span>${product.price.sale.toFixed(2)}</span>
-                  </>
-                ) : (
-                  <span className="tracking-[0.15em]">${(product.price as number).toFixed(2)}</span>
-                )}
-              </div>
+              {!product.comingSoon && (
+                <div className="product-price-detail">
+                  {isBundle(product.price) ? (
+                    <>
+                      <span className="line-through text-[#f8fcdc]/40 mr-2">${product.price.original.toFixed(2)}</span>
+                      <span>${product.price.sale.toFixed(2)}</span>
+                    </>
+                  ) : (
+                    <span className="tracking-[0.15em]">${(product.price as number).toFixed(2)}</span>
+                  )}
+                </div>
+              )}
 
               {product.type === 'physical' && (
                 <>
@@ -345,6 +347,13 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                   >
                     Coming Soon
                   </button>
+                ) : product.comingSoon ? (
+                  <button
+                    disabled
+                    className="add-to-cart-button cursor-not-allowed opacity-70 bg-orange-600/50 text-white max-[927px]:text-sm max-[696px]:text-xs max-[696px]:py-2 max-[696px]:px-4"
+                  >
+                    Available Dec 31
+                  </button>
                 ) : (
                   <button
                     className={`add-to-cart-button max-[927px]:text-sm max-[696px]:text-xs max-[696px]:py-2 max-[696px]:px-4 ${
@@ -387,7 +396,7 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
             </div>
           </div>
 
-          {/* 🚀 Related Products - Fixed to exclude Solo Collection */}
+          {/* 🚀 Related Products - Fixed with Coming Soon Support */}
           {relatedProducts.length > 0 && (
             <div className="related-products-wrapper w-full">
               <h2 className="text-2xl font-bold text-[#dc9e63] mb-8">RELATED PRODUCTS</h2>
@@ -395,45 +404,65 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                 {relatedProducts.map((item) => {
                   // 🎯 Separate logic for physical vs digital products
                   if (item.type === 'physical') {
-                    // 🎁 Physical product display - simple and clean (NO badge)
+                    // 🎁 Physical product display with Coming Soon support
                     return (
                       <div
                         key={item.id}
                         onClick={(e) => handleRelatedProductClick(item, e)}
                         className="stems-item cursor-pointer"
                       >
-                        <Image
-                          src={item.image}
-                          alt={item.title}
-                          width={200}
-                          height={200}
-                          className="stems-image"
-                          loading="lazy"
-                          quality={85}
-                          sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 200px"
-                          placeholder="blur"
-                          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-                        />
+                        <div className="relative">
+                          <Image
+                            src={item.image}
+                            alt={item.title}
+                            width={200}
+                            height={200}
+                            className="stems-image"
+                            loading="lazy"
+                            quality={85}
+                            sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 200px"
+                            placeholder="blur"
+                            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                          />
+                          {item.comingSoon && (
+                            <div className="absolute top-2 right-2 bg-orange-600/50 text-white text-xs px-2 py-1 rounded-md font-semibold border border-orange-600/80">
+                              Available Dec 31
+                            </div>
+                          )}
+                        </div>
                         <div className="stems-label-group">
                           <p className="stems-title-text text-[#d37142]">{item.title}</p>
                           <p className="stems-subtitle-tiny">{item.subtitle}</p>
                           <p className="stems-price">
-                            {isBundle(item.price) ? (
-                              <>
-                                <span className="line-through text-[#f8fcdc] mr-1">
-                                  ${item.price.original.toFixed(2)}
-                                </span>
-                                <span>${item.price.sale.toFixed(2)}</span>
-                              </>
-                            ) : (
-                              <span>${(item.price as number).toFixed(2)}</span>
-                            )}
-                          </p>
+  {item.comingSoon ? (
+    <span className="invisible">
+      {isBundle(item.price) ? (
+        <>
+          <span className="line-through text-[#f8fcdc] mr-1">
+            ${item.price.original.toFixed(2)}
+          </span>
+          <span>${item.price.sale.toFixed(2)}</span>
+        </>
+      ) : (
+        <span>${(item.price as number).toFixed(2)}</span>
+      )}
+    </span>
+  ) : isBundle(item.price) ? (
+    <>
+      <span className="line-through text-[#f8fcdc] mr-1">
+        ${item.price.original.toFixed(2)}
+      </span>
+      <span>${item.price.sale.toFixed(2)}</span>
+    </>
+  ) : (
+    <span>${(item.price as number).toFixed(2)}</span>
+  )}
+</p>
                         </div>
                       </div>
                     );
                   } else {
-                    // 🎵 Digital product display - with animations and special formatting
+                    // 🎵 Digital product display with Coming Soon support
                     const isTab = isTabProduct(item);
                     const isBackingTrack = item.category === 'Backing Track';
 
@@ -443,18 +472,25 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                         onClick={(e) => handleRelatedProductClick(item, e)}
                         className={`stems-item cursor-pointer ${isTab || isBackingTrack ? 'is-backing' : ''}`}
                       >
-                        <Image
-                          src={item.image}
-                          alt={item.title}
-                          width={200}
-                          height={200}
-                          className="stems-image"
-                          loading="lazy"
-                          quality={85}
-                          sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 200px"
-                          placeholder="blur"
-                          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-                        />
+                        <div className="relative">
+                          <Image
+                            src={item.image}
+                            alt={item.title}
+                            width={200}
+                            height={200}
+                            className="stems-image"
+                            loading="lazy"
+                            quality={85}
+                            sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 200px"
+                            placeholder="blur"
+                            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                          />
+                          {item.comingSoon && (
+                            <div className="absolute top-2 right-2 bg-orange-600/50 text-white text-xs px-2 py-1 rounded-md font-semibold border border-orange-600/80">
+                              Available Dec 31
+                            </div>
+                          )}
+                        </div>
                         <div className="stems-label-group mt-2">
                           <p className="stems-title-text">
                             {(item as any).song?.toUpperCase() || item.title}
@@ -469,17 +505,30 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                             {isBackingTrack ? 'BACKING TRACK' : isTab ? 'TABS' : 'STEM'}
                           </p>
                           <p className="stems-price">
-                            {isBundle(item.price) ? (
-                              <>
-                                <span className="line-through text-[#f8fcdc] mr-1">
-                                  ${item.price.original.toFixed(2)}
-                                </span>
-                                <span>${item.price.sale.toFixed(2)}</span>
-                              </>
-                            ) : (
-                              <span>${(item.price as number).toFixed(2)}</span>
-                            )}
-                          </p>
+  {item.comingSoon ? (
+    <span className="invisible">
+      {isBundle(item.price) ? (
+        <>
+          <span className="line-through text-[#f8fcdc] mr-1">
+            ${item.price.original.toFixed(2)}
+          </span>
+          <span>${item.price.sale.toFixed(2)}</span>
+        </>
+      ) : (
+        <span>${(item.price as number).toFixed(2)}</span>
+      )}
+    </span>
+  ) : isBundle(item.price) ? (
+    <>
+      <span className="line-through text-[#f8fcdc] mr-1">
+        ${item.price.original.toFixed(2)}
+      </span>
+      <span>${item.price.sale.toFixed(2)}</span>
+    </>
+  ) : (
+    <span>${(item.price as number).toFixed(2)}</span>
+  )}
+</p>
                         </div>
                       </div>
                     );

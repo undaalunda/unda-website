@@ -587,15 +587,22 @@ export default function AlbumHubPage({
                         className={`stems-item product-label-link cursor-pointer ${(isBackingTrack || isTab) ? 'is-backing' : ''}`}
                       >
                         {/* 🚀 เปลี่ยนเป็น ProductImage */}
-                        <ProductImage
-                          src={product.image}
-                          alt={`${product.title} - ${product.subtitle}`}
-                          width={200}
-                          height={200}
-                          className="stems-image"
-                          quality={85}
-                          sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
-                        />
+                        <div className="relative">
+                          <ProductImage
+                            src={product.image}
+                            alt={`${product.title} - ${product.subtitle}`}
+                            width={200}
+                            height={200}
+                            className="stems-image"
+                            quality={85}
+                            sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
+                          />
+                          {product.comingSoon && (
+                            <div className="absolute top-2 right-2 bg-orange-600/50 text-white text-xs px-2 py-1 rounded-md font-semibold border border-orange-600/80">
+                              Available Dec 31
+                            </div>
+                          )}
+                        </div>
                         <div className="stems-label-group">
                           <p className="stems-title-text">
                             {(product as any).song?.toUpperCase() || product.title}
@@ -610,7 +617,13 @@ export default function AlbumHubPage({
                             {product.category === 'Backing Track' ? 'BACKING TRACK' : 
                              product.category === 'Tabs' ? 'TABS' : 'STEM'}
                           </p>
-                          <p className="stems-price">{displayPrice}</p>
+                          <p className="stems-price">
+  {product.comingSoon ? (
+    <span className="invisible">{displayPrice}</span>
+  ) : (
+    displayPrice
+  )}
+</p>
                         </div>
                       </div>
                     ) : (
@@ -641,7 +654,13 @@ export default function AlbumHubPage({
                             {product.category === 'Backing Track' ? 'BACKING TRACK' : 
                              product.category === 'Tabs' ? 'TABS' : 'STEM'}
                           </p>
-                          <p className="stems-price">{displayPrice}</p>
+                          <p className="stems-price">
+  {product.comingSoon ? (
+    <span className="invisible">{displayPrice}</span>
+  ) : (
+    displayPrice
+  )}
+</p>
                         </div>
                       </div>
                     );

@@ -193,20 +193,25 @@ export default function SearchOverlay({ onClose }: { onClose: () => void }) {
                               <span className="text-xs text-[#f8fcdc]/70 truncate">
                                 {item.subtitle}
                               </span>
-                              {item.price && (
-                                <div className="flex items-center gap-1 text-xs text-[#dc9e63] mt-1">
-                                  {isBundlePrice(item.price) ? (
-                                    <>
-                                      <span className="line-through text-[#f8fcdc]/40">
-                                        ${item.price.original.toFixed(2)}
-                                      </span>
-                                      <span>${item.price.sale.toFixed(2)}</span>
-                                    </>
-                                  ) : (
-                                    <span>${typeof item.price === 'number' ? item.price.toFixed(2) : ''}</span>
-                                  )}
-                                </div>
-                              )}
+                              {item.price && !item.comingSoon && (
+  <div className="flex items-center gap-1 text-xs text-[#dc9e63] mt-1">
+    {isBundlePrice(item.price) ? (
+      <>
+        <span className="line-through text-[#f8fcdc]/40">
+          ${item.price.original.toFixed(2)}
+        </span>
+        <span>${item.price.sale.toFixed(2)}</span>
+      </>
+    ) : (
+      <span>${typeof item.price === 'number' ? item.price.toFixed(2) : ''}</span>
+    )}
+  </div>
+)}
+{item.comingSoon && (
+  <div className="text-xs text-orange-300 mt-1 italic">
+    Available Dec 31
+  </div>
+)}
                             </div>
                           </Link>
                         ))}

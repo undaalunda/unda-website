@@ -852,14 +852,14 @@ useEffect(() => {
                                       quality={75}
                                       sizes="48px"
                                     />
-                                    <div className="flex flex-col">
+                                   <div className="flex flex-col">
                                       <span className="text-sm font-medium text-[#f8fcdc]">
                                         {item.title}
                                       </span>
                                       <span className="text-xs text-[#f8fcdc]/70">{item.subtitle}</span>
-                                      {item.price && (
+                                      {item.price && !item.comingSoon && (
                                         typeof item.price === 'object' ? (
-                                          <div className="flex items-center gap-1 md:gap-2 text-xs mt-1">
+                                          <div className="flex items-center gap-2 text-xs mt-1">
                                             <span className="line-through text-[#f8fcdc]/40">
                                               ${item.price.original.toFixed(2)}
                                             </span>
@@ -872,6 +872,11 @@ useEffect(() => {
                                             ${item.price.toFixed(2)}
                                           </div>
                                         )
+                                      )}
+                                      {item.comingSoon && (
+                                        <div className="text-xs text-orange-300 mt-1 italic">
+                                          Available Dec 31
+                                        </div>
                                       )}
                                     </div>
                                   </Link>
@@ -1043,7 +1048,7 @@ useEffect(() => {
                                         {item.title}
                                       </span>
                                       <span className="text-xs text-[#f8fcdc]/70">{item.subtitle}</span>
-                                      {item.price && (
+                                      {item.price && !item.comingSoon && (
                                         typeof item.price === 'object' ? (
                                           <div className="flex items-center gap-2 text-xs mt-1">
                                             <span className="line-through text-[#f8fcdc]/40">
@@ -1058,6 +1063,11 @@ useEffect(() => {
                                             ${item.price.toFixed(2)}
                                           </div>
                                         )
+                                      )}
+                                      {item.comingSoon && (
+                                        <div className="text-xs text-orange-300 mt-1 italic">
+                                          Available Dec 31
+                                        </div>
                                       )}
                                     </div>
                                   </Link>

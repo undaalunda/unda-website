@@ -679,70 +679,82 @@ return () => {
             <h2 className="stems-title">STEMS & BACKINGS</h2>
             <div className="stems-row">
               {allItems
-                .filter((item) => {
-                  const selectedItems = [
-                    'jyy-drums',
-                    'anomic-guitars-stem',
-                    'feign-keys-stem',
-                    'consonance-guitars',
-                    'the-dark-bass',
-                    'atlantic-guitars-stem',
-                    'red-down-keys',
-                    'dark-wonderful-world-drums-stem'
-                  ];
-                  
-                  return (item.category === 'Backing Track' || item.category === 'Stem') && selectedItems.includes(item.id);
-                })
-                .sort((a, b) => {
-                  const patternOrder = [
-                    'jyy-drums',
-                    'anomic-guitars-stem',
-                    'feign-keys-stem',
-                    'consonance-guitars',
-                    'the-dark-bass',
-                    'atlantic-guitars-stem',
-                    'red-down-keys',
-                    'dark-wonderful-world-drums-stem'
-                  ];
-                  return patternOrder.indexOf(a.id) - patternOrder.indexOf(b.id);
-                })
-                .map((item) => (
-                  <Link
-                    href={item.url || `/product/${item.id}`}
-                    key={item.id}
-                    className="stems-item product-label-link is-backing"
-                  >
-                    <ProductImage
-                      src={item.image}
-                      alt={item.title}
-                      width={200}
-                      height={200}
-                      className="stems-image"
-                      quality={95}
-                      sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
-                    />
-                    <div className="stems-label-group">
-                      <h3 className="sr-only">{`${item.title} – ${item.subtitle}`}</h3>
-                      <p className="stems-title-text">{item.title}</p>
-                      <p className="stems-subtitle-tiny">
-                        {item.subtitle
-                          .replace(' BACKING TRACK', '')
-                          .replace(' STEM', '')
-                          .replace(' TAB', '')}
-                      </p>
-                      <span className="backing-line"></span>
-                      <p className="stems-subtitle-tiny tracking-wide uppercase text-center backing-text">
-                        {item.category === 'Stem' ? 'STEM' : 'BACKING TRACK'}
-                      </p>
-                      <p className="stems-price">
-                        $
-                        {typeof item.price === 'object'
-                          ? item.price.sale.toFixed(2)
-                          : item.price.toFixed(2)}
-                      </p>
-                    </div>
-                  </Link>
-                ))}
+  .filter((item) => {
+    const selectedItems = [
+      'jyy-drums',
+      'anomic-guitars-stem',
+      'feign-keys-stem',
+      'consonance-guitars',
+      'the-dark-bass',
+      'atlantic-guitars-stem',
+      'red-down-keys',
+      'dark-wonderful-world-drums-stem'
+    ];
+    
+    return (item.category === 'Backing Track' || item.category === 'Stem') && selectedItems.includes(item.id);
+  })
+  .sort((a, b) => {
+    const patternOrder = [
+      'jyy-drums',
+      'anomic-guitars-stem',
+      'feign-keys-stem',
+      'consonance-guitars',
+      'the-dark-bass',
+      'atlantic-guitars-stem',
+      'red-down-keys',
+      'dark-wonderful-world-drums-stem'
+    ];
+    return patternOrder.indexOf(a.id) - patternOrder.indexOf(b.id);
+  })
+  .map((item) => (
+    <Link
+      href={item.url || `/product/${item.id}`}
+      key={item.id}
+      className="stems-item product-label-link is-backing"
+    >
+      <div className="relative">
+        <ProductImage
+          src={item.image}
+          alt={item.title}
+          width={200}
+          height={200}
+          className="stems-image"
+          quality={95}
+          sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
+        />
+        {item.comingSoon && (
+          <div className="absolute top-2 right-2 bg-orange-600/50 text-white text-xs px-2 py-1 rounded-md font-semibold border border-orange-500/60">
+            Available Dec 31
+          </div>
+        )}
+      </div>
+      <div className="stems-label-group">
+        <h3 className="sr-only">{`${item.title} – ${item.subtitle}`}</h3>
+        <p className="stems-title-text">{item.title}</p>
+        <p className="stems-subtitle-tiny">
+          {item.subtitle
+            .replace(' BACKING TRACK', '')
+            .replace(' STEM', '')
+            .replace(' TAB', '')}
+        </p>
+        <span className="backing-line"></span>
+        <p className="stems-subtitle-tiny tracking-wide uppercase text-center backing-text">
+          {item.category === 'Stem' ? 'STEM' : 'BACKING TRACK'}
+        </p>
+        <p className="stems-price">
+          {item.comingSoon ? (
+            <span className="invisible">
+              ${typeof item.price === 'object' ? item.price.sale.toFixed(2) : item.price.toFixed(2)}
+            </span>
+          ) : (
+            <span>
+              ${typeof item.price === 'object' ? item.price.sale.toFixed(2) : item.price.toFixed(2)}
+            </span>
+          )}
+        </p>
+      </div>
+    </Link>
+  ))}
             </div>
             <div className="shopall-button-wrapper">
               <Link 
