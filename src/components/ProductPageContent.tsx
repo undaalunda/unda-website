@@ -235,9 +235,15 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                     </div>
                   </div>
 
-                  <div className="mt-1 text-xs font-light tracking-wide">
-                    <span className="text-orange-300/80 italic">COMING SOON</span>
-                  </div>
+                  {product.soldOut ? (
+                    <div className="mt-1 text-xs font-light tracking-wide">
+                      <span className="text-red-400/80 italic">SOLD OUT</span>
+                    </div>
+                  ) : (
+                    <div className="mt-1 text-xs font-light tracking-wide">
+                      <span className="text-orange-300/80 italic">COMING SOON</span>
+                    </div>
+                  )}
                 </>
               )}
 
@@ -337,10 +343,17 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                 </div>
               )}
 
-              <div className="relative mt-6 max-[927px]:mt-4 max-[696px]:mt-3">
+             <div className="relative mt-6 max-[927px]:mt-4 max-[696px]:mt-3">
                 {errorMessage && <CartErrorPopup message={errorMessage} />}
 
-                {product.type === 'physical' ? (
+                {product.soldOut ? (
+                  <button
+                    disabled
+                    className="add-to-cart-button cursor-not-allowed opacity-50 bg-red-900/60 text-white max-[927px]:text-sm max-[696px]:text-xs max-[696px]:py-2 max-[696px]:px-4"
+                  >
+                    SOLD OUT
+                  </button>
+                ) : product.type === 'physical' ? (
                   <button
                     disabled
                     className="add-to-cart-button cursor-not-allowed opacity-50 bg-[#888] text-white max-[927px]:text-sm max-[696px]:text-xs max-[696px]:py-2 max-[696px]:px-4"
@@ -424,7 +437,12 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                             placeholder="blur"
                             blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                           />
-                          {item.comingSoon && (
+                          {item.soldOut && (
+                            <div className="absolute top-2 right-2 bg-red-900/40 text-white text-xs px-2 py-1 rounded-md font-semibold border border-red-800/50">
+                              SOLD OUT
+                            </div>
+                          )}
+                          {item.comingSoon && !item.soldOut && (
                             <div className="absolute top-2 right-2 bg-orange-600/50 text-white text-xs px-2 py-1 rounded-md font-semibold border border-orange-600/80">
                               Available Dec 31
                             </div>
@@ -485,7 +503,12 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                             placeholder="blur"
                             blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                           />
-                          {item.comingSoon && (
+                          {item.soldOut && (
+                            <div className="absolute top-2 right-2 bg-red-900/40 text-white text-xs px-2 py-1 rounded-md font-semibold border border-red-800/50">
+                              SOLD OUT
+                            </div>
+                          )}
+                          {item.comingSoon && !item.soldOut && (
                             <div className="absolute top-2 right-2 bg-orange-600/50 text-white text-xs px-2 py-1 rounded-md font-semibold border border-orange-600/80">
                               Available Dec 31
                             </div>

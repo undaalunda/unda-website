@@ -103,18 +103,30 @@ export default function ShopPageContent({ tab }: { tab?: TabType }) {
                     isBackingTrack ? 'is-backing' : ''
                   }`}
                 >
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    width={200}
-                    height={200}
-                    className="stems-image"
-                    loading="lazy" // 🚀 Lazy loading
-                    quality={75}   // 🎯 ลดจาก 85 → 75
-                    sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px" // 📐 Responsive
-                    placeholder="blur" // 🌟 Smooth loading
-                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-                  />
+                  <div className="relative">
+                    <Image
+                      src={item.image}
+                      alt={item.title}
+                      width={200}
+                      height={200}
+                      className="stems-image"
+                      loading="lazy"
+                      quality={75}
+                      sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
+                      placeholder="blur"
+                      blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                    />
+                    {item.soldOut && (
+                      <div className="absolute top-2 right-2 bg-red-900/40 text-white text-xs px-2 py-1 rounded-md font-semibold border border-red-800/50">
+                        SOLD OUT
+                      </div>
+                    )}
+                    {item.comingSoon && !item.soldOut && (
+                      <div className="absolute top-2 right-2 bg-orange-600/50 text-white text-xs px-2 py-1 rounded-md font-semibold border border-orange-600/80">
+                        Available Dec 31
+                      </div>
+                    )}
+                  </div>
                   <div className="stems-label-group">
                     <p className="stems-title-text">{item.title}</p>
                     <p className="stems-subtitle">

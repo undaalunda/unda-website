@@ -708,11 +708,11 @@ return () => {
   })
   .map((item) => (
     <Link
-      href={item.url || `/product/${item.id}`}
-      key={item.id}
-      className="stems-item product-label-link is-backing"
-    >
-      <div className="relative">
+  href={item.url || `/product/${item.id}`}
+  key={item.id}
+  className="stems-item product-label-link is-backing"
+>
+  <div className="relative">
         <ProductImage
           src={item.image}
           alt={item.title}
@@ -722,7 +722,12 @@ return () => {
           quality={95}
           sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
         />
-        {item.comingSoon && (
+        {item.soldOut && (
+          <div className="absolute top-2 right-2 bg-red-900/40 text-white text-xs px-2 py-1 rounded-md font-semibold border border-red-800/50">
+            SOLD OUT
+          </div>
+        )}
+        {item.comingSoon && !item.soldOut && (
           <div className="absolute top-2 right-2 bg-orange-600/50 text-white text-xs px-2 py-1 rounded-md font-semibold border border-orange-500/60">
             Available Dec 31
           </div>
@@ -775,16 +780,23 @@ return () => {
             <h2 className="stems-title">MUSIC & MERCH</h2>
             <div className="stems-row">
               {homepageItems.map((item) => (
-                <Link href={item.url || `/product/${item.id}`} key={item.id} className="stems-item product-label-link">
-                  <ProductImage 
-                    src={item.image} 
-                    alt={item.title} 
-                    width={200} 
-                    height={200} 
-                    className="stems-image"
-                    quality={95}
-                    sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
-                  />
+  <Link href={item.url || `/product/${item.id}`} key={item.id} className="stems-item product-label-link">
+    <div className="relative">
+      <ProductImage 
+        src={item.image} 
+        alt={item.title} 
+        width={200} 
+        height={200} 
+        className="stems-image"
+        quality={95}
+        sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
+      />
+      {item.soldOut && (
+        <div className="absolute top-2 right-2 bg-red-900/40 text-white text-xs px-2 py-1 rounded-md font-semibold border border-red-800/50">
+          SOLD OUT
+        </div>
+      )}
+    </div>
                   <div className="stems-label-group">
                     <h3 className="sr-only">{`${item.title} – ${item.subtitle.replace(' BACKING TRACK', '').replace(' STEM', '').replace(' TAB', '')}`}</h3>
                     <p className="stems-title-text">{item.title}</p>
