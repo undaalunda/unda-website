@@ -486,7 +486,7 @@ return () => {
               </p>
               <p className="hero-line2">
                 AVAILABLE NOW TO <Link href="/shop/physical" onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'merch')} className="hero-cta-link">PRE-ORDER</Link> &{' '}
-                <a href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0" target="_blank" rel="noopener noreferrer" className="hero-cta-link">
+                <a href="https://orcd.co/UndaAlunda_DarkWonderfulWorld" target="_blank" rel="noopener noreferrer" className="hero-cta-link">
                   PRE-SAVE
                 </a>
               </p>
@@ -498,7 +498,7 @@ return () => {
               <p className="hero-line2">AVAILABLE NOW TO</p>
               <p className="hero-line2">
                 <Link href="/shop/physical" onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'merch')} className="hero-cta-link">PRE-ORDER</Link> &{' '}
-                <a href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0" target="_blank" rel="noopener noreferrer" className="hero-cta-link">
+                <a href="https://orcd.co/UndaAlunda_DarkWonderfulWorld" target="_blank" rel="noopener noreferrer" className="hero-cta-link">
                   PRE-SAVE
                 </a>
               </p>
