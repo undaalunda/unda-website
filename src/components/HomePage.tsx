@@ -591,20 +591,28 @@ return () => {
           >
             STEMS & SAMPLES
           </Link>
-          <Link 
-            href="/shop/physical" 
-            onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'merch')}
-            className="info-button"
-          >
-            MERCH
-          </Link>
-          <Link 
-            href="/shop/physical" 
-            onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'music')}
-            className="info-button"
-          >
-            PHYSICAL ALBUMS
-          </Link>
+          <div
+  className="info-button"
+  style={{
+    cursor: 'not-allowed',
+    opacity: 0.5,
+    pointerEvents: 'none',
+    position: 'relative'
+  }}
+>
+  MERCH
+</div>
+<div
+  className="info-button"
+  style={{
+    cursor: 'not-allowed',
+    opacity: 0.5,
+    pointerEvents: 'none',
+    position: 'relative'
+  }}
+>
+  PHYSICAL ALBUMS
+</div>
           <a
             href="https://undaalunda.bandcamp.com/album/dark-wonderful-world-live-in-thailand"
             className="info-button"
@@ -614,6 +622,7 @@ return () => {
             DIGITAL ALBUMS
           </a>
         </div>
+        
         <p className="since-note">Delivering Worldwide Since 2025</p>
 
         {/* TRANSCRIPTION SECTION - 🚀 OPTIMIZED */}
