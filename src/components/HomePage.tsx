@@ -498,7 +498,7 @@ return () => {
               <p className="hero-line1"><span className="highlight">December 31<sup style={{ fontSize: '0.6em', marginLeft: '-0.1em' }}>st</sup> 2025</span></p>
               <p className="hero-line2">AVAILABLE NOW TO</p>
               <p className="hero-line2">
-                <Link href="/shop" onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'merch')} className="hero-cta-link">PRE-ORDER</Link> &{' '}
+                <Link href="/shop" onClick={createNavigationHandler('/shop', undefined, undefined, 'merch')} className="hero-cta-link">PRE-ORDER</Link> &{' '}
                 <a href="https://orcd.co/UndaAlunda_DarkWonderfulWorld" target="_blank" rel="noopener noreferrer" className="hero-cta-link">
                   PRE-SAVE
                 </a>
