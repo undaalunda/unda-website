@@ -236,14 +236,14 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                   </div>
 
                   {product.soldOut ? (
-                    <div className="mt-1 text-xs font-light tracking-wide">
-                      <span className="text-red-400/80 italic">SOLD OUT</span>
-                    </div>
-                  ) : (
-                    <div className="mt-1 text-xs font-light tracking-wide">
-                      <span className="text-orange-300/80 italic">COMING SOON</span>
-                    </div>
-                  )}
+  <div className="mt-1 text-xs font-light tracking-wide">
+    <span className="text-red-400/80 italic">SOLD OUT</span>
+  </div>
+) : (
+  <div className="mt-1 text-xs font-light tracking-wide">
+    <span className="text-green-400/80 italic">IN STOCK</span>
+  </div>
+)}
                 </>
               )}
 
@@ -347,20 +347,13 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                 {errorMessage && <CartErrorPopup message={errorMessage} />}
 
                 {product.soldOut ? (
-                  <button
-                    disabled
-                    className="add-to-cart-button cursor-not-allowed opacity-50 bg-red-900/60 text-white max-[927px]:text-sm max-[696px]:text-xs max-[696px]:py-2 max-[696px]:px-4"
-                  >
-                    SOLD OUT
-                  </button>
-                ) : product.type === 'physical' ? (
-                  <button
-                    disabled
-                    className="add-to-cart-button cursor-not-allowed opacity-50 bg-[#888] text-white max-[927px]:text-sm max-[696px]:text-xs max-[696px]:py-2 max-[696px]:px-4"
-                  >
-                    Coming Soon
-                  </button>
-                ) : product.comingSoon ? (
+  <button
+    disabled
+    className="add-to-cart-button cursor-not-allowed opacity-50 bg-red-900/60 text-white max-[927px]:text-sm max-[696px]:text-xs max-[696px]:py-2 max-[696px]:px-4"
+  >
+    SOLD OUT
+  </button>
+) : product.comingSoon ? (
                   <button
                     disabled
                     className="add-to-cart-button cursor-not-allowed opacity-70 bg-orange-600/50 text-white max-[927px]:text-sm max-[696px]:text-xs max-[696px]:py-2 max-[696px]:px-4"

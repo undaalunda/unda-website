@@ -554,12 +554,10 @@ export default function SoloCollectionPage({
     <span className="backing-line" />
     <p className="stems-subtitle-tiny">TABS</p>
     <p className="stems-price">
-      {product.comingSoon ? (
-        <span className="invisible">${(product.price as number).toFixed(2)}</span>
-      ) : (
-        <span>${(product.price as number).toFixed(2)}</span>
-      )}
-    </p>
+  {!product.comingSoon && (
+    <span>${(product.price as number).toFixed(2)}</span>
+  )}
+</p>
   </div>
 </div>
                     ) : (
@@ -581,7 +579,11 @@ export default function SoloCollectionPage({
                           <p className="stems-subtitle">{(product as any).instrument?.toUpperCase() || 'GUITAR'}</p>
                           <span className="backing-line" />
                           <p className="stems-subtitle-tiny">TABS</p>
-                          <p className="stems-price">${(product.price as number).toFixed(2)}</p>
+                          <p className="stems-price">
+  {!product.comingSoon && (
+    <span>${(product.price as number).toFixed(2)}</span>
+  )}
+</p>
                         </div>
                       </div>
                     );

@@ -32,8 +32,8 @@ export async function POST(req: NextRequest) {
     const payload: any = {
       customerDetails: {
         shipperDetails: {
-          postalCode: '10200',
-          cityName: 'Bangkok',
+          postalCode: '73000',
+          cityName: 'Nakhon Pathom',
           countryCode: 'TH',
         },
         receiverDetails: {

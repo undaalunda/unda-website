@@ -306,10 +306,14 @@ export default function PhysicalShopContent({ initialTab }: { initialTab?: Physi
 
                   return (
                     <div
-                      key={item.id}
-                      onClick={(e) => handleProductClick(item, e)}
-                      className="stems-item product-label-link cursor-pointer"
-                    >
+  key={item.id}
+  onClick={(e) => (item.available || !item.comingSoon) ? handleProductClick(item, e) : null}
+  className={`stems-item product-label-link ${
+    item.available || !item.comingSoon 
+      ? 'cursor-pointer' 
+      : 'opacity-60 cursor-not-allowed'
+  }`}
+>
                       <div className="relative">
                         <Image
                           src={item.image}
@@ -328,16 +332,18 @@ export default function PhysicalShopContent({ initialTab }: { initialTab?: Physi
                             SOLD OUT
                           </div>
                         )}
-                        {item.comingSoon && !item.soldOut && (
-                          <div className="absolute top-2 right-2 bg-orange-600/50 text-white text-xs px-2 py-1 rounded-md font-semibold border border-orange-600/80">
-                            Available Dec 31
-                          </div>
-                        )}
+                        {item.available && item.comingSoon && !item.soldOut && (
+  <div className="absolute top-2 right-2 bg-orange-600/50 text-white text-xs px-2 py-1 rounded-md font-semibold border border-orange-600/80">
+    Available Dec 31
+  </div>
+)}
                       </div>
                       <div className="stems-label-group">
                         <p className="stems-title-text text-[#d37142]">{item.title}</p>
                         <p className="stems-subtitle-tiny">{item.subtitle}</p>
-                        <p className="stems-price">{displayPrice}</p>
+                        <p className="stems-price">
+  {(!item.comingSoon || item.available) && displayPrice}
+</p>
                       </div>
                     </div>
                   );

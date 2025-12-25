@@ -254,6 +254,7 @@ return () => {
   return (
     <AppClientWrapper>
       <style jsx global>{`
+      
         /* Aggressively hide ALL video controls */
         video::-webkit-media-controls {
           display: none !important;
@@ -485,7 +486,7 @@ return () => {
                 THE NEW ALBUM'S COMING <span className="highlight">December 31<sup style={{ fontSize: '0.6em', marginLeft: '-0.1em' }}>st</sup> 2025</span>
               </p>
               <p className="hero-line2">
-                AVAILABLE NOW TO <Link href="/shop/physical" onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'merch')} className="hero-cta-link">PRE-ORDER</Link> &{' '}
+                AVAILABLE NOW TO <Link href="/shop" className="hero-cta-link">PRE-ORDER</Link> &{' '}
                 <a href="https://orcd.co/UndaAlunda_DarkWonderfulWorld" target="_blank" rel="noopener noreferrer" className="hero-cta-link">
                   PRE-SAVE
                 </a>
@@ -765,69 +766,6 @@ return () => {
               <Link 
                 href="/shop/digital/dark-wonderful-world" 
                 onClick={createNavigationHandler('/shop/digital/dark-wonderful-world', 'backing', 'all')}
-                className="info-button"
-              >
-                SHOP ALL
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* MUSIC & MERCH - 🚀 OPTIMIZED */}
-        <section className="stems-section">
-          <div ref={musicMerchRef} className={`fade-trigger ${showMerch ? 'fade-in' : ''}`}>
-            <p className="stems-sub">MUSIC IN YOUR HANDS</p>
-            <h2 className="stems-title">MUSIC & MERCH</h2>
-            <div className="stems-row">
-              {homepageItems.map((item) => (
-  <Link href={item.url || `/product/${item.id}`} key={item.id} className="stems-item product-label-link">
-    <div className="relative">
-      <ProductImage 
-        src={item.image} 
-        alt={item.title} 
-        width={200} 
-        height={200} 
-        className="stems-image"
-        quality={95}
-        sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
-      />
-      {item.soldOut && (
-        <div className="absolute top-2 right-2 bg-red-900/40 text-white text-xs px-2 py-1 rounded-md font-semibold border border-red-800/50">
-          SOLD OUT
-        </div>
-      )}
-    </div>
-                  <div className="stems-label-group">
-                    <h3 className="sr-only">{`${item.title} – ${item.subtitle.replace(' BACKING TRACK', '').replace(' STEM', '').replace(' TAB', '')}`}</h3>
-                    <p className="stems-title-text">{item.title}</p>
-                    <p className="stems-subtitle-tiny">
-                      {item.subtitle
-                        .replace(' BACKING TRACK', '')
-                        .replace(' STEM', '')
-                        .replace(' TAB', '')}
-                    </p>
-                    <p className="stems-price">
-                      {typeof item.price === 'object' && item.price !== null
-                        ? <>
-                            <span className="line-through mr-1 text-[#f8fcdc]">
-                              ${item.price.original.toFixed(2)}
-                            </span>
-                            <span className="text-[#cc3f33]">
-                              ${item.price.sale.toFixed(2)}
-                            </span>
-                          </>
-                        : typeof item.price === 'number'
-                          ? `$${item.price.toFixed(2)}`
-                          : null}
-                    </p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-            <div className="shopall-button-wrapper">
-              <Link 
-                href="/shop/physical" 
-                onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'merch')}
                 className="info-button"
               >
                 SHOP ALL

@@ -108,24 +108,52 @@ const filtered = useMemo(() => {
   const queryWords = q.split(/\s+/);
 
   return q.length > 0
-    ? allItems.filter((item) => {
-        const fields = [
-          item.title,
-          item.subtitle,
-          item.category,
-          item.description,
-          ...(item.tags || []),
-          typeof item.price === 'number'
-            ? item.price.toString()
-            : `${item.price?.original || ''} ${item.price?.sale || ''}`
-        ]
-          .filter(Boolean)
-          .map((val) => String(val).toLowerCase());
+    ? allItems
+        .filter((item) => {
+          // ❌ ไม่แสดง Physical products
+          if (item.type === 'physical') return false;
+          
+          // ❌ ไม่แสดง Keys/Bass/Drums Tabs
+          if (
+            item.category === 'Tabs' && 
+            (item.instrument === 'Keys' || item.instrument === 'Bass' || item.instrument === 'Drums')
+          ) {
+            return false;
+          }
+          
+          // ❌ ไม่แสดง Solo Collection Guitar Tabs
+          if (
+            item.category === 'Tabs' && 
+            item.instrument === 'Guitar' &&
+            (item.tags.includes('contest') || 
+             item.tags.includes('abasi') || 
+             item.tags.includes('mayones') || 
+             item.tags.includes('vola'))
+          ) {
+            return false;
+          }
+          
+          // ✅ แสดงเฉพาะสินค้าที่ comingSoon: true
+          return item.comingSoon === true;
+        })
+        .filter((item) => {
+          const fields = [
+            item.title,
+            item.subtitle,
+            item.category,
+            item.description,
+            ...(item.tags || []),
+            typeof item.price === 'number'
+              ? item.price.toString()
+              : `${item.price?.original || ''} ${item.price?.sale || ''}`
+          ]
+            .filter(Boolean)
+            .map((val) => String(val).toLowerCase());
 
-        return queryWords.every((word) =>
-          fields.some((field) => field.includes(word))
-        );
-      })
+          return queryWords.every((word) =>
+            fields.some((field) => field.includes(word))
+          );
+        })
     : [];
 }, [delayedQuery]);
 

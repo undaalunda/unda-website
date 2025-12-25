@@ -669,20 +669,23 @@ export default function CheckoutForm() {
             }),
           });
 
-          const saveRes = await fetch('/api/save-order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              billingInfo: trimmedBilling,
-              shippingInfo: shipToDifferent ? trimmedShipping : trimmedBilling,
-              cartItems,
-              shippingMethod,
-              shippingZone,
-              shippingRate,
-              email: trimmedBilling.email,
-              orderId,
-            }),
-          });
+          const totalWeight = calculateCartWeight(cartItems);
+
+const saveRes = await fetch('/api/save-order', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    billingInfo: trimmedBilling,
+    shippingInfo: shipToDifferent ? trimmedShipping : trimmedBilling,
+    cartItems,
+    shippingMethod,
+    shippingZone,
+    shippingRate,
+    email: trimmedBilling.email,
+    orderId,
+    totalWeight,
+  }),
+});
 
           const saveData = await saveRes.json();
 

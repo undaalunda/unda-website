@@ -1,4 +1,4 @@
-//ShopLandingContent.tsx - CSS Colors Version
+//ShopLandingContent.tsx - CSS Colors Version with Badge
 'use client';
 
 import React from 'react';
@@ -15,10 +15,10 @@ export default function ShopLandingContent() {
         <div className="shop-landing-cards-container">
           <div className="shop-landing-cards-grid min-[1281px]:grid min-[1281px]:grid-cols-2 min-[1281px]:gap-8">
             
-            {/* Physical Shop Card - CSS Colors */}
-            <div className="shop-landing-card-item group">
-              <Link href="/shop/physical" className="block">
-                <div className="shop-landing-card bg-gradient-to-br from-[rgba(252,194,118,0.15)] via-[rgba(211,113,66,0.12)] to-[rgba(120,26,26,0.08)] border border-[rgba(252,194,118,0.3)] hover:border-[rgba(252,194,118,0.5)] hover:shadow-2xl hover:shadow-[rgba(252,194,118,0.2)]">
+            {/* Physical Shop Card - CSS Colors - DISABLED */}
+            <div className="shop-landing-card-item group cursor-not-allowed">
+              <div className="block pointer-events-none relative">
+                <div className="shop-landing-card bg-gradient-to-br from-[rgba(252,194,118,0.15)] via-[rgba(211,113,66,0.12)] to-[rgba(120,26,26,0.08)] border border-[rgba(252,194,118,0.3)] opacity-40">
                   
                   {/* Content */}
                   <div className="shop-landing-card-content">
@@ -31,16 +31,21 @@ export default function ShopLandingContent() {
                   </div>
                   
                   <div className="shop-landing-card-button-wrapper">
-                    <div className="shop-landing-card-button bg-gradient-to-r from-[#d37142] via-[#781a1a] to-[#4a1111] hover:from-[#781a1a] hover:via-[#4a1111] hover:to-[#2d0a0a] shadow-lg shadow-[rgba(252,194,118,0.3)]">
+                    <div className="shop-landing-card-button bg-gradient-to-r from-[#d37142] via-[#781a1a] to-[#4a1111] shadow-lg shadow-[rgba(252,194,118,0.3)]">
                       Shop Physical
                     </div>
                   </div>
                 </div>
-              </Link>
+
+                {/* Coming Soon Badge - Bronze/Brown tone */}
+                <div className="absolute top-4 right-4 bg-[rgba(139,90,43,0.7)] text-[rgba(210,180,140,0.95)] px-4 py-2 rounded-full text-sm font-semibold border border-[rgba(160,120,80,0.4)] backdrop-blur-sm shadow-md">
+                  Coming Soon
+                </div>
+              </div>
             </div>
 
             {/* Digital Shop Card - CSS Colors */}
-            <div className="shop-landing-card-item group">
+            <div className="shop-landing-card-item group cursor-pointer">
               <Link href="/shop/digital" className="block">
                 <div className="shop-landing-card shop-landing-digital-card bg-gradient-to-br from-[rgba(91,129,153,0.15)] via-[rgba(37,60,80,0.12)] to-[rgba(16,33,52,0.08)] border border-[rgba(91,129,153,0.3)] hover:border-[rgba(91,129,153,0.5)] hover:shadow-2xl hover:shadow-[rgba(91,129,153,0.2)]">
                   <div className="shop-landing-card-content">
@@ -52,7 +57,7 @@ export default function ShopLandingContent() {
                     </p>
                   </div>
                   <div className="shop-landing-card-button-wrapper">
-                    <div className="shop-landing-card-button shop-landing-digital-button bg-gradient-to-r from-[#253c50] via-[#102134] to-[#0a1421] hover:from-[#102134] hover:via-[#0a1421] hover:to-[#050c14] shadow-lg shadow-[rgba(91,129,153,0.3)]">
+                    <div className="shop-landing-card-button shop-landing-digital-button bg-gradient-to-r from-[#253c50] via-[#102134] to-[#0a1421] shadow-lg shadow-[rgba(91,129,153,0.3)]">
                       Shop Digital
                     </div>
                   </div>

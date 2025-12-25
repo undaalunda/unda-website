@@ -216,11 +216,39 @@ useEffect(() => {
   
 
   const filtered = useMemo(() => {
-    const q = delayedQuery.toLowerCase().trim();
-    const queryWords = q.split(/\s+/); // แยก query เป็นคำๆ
+  const q = delayedQuery.toLowerCase().trim();
+  const queryWords = q.split(/\s+/);
 
-    return q.length > 0
-      ? allItems.filter((item) => {
+  return q.length > 0
+    ? allItems
+        .filter((item) => {
+          // ❌ ไม่แสดง Physical products
+          if (item.type === 'physical') return false;
+          
+          // ❌ ไม่แสดง Keys/Bass/Drums Tabs
+          if (
+            item.category === 'Tabs' && 
+            (item.instrument === 'Keys' || item.instrument === 'Bass' || item.instrument === 'Drums')
+          ) {
+            return false;
+          }
+          
+          // ❌ ไม่แสดง Solo Collection Guitar Tabs
+          if (
+            item.category === 'Tabs' && 
+            item.instrument === 'Guitar' &&
+            (item.tags.includes('contest') || 
+             item.tags.includes('abasi') || 
+             item.tags.includes('mayones') || 
+             item.tags.includes('vola'))
+          ) {
+            return false;
+          }
+          
+          // ✅ แสดงเฉพาะสินค้าที่ comingSoon: true
+          return item.comingSoon === true;
+        })
+        .filter((item) => {
           const fields = [
             item.title,
             item.subtitle,
@@ -234,13 +262,12 @@ useEffect(() => {
             .filter(Boolean)
             .map((val) => String(val).toLowerCase());
 
-          // ✅ ตรวจว่า "ทุกคำที่พิมพ์มา" ต้อง match กับ field อะไรก็ได้
           return queryWords.every((word) =>
             fields.some((field) => field.includes(word))
           );
         })
-      : [];
-  }, [delayedQuery]);
+    : [];
+}, [delayedQuery]);
 
   const suggestions = useMemo(() => {
     const q = delayedQuery.toLowerCase();

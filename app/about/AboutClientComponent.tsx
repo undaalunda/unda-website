@@ -1,4 +1,4 @@
-// AboutClientComponent.tsx - Fixed TypeScript Errors 🎨
+// AboutClientComponent.tsx - Updated Content with YouTube Button 🎨
 
 'use client';
 
@@ -35,86 +35,50 @@ const fadeInSection: Variants = {
   },
 };
 
-// 🚀 Memoized paragraph data (unchanged)
+// 🚀 Updated paragraph data - รวม button ไว้ใน section เดียวกัน
 const styledParagraphs = [
   {
-    text: `Unda Alunda began hearing those sounds as a child.\nAt the age of 11, he started using the guitar as his own language.\nAnd ever since, "sound" has become both his voice—and his way of being—in this world.`,
+    text: `Unda Alunda first began hearing these sounds as a child.\nAt the age of eleven, he started using the guitar as his own language.\nSince then, sound has become both his voice and his way of existing in the world.`,
     className: 'mt-24 text-left'
   },
   {
-    text: `At 15, he began formally studying jazz music.\nHe went on to earn top honors in both Theory and Ear Training at the College of Music, Mahidol University, where he studied from high school through graduation.`,
+    text: `At fifteen, he began formally studying jazz music.\nHe later earned top honors in both Music Theory and Ear Training at the College of Music, Mahidol University,\nwhere he studied from high school through graduation.`,
     className: 'text-left'
   },
   {
-    text: `From a young age, he believed that to create music free from bias and stylistic constraint—\nto truly honor spirit, imagination, creativity, and feeling above tradition or theory—`,
+    text: `From a young age, Unda believed that creating music free from bias and stylistic limitation—\nmusic that truly honors spirit, imagination, creativity, and feeling above tradition or theory—\nrequires deep knowledge and discipline first.`,
     className: 'italic text-[#f8fcdc]/90 text-left'
   },
   {
-    text: `One must first possess enough knowledge and discipline\nto let go of control.\nTo let the body speak.\nTo let music come through… as sound.`,
+    text: `Only then can control be released,\nthe body allowed to speak,\nand music allowed to emerge simply as sound.`,
     className: 'font-semibold text-[#dc9e63] text-left'
   },
   {
-    text: `Sometimes it arrives as a note.\nSometimes as a long, stretching silence.\nAnd sometimes… as a question he keeps asking himself:`,
+    text: `Sometimes that sound appears as a single note.\nSometimes as a long, stretching silence.\nAnd sometimes as a question he continues to ask himself:`,
     className: 'text-left'
   },
   {
-    text: `"Without music… would I still be me?"`,
+    text: `"Without music, would I still be me?"`,
     className: 'text-center italic text-2xl text-[#dc9e63] mt-10 mb-10',
   },
   {
-    text: `Unda spent much of his childhood practicing guitar 10–15 hours a day,\nand began composing music not long after.`,
+    text: `Throughout his childhood, Unda spent ten to fifteen hours a day practicing guitar,\nand he began composing music not long after.`,
     className: 'text-left'
   },
   {
-    text: `Those sounds were gradually shaped and refined,\nbuilt up slowly from the hands of a 19-year-old.\n\nThey became songs.\nThey became melodies.\nAnd eventually… they became a safe place—\nwhere he could feel completely, quietly, himself.`,
+    text: `Over time, those sounds were shaped and refined,\nslowly built through the hands of a nineteen-year-old.\n\nThey became songs, melodies,\nand eventually a safe place—\nwhere he could feel completely and quietly himself.`,
     className: 'text-left'
   },
   {
-    text: `That journey led him to the stage of Overdrive Guitar Contest XI,\nthe biggest guitar competition in Thailand,\nwhere he performed Against and First Aid,\ntwo original songs born from trial, error, and inner searching.`,
+    text: `In his early twenties,\nUnda began spending more time living.\nHe gathered real experiences,\nsought inspiration,\nand met new people,\neach leaving their own trace behind.`,
     className: 'text-left'
   },
   {
-    text: `He shared them publicly for the first time—\nand won first prize.`,
-    className: 'font-semibold text-center'
-  },
-  {
-    text: `It was the moment when the name "Unda Alunda" first began to be spoken in Thailand.`,
-    className: 'text-center font-semibold mb-15'
-  },
-  {
-    text: `Not long after,\nhe won Hardrock Pattaya Guitar Battle 2019,\njudged by world-class artists Alex Hutchings and Matteo Mancuso—\na milestone that further amplified the reach of his voice.`,
-    className: 'text-left mt-10'
-  },
-  {
-    text: `But that voice wouldn't stay within Thailand for long.`,
-    className: 'italic text-left mb-10'
-  },
-  {
-    text: `In 2020, he submitted an entry to the international Abasi Neural Contest,\nheld by Neural DSP in collaboration with Tosin Abasi of Animals as Leaders.\nOut of over 600 submissions from around the world—he won.`,
+    text: `Whether through joy or sorrow, light or darkness,\nmusic has always been the vessel through which he expresses who he is.\nIt continues to carry him,\njust as it did in the beginning.`,
     className: 'text-left'
   },
   {
-    text: `Not only did he earn the judges' respect,\nbut Tosin also invited him to officially join Abasi Concepts as a signed artist.`,
-    className: 'text-left'
-  },
-  {
-    text: `The following year, he received the highest jury scores\nfrom Aaron Marshall (Intervals), Jakub Zytecki, and Sam Jacobs\nin the MRNB Contest, which featured thousands of players globally.`,
-    className: 'text-left'
-  },
-  {
-    text: `And slowly, his name began to spread—\nhis Instagram following grew steadily\nas many world-renowned guitarists and composers\nbegan to listen.\nTo pay attention.\nTo hear what he had to say… through sound.`,
-    className: 'text-left'
-  },
-  {
-    text: `In his early twenties,\nUnda began spending more time living—\ngathering real experiences,\nseeking inspiration,\nmeeting new people,\neach of whom left a trace.`,
-    className: 'text-left'
-  },
-  {
-    text: `Whether joy or sorrow, light or darkness,\nmusic has always been the vessel through which he's expressed who he is.\nAnd it continues to carry him—\nas it did in the beginning.`,
-    className: 'text-left'
-  },
-  {
-    text: `Until finally…\nthose sounds came together as his first full-length album:`,
+    text: `All of these sounds eventually came together as his first full-length album:`,
     className: 'italic text-center'
   },
   {
@@ -124,27 +88,21 @@ const styledParagraphs = [
   {
     text: `Recorded live for the first time in Thailand\nin April 2024.`,
     className: 'text-sm text-center italic mt-10'
-  },
-  {
-    text: `Live performance at Mahidol University, Nakhon Pathom in Thailand.`,
-    className: 'text-sm text-center italic mb-24'
   }
 ] as const;
 
-// 🚀 Memoized section ranges (unchanged)
+// 🚀 Updated section ranges - รวมทุกอย่างเข้า section สุดท้าย
 const sectionRanges = [
   [0, 6],
   [6, 11],
-  [11, 17],
-  [17, 19],
-  [19, 23],
+  [11, 13], // รวมทั้ง text และ button
 ] as const;
 
 export default function AboutClientComponent() {
   const [showScrollHint, setShowScrollHint] = useState(true);
   const scrollHintTriggerRef = useRef<HTMLDivElement | null>(null);
 
-  // 🚀 Memoized scroll handler (unchanged)
+  // 🚀 Memoized scroll handler
   const handleScroll = useCallback(() => {
     const rect = scrollHintTriggerRef.current?.getBoundingClientRect();
     if (!rect) return;
@@ -158,7 +116,7 @@ export default function AboutClientComponent() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
 
-  // 🚀 Memoized viewport settings (unchanged)
+  // 🚀 Memoized viewport settings
   const viewportSettings = useMemo(() => ({ 
     once: true, 
     amount: 0.6 
@@ -171,7 +129,7 @@ export default function AboutClientComponent() {
         {/* 🎯 Invisible H1 for SEO only */}
         <h1 className="sr-only">About Unda Alunda</h1>
 
-        {/* 🎨 Your original artistic sections - completely unchanged */}
+        {/* 🎨 Updated opening sections */}
         <motion.section
           className="min-h-screen flex items-center justify-center text-center"
           initial="hidden"
@@ -183,7 +141,7 @@ export default function AboutClientComponent() {
             variants={fadeInUp}
             custom={0}
           >
-            Have you ever heard a song that seems to know you better than you know yourself..?
+            Have you ever heard a song that seems to understand you better than you understand yourself?
           </motion.h2>
         </motion.section>
 
@@ -200,7 +158,7 @@ export default function AboutClientComponent() {
             variants={fadeInUp}
             custom={1}
           >
-            When was the last time you truly felt like yourself..?
+            When was the last time you truly felt like yourself?
           </motion.h3>
         </motion.section>
 
@@ -212,24 +170,24 @@ export default function AboutClientComponent() {
           variants={fadeInSection}
         >
           <motion.p className="text-2xl sm:text-3xl font-light italic tracking-wide" variants={fadeInUp} custom={2}>
-            Sometimes, there's something within us that defies explanation.
+            Sometimes, there is something within us that cannot be explained.
           </motion.p>
           <motion.p className="text-xl sm:text-2xl" variants={fadeInUp} custom={3}>
-            It's not words.
+            It is not words.
           </motion.p>
           <motion.p className="text-xl sm:text-2xl" variants={fadeInUp} custom={4}>
-            It's not logic.
+            It is not logic.
           </motion.p>
           <motion.p className="text-xl sm:text-2xl text-[#dc9e63] font-semibold" variants={fadeInUp} custom={5}>
-            But it knows us—deeply, clearly.
+            Yet it knows us deeply and clearly,
           </motion.p>
           <motion.p className="text-xl sm:text-2xl italic" variants={fadeInUp} custom={6}>
-            Even in moments when we barely recognize ourselves.
+            even in moments when we barely recognize who we are.
           </motion.p>
         </motion.section>
 
-        {/* 📖 Your original story sections - completely unchanged */}
-        {sectionRanges.map(([start, end], sectionIndex) => (
+        {/* 📖 Story sections - Section 1 & 2 */}
+        {sectionRanges.slice(0, 2).map(([start, end], sectionIndex) => (
           <motion.section
             key={sectionIndex}
             className="min-h-screen flex flex-col items-center justify-center text-center space-y-4"
@@ -251,7 +209,49 @@ export default function AboutClientComponent() {
           </motion.section>
         ))}
 
-        {/* 🚀 Your original scroll hint - unchanged */}
+        {/* 📖 Final Section - รวม text + button */}
+        <motion.section
+          className="min-h-screen flex flex-col items-center justify-center text-center space-y-4 pb-20"
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportSettings}
+          variants={fadeInSection}
+        >
+          {/* Text content */}
+          {styledParagraphs.slice(11, 13).map((p, i) => (
+            <motion.p
+              key={i}
+              className={`text-lg sm:text-xl ${p.className}`}
+              variants={fadeInUp}
+              custom={i + 1}
+            >
+              {p.text}
+            </motion.p>
+          ))}
+
+          {/* 🎥 YouTube Button - ต่อจาก text เลย */}
+          <motion.a
+            href="https://www.youtube.com/watch?v=ZxudWBd_0KQ&t=947s"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="video-hero-button mt-8"
+            style={{ 
+              fontWeight: '100',
+              letterSpacing: '0.08em',
+              display: 'inline-flex',
+              alignItems: 'center'
+            }}
+            variants={fadeInUp}
+            custom={3}
+          >
+            <svg width="10" height="12" viewBox="0 0 10 12" fill="#f8fcdc" style={{ marginRight: '0.5rem', transition: 'fill 0.3s ease' }}>
+              <path d="M0 0L10 6L0 12V0Z"/>
+            </svg>
+            WATCH FULL VIDEO
+          </motion.a>
+        </motion.section>
+
+        {/* 🚀 Scroll hint */}
         <AnimatePresence>
           {showScrollHint && (
             <motion.div
