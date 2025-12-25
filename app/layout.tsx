@@ -271,6 +271,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <meta name="author" content="Unda Alunda" />
         <meta name="publisher" content="Unda Alunda" />
         <meta name="theme-color" content="#160000" />
+        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#160000" />
+        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#160000" />
+        <meta name="msapplication-TileColor" content="#160000" />
+        <meta name="msapplication-navbutton-color" content="#160000" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" /> 
         <meta name="apple-mobile-web-app-title" content="Unda Alunda" />
