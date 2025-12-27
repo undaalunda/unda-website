@@ -28,15 +28,212 @@ const getDownloadFileForItem = (item: CartItem): string | null => {
     ];
     
     const downloadMap: Record<string, string> = {
-      'anomic-drums': '/files/anomic-drums.wav',
-      'jyy-guitars': '/files/jyy-guitars.wav', 
-      'atlantic-guitar': '/files/atlantic-guitar.wav',
-      'out-dark-drums': '/files/out-dark-drums.wav',
-      'feign-guitars': '/files/feign-guitars.wav',
-      'dark-keys': '/files/dark-keys.wav',
-      'reddown-bass': '/files/reddown-bass.wav',
-      'quietness-bass': '/files/quietness-bass.wav',
-    };
+  // ========== BACKING TRACKS ==========
+  // THE DARK
+  'the-dark-guitars': '/files/the-dark-guitars-backing.wav',
+  'the-dark-lead-guitar': '/files/the-dark-lead-guitar-backing.wav',
+  'the-dark-keys': '/files/the-dark-keys-backing.wav',
+  'the-dark-bass': '/files/the-dark-bass-backing.wav',
+  'the-dark-drums': '/files/the-dark-drums-backing.wav',
+  
+  // ANOMIC
+  'anomic-guitars': '/files/anomic-guitars-backing.wav',
+  'anomic-lead-guitar': '/files/anomic-lead-guitar-backing.wav',
+  'anomic-keys': '/files/anomic-keys-backing.wav',
+  'anomic-bass': '/files/anomic-bass-backing.wav',
+  'anomic-drums': '/files/anomic-drums-backing.wav',
+  
+  // CONSONANCE
+  'consonance-guitars': '/files/consonance-guitars-backing.wav',
+  'consonance-lead-guitar': '/files/consonance-lead-guitar-backing.wav',
+  'consonance-keys': '/files/consonance-keys-backing.wav',
+  'consonance-bass': '/files/consonance-bass-backing.wav',
+  'consonance-drums': '/files/consonance-drums-backing.wav',
+  
+  // JYY
+  'jyy-guitars': '/files/jyy-guitars-backing.wav',
+  'jyy-lead-guitar': '/files/jyy-lead-guitar-backing.wav',
+  'jyy-keys': '/files/jyy-keys-backing.wav',
+  'jyy-bass': '/files/jyy-bass-backing.wav',
+  'jyy-drums': '/files/jyy-drums-backing.wav',
+  
+  // OUT OF THE DARK
+  'out-of-the-dark-guitars': '/files/out-of-the-dark-guitars-backing.wav',
+  'out-of-the-dark-lead-guitar': '/files/out-of-the-dark-lead-guitar-backing.wav',
+  'out-of-the-dark-keys': '/files/out-of-the-dark-keys-backing.wav',
+  'out-of-the-dark-bass': '/files/out-of-the-dark-bass-backing.wav',
+  'out-of-the-dark-drums': '/files/out-of-the-dark-drums-backing.wav',
+  
+  // RED DOWN
+  'red-down-guitars': '/files/red-down-guitars-backing.wav',
+  'red-down-lead-guitar': '/files/red-down-lead-guitar-backing.wav',
+  'red-down-keys': '/files/red-down-keys-backing.wav',
+  'red-down-bass': '/files/red-down-bass-backing.wav',
+  'red-down-drums': '/files/red-down-drums-backing.wav',
+  
+  // ATLANTIC
+  'atlantic-guitars': '/files/atlantic-guitars-backing.wav',
+  'atlantic-lead-guitar': '/files/atlantic-lead-guitar-backing.wav',
+  'atlantic-keys': '/files/atlantic-keys-backing.wav',
+  'atlantic-bass': '/files/atlantic-bass-backing.wav',
+  'atlantic-drums': '/files/atlantic-drums-backing.wav',
+  
+  // FEIGN
+  'feign-guitars': '/files/feign-guitars-backing.wav',
+  'feign-lead-guitar': '/files/feign-lead-guitar-backing.wav',
+  'feign-keys': '/files/feign-keys-backing.wav',
+  'feign-bass': '/files/feign-bass-backing.wav',
+  'feign-drums': '/files/feign-drums-backing.wav',
+  
+  // DARK WONDERFUL WORLD
+  'dark-wonderful-world-guitars': '/files/dark-wonderful-world-guitars-backing.wav',
+  'dark-wonderful-world-lead-guitar': '/files/dark-wonderful-world-lead-guitar-backing.wav',
+  'dark-wonderful-world-keys': '/files/dark-wonderful-world-keys-backing.wav',
+  'dark-wonderful-world-bass': '/files/dark-wonderful-world-bass-backing.wav',
+  'dark-wonderful-world-drums': '/files/dark-wonderful-world-drums-backing.wav',
+  
+  // QUIETNESS
+  'quietness-guitars': '/files/quietness-guitars-backing.wav',
+  'quietness-lead-guitar': '/files/quietness-lead-guitar-backing.wav',
+  'quietness-keys': '/files/quietness-keys-backing.wav',
+  'quietness-bass': '/files/quietness-bass-backing.wav',
+  'quietness-drums': '/files/quietness-drums-backing.wav',
+  
+  // ========== STEMS ==========
+  // THE DARK
+  'the-dark-guitars-stem': '/files/the-dark-guitars-stem.wav',
+  'the-dark-guitar-lead-stem': '/files/the-dark-lead-guitar-stem.wav',
+  'the-dark-keys-stem': '/files/the-dark-keys-stem.wav',
+  'the-dark-bass-stem': '/files/the-dark-bass-stem.wav',
+  'the-dark-drums-stem': '/files/the-dark-drums-stem.wav',
+  
+  // ANOMIC
+  'anomic-guitars-stem': '/files/anomic-guitars-stem.wav',
+  'anomic-guitar-lead-stem': '/files/anomic-lead-guitar-stem.wav',
+  'anomic-keys-stem': '/files/anomic-keys-stem.wav',
+  'anomic-bass-stem': '/files/anomic-bass-stem.wav',
+  'anomic-drums-stem': '/files/anomic-drums-stem.wav',
+  
+  // CONSONANCE
+  'consonance-guitars-stem': '/files/consonance-guitars-stem.wav',
+  'consonance-guitar-lead-stem': '/files/consonance-lead-guitar-stem.wav',
+  'consonance-keys-stem': '/files/consonance-keys-stem.wav',
+  'consonance-bass-stem': '/files/consonance-bass-stem.wav',
+  'consonance-drums-stem': '/files/consonance-drums-stem.wav',
+  
+  // JYY
+  'jyy-guitars-stem': '/files/jyy-guitars-stem.wav',
+  'jyy-guitar-lead-stem': '/files/jyy-lead-guitar-stem.wav',
+  'jyy-keys-stem': '/files/jyy-keys-stem.wav',
+  'jyy-bass-stem': '/files/jyy-bass-stem.wav',
+  'jyy-drums-stem': '/files/jyy-drums-stem.wav',
+  
+  // OUT OF THE DARK
+  'out-of-the-dark-guitars-stem': '/files/out-of-the-dark-guitars-stem.wav',
+  'out-of-the-dark-guitar-lead-stem': '/files/out-of-the-dark-lead-guitar-stem.wav',
+  'out-of-the-dark-keys-stem': '/files/out-of-the-dark-keys-stem.wav',
+  'out-of-the-dark-bass-stem': '/files/out-of-the-dark-bass-stem.wav',
+  'out-of-the-dark-drums-stem': '/files/out-of-the-dark-drums-stem.wav',
+  
+  // RED DOWN
+  'red-down-guitars-stem': '/files/red-down-guitars-stem.wav',
+  'red-down-guitar-lead-stem': '/files/red-down-lead-guitar-stem.wav',
+  'red-down-keys-stem': '/files/red-down-keys-stem.wav',
+  'red-down-bass-stem': '/files/red-down-bass-stem.wav',
+  'red-down-drums-stem': '/files/red-down-drums-stem.wav',
+  
+  // ATLANTIC
+  'atlantic-guitars-stem': '/files/atlantic-guitars-stem.wav',
+  'atlantic-guitar-lead-stem': '/files/atlantic-lead-guitar-stem.wav',
+  'atlantic-keys-stem': '/files/atlantic-keys-stem.wav',
+  'atlantic-bass-stem': '/files/atlantic-bass-stem.wav',
+  'atlantic-drums-stem': '/files/atlantic-drums-stem.wav',
+  
+  // FEIGN
+  'feign-guitars-stem': '/files/feign-guitars-stem.wav',
+  'feign-guitar-lead-stem': '/files/feign-lead-guitar-stem.wav',
+  'feign-keys-stem': '/files/feign-keys-stem.wav',
+  'feign-bass-stem': '/files/feign-bass-stem.wav',
+  'feign-drums-stem': '/files/feign-drums-stem.wav',
+  
+  // DARK WONDERFUL WORLD
+  'dark-wonderful-world-guitars-stem': '/files/dark-wonderful-world-guitars-stem.wav',
+  'dark-wonderful-world-guitar-lead-stem': '/files/dark-wonderful-world-lead-guitar-stem.wav',
+  'dark-wonderful-world-keys-stem': '/files/dark-wonderful-world-keys-stem.wav',
+  'dark-wonderful-world-bass-stem': '/files/dark-wonderful-world-bass-stem.wav',
+  'dark-wonderful-world-drums-stem': '/files/dark-wonderful-world-drums-stem.wav',
+  
+  // QUIETNESS
+  'quietness-guitars-stem': '/files/quietness-guitars-stem.wav',
+  'quietness-guitar-lead-stem': '/files/quietness-lead-guitar-stem.wav',
+  'quietness-keys-stem': '/files/quietness-keys-stem.wav',
+  'quietness-bass-stem': '/files/quietness-bass-stem.wav',
+  'quietness-drums-stem': '/files/quietness-drums-stem.wav',
+  
+  // ========== TABS ==========
+  // THE DARK
+  'the-dark-guitar-tab': '/files/the-dark-guitar-tab.pdf',
+  'the-dark-keys-tab': '/files/the-dark-keys-tab.pdf',
+  'the-dark-bass-tab': '/files/the-dark-bass-tab.pdf',
+  'the-dark-drums-tab': '/files/the-dark-drums-tab.pdf',
+  
+  // ANOMIC
+  'anomic-guitar-tab': '/files/anomic-guitar-tab.pdf',
+  'anomic-keys-tab': '/files/anomic-keys-tab.pdf',
+  'anomic-bass-tab': '/files/anomic-bass-tab.pdf',
+  'anomic-drums-tab': '/files/anomic-drums-tab.pdf',
+  
+  // CONSONANCE
+  'consonance-guitar-tab': '/files/consonance-guitar-tab.pdf',
+  'consonance-keys-tab': '/files/consonance-keys-tab.pdf',
+  'consonance-bass-tab': '/files/consonance-bass-tab.pdf',
+  'consonance-drums-tab': '/files/consonance-drums-tab.pdf',
+  
+  // JYY
+  'jyy-guitar-tab': '/files/jyy-guitar-tab.pdf',
+  'jyy-keys-tab': '/files/jyy-keys-tab.pdf',
+  'jyy-bass-tab': '/files/jyy-bass-tab.pdf',
+  'jyy-drums-tab': '/files/jyy-drums-tab.pdf',
+  
+  // OUT OF THE DARK
+  'out-of-the-dark-guitar-tab': '/files/out-of-the-dark-guitar-tab.pdf',
+  'out-of-the-dark-keys-tab': '/files/out-of-the-dark-keys-tab.pdf',
+  'out-of-the-dark-bass-tab': '/files/out-of-the-dark-bass-tab.pdf',
+  'out-of-the-dark-drums-tab': '/files/out-of-the-dark-drums-tab.pdf',
+  
+  // RED DOWN
+  'red-down-guitar-tab': '/files/red-down-guitar-tab.pdf',
+  'red-down-keys-tab': '/files/red-down-keys-tab.pdf',
+  'red-down-bass-tab': '/files/red-down-bass-tab.pdf',
+  'red-down-drums-tab': '/files/red-down-drums-tab.pdf',
+  
+  // ATLANTIC
+  'atlantic-guitar-tab': '/files/atlantic-guitar-tab.pdf',
+  'atlantic-keys-tab': '/files/atlantic-keys-tab.pdf',
+  'atlantic-bass-tab': '/files/atlantic-bass-tab.pdf',
+  'atlantic-drums-tab': '/files/atlantic-drums-tab.pdf',
+  
+  // FEIGN
+  'feign-guitar-tab': '/files/feign-guitar-tab.pdf',
+  'feign-keys-tab': '/files/feign-keys-tab.pdf',
+  'feign-bass-tab': '/files/feign-bass-tab.pdf',
+  'feign-drums-tab': '/files/feign-drums-tab.pdf',
+  
+  // DARK WONDERFUL WORLD
+  'dark-wonderful-world-guitar-tab': '/files/dark-wonderful-world-guitar-tab.pdf',
+  'dark-wonderful-world-keys-tab': '/files/dark-wonderful-world-keys-tab.pdf',
+  'dark-wonderful-world-bass-tab': '/files/dark-wonderful-world-bass-tab.pdf',
+  'dark-wonderful-world-drums-tab': '/files/dark-wonderful-world-drums-tab.pdf',
+  
+  // QUIETNESS
+  'quietness-guitar-tab': '/files/quietness-guitar-tab.pdf',
+  'quietness-keys-tab': '/files/quietness-keys-tab.pdf',
+  'quietness-bass-tab': '/files/quietness-bass-tab.pdf',
+  'quietness-drums-tab': '/files/quietness-drums-tab.pdf',
+  
+  // CAN'T FEEL MY FACE
+  'cant-feel-my-face-guitar-tab': '/files/cant-feel-my-face-guitar-tab.pdf',
+};
     
     // Log เพื่อ debug
     console.log('🔍 Looking for download file:', {
