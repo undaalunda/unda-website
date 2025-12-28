@@ -1,0 +1,33 @@
+{
+  "customerDetails": {
+    "shipperDetails": {
+      "postalCode": "10200",
+      "cityName": "Bangkok",
+      "countryCode": "TH"
+    },
+    "receiverDetails": {
+      "postalCode": "10001",
+      "cityName": "New York",
+      "countryCode": "US"
+    }
+  },
+  "accounts": [
+    {
+      "typeCode": "shipper",
+      "number": "561225618"
+    }
+  ],
+  "plannedShippingDateAndTime": "2025-06-06T10:00:00+07:00",
+  "unitOfMeasurement": "metric",
+  "isCustomsDeclarable": false,
+  "packages": [
+    {
+      "weight": 1,
+      "dimensions": {
+        "length": 10,
+        "width": 10,
+        "height": 5
+      }
+    }
+  ]
+}
