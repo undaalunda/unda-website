@@ -95,62 +95,28 @@ export default function DownloadPageClient({
 
       const fileName = entry.filePath.split('/').pop() || 'download';
       
-      console.log('🔗 Attempting to download:', fileName);
+      console.log('🔗 Downloading:', fileName);
       
       try {
-        // เช็คว่าไฟล์มีจริงไหม
-        const checkResponse = await fetch(entry.filePath, { method: 'HEAD' });
+        // ดาวน์โหลดผ่าน API โดยตรง (ไม่เช็ค HEAD)
+        console.log('📥 Downloading file via API...');
         
-        if (checkResponse.ok) {
-          // ดาวน์โหลดผ่าน Next.js API Route
-          console.log('📥 Downloading file via API...');
-          
-          const apiUrl = `/api/download-file?token=${token}&file=${fileName}`;
-          const downloadResponse = await fetch(apiUrl);
-          
-          if (!downloadResponse.ok) {
-            throw new Error('Download failed: ' + downloadResponse.statusText);
-          }
-          
-          const blob = await downloadResponse.blob();
-          const url = URL.createObjectURL(blob);
-          
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = fileName;
-          link.style.display = 'none';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          
-          URL.revokeObjectURL(url);
-          
-          console.log('✅ Real file downloaded:', fileName);
-        } else {
-          // ไฟล์ยังไม่มี - สร้าง placeholder
-          const placeholderContent = `This is a placeholder for ${fileName}.\n\nThe actual file will be available soon.\nPlease check back later or contact support.\n\nFile: ${fileName}\nExpected path: ${entry.filePath}`;
-          
-          const blob = new Blob([placeholderContent], { type: 'text/plain' });
-          const url = URL.createObjectURL(blob);
-          
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = fileName;
-          link.style.display = 'none';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          
-          URL.revokeObjectURL(url);
-          
-          console.log('📄 Placeholder file downloaded:', fileName);
+        const apiUrl = `/api/download-file?token=${token}&file=${fileName}`;
+        const downloadResponse = await fetch(apiUrl);
+        
+        if (!downloadResponse.ok) {
+          const errorText = await downloadResponse.text();
+          console.error('❌ Download failed:', errorText);
+          throw new Error('Download failed: ' + errorText);
         }
-      } catch (downloadError) {
-        console.error('❌ Download check failed:', downloadError);
         
-        const placeholderContent = `This is a placeholder for ${fileName}.\n\nThe actual file will be available soon.\nPlease check back later or contact support.\n\nFile: ${fileName}\nExpected path: ${entry.filePath}`;
+        const blob = await downloadResponse.blob();
         
-        const blob = new Blob([placeholderContent], { type: 'text/plain' });
+        // เช็คว่าได้ blob จริงไหม
+        if (blob.size < 1000) {
+          console.warn('⚠️ File size suspiciously small:', blob.size);
+        }
+        
         const url = URL.createObjectURL(blob);
         
         const link = document.createElement('a');
@@ -163,9 +129,16 @@ export default function DownloadPageClient({
         
         URL.revokeObjectURL(url);
         
-        console.log('📄 Fallback placeholder downloaded:', fileName);
+        console.log('✅ File downloaded:', fileName, 'Size:', blob.size, 'bytes');
+
+      } catch (downloadError) {
+        console.error('❌ Download error:', downloadError);
+        alert('Download failed: ' + (downloadError instanceof Error ? downloadError.message : 'Unknown error'));
+        setIsDownloading(false);
+        return;
       }
 
+      // แสดง success message
       setShowSuccess(true);
       setTimeout(() => {
         setShowSuccess(false);
@@ -175,7 +148,6 @@ export default function DownloadPageClient({
     } catch (error) {
       console.error('Download failed:', error);
       alert('Download failed. Please try again.');
-    } finally {
       setIsDownloading(false);
     }
   };
