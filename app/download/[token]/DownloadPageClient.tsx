@@ -1,5 +1,4 @@
-// /app/download/[token]/DownloadPageClient.tsx - แก้ให้ดาวน์โหลดจริง
-
+// /app/download/[token]/DownloadPageClient.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -96,17 +95,23 @@ export default function DownloadPageClient({
 
       const fileName = entry.filePath.split('/').pop() || 'download';
       
-      console.log('🔗 Attempting to download:', entry.filePath);
+      console.log('🔗 Attempting to download:', fileName);
       
       try {
         // เช็คว่าไฟล์มีจริงไหม
         const checkResponse = await fetch(entry.filePath, { method: 'HEAD' });
         
         if (checkResponse.ok) {
-          // ✅ ดาวน์โหลดไฟล์จริง (แก้ตรงนี้!)
-          console.log('📥 Downloading file from R2...');
+          // ดาวน์โหลดผ่าน Next.js API Route
+          console.log('📥 Downloading file via API...');
           
-          const downloadResponse = await fetch(entry.filePath);
+          const apiUrl = `/api/download-file?token=${token}&file=${fileName}`;
+          const downloadResponse = await fetch(apiUrl);
+          
+          if (!downloadResponse.ok) {
+            throw new Error('Download failed: ' + downloadResponse.statusText);
+          }
+          
           const blob = await downloadResponse.blob();
           const url = URL.createObjectURL(blob);
           
@@ -118,7 +123,6 @@ export default function DownloadPageClient({
           link.click();
           document.body.removeChild(link);
           
-          // Clean up
           URL.revokeObjectURL(url);
           
           console.log('✅ Real file downloaded:', fileName);
@@ -144,7 +148,6 @@ export default function DownloadPageClient({
       } catch (downloadError) {
         console.error('❌ Download check failed:', downloadError);
         
-        // Fallback placeholder
         const placeholderContent = `This is a placeholder for ${fileName}.\n\nThe actual file will be available soon.\nPlease check back later or contact support.\n\nFile: ${fileName}\nExpected path: ${entry.filePath}`;
         
         const blob = new Blob([placeholderContent], { type: 'text/plain' });
@@ -163,7 +166,6 @@ export default function DownloadPageClient({
         console.log('📄 Fallback placeholder downloaded:', fileName);
       }
 
-      // แสดง success message
       setShowSuccess(true);
       setTimeout(() => {
         setShowSuccess(false);
