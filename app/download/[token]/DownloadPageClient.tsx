@@ -80,25 +80,12 @@ export default function DownloadPageClient({
     try {
       setIsDownloading(true);
       
-      // Mark token as used
-      const response = await fetch('/api/mark-downloaded', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token, orderId: entry.orderId }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to mark download as used');
-      }
-
       const fileName = entry.filePath.split('/').pop() || 'download';
       
       console.log('🔗 Downloading:', fileName);
       
       try {
-        // ดาวน์โหลดผ่าน API โดยตรง (ไม่เช็ค HEAD)
+        // 1. ดาวน์โหลดไฟล์ก่อน (ไม่ mark ว่าใช้แล้ว)
         console.log('📥 Downloading file via API...');
         
         const apiUrl = `/api/download-file?token=${token}&file=${fileName}`;
@@ -130,6 +117,23 @@ export default function DownloadPageClient({
         URL.revokeObjectURL(url);
         
         console.log('✅ File downloaded:', fileName, 'Size:', blob.size, 'bytes');
+
+        // 2. หลังดาวน์โหลดสำเร็จแล้ว ค่อย mark ว่าใช้แล้ว
+        console.log('🔒 Marking token as used...');
+        
+        const markResponse = await fetch('/api/mark-downloaded', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ token, orderId: entry.orderId }),
+        });
+
+        if (!markResponse.ok) {
+          console.warn('⚠️ Failed to mark as used (but download succeeded)');
+        } else {
+          console.log('✅ Token marked as used');
+        }
 
       } catch (downloadError) {
         console.error('❌ Download error:', downloadError);
