@@ -20,25 +20,31 @@ export async function GET(request: NextRequest) {
     
     console.log('📥 Download request:', { token, filename });
     
-    // ตรวจสอบ token ใน Supabase
+    // ตรวจสอบ token ใน Supabase table Orders
     const { data: tokenData, error } = await supabase
-      .from('download_tokens')
+      .from('Orders')
       .select('*')
-      .eq('token', token)
+      .eq('download_token', token)
       .single();
     
     if (error || !tokenData) {
-      console.error('❌ Invalid token:', token);
+      console.error('❌ Invalid token:', token, error);
       return new Response('Invalid token', { status: 403 });
     }
     
+    console.log('✅ Token found in Orders table:', {
+      orderId: tokenData.id,
+      isUsed: tokenData.is_used,
+      expiresAt: tokenData.download_expires
+    });
+    
     // เช็คว่า token หมดอายุหรือใช้แล้วหรือยัง
-    if (tokenData.download_completed) {
+    if (tokenData.is_used) {
       console.error('❌ Token already used:', token);
       return new Response('Token already used', { status: 403 });
     }
     
-    const expiresAt = new Date(tokenData.expires_at);
+    const expiresAt = new Date(tokenData.download_expires);
     if (expiresAt < new Date()) {
       console.error('❌ Token expired:', token);
       return new Response('Token expired', { status: 403 });
@@ -48,10 +54,12 @@ export async function GET(request: NextRequest) {
     
     // ดึงไฟล์จาก R2
     const fileUrl = `${R2_URL}/${filename}`;
+    console.log('🔗 Fetching from:', fileUrl);
+    
     const fileResponse = await fetch(fileUrl);
     
     if (!fileResponse.ok) {
-      console.error('❌ File not found in R2:', filename);
+      console.error('❌ File not found in R2:', filename, fileResponse.status);
       return new Response('File not found', { status: 404 });
     }
     
@@ -62,11 +70,12 @@ export async function GET(request: NextRequest) {
     headers.set('Content-Type', fileResponse.headers.get('Content-Type') || 'application/octet-stream');
     headers.set('Content-Disposition', `attachment; filename="${filename}"`);
     headers.set('Cache-Control', 'no-cache');
+    headers.set('Access-Control-Allow-Origin', '*');
     
     return new Response(fileResponse.body, { headers });
     
   } catch (error) {
     console.error('🔥 Download error:', error);
-    return new Response('Server error', { status: 500 });
+    return new Response('Server error: ' + (error instanceof Error ? error.message : 'Unknown'), { status: 500 });
   }
 }
