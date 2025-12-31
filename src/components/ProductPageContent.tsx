@@ -260,36 +260,36 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
               )}
 
               {product.type === 'physical' && (
-  <>
-    {/* 🎽 Bundle Size Selector - for bundles with multiple t-shirts */}
-    {isProductBundle && hasBundleSizeOptions ? (
-      <BundleSizeSelector
-        sizeOptions={product.sizeOptions!}
-        selectedSizes={bundleSizes}
-        onSizeChange={handleBundleSizeChange}
-      />
-    ) : (
-      /* Regular Size Selector - for single products */
-      product.sizes && product.sizes.length > 0 && (
-        <div className="mt-4">
-          {/* SIZE CHART LINK */}
-          {product.sizeChartImage && (
-  <button
-    onClick={() => setShowSizeChart(true)}
-    className="text-[10px] text-[#f8fcdc]/60 hover:text-[#dc9e63] mb-2 transition-colors uppercase tracking-wider block cursor-pointer"
-  >
-    SIZE CHART &gt;
-  </button>
-)}
-          
-          <SizeSelector
-            sizes={product.sizes}
-            selectedSize={selectedSize}
-            onSizeChange={setSelectedSize}
-          />
-        </div>
-      )
-    )}
+                <>
+                  {/* 🎽 Bundle Size Selector - for bundles with multiple t-shirts */}
+                  {isProductBundle && hasBundleSizeOptions ? (
+                    <BundleSizeSelector
+                      sizeOptions={product.sizeOptions!}
+                      selectedSizes={bundleSizes}
+                      onSizeChange={handleBundleSizeChange}
+                    />
+                  ) : (
+                    /* Regular Size Selector - for single products */
+                    product.sizes && product.sizes.length > 0 && (
+                      <div className="mt-4">
+                        {/* SIZE CHART LINK */}
+                        {product.sizeChartImage && (
+                          <button
+                            onClick={() => setShowSizeChart(true)}
+                            className="text-[10px] text-[#f8fcdc]/60 hover:text-[#dc9e63] mb-2 transition-colors uppercase tracking-wider block cursor-pointer"
+                          >
+                            SIZE CHART &gt;
+                          </button>
+                        )}
+                        
+                        <SizeSelector
+                          sizes={product.sizes}
+                          selectedSize={selectedSize}
+                          onSizeChange={setSelectedSize}
+                        />
+                      </div>
+                    )
+                  )}
 
                   <div className="product-quantity-wrapper mt-2">
                     <label className="text-sm font-medium mb-1">Quantity:</label>
@@ -306,7 +306,7 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                     </div>
                   ) : (
                     <div className="mt-1 text-xs font-light tracking-wide">
-                      <span className="text-orange-400/80 italic">PRE-ORDER</span>
+                      <span className="text-orange-400/80 italic">PRE-ORDER (30 DAYS)</span>
                     </div>
                   )}
                 </>
@@ -363,12 +363,12 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                         <p key={idx}>
                           <em>
                             {parts[0]}
-                            <a
+                            <Link
                               href="/terms-and-conditions"
                               className="text-s text-[#dc9e63] hover:text-[#f8fcdc] cursor-pointer no-underline transition-colors duration-300"
                             >
                               Terms & Conditions
-                            </a>
+                            </Link>
                             {parts[1]}
                           </em>
                         </p>
@@ -465,21 +465,21 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                       }
 
                       // Prepare size info for cart
-const sizeInfo = isProductBundle && hasBundleSizeOptions
-  ? Object.entries(bundleSizes)
-      .map(([productId, size]) => {
-        let itemName = productId;
-        
-        if (productId.includes('dark-wonderful-world-t-shirt')) {
-          itemName = 'DWW T-Shirt';
-        } else if (productId.includes('consonance-t-shirt')) {
-          itemName = 'Consonance T-Shirt';
-        }
-        
-        return `${itemName}: ${size}`;
-      })
-      .join(', ')
-  : selectedSize;
+                      const sizeInfo = isProductBundle && hasBundleSizeOptions
+                        ? Object.entries(bundleSizes)
+                            .map(([productId, size]) => {
+                              let itemName = productId;
+                              
+                              if (productId.includes('dark-wonderful-world-t-shirt')) {
+                                itemName = 'DWW T-Shirt';
+                              } else if (productId.includes('consonance-t-shirt')) {
+                                itemName = 'Consonance T-Shirt';
+                              }
+                              
+                              return `${itemName}: ${size}`;
+                            })
+                            .join(', ')
+                        : selectedSize;
 
                       const cartActionItem: LastActionItem = {
                         item: {
@@ -667,7 +667,7 @@ const sizeInfo = isProductBundle && hasBundleSizeOptions
             </div>
           )}
 
-               </div>
+        </div>
       </div>
       
       {/* Size Chart Modal */}
