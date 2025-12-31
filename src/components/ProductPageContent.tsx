@@ -465,9 +465,21 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                       }
 
                       // Prepare size info for cart
-                      const sizeInfo = isProductBundle && hasBundleSizeOptions
-                        ? Object.entries(bundleSizes).map(([productId, size]) => `${size}`).join(', ')
-                        : selectedSize;
+const sizeInfo = isProductBundle && hasBundleSizeOptions
+  ? Object.entries(bundleSizes)
+      .map(([productId, size]) => {
+        let itemName = productId;
+        
+        if (productId.includes('dark-wonderful-world-t-shirt')) {
+          itemName = 'DWW T-Shirt';
+        } else if (productId.includes('consonance-t-shirt')) {
+          itemName = 'Consonance T-Shirt';
+        }
+        
+        return `${itemName}: ${size}`;
+      })
+      .join(', ')
+  : selectedSize;
 
                       const cartActionItem: LastActionItem = {
                         item: {

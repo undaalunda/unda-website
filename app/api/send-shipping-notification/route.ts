@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
     });
 
     // 🔗 สร้าง tracking URL
-    const trackingUrl = `https://track.dhl.com/${trackingNumber}`;
+    const trackingUrl = `https://www.dhl.com/th-en/home/tracking.html?tracking-id=${trackingNumber}`;
     const publicBaseUrl = process.env.NODE_ENV === 'production'
       ? (process.env.NEXT_PUBLIC_BASE_URL || 'https://unda-website.vercel.app')
       : 'http://localhost:3000';
