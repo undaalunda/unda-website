@@ -1,4 +1,4 @@
-/* ProductPageContent.tsx - Fixed Related Products with Coming Soon Support */
+/* ProductPageContent.tsx - Enhanced Bundle Support with Multi-Size Selection */
 
 'use client';
 
@@ -14,6 +14,9 @@ import { useCart } from '@/context/CartContext';
 import CartErrorPopup from '@/components/CartErrorPopup';
 import AppClientWrapper from '@/components/AppClientWrapper';
 import ProductSchema from '@/components/ProductSchema';
+import SizeSelector from '@/components/SizeSelector';
+import BundleSizeSelector from '../components/BundleSizeSelector';
+import SizeChartModal from '../components/SizeChartModal';
 
 function isBundle(price: number | { original: number; sale: number }): price is { original: number; sale: number } {
   return typeof price === 'object' && price !== null && 'original' in price && 'sale' in price;
@@ -24,7 +27,6 @@ function getStockStatus(product: Product): 'in-stock' | 'out-of-stock' | 'pre-or
   return 'in-stock';
 }
 
-// 🎯 Enhanced function to check if product is a Tab
 function isTabProduct(item: Product): boolean {
   return (
     item.category.toLowerCase().includes('tab') ||
@@ -33,7 +35,6 @@ function isTabProduct(item: Product): boolean {
   );
 }
 
-// 🚀 Navigation Context Interface (simplified for related products only)
 interface NavigationContext {
   from: 'album' | 'solo-collection' | 'physical';
   album?: string;
@@ -52,15 +53,24 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
   const { addToCart, removeFromCart, cartItems, setLastActionItem } = useCart();
   const [quantity, setQuantity] = useState<number>(1);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  
+  // 🎽 Bundle size state - for multiple t-shirts
+  const [bundleSizes, setBundleSizes] = useState<{ [productId: string]: string }>({});
+
+  // 📐 Size chart modal state
+  const [showSizeChart, setShowSizeChart] = useState(false);
+  
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const isAlreadyInCart = cartItems.some((item) => item.id === product.id);
   const stockStatus = getStockStatus(product);
   const router = useRouter();
-
-  // 🚀 Navigation Context for Related Products
   const [navigationContext, setNavigationContext] = useState<NavigationContext | null>(null);
 
-  // 🚀 Load Navigation Context from Session Storage (for related products)
+  // Check if product is a bundle
+  const isProductBundle = product.category === 'Bundles';
+  const hasBundleSizeOptions = product.sizeOptions && Object.keys(product.sizeOptions).length > 0;
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const stored = sessionStorage.getItem('navigationContext');
@@ -79,7 +89,6 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
     if (product) {
       const pool = product.type === 'digital'
         ? allItems.filter((item) => {
-            // Exclude Solo Collection items
             const isSoloCollectionItem = 
               item.tags?.includes('contest') || 
               item.id.includes('abasi') || 
@@ -101,10 +110,8 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
       }
     }, [product?.id]);
 
-  // 🚀 Enhanced Browser Back Button Handler (cleanup session storage)
   useEffect(() => {
     const handlePopState = () => {
-      // If user uses browser back, preserve context for the return page
       if (typeof window !== 'undefined') {
         const context = sessionStorage.getItem('navigationContext');
         if (context) {
@@ -133,16 +140,48 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
     }
   }, []);
 
-  // 🚀 Handle Related Product Click
   const handleRelatedProductClick = (item: Product, e: React.MouseEvent) => {
     e.preventDefault();
     
-    // Preserve context for related products
     if (navigationContext) {
       sessionStorage.setItem('navigationContext', JSON.stringify(navigationContext));
     }
     
     router.push(`/product/${item.id}`);
+  };
+
+  // 🎽 Handle bundle size change
+  const handleBundleSizeChange = (productId: string, size: string) => {
+    setBundleSizes(prev => ({
+      ...prev,
+      [productId]: size
+    }));
+  };
+
+  // 🎽 Validate bundle sizes before adding to cart
+  const validateBundleSizes = (): boolean => {
+    if (!hasBundleSizeOptions) return true;
+    
+    const requiredProducts = Object.keys(product.sizeOptions!);
+    const missingSelections: string[] = [];
+
+    requiredProducts.forEach(productId => {
+      if (!bundleSizes[productId]) {
+        missingSelections.push(productId);
+      }
+    });
+
+    if (missingSelections.length > 0) {
+      setErrorMessage(
+        missingSelections.length === 1 
+          ? 'Please select a size for the t-shirt'
+          : `Please select sizes for all ${missingSelections.length} t-shirts`
+      );
+      setTimeout(() => setErrorMessage(null), 3000);
+      return false;
+    }
+
+    return true;
   };
 
   if (!product) {
@@ -167,10 +206,9 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
       />
 
       <div className="min-h-screen flex flex-col justify-center items-center text-[#f8fcdc] font-[Cinzel] px-4 md:px-6 pt-32">
-        {/* Container for all content */}
         <div className="w-full max-w-5xl pb-24">
           
-          {/* 🚀 Clean Breadcrumb - Fixed positioning */}
+          {/* Breadcrumb */}
           <div className="mb-10 text-sm text-[#f8fcdc]/70 max-[1280px]:text-center min-[1280px]:text-left">
             <Link href="/" className="hover:text-[#dc9e63] transition-colors">Home</Link>
             <span className="mx-2">/</span>
@@ -186,12 +224,10 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
           </div>
 
           {/* Product Main Content */}
-          <div className="flex flex-col max-[927px]:flex-col md:flex-row 
-                        gap-4 md:gap-6 xl:gap-8 mb-20">
+          <div className="flex flex-col max-[927px]:flex-col md:flex-row gap-4 md:gap-6 xl:gap-8 mb-20">
             <div className="w-full md:w-1/2 flex justify-center">
-              <div className="sticky top-32 self-start w-full 
-                            max-w-[500px] max-[1280px]:max-w-[400px]">
-                <div className="relative aspect-square w-full">
+              <div className="sticky top-32 self-start w-full max-w-[500px] max-[1280px]:max-w-[400px]">
+                <div className={`relative aspect-square w-full ${product.tags?.includes('keychain') ? 'keychain-glow' : ''}`}>
                   <Image
                     src={product.image}
                     alt={product.title}
@@ -199,9 +235,8 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                     sizes="(max-width: 1280px) 400px, 500px"
                     className="object-contain"
                     priority
-                    quality={90}
-                    placeholder="blur"
-                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                    quality={100}
+                    unoptimized={true}
                   />
                 </div>
               </div>
@@ -225,7 +260,37 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
               )}
 
               {product.type === 'physical' && (
-                <>
+  <>
+    {/* 🎽 Bundle Size Selector - for bundles with multiple t-shirts */}
+    {isProductBundle && hasBundleSizeOptions ? (
+      <BundleSizeSelector
+        sizeOptions={product.sizeOptions!}
+        selectedSizes={bundleSizes}
+        onSizeChange={handleBundleSizeChange}
+      />
+    ) : (
+      /* Regular Size Selector - for single products */
+      product.sizes && product.sizes.length > 0 && (
+        <div className="mt-4">
+          {/* SIZE CHART LINK */}
+          {product.sizeChartImage && (
+  <button
+    onClick={() => setShowSizeChart(true)}
+    className="text-[10px] text-[#f8fcdc]/60 hover:text-[#dc9e63] mb-2 transition-colors uppercase tracking-wider block cursor-pointer"
+  >
+    SIZE CHART &gt;
+  </button>
+)}
+          
+          <SizeSelector
+            sizes={product.sizes}
+            selectedSize={selectedSize}
+            onSizeChange={setSelectedSize}
+          />
+        </div>
+      )
+    )}
+
                   <div className="product-quantity-wrapper mt-2">
                     <label className="text-sm font-medium mb-1">Quantity:</label>
                     <div className="flex items-center gap-2 mt-1">
@@ -236,14 +301,14 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                   </div>
 
                   {product.soldOut ? (
-  <div className="mt-1 text-xs font-light tracking-wide">
-    <span className="text-red-400/80 italic">SOLD OUT</span>
-  </div>
-) : (
-  <div className="mt-1 text-xs font-light tracking-wide">
-    <span className="text-green-400/80 italic">IN STOCK</span>
-  </div>
-)}
+                    <div className="mt-1 text-xs font-light tracking-wide">
+                      <span className="text-red-400/80 italic">SOLD OUT</span>
+                    </div>
+                  ) : (
+                    <div className="mt-1 text-xs font-light tracking-wide">
+                      <span className="text-orange-400/80 italic">PRE-ORDER</span>
+                    </div>
+                  )}
                 </>
               )}
 
@@ -262,6 +327,25 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                           </p>
                         );
                       }
+                      
+                      // 💰 Highlight savings
+                      if (trimmed.includes('💰 Save')) {
+                        return (
+                          <p key={idx} className="text-[#4ade80] font-semibold mt-2">
+                            {line}
+                          </p>
+                        );
+                      }
+                      
+                      // 🎽 Highlight t-shirt note
+                      if (trimmed.includes('Note:') && trimmed.includes('t-shirt')) {
+                        return (
+                          <p key={idx} className="text-[#fbbf24] italic mt-2">
+                            {line}
+                          </p>
+                        );
+                      }
+                      
                       return <p key={idx}>{line}</p>;
                     }
 
@@ -343,17 +427,17 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                 </div>
               )}
 
-             <div className="relative mt-6 max-[927px]:mt-4 max-[696px]:mt-3">
+              <div className="relative mt-6 max-[927px]:mt-4 max-[696px]:mt-3">
                 {errorMessage && <CartErrorPopup message={errorMessage} />}
 
                 {product.soldOut ? (
-  <button
-    disabled
-    className="add-to-cart-button cursor-not-allowed opacity-50 bg-red-900/60 text-white max-[927px]:text-sm max-[696px]:text-xs max-[696px]:py-2 max-[696px]:px-4"
-  >
-    SOLD OUT
-  </button>
-) : product.comingSoon ? (
+                  <button
+                    disabled
+                    className="add-to-cart-button cursor-not-allowed opacity-50 bg-red-900/60 text-white max-[927px]:text-sm max-[696px]:text-xs max-[696px]:py-2 max-[696px]:px-4"
+                  >
+                    SOLD OUT
+                  </button>
+                ) : product.comingSoon ? (
                   <button
                     disabled
                     className="add-to-cart-button cursor-not-allowed opacity-70 bg-orange-600/50 text-white max-[927px]:text-sm max-[696px]:text-xs max-[696px]:py-2 max-[696px]:px-4"
@@ -368,16 +452,36 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                         : 'cursor-pointer'
                     }`}
                     onClick={() => {
+                      // 🎽 Bundle validation
+                      if (isProductBundle && hasBundleSizeOptions) {
+                        if (!validateBundleSizes()) {
+                          return;
+                        }
+                      } else if (product.sizes && product.sizes.length > 0 && !selectedSize) {
+                        // Regular single product validation
+                        setErrorMessage('Please select a size');
+                        setTimeout(() => setErrorMessage(null), 3000);
+                        return;
+                      }
+
+                      // Prepare size info for cart
+                      const sizeInfo = isProductBundle && hasBundleSizeOptions
+                        ? Object.entries(bundleSizes).map(([productId, size]) => `${size}`).join(', ')
+                        : selectedSize;
+
                       const cartActionItem: LastActionItem = {
                         item: {
                           id: product.id,
                           title: product.title,
-                          subtitle: product.subtitle ?? '',
+                          subtitle: sizeInfo 
+                            ? `${product.subtitle ?? ''} - Size ${sizeInfo}`
+                            : (product.subtitle ?? ''),
                           price: product.price,
                           image: product.image,
                           quantity: 1,
                           type: product.type,
                           weight: product.weight ?? 0,
+                          size: sizeInfo ?? undefined,
                         },
                         action: isAlreadyInCart ? 'remove' : 'add',
                       };
@@ -388,7 +492,7 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                         if (isAlreadyInCart) {
                           removeFromCart(product.id);
                         } else {
-                          addToCart(product.id, 1);
+                          addToCart(product.id, 1, sizeInfo ?? undefined);
                           setErrorMessage(null);
                         }
                         setLastActionItem(cartActionItem);
@@ -402,20 +506,18 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
             </div>
           </div>
 
-          {/* 🚀 Related Products - Fixed with Coming Soon Support */}
+          {/* Related Products */}
           {relatedProducts.length > 0 && (
             <div className="related-products-wrapper w-full">
               <h2 className="text-2xl font-bold text-[#dc9e63] mb-8">RELATED PRODUCTS</h2>
               <div className="stems-row grid grid-cols-2 md:grid-cols-4 gap-6">
                 {relatedProducts.map((item) => {
-                  // 🎯 Separate logic for physical vs digital products
                   if (item.type === 'physical') {
-                    // 🎁 Physical product display with Coming Soon support
                     return (
                       <div
                         key={item.id}
                         onClick={(e) => handleRelatedProductClick(item, e)}
-                        className="stems-item cursor-pointer"
+                        className={`stems-item cursor-pointer ${item.tags?.includes('keychain') ? 'keychain-glow' : ''}`}
                       >
                         <div className="relative">
                           <Image
@@ -425,7 +527,7 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                             height={200}
                             className="stems-image"
                             loading="lazy"
-                            quality={85}
+                            quality={95}
                             sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 200px"
                             placeholder="blur"
                             blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
@@ -445,35 +547,34 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                           <p className="stems-title-text text-[#d37142]">{item.title}</p>
                           <p className="stems-subtitle-tiny">{item.subtitle}</p>
                           <p className="stems-price">
-  {item.comingSoon ? (
-    <span className="invisible">
-      {isBundle(item.price) ? (
-        <>
-          <span className="line-through text-[#f8fcdc] mr-1">
-            ${item.price.original.toFixed(2)}
-          </span>
-          <span>${item.price.sale.toFixed(2)}</span>
-        </>
-      ) : (
-        <span>${(item.price as number).toFixed(2)}</span>
-      )}
-    </span>
-  ) : isBundle(item.price) ? (
-    <>
-      <span className="line-through text-[#f8fcdc] mr-1">
-        ${item.price.original.toFixed(2)}
-      </span>
-      <span>${item.price.sale.toFixed(2)}</span>
-    </>
-  ) : (
-    <span>${(item.price as number).toFixed(2)}</span>
-  )}
-</p>
+                            {item.comingSoon ? (
+                              <span className="invisible">
+                                {isBundle(item.price) ? (
+                                  <>
+                                    <span className="line-through text-[#f8fcdc] mr-1">
+                                      ${item.price.original.toFixed(2)}
+                                    </span>
+                                    <span>${item.price.sale.toFixed(2)}</span>
+                                  </>
+                                ) : (
+                                  <span>${(item.price as number).toFixed(2)}</span>
+                                )}
+                              </span>
+                            ) : isBundle(item.price) ? (
+                              <>
+                                <span className="line-through text-[#f8fcdc] mr-1">
+                                  ${item.price.original.toFixed(2)}
+                                </span>
+                                <span>${item.price.sale.toFixed(2)}</span>
+                              </>
+                            ) : (
+                              <span>${(item.price as number).toFixed(2)}</span>
+                            )}
+                          </p>
                         </div>
                       </div>
                     );
                   } else {
-                    // 🎵 Digital product display with Coming Soon support
                     const isTab = isTabProduct(item);
                     const isBackingTrack = item.category === 'Backing Track';
 
@@ -491,7 +592,7 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                             height={200}
                             className="stems-image"
                             loading="lazy"
-                            quality={85}
+                            quality={95}
                             sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 200px"
                             placeholder="blur"
                             blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
@@ -521,30 +622,30 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                             {isBackingTrack ? 'BACKING TRACK' : isTab ? 'TABS' : 'STEM'}
                           </p>
                           <p className="stems-price">
-  {item.comingSoon ? (
-    <span className="invisible">
-      {isBundle(item.price) ? (
-        <>
-          <span className="line-through text-[#f8fcdc] mr-1">
-            ${item.price.original.toFixed(2)}
-          </span>
-          <span>${item.price.sale.toFixed(2)}</span>
-        </>
-      ) : (
-        <span>${(item.price as number).toFixed(2)}</span>
-      )}
-    </span>
-  ) : isBundle(item.price) ? (
-    <>
-      <span className="line-through text-[#f8fcdc] mr-1">
-        ${item.price.original.toFixed(2)}
-      </span>
-      <span>${item.price.sale.toFixed(2)}</span>
-    </>
-  ) : (
-    <span>${(item.price as number).toFixed(2)}</span>
-  )}
-</p>
+                            {item.comingSoon ? (
+                              <span className="invisible">
+                                {isBundle(item.price) ? (
+                                  <>
+                                    <span className="line-through text-[#f8fcdc] mr-1">
+                                      ${item.price.original.toFixed(2)}
+                                    </span>
+                                    <span>${item.price.sale.toFixed(2)}</span>
+                                  </>
+                                ) : (
+                                  <span>${(item.price as number).toFixed(2)}</span>
+                                )}
+                              </span>
+                            ) : isBundle(item.price) ? (
+                              <>
+                                <span className="line-through text-[#f8fcdc] mr-1">
+                                  ${item.price.original.toFixed(2)}
+                                </span>
+                                <span>${item.price.sale.toFixed(2)}</span>
+                              </>
+                            ) : (
+                              <span>${(item.price as number).toFixed(2)}</span>
+                            )}
+                          </p>
                         </div>
                       </div>
                     );
@@ -554,8 +655,18 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
             </div>
           )}
 
-        </div>
+               </div>
       </div>
+      
+      {/* Size Chart Modal */}
+      {product.sizeChartImage && (
+        <SizeChartModal
+          sizeChartImage={product.sizeChartImage}
+          isOpen={showSizeChart}
+          onClose={() => setShowSizeChart(false)}
+          productTitle={product.title}
+        />
+      )}
     </AppClientWrapper>
   );
 }

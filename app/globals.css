@@ -2444,3 +2444,25 @@ video::part(controls) {
 .hero-wrapper > *:not(video) {
   pointer-events: auto;
 }
+
+/* Keychain Glow - Product Page (Main Image) */
+.keychain-glow img[fill] {
+  background: radial-gradient(circle at center 35%, rgba(220, 158, 99, 0.2) 0%, rgba(220, 158, 99, 0.08) 40%, transparent 80%) !important;
+  padding: 30px !important;
+  border-radius: 16px !important;
+  box-sizing: border-box !important;
+}
+
+/* Size Chart Modal Fade In Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-in-out;
+}

@@ -189,6 +189,10 @@ const ErrorState = ({ error, onReset }: { error: string; onReset: () => void }) 
 
 // Single order details display
 const OrderDetails = ({ order, onBack }: { order: Order; onBack: () => void }) => {
+  const [trackingData, setTrackingData] = useState<any>(null);
+  const [trackingLoading, setTrackingLoading] = useState(false);
+  const [trackingError, setTrackingError] = useState<string | null>(null);
+
   const formattedDate = useMemo(() => 
     new Date(order.created_at).toLocaleString('en-US', {
       year: 'numeric',
@@ -217,30 +221,55 @@ const OrderDetails = ({ order, onBack }: { order: Order; onBack: () => void }) =
     }
   }, [order.payment_status]);
 
+  // 🚀 Fetch DHL tracking data
+  const fetchTracking = async () => {
+    if (!order.tracking_number) return;
+
+    setTrackingLoading(true);
+    setTrackingError(null);
+
+    try {
+      const response = await fetch(
+        `/api/get-dhl-tracking?trackingNumber=${encodeURIComponent(order.tracking_number)}`
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch tracking information');
+      }
+
+      const data = await response.json();
+      setTrackingData(data.tracking);
+    } catch (err) {
+      setTrackingError(err instanceof Error ? err.message : 'Failed to load tracking info');
+    } finally {
+      setTrackingLoading(false);
+    }
+  };
+
   return (
     <main className="pt-32 md:pt-44 px-6 max-w-4xl mx-auto text-[#f8fcdc] font-[Cinzel]">
-  <div className="mb-4 md:mb-6">
-    <button
-      onClick={onBack}
-      className="text-[#dc9e63] hover:text-[#f8cfa3] transition-colors cursor-pointer text-sm md:text-base"
-    >
-      ← Back to Search
-    </button>
-  </div>
+      <div className="mb-4 md:mb-6">
+        <button
+          onClick={onBack}
+          className="text-[#dc9e63] hover:text-[#f8cfa3] transition-colors cursor-pointer text-sm md:text-base"
+        >
+          ← Back to Search
+        </button>
+      </div>
 
-  <div className="text-center mb-6 md:mb-8">
-    <h1 className="text-2xl md:text-3xl font-bold mb-2 text-[#dc9e63]">Order Details</h1>
-    <p className="text-[#f8fcdc]/60 text-sm md:text-base">Order #{order.id}</p>
-  </div>
+      <div className="text-center mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold mb-2 text-[#dc9e63]">Order Details</h1>
+        <p className="text-[#f8fcdc]/60 text-sm md:text-base">Order #{order.id}</p>
+      </div>
 
-  <div className="space-y-4 md:space-y-6">
+      <div className="space-y-4 md:space-y-6">
         {/* Customer Information */}
         <div className="bg-[#1a0000]/60 border border-[#f8fcdc]/20 p-6 rounded-lg">
-  <h2 className="text-xl font-semibold mb-4 text-[#dc9e63]">Customer Information</h2>
-  <div className="flex justify-between">
-    <span className="text-[#f8fcdc]/70">Email:</span>
-    <span className="text-[#f8fcdc]">{order.email}</span>
-  </div>
+          <h2 className="text-xl font-semibold mb-4 text-[#dc9e63]">Customer Information</h2>
+          <div className="flex justify-between">
+            <span className="text-[#f8fcdc]/70">Email:</span>
+            <span className="text-[#f8fcdc]">{order.email}</span>
+          </div>
         </div>
 
         {/* Order Summary */}
@@ -278,19 +307,20 @@ const OrderDetails = ({ order, onBack }: { order: Order; onBack: () => void }) =
                     )}
                   </div>
                   <div className="text-[#dc9e63] text-sm md:text-base">
-  {item.price ? `$${Number(item.price).toFixed(2)}` : ''}
-</div>
+                    {item.price ? `$${Number(item.price).toFixed(2)}` : ''}
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* Tracking Information */}
+        {/* 🚀 NEW: Tracking Information with DHL Integration */}
         {(order.tracking_number || order.courier) && (
           <div className="bg-[#1a0000]/60 border border-[#f8fcdc]/20 p-6 rounded-lg">
             <h2 className="text-xl font-semibold mb-4 text-[#dc9e63]">Tracking Information</h2>
-            <div className="space-y-3">
+            
+            <div className="space-y-3 mb-4">
               {order.courier && (
                 <div className="flex justify-between">
                   <span className="text-[#f8fcdc]/70">Courier:</span>
@@ -310,6 +340,106 @@ const OrderDetails = ({ order, onBack }: { order: Order; onBack: () => void }) =
                 </div>
               )}
             </div>
+
+            {/* Track Package Button */}
+            {order.tracking_number && (
+              <button
+                onClick={fetchTracking}
+                disabled={trackingLoading}
+                className="w-full bg-[#dc9e63] text-[#1a0000] py-3 px-4 rounded-lg font-semibold hover:bg-[#f8cfa3] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+              >
+                {trackingLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#1a0000]"></div>
+                    Loading Tracking...
+                  </>
+                ) : (
+                  <>
+                    📦 Track Package
+                  </>
+                )}
+              </button>
+            )}
+
+            {/* Tracking Error */}
+            {trackingError && (
+              <div className="mt-4 p-4 bg-red-900/20 border border-red-500/30 rounded-lg">
+                <p className="text-red-400 text-sm">{trackingError}</p>
+              </div>
+            )}
+
+            {/* 🚀 DHL Tracking Timeline */}
+            {trackingData && trackingData.shipments && trackingData.shipments[0] && (
+              <div className="mt-6 space-y-4">
+                <div className="border-t border-[#f8fcdc]/10 pt-4">
+                  <h3 className="text-lg font-semibold text-[#dc9e63] mb-3">Shipment Status</h3>
+                  
+                  {/* Current Status */}
+                  <div className="bg-[#2a0000]/40 p-4 rounded-lg mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="text-3xl">📍</div>
+                      <div className="flex-1">
+                        <div className="text-[#f8fcdc] font-semibold">
+                          {trackingData.shipments[0].status?.description || 'In Transit'}
+                        </div>
+                        <div className="text-[#f8fcdc]/60 text-sm">
+                          {trackingData.shipments[0].status?.location?.address?.addressLocality || 'Location unavailable'}
+                        </div>
+                        <div className="text-[#f8fcdc]/40 text-xs mt-1">
+                          {trackingData.shipments[0].status?.timestamp ? 
+                            new Date(trackingData.shipments[0].status.timestamp).toLocaleString() : 
+                            'Time unavailable'
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Tracking Events Timeline */}
+                  {trackingData.shipments[0].events && trackingData.shipments[0].events.length > 0 && (
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-semibold text-[#f8fcdc]/70 uppercase tracking-wide">Tracking History</h4>
+                      {trackingData.shipments[0].events.map((event: any, idx: number) => (
+                        <div key={idx} className="flex gap-3 relative">
+                          {/* Timeline Line */}
+                          {idx !== trackingData.shipments[0].events.length - 1 && (
+                            <div className="absolute left-[11px] top-6 bottom-0 w-[2px] bg-[#f8fcdc]/10"></div>
+                          )}
+                          
+                          {/* Event Dot */}
+                          <div className="relative z-10 mt-1">
+                            <div className="w-6 h-6 rounded-full bg-[#dc9e63] border-2 border-[#1a0000] flex items-center justify-center">
+                              <div className="w-2 h-2 rounded-full bg-[#1a0000]"></div>
+                            </div>
+                          </div>
+
+                          {/* Event Content */}
+                          <div className="flex-1 pb-4">
+                            <div className="text-[#f8fcdc] text-sm font-medium">
+                              {event.description || 'Event'}
+                            </div>
+                            <div className="text-[#f8fcdc]/60 text-xs">
+                              {event.location?.address?.addressLocality || 'Location unavailable'}
+                            </div>
+                            <div className="text-[#f8fcdc]/40 text-xs mt-1">
+                              {event.timestamp ? 
+                                new Date(event.timestamp).toLocaleString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                }) : 
+                                'Time unavailable'
+                              }
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

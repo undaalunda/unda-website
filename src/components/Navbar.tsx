@@ -215,39 +215,13 @@ useEffect(() => {
 }, []);
   
 
-  const filtered = useMemo(() => {
+ const filtered = useMemo(() => {
   const q = delayedQuery.toLowerCase().trim();
   const queryWords = q.split(/\s+/);
 
   return q.length > 0
     ? allItems
-        .filter((item) => {
-          // ❌ ไม่แสดง Physical products
-          if (item.type === 'physical') return false;
-          
-          // ❌ ไม่แสดง Keys/Bass/Drums Tabs
-          if (
-            item.category === 'Tabs' && 
-            (item.instrument === 'Keys' || item.instrument === 'Bass' || item.instrument === 'Drums')
-          ) {
-            return false;
-          }
-          
-          // ❌ ไม่แสดง Solo Collection Guitar Tabs
-          if (
-            item.category === 'Tabs' && 
-            item.instrument === 'Guitar' &&
-            (item.tags.includes('contest') || 
-             item.tags.includes('abasi') || 
-             item.tags.includes('mayones') || 
-             item.tags.includes('vola'))
-          ) {
-            return false;
-          }
-          
-          // ✅ แสดงเฉพาะสินค้าที่ comingSoon: true
-          return item.comingSoon === true;
-        })
+        .filter((item) => item.category !== 'Tabs')
         .filter((item) => {
           const fields = [
             item.title,
@@ -876,7 +850,7 @@ useEffect(() => {
                                       height={48}
                                       className="w-12 h-12 object-cover rounded"
                                       loading="lazy"
-                                      quality={75}
+                                      quality={95}
                                       sizes="48px"
                                     />
                                    <div className="flex flex-col">
@@ -1067,7 +1041,7 @@ useEffect(() => {
                                       height={48}
                                       className="w-12 h-12 object-cover rounded"
                                       loading="lazy"
-                                      quality={75}
+                                      quality={95}
                                       sizes="48px"
                                     />
                                     <div className="flex flex-col">

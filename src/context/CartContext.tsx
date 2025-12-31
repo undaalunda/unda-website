@@ -14,6 +14,7 @@ export type CartItem = {
   quantity: number;
   type: 'digital' | 'physical';
   weight: number;
+  size?: string;  // ← เพิ่มบรรทัดนี้
 };
 
 export type LastActionItem = {
@@ -23,7 +24,7 @@ export type LastActionItem = {
 
 interface CartContextType {
   cartItems: CartItem[];
-  addToCart: (id: string, quantity?: number) => void;
+  addToCart: (id: string, quantity?: number, size?: string) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -125,7 +126,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   }, [cartItems, isCartReady]);
 
   // 🚀 Super optimized addToCart with Map lookup
-  const addToCart = useCallback((id: string, quantity: number = 1): void => {
+  const addToCart = useCallback((id: string, quantity: number = 1, size?: string): void => {
     // 🎯 O(1) lookup instead of O(n) find
     const item = productById.get(id);
     if (!item) {
@@ -137,8 +138,13 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
     setCartItems((prev) => {
       // 🚀 Use Map for O(1) lookup in cart too
-      const cartMap = new Map(prev.map(item => [item.id, item]));
-      const existing = cartMap.get(id);
+      // ✅ ถ้ามี size ให้เช็คทั้ง id + size
+const cartKey = size ? `${id}-${size}` : id;
+const cartMap = new Map(prev.map(item => {
+  const key = item.size ? `${item.id}-${item.size}` : item.id;
+  return [key, item];
+}));
+const existing = cartMap.get(cartKey);
       const newQuantity = (existing?.quantity || 0) + quantity;
 
       // 🚨 Quantity validation
@@ -162,32 +168,33 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       } else {
         // 🎯 Add new item
         const newItem: CartItem = {
-          id: item.id,
-          title: item.title,
-          subtitle: item.subtitle ?? '',
-          price: item.price,
-          image: item.image,
-          quantity,
-          type: item.type,
-          weight: itemWeight,
-        };
+  id: item.id,
+  title: item.title,
+  subtitle: size ? `${item.subtitle ?? ''} - Size ${size}` : (item.subtitle ?? ''),  // ← เพิ่ม size ใน subtitle
+  price: item.price,
+  image: item.image,
+  quantity,
+  type: item.type,
+  weight: itemWeight,
+  size,  // ← เพิ่ม
+};
         updatedCart = [...prev, newItem];
       }
 
-      // 🎯 Set last action for popup
       setLastActionItem({
-        item: {
-          id: item.id,
-          title: item.title,
-          subtitle: item.subtitle ?? '',
-          price: item.price,
-          image: item.image,
-          quantity,
-          type: item.type,
-          weight: itemWeight,
-        },
-        action: 'add',
-      });
+  item: {
+    id: item.id,
+    title: item.title,
+    subtitle: size ? `${item.subtitle ?? ''} - Size ${size}` : (item.subtitle ?? ''),  // ← เพิ่ม size
+    price: item.price,
+    image: item.image,
+    quantity,
+    type: item.type,
+    weight: itemWeight,
+    size,  // ← เพิ่ม
+  },
+  action: 'add',
+});
 
       return updatedCart;
     });

@@ -2,99 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import supabase from '../../../lib/supabase';
-import { allItems } from '../../../src/components/allItems'; // 🧠 ใช้คำนวณราคาและเช็ค digital
-
-async function createDHLShipment({
-  orderId,
-  fullName,
-  address,
-  country,
-}: {
-  orderId: string;
-  fullName: string;
-  address: string;
-  country: string;
-}) {
-  const endpoint = `https://express.api.dhl.com/mydhlapi/test/shipments`;
-  const credentials = process.env.DHL_TRACKING_AUTH!;
-  const plannedDate = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
-    .toISOString()
-    .replace('Z', '+07:00');
-
-  const payload = {
-    plannedShippingDateAndTime: plannedDate,
-    pickup: { isRequested: false },
-    productCode: country === 'TH' ? 'N' : 'P',
-    customerDetails: {
-      shipperDetails: {
-        postalCode: '10200',
-        cityName: 'Bangkok',
-        countryCode: 'TH',
-        name: 'My Company',
-        addressLine1: '123 Mock Road',
-        email: 'contact@example.com',
-      },
-      receiverDetails: {
-        postalCode: '00000',
-        cityName: 'Somewhere',
-        countryCode: country,
-        name: fullName,
-        addressLine1: address,
-        email: 'customer@example.com',
-      },
-    },
-    accounts: [
-      {
-        typeCode: 'shipper',
-        number: process.env.DHL_ACCOUNT_NUMBER!,
-      },
-    ],
-    packages: [
-      {
-        weight: 1,
-        dimensions: { length: 10, width: 10, height: 5 },
-      },
-    ],
-  };
-
-  const res = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      Authorization: `Basic ${credentials}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
-  });
-
-  const raw = await res.text();
-  console.log('[📨 RAW DHL Shipment Response]', raw);
-
-  try {
-    const data = JSON.parse(raw);
-    const tracking = data?.shipmentTrackingNumber;
-
-    return {
-      tracking_number: tracking || null,
-      courier: tracking ? 'dhl' : null,
-      tracking_url: tracking ? `https://track.dhl.com/${tracking}` : null,
-      estimated_delivery: tracking
-        ? new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toDateString()
-        : null,
-      label_url: tracking
-        ? `https://fake-labels.undaalunda.com/${tracking}.pdf`
-        : null,
-    };
-  } catch (err) {
-    console.error('[🪨 JSON Parse Fail]', raw);
-    return {
-      tracking_number: null,
-      courier: null,
-      tracking_url: null,
-      estimated_delivery: null,
-      label_url: null,
-    };
-  }
-}
+import { allItems } from '../../../src/components/allItems';
 
 export async function POST(req: NextRequest) {
   try {
@@ -115,6 +23,8 @@ export async function POST(req: NextRequest) {
     }
 
     const finalShipping = shippingInfo || billingInfo;
+    
+    // ✅ เช็คว่าเป็น digital only หรือไม่
     const isDigitalOnly = cartItems.every((cartItem: any) => {
       const product = allItems.find(p => p.id === cartItem.id);
       if (!product) {
@@ -134,20 +44,16 @@ export async function POST(req: NextRequest) {
       }, 0) * 100
     );
 
+    // 🆕 ไม่สร้าง tracking ปลอมอีกต่อไป!
     let shipmentResult: {
       tracking_number: string | null;
       courier: string | null;
       tracking_url: string | null;
       estimated_delivery: string | null;
       label_url: string | null;
-    } = {
-      tracking_number: null,
-      courier: null,
-      tracking_url: null,
-      estimated_delivery: null,
-      label_url: null,
     };
 
+    // ✅ ถ้าเป็น physical items
     if (!isDigitalOnly) {
       if (!shippingMethod || !shippingZone) {
         return NextResponse.json(
@@ -156,14 +62,24 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      shipmentResult = await createDHLShipment({
-        orderId,
-        fullName: `${finalShipping.firstName} ${finalShipping.lastName}`,
-        address: finalShipping.address,
-        country: finalShipping.country,
-      });
-
-      console.log('[🚚 DHL Shipment Result]', shipmentResult);
+      shipmentResult = {
+        tracking_number: null,
+        courier: 'dhl',
+        tracking_url: null,
+        estimated_delivery: null,
+        label_url: null,
+      };
+      
+      console.log('[📦 Physical order - will need manual shipping]');
+    } else {
+      // ✅ Digital order
+      shipmentResult = {
+        tracking_number: null,
+        courier: null,
+        tracking_url: null,
+        estimated_delivery: null,
+        label_url: null,
+      };
     }
 
     const updateData = {
@@ -178,7 +94,7 @@ export async function POST(req: NextRequest) {
       estimated_delivery: shipmentResult.estimated_delivery,
       label_url: shipmentResult.label_url,
       amount,
-      status: isDigitalOnly ? 'paid' : 'pending',
+      status: isDigitalOnly ? 'paid' : 'pending_shipment',
     };
 
     console.log('[📦 Updating order in Supabase]', updateData);
@@ -192,6 +108,12 @@ export async function POST(req: NextRequest) {
       console.error('❌ Supabase update error:', error.message);
       return NextResponse.json({ error: 'Failed to update order in DB' }, { status: 500 });
     }
+
+    console.log('✅ Order saved successfully:', {
+      orderId,
+      isDigitalOnly,
+      status: isDigitalOnly ? 'paid' : 'pending_shipment'
+    });
 
     return NextResponse.json({
       success: true,

@@ -1,4 +1,4 @@
-//CheckoutForm.tsx - Part 1/3 - Performance Optimized
+//CheckoutForm.tsx - แก้เฉพาะส่วนที่เกี่ยวกับ DHL
 
 "use client";
 
@@ -37,7 +37,6 @@ const isValidAddress = (addr: string) =>
 const getMissing = (info: Record<string, any>, required: string[]) =>
   required.filter(field => !info[field]?.toString().trim());
 
-// 🚀 Memoized country options to prevent re-creation
 const countryOptions = [
   { value: '', label: 'Select a country' },
   { value: 'AX', label: 'Aaland Islands' },
@@ -296,9 +295,8 @@ export default function CheckoutForm() {
   const router = useRouter();
   const stripe = useStripe();
   const elements = useElements();
-  const { cartItems, clearCart, cartTotal } = useCart(); // 🚀 Use pre-computed cartTotal
+  const { cartItems, clearCart, cartTotal } = useCart();
   
-  // 🚀 Memoize expensive calculations
   const isDigitalOnly = useMemo(() => 
     cartItems.every(item => item.type === 'digital'), 
     [cartItems]
@@ -306,6 +304,7 @@ export default function CheckoutForm() {
   
   const [shippingZone, setShippingZone] = useState<'TH' | 'ASIA' | 'ROW'>('TH');
   const [shippingRate, setShippingRate] = useState(0);
+  const [loadingShipping, setLoadingShipping] = useState(false);
   const [shippingMethod, setShippingMethod] = useState<'asia-tracked' | 'row-tracked' | 'domestic'>('domestic');
   const [shipToDifferent, setShipToDifferent] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -336,7 +335,6 @@ export default function CheckoutForm() {
   const billingRequired = ['firstName', 'lastName', 'address', 'city', 'postcode', 'phone', 'email', 'country'];
   const shippingRequired = ['firstName', 'lastName', 'address', 'city', 'postcode', 'country'];
 
-  // 🚀 Memoize event handlers to prevent re-renders
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setBillingInfo(prev => ({ ...prev, [name]: value }));
@@ -355,7 +353,6 @@ export default function CheckoutForm() {
     }
   }, []);
 
-  // 🚀 Memoize cart weight calculation
   const calculateCartWeight = useCallback((cartItems: any[]): number => {
     return cartItems.reduce((total, item) => {
       const product = allItems.find(p => p.id === item.id);
@@ -373,12 +370,11 @@ export default function CheckoutForm() {
     }, 0);
   }, []);
 
-  // 🚀 Memoize final total calculation
   const finalTotal = useMemo(() => {
     return cartTotal + (isDigitalOnly ? 0 : (shippingRate || 0));
   }, [cartTotal, isDigitalOnly, shippingRate]);
 
-  // 🚀 Debounced shipping rate fetch
+  // 🚀 แก้ useEffect สำหรับ DHL API
   useEffect(() => {
     console.log('[🧪 useEffect triggered]', billingInfo.country, billingInfo.postcode);
 
@@ -388,26 +384,22 @@ export default function CheckoutForm() {
     const newZone = getShippingZone(billingInfo.country);
     setShippingZone(newZone);
 
-    // 🚀 Debounce API calls to prevent excessive requests
     if (shippingRateTimeoutRef.current) {
-    clearTimeout(shippingRateTimeoutRef.current);
-        }
+      clearTimeout(shippingRateTimeoutRef.current);
+    }
 
     shippingRateTimeoutRef.current = setTimeout(async () => {
       try {
+        setLoadingShipping(true);
         const totalWeight = calculateCartWeight(cartItems);
 
-        function cleanCityName(city: string): string {
-          return city.replace(/^(Muang|Amphoe|Tambon)\s*/i, '').trim();
-        }
-
+        // ✅ ลบ cleanCityName แล้ว - ใช้ชื่อเมืองตรงๆ
         const payload = {
           countryCode: billingInfo.country,
           postalCode: billingInfo.postcode,
-          cityName: cleanCityName(billingInfo.city),
+          cityName: billingInfo.city,  // ✅ ส่งตรงๆ ไม่ clean
           weight: totalWeight,
-          declaredValue: 100,
-          declaredValueCurrency: 'THB',
+          declaredValue: cartTotal  // ✅ เพิ่ม declaredValue
         };
 
         console.log('[📦 DHL Request Payload]', JSON.stringify(payload, null, 2));
@@ -421,30 +413,44 @@ export default function CheckoutForm() {
         const data = await res.json();
         console.log('[💸 DHL API Response]', JSON.stringify(data, null, 2));
 
+        // ✅ เช็ค Error ก่อน
+        if (!data.success || data.error) {
+          console.error('❌ Shipping rate error:', data.error);
+          setShippingRate(0);
+          setErrorMessage(data.error || 'Unable to calculate shipping rate. Please verify your address.');
+          setLoadingShipping(false); 
+          return;
+        }
+
         const product = data.products?.[0];
         const thbPrice =
           product?.totalPrice?.find((p: any) => p.currencyType === 'BILLC')?.price ?? 0;
 
         const exchangeRate = data.exchangeRates?.find(
           (rate: any) => rate.currency === 'THB' && rate.baseCurrency === 'USD'
-        )?.currentExchangeRate ?? 0.027;
+        )?.currentExchangeRate ?? 0.029;
 
         const price = +(thbPrice * exchangeRate).toFixed(2);
 
-        if (price) {
+        if (price > 0) {
           setShippingRate(Number(price));
-          console.log('✅ Shipping rate set to:', price);
+          setErrorMessage('');
+          setLoadingShipping(false);
+          console.log('✅ Shipping rate set to:', price, 'USD');
         } else {
           setShippingRate(0);
-          console.warn('⚠️ No shipping rate returned');
+          setErrorMessage('Unable to calculate shipping rate. Please check your address.');
+          setLoadingShipping(false);
         }
-      } catch (err) {
+       } catch (err) {
         console.error('❌ Shipping rate error', err);
         setShippingRate(0);
+        setErrorMessage('Unable to calculate shipping rate. Please try again.');
+        setLoadingShipping(false); 
       }
-    }, 500); // 🚀 Debounce by 500ms
+    }, 500);
 
-  }, [billingInfo.country, billingInfo.postcode, billingInfo.city, cartItems, isDigitalOnly, calculateCartWeight]);
+  }, [billingInfo.country, billingInfo.postcode, billingInfo.city, cartItems, isDigitalOnly, calculateCartWeight, cartTotal]);
 
   useEffect(() => {
     if (isDigitalOnly) return;
@@ -479,8 +485,6 @@ export default function CheckoutForm() {
     };
     document.head.appendChild(script);
   }, []);
-
-  // CheckoutForm.tsx - Part 3/3 - handleSubmit + JSX
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -613,7 +617,6 @@ export default function CheckoutForm() {
       try {
         const amountToCharge = Math.round((cartTotal + shippingCost) * 100);
 
-        // ✅ 1. สร้าง order โดยเรียก API ฝั่ง server
         const orderRes = await fetch('/api/create-order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -635,7 +638,6 @@ export default function CheckoutForm() {
           return;
         }
 
-        // ✅ 2. ส่ง orderId เข้า Stripe Payment Intent
         const res = await fetch('/api/create-payment-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -645,7 +647,7 @@ export default function CheckoutForm() {
             token,
             email: trimmedBilling.email,
             marketing: consentMarketing,
-            orderId, // ✅ แนบ orderId
+            orderId,
           }),
         });
 
@@ -671,21 +673,21 @@ export default function CheckoutForm() {
 
           const totalWeight = calculateCartWeight(cartItems);
 
-const saveRes = await fetch('/api/save-order', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    billingInfo: trimmedBilling,
-    shippingInfo: shipToDifferent ? trimmedShipping : trimmedBilling,
-    cartItems,
-    shippingMethod,
-    shippingZone,
-    shippingRate,
-    email: trimmedBilling.email,
-    orderId,
-    totalWeight,
-  }),
-});
+          const saveRes = await fetch('/api/save-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              billingInfo: trimmedBilling,
+              shippingInfo: shipToDifferent ? trimmedShipping : trimmedBilling,
+              cartItems,
+              shippingMethod,
+              shippingZone,
+              shippingRate,
+              email: trimmedBilling.email,
+              orderId,
+              totalWeight,
+            }),
+          });
 
           const saveData = await saveRes.json();
 
@@ -693,7 +695,6 @@ const saveRes = await fetch('/api/save-order', {
             throw new Error('Failed to save order or missing order ID');
           }
 
-          // ✅ เช็คว่าผู้ใช้ยินยอมรับอีเมลก่อน subscribe
           if (consentMarketing) {
             try {
               await subscribeToNewsletter({
@@ -707,7 +708,6 @@ const saveRes = await fetch('/api/save-order', {
             }
           }
 
-          // 🎯 Redirect พร้อม query
           router.push(`/thank-you?email=${encodeURIComponent(trimmedBilling.email)}&orderId=${orderId}`);
         }
       } catch (err: any) {
@@ -721,9 +721,10 @@ const saveRes = await fetch('/api/save-order', {
   }, [
     billingInfo, shippingInfo, shipToDifferent, isDigitalOnly, cartItems, shippingRate,
     captchaReady, consentTerms, consentMarketing, paymentMethod, stripe, elements,
-    cartTotal, shippingMethod, shippingZone, clearCart, router
+    cartTotal, shippingMethod, shippingZone, clearCart, router, calculateCartWeight
   ]);
 
+  // JSX part remains the same...
   return (
     <main className="min-h-screen flex flex-col items-center justify-center pt-[120px] text-[#f8fcdc] font-[Cinzel] px-6">
       <h1 className="text-4xl font-extrabold tracking-wide mb-8 text-[#dc9e63]">CHECKOUT</h1>
@@ -771,7 +772,6 @@ const saveRes = await fetch('/api/save-order', {
               />
             ))}
 
-            {/* Country Select - 🚀 Optimized */}
             <select
               name="country"
               value={billingInfo.country}
@@ -786,7 +786,6 @@ const saveRes = await fetch('/api/save-order', {
               ))}
             </select>
 
-            {/* Rest of inputs */}
             {[
               { name: 'address', placeholder: 'Street Address', required: true },
               { name: 'address2', placeholder: 'Apartment, suite, unit, etc. (optional)' },
@@ -844,7 +843,6 @@ const saveRes = await fetch('/api/save-order', {
                 />
               ))}
 
-              {/* Shipping Country Select */}
               <select
                 name="country"
                 value={shippingInfo.country}
@@ -884,17 +882,14 @@ const saveRes = await fetch('/api/save-order', {
 
         {/* Your Order + Payment Wrapper */}
         <div className="w-full md:max-w-[450px]">
-          {/* Your Order */}
           <h2 className="text-xl font-bold text-[#dc9e63] mb-4 mt-0">YOUR ORDER</h2>
           <div className="bg-[#1e0000]/50 p-4 rounded-xl shadow-xl mb-6">
             <ul className="mb-4 text-sm space-y-2 leading-8">
-              {/* 🧾 PRODUCT HEADER */}
               <li className="flex justify-between text-base font-bold mb-1">
                 <span>Product</span>
                 <span>Subtotal</span>
               </li>
 
-              {/* 🧾 PRODUCT LIST */}
               {cartItems.map(item => (
                 <li key={item.id} className="flex gap-4 items-center mb-4">
                   <img src={item.image} alt={item.title} className="w-12 h-12 object-cover rounded" />
@@ -910,7 +905,6 @@ const saveRes = await fetch('/api/save-order', {
                 </li>
               ))}
 
-              {/* 💵 SUBTOTAL */}
               <li className="flex justify-between font-bold text-sm uppercase mb-3">
                 <span className="uppercase text-[#f8fcdc]">Subtotal</span>
                 <span className="text-[#f8fcdc]">
@@ -918,28 +912,29 @@ const saveRes = await fetch('/api/save-order', {
                 </span>
               </li>
 
-              {/* 🚚 SHIPPING */}
               {!isDigitalOnly && (
-                <li className="pt-2">
-                  <span className="font-bold block mb-2">Shipping</span>
-                  <div className="flex justify-between text-[#f8fcdc]/70 font-extralight">
-                    <span>
-                      {shippingMethod === 'asia-tracked' && 'Asia Tracked'}
-                      {shippingMethod === 'row-tracked' && 'ROW Tracked'}
-                      {shippingMethod === 'domestic' && 'Domestic Delivery (TH)'}
-                    </span>
-                    <span>
-                      {shippingRate === null ? (
-                        <em>Calculating...</em>
-                      ) : (
-                        `$${shippingRate.toFixed(2)}`
-                      )}
-                    </span>
-                  </div>
-                </li>
-              )}
+  <li className="pt-2">
+    <span className="font-bold block mb-2">Shipping</span>
+    <div className="flex justify-between text-[#f8fcdc]/70 font-extralight">
+      <span>
+        {shippingMethod === 'asia-tracked' && 'Asia Tracked'}
+        {shippingMethod === 'row-tracked' && 'ROW Tracked'}
+        {shippingMethod === 'domestic' && 'Domestic Delivery (TH)'}
+      </span>
+      <span className="flex items-center gap-2">
+        {loadingShipping ? (
+          <>
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#dc9e63]"></div>
+            <em>Calculating...</em>
+          </>
+        ) : (
+          `$${shippingRate.toFixed(2)}`
+        )}
+      </span>
+    </div>
+  </li>
+)}
 
-              {/* 💰 TOTAL - 🚀 Use memoized finalTotal */}
               <li className="flex justify-between font-bold text-2xl uppercase border-t border-[#f8fcdc]/10 pt-4 mt-4">
                 <span className="uppercase text-[#f8fcdc]">TOTAL</span>
                 <span className="text-[#f8fcdc]">
@@ -949,7 +944,6 @@ const saveRes = await fetch('/api/save-order', {
             </ul>
           </div>
 
-          {/* Payment */}
           <h2 className="text-xl text-[#dc9e63] font-bold mb-4">PAYMENT</h2>
           <div className="bg-[#1e0000]/50 p-4 rounded-xl shadow-xl mb-6">        
 
@@ -1018,8 +1012,8 @@ const saveRes = await fetch('/api/save-order', {
 
           <button
             type="submit"
-            disabled={false}
-            className="w-full bg-[#dc9e63] text-black py-3 rounded-xl text-lg font-extrabold tracking-wide hover:bg-[#f8cfa3] transition-colors shadow-lg cursor-pointer"
+            disabled={loading || (!isDigitalOnly && (shippingRate === null || shippingRate === 0))}
+            className="w-full bg-[#dc9e63] text-black py-3 rounded-xl text-lg font-extrabold tracking-wide hover:bg-[#f8cfa3] transition-colors shadow-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Processing...' : 'PLACE ORDER'}
           </button>

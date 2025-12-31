@@ -46,7 +46,7 @@ const CartItemComponent = memo(function CartItemComponent({
         height={80}
         className="rounded"
         loading="lazy" // 🚀 Lazy loading
-        quality={75}   // 🎯 ลดขนาด
+        quality={95}   // 🎯 ลดขนาด
       />
 
       <div className="flex-1">

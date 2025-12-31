@@ -33,8 +33,8 @@ const getCurrentAlbum = (slug: string) => {
 // Get digital products for this album
 const getAlbumProducts = (albumSlug: string) => {
   const realProducts = allItems.filter(item => {
-    // Only include Tabs, Backing Track, or Stem
-    const isValidCategory = item.category === 'Tabs' || item.category === 'Backing Track' || item.category === 'Stem';
+    // Only include Tabs and Backing Track (removed Stem)
+    const isValidCategory = item.category === 'Tabs' || item.category === 'Backing Track';
     
     // Exclude Solo Collection items (items with contest tag or specific IDs)
     const isSoloCollectionItem = 
@@ -53,7 +53,7 @@ function isBundlePrice(price: number | { original: number; sale: number }): pric
   return typeof price === 'object' && price !== null && 'original' in price && 'sale' in price;
 }
 
-type FilterType = 'all' | 'tabs' | 'backing' | 'stems';
+type FilterType = 'all' | 'tabs' | 'backing';
 type InstrumentType = 'all' | 'guitar' | 'bass' | 'keys' | 'drums';
 
 interface AlbumHubPageProps {
@@ -71,7 +71,7 @@ export default function AlbumHubPage({
   
   // Helper functions
   const normalizeFilter = (filter?: string): FilterType => {
-    return (filter === 'tabs' || filter === 'backing' || filter === 'stems') 
+    return (filter === 'tabs' || filter === 'backing') 
       ? filter as FilterType 
       : 'all';
   };
@@ -85,7 +85,7 @@ export default function AlbumHubPage({
   // Initial state with sessionStorage support
   const getInitialStateFromContext = (): { filterType: FilterType; filterInstrument: InstrumentType } => {
     const normalizeFilterLocal = (filter?: string): FilterType => {
-      return (filter === 'tabs' || filter === 'backing' || filter === 'stems') 
+      return (filter === 'tabs' || filter === 'backing') 
         ? filter as FilterType 
         : 'all';
     };
@@ -111,7 +111,7 @@ export default function AlbumHubPage({
       if (navigationContext) {
         const context = JSON.parse(navigationContext);
         
-        const contextFilter = context.filter && ['tabs', 'backing', 'stems'].includes(context.filter)
+        const contextFilter = context.filter && ['tabs', 'backing'].includes(context.filter)
           ? context.filter as FilterType
           : 'all';
         const contextInstrument = context.instrument && ['guitar', 'bass', 'keys', 'drums'].includes(context.instrument)
@@ -203,8 +203,7 @@ export default function AlbumHubPage({
       // Type filter
       const typeMatch = filterType === 'all' || 
         (filterType === 'tabs' && product.category === 'Tabs') ||
-        (filterType === 'backing' && product.category === 'Backing Track') ||
-        (filterType === 'stems' && product.category === 'Stem');
+        (filterType === 'backing' && product.category === 'Backing Track');
 
       // Instrument filter
       let instrumentMatch = false;
@@ -226,7 +225,7 @@ export default function AlbumHubPage({
             instrumentMatch = searchText.includes('drum') || searchText.includes('percussion');
           }
         } 
-        // For Tab and Stem - use existing logic
+        // For Tab - use existing logic
         else {
           if (filterInstrument === 'guitar') {
             instrumentMatch = (product as any).instrument?.toLowerCase().includes('guitar') ||
@@ -267,8 +266,7 @@ export default function AlbumHubPage({
   const getProductCounts = useMemo(() => {
     const tabs = allProducts.filter(p => p.category === 'Tabs').length;
     const backing = allProducts.filter(p => p.category === 'Backing Track').length;
-    const stems = allProducts.filter(p => p.category === 'Stem').length;
-    return { tabs, backing, stems, total: tabs + backing + stems };
+    return { tabs, backing, total: tabs + backing };
   }, [allProducts]);
 
   // Product click handler
@@ -465,12 +463,6 @@ export default function AlbumHubPage({
             >
               BACKING TRACKS ({getProductCounts.backing})
             </button>
-            <button
-              onClick={() => handleFilterTypeChange('stems')}
-              className={`info-button cursor-pointer ${filterType === 'stems' ? 'active-tab' : ''}`}
-            >
-              STEMS ({getProductCounts.stems})
-            </button>
           </div>
 
           {/* Instrument Filters */}
@@ -594,7 +586,7 @@ export default function AlbumHubPage({
                             width={200}
                             height={200}
                             className="stems-image"
-                            quality={85}
+                            quality={95}
                             sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
                           />
                           {product.comingSoon && (
@@ -614,16 +606,15 @@ export default function AlbumHubPage({
                           </p>
                           <span className="backing-line" />
                           <p className="stems-subtitle-tiny">
-                            {product.category === 'Backing Track' ? 'BACKING TRACK' : 
-                             product.category === 'Tabs' ? 'TABS' : 'STEM'}
+                            {product.category === 'Backing Track' ? 'BACKING TRACK' : 'TABS'}
                           </p>
                           <p className="stems-price">
-  {product.comingSoon ? (
-    <span className="invisible">{displayPrice}</span>
-  ) : (
-    displayPrice
-  )}
-</p>
+                            {product.comingSoon ? (
+                              <span className="invisible">{displayPrice}</span>
+                            ) : (
+                              displayPrice
+                            )}
+                          </p>
                         </div>
                       </div>
                     ) : (
@@ -639,7 +630,7 @@ export default function AlbumHubPage({
                           width={200}
                           height={200}
                           className="stems-image"
-                          quality={85}
+                          quality={95}
                           sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
                         />
                         <div className="stems-label-group">
@@ -651,16 +642,15 @@ export default function AlbumHubPage({
                           </p>
                           <span className="backing-line" />
                           <p className="stems-subtitle-tiny">
-                            {product.category === 'Backing Track' ? 'BACKING TRACK' : 
-                             product.category === 'Tabs' ? 'TABS' : 'STEM'}
+                            {product.category === 'Backing Track' ? 'BACKING TRACK' : 'TABS'}
                           </p>
                           <p className="stems-price">
-  {product.comingSoon ? (
-    <span className="invisible">{displayPrice}</span>
-  ) : (
-    displayPrice
-  )}
-</p>
+                            {product.comingSoon ? (
+                              <span className="invisible">{displayPrice}</span>
+                            ) : (
+                              displayPrice
+                            )}
+                          </p>
                         </div>
                       </div>
                     );

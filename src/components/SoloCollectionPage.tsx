@@ -539,7 +539,7 @@ export default function SoloCollectionPage({
       width={200}
       height={200}
       className="stems-image"
-      quality={85}
+      quality={95}
       sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
     />
     {product.comingSoon && (
@@ -571,7 +571,7 @@ export default function SoloCollectionPage({
                           width={200}
                           height={200}
                           className="stems-image"
-                          quality={85}
+                          quality={95}
                           sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
                         />
                         <div className="stems-label-group">

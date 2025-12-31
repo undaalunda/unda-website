@@ -1,4 +1,4 @@
-//ShopLandingContent.tsx - CSS Colors Version with Badge
+//ShopLandingContent.tsx - CSS Colors Version (Physical Shop Enabled)
 'use client';
 
 import React from 'react';
@@ -15,10 +15,10 @@ export default function ShopLandingContent() {
         <div className="shop-landing-cards-container">
           <div className="shop-landing-cards-grid min-[1281px]:grid min-[1281px]:grid-cols-2 min-[1281px]:gap-8">
             
-            {/* Physical Shop Card - CSS Colors - DISABLED */}
-            <div className="shop-landing-card-item group cursor-not-allowed">
-              <div className="block pointer-events-none relative">
-                <div className="shop-landing-card bg-gradient-to-br from-[rgba(252,194,118,0.15)] via-[rgba(211,113,66,0.12)] to-[rgba(120,26,26,0.08)] border border-[rgba(252,194,118,0.3)] opacity-40">
+            {/* Physical Shop Card - CSS Colors - ENABLED */}
+            <div className="shop-landing-card-item group cursor-pointer">
+              <Link href="/shop/physical" className="block">
+                <div className="shop-landing-card bg-gradient-to-br from-[rgba(252,194,118,0.15)] via-[rgba(211,113,66,0.12)] to-[rgba(120,26,26,0.08)] border border-[rgba(252,194,118,0.3)] hover:border-[rgba(252,194,118,0.5)] hover:shadow-2xl hover:shadow-[rgba(252,194,118,0.2)]">
                   
                   {/* Content */}
                   <div className="shop-landing-card-content">
@@ -36,12 +36,7 @@ export default function ShopLandingContent() {
                     </div>
                   </div>
                 </div>
-
-                {/* Coming Soon Badge - Bronze/Brown tone */}
-                <div className="absolute top-4 right-4 bg-[rgba(139,90,43,0.7)] text-[rgba(210,180,140,0.95)] px-4 py-2 rounded-full text-sm font-semibold border border-[rgba(160,120,80,0.4)] backdrop-blur-sm shadow-md">
-                  Coming Soon
-                </div>
-              </div>
+              </Link>
             </div>
 
             {/* Digital Shop Card - CSS Colors */}

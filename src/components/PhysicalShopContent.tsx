@@ -312,21 +312,20 @@ export default function PhysicalShopContent({ initialTab }: { initialTab?: Physi
     item.available || !item.comingSoon 
       ? 'cursor-pointer' 
       : 'opacity-60 cursor-not-allowed'
-  }`}
+  } ${item.tags.includes('keychain') ? 'keychain-glow' : ''}`}
 >
-                      <div className="relative">
-                        <Image
-                          src={item.image}
-                          alt={item.title}
-                          width={200}
-                          height={200}
-                          className="stems-image"
-                          loading="lazy"
-                          quality={75}
-                          sizes="(max-width: 480px) 140px, (max-width: 696px) 140px, (max-width: 927px) 160px, 180px"
-                          placeholder="blur"
-                          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
-                        />
+  <div className="relative">
+    <Image
+  src={item.image}
+  alt={item.title}
+  width={200}
+  height={200}
+  className="stems-image"
+  loading="lazy"
+  quality={100}
+  unoptimized={false}
+  sizes="(max-width: 480px) 200px, (max-width: 696px) 200px, (max-width: 927px) 250px, 300px"
+/>
                         {item.soldOut && (
                           <div className="absolute top-2 right-2 bg-red-900/40 text-white text-xs px-2 py-1 rounded-md font-semibold border border-red-800/50">
                             SOLD OUT

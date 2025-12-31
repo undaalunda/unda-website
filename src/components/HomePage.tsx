@@ -15,16 +15,19 @@ import { HeroImage, ProductImage } from '@/components/OptimizedImage';
 // 🚀 Lazy load heavy components
 const BandsinTownWidget = lazy(() => import('@/components/BandsinTownWidget'));
 
-const blacklist = [
-  'bass-book', 'keys-book', 'drums-book', 'cat-scores-t-shirt-white',
-  'album-merch-bundle', 'book-merch-bundle', 'book-bonus-bundle',
-  'book-bundle', 'apparel-book-bundle', 'sticker-book-bundle'
+const allowedItems = [
+  'dark-wonderful-world-t-shirt',
+  'cat-in-the-cloud-longsleeve',
+  'mr-feign-t-shirt',
+  'dark-wonderful-world-bag',
+  'guitars-book',
+  'signed-keychain',
+  'audio-digipak',
+  'dual-album-bundle'
 ];
 
 const homepageItems = allItems.filter(
-  (item) => 
-    (item.category === 'Merch' || item.category === 'Bundles' || item.category === 'Music') &&
-    !blacklist.includes(item.id)
+  (item) => allowedItems.includes(item.id)
 );
 
 export default function HomePage() {
@@ -483,24 +486,24 @@ return () => {
           <div style={{ marginBottom: '0vh' }}>
             <div className="hero-text desktop-only">
               <p className="hero-line1">
-                THE NEW ALBUM'S COMING <span className="highlight">December 31<sup style={{ fontSize: '0.6em', marginLeft: '-0.1em' }}>st</sup> 2025</span>
+                THE NEW ALBUM'S <span className="highlight">OUT NOW</span>
               </p>
               <p className="hero-line2">
-                AVAILABLE NOW TO <Link href="/shop" className="hero-cta-link">PRE-ORDER</Link> &{' '}
+                AVAILABLE NOW TO <Link href="/shop/physical" onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'music')} className="hero-cta-link">PRE-ORDER</Link> &{' '}
                 <a href="https://orcd.co/UndaAlunda_DarkWonderfulWorld" target="_blank" rel="noopener noreferrer" className="hero-cta-link">
-                  PRE-SAVE
+                  STREAM
                 </a>
               </p>
             </div>
             
             <div className="hero-text mobile-only">
-              <p className="hero-line1">THE NEW ALBUM'S COMING</p>
-              <p className="hero-line1"><span className="highlight">December 31<sup style={{ fontSize: '0.6em', marginLeft: '-0.1em' }}>st</sup> 2025</span></p>
+              <p className="hero-line1">THE NEW ALBUM'S</p>
+              <p className="hero-line1"><span className="highlight">OUT NOW</span></p>
               <p className="hero-line2">AVAILABLE NOW TO</p>
               <p className="hero-line2">
-                <Link href="/shop" onClick={createNavigationHandler('/shop', undefined, undefined, 'merch')} className="hero-cta-link">PRE-ORDER</Link> &{' '}
+               <Link href="/shop/physical" onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'music')} className="hero-cta-link">PRE-ORDER</Link> &{' '}
                 <a href="https://orcd.co/UndaAlunda_DarkWonderfulWorld" target="_blank" rel="noopener noreferrer" className="hero-cta-link">
-                  PRE-SAVE
+                  STREAM
                 </a>
               </p>
             </div>
@@ -591,28 +594,20 @@ return () => {
           >
             STEMS & SAMPLES
           </Link>
-          <div
+          <Link 
+  href="/shop/physical" 
+  onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'merch')}
   className="info-button"
-  style={{
-    cursor: 'not-allowed',
-    opacity: 0.5,
-    pointerEvents: 'none',
-    position: 'relative'
-  }}
 >
   MERCH
-</div>
-<div
+</Link>
+<Link 
+  href="/shop/physical" 
+  onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'music')}
   className="info-button"
-  style={{
-    cursor: 'not-allowed',
-    opacity: 0.5,
-    pointerEvents: 'none',
-    position: 'relative'
-  }}
 >
   PHYSICAL ALBUMS
-</div>
+</Link>
           <a
             href="https://undaalunda.bandcamp.com/album/dark-wonderful-world-live-in-thailand"
             className="info-button"
@@ -682,99 +677,76 @@ return () => {
           </div>
         </section>
 
-        {/* STEMS SECTION - 🚀 OPTIMIZED */}
+        {/* MUSIC & MERCH - 🚀 OPTIMIZED */}
         <section className="stems-section">
-          <div ref={stemsRef} className={`fade-trigger ${showStems ? 'fade-in' : ''}`}>
-            <p className="stems-sub">JAM THE TRACKS</p>
-            <h2 className="stems-title">STEMS & BACKINGS</h2>
+          <div ref={musicMerchRef} className={`fade-trigger ${showMerch ? 'fade-in' : ''}`}>
+            <p className="stems-sub">MUSIC IN YOUR HANDS</p>
+            <h2 className="stems-title">MUSIC & MERCH</h2>
             <div className="stems-row">
-              {allItems
-  .filter((item) => {
-    const selectedItems = [
-      'jyy-drums',
-      'anomic-guitars-stem',
-      'feign-keys-stem',
-      'consonance-guitars',
-      'the-dark-bass',
-      'atlantic-guitars-stem',
-      'red-down-keys',
-      'dark-wonderful-world-drums-stem'
-    ];
-    
-    return (item.category === 'Backing Track' || item.category === 'Stem') && selectedItems.includes(item.id);
-  })
-  .sort((a, b) => {
-    const patternOrder = [
-      'jyy-drums',
-      'anomic-guitars-stem',
-      'feign-keys-stem',
-      'consonance-guitars',
-      'the-dark-bass',
-      'atlantic-guitars-stem',
-      'red-down-keys',
-      'dark-wonderful-world-drums-stem'
-    ];
-    return patternOrder.indexOf(a.id) - patternOrder.indexOf(b.id);
-  })
-  .map((item) => (
-    <Link
-  href={item.url || `/product/${item.id}`}
-  key={item.id}
-  className="stems-item product-label-link is-backing"
->
-  <div className="relative">
-        <ProductImage
-          src={item.image}
-          alt={item.title}
-          width={200}
-          height={200}
-          className="stems-image"
-          quality={95}
-          sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
-        />
-        {item.soldOut && (
-          <div className="absolute top-2 right-2 bg-red-900/40 text-white text-xs px-2 py-1 rounded-md font-semibold border border-red-800/50">
-            SOLD OUT
-          </div>
-        )}
-        {item.comingSoon && !item.soldOut && (
-          <div className="absolute top-2 right-2 bg-orange-600/50 text-white text-xs px-2 py-1 rounded-md font-semibold border border-orange-500/60">
-            Available Dec 31
-          </div>
-        )}
-      </div>
-      <div className="stems-label-group">
-        <h3 className="sr-only">{`${item.title} – ${item.subtitle}`}</h3>
-        <p className="stems-title-text">{item.title}</p>
-        <p className="stems-subtitle-tiny">
-          {item.subtitle
-            .replace(' BACKING TRACK', '')
-            .replace(' STEM', '')
-            .replace(' TAB', '')}
-        </p>
-        <span className="backing-line"></span>
-        <p className="stems-subtitle-tiny tracking-wide uppercase text-center backing-text">
-          {item.category === 'Stem' ? 'STEM' : 'BACKING TRACK'}
-        </p>
-        <p className="stems-price">
-          {item.comingSoon ? (
-            <span className="invisible">
-              ${typeof item.price === 'object' ? item.price.sale.toFixed(2) : item.price.toFixed(2)}
-            </span>
-          ) : (
-            <span>
-              ${typeof item.price === 'object' ? item.price.sale.toFixed(2) : item.price.toFixed(2)}
-            </span>
-          )}
-        </p>
-      </div>
-    </Link>
-  ))}
+              {homepageItems.map((item) => (
+                <Link href={item.url || `/product/${item.id}`} key={item.id} className="stems-item product-label-link">
+                  <div className="relative">
+                    <ProductImage
+                      src={item.image}
+                      alt={item.title}
+                      width={200}
+                      height={200}
+                      className="stems-image"
+                      quality={95}
+                      sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
+                    />
+                    {item.soldOut && (
+                      <div className="absolute top-2 right-2 bg-red-900/40 text-white text-xs px-2 py-1 rounded-md font-semibold border border-red-800/50">
+                        SOLD OUT
+                      </div>
+                    )}
+                    {item.comingSoon && !item.soldOut && (
+                      <div className="absolute top-2 right-2 bg-orange-600/50 text-white text-xs px-2 py-1 rounded-md font-semibold border border-orange-500/60">
+                        Available Dec 31
+                      </div>
+                    )}
+                  </div>
+                  <div className="stems-label-group">
+                    <h3 className="sr-only">{`${item.title} – ${item.subtitle.replace(' BACKING TRACK', '').replace(' STEM', '').replace(' TAB', '')}`}</h3>
+                    <p className="stems-title-text">{item.title}</p>
+                    <p className="stems-subtitle-tiny">
+                      {item.subtitle
+                        .replace(' BACKING TRACK', '')
+                        .replace(' STEM', '')
+                        .replace(' TAB', '')}
+                    </p>
+                    <p className="stems-price">
+                      {item.comingSoon ? (
+                        <span className="invisible">
+                          {typeof item.price === 'object' && item.price !== null
+                            ? `$${item.price.sale.toFixed(2)}`
+                            : typeof item.price === 'number'
+                              ? `$${item.price.toFixed(2)}`
+                              : null}
+                        </span>
+                      ) : (
+                        typeof item.price === 'object' && item.price !== null
+                          ? <>
+                              <span className="line-through mr-1 text-[#f8fcdc]">
+                                ${item.price.original.toFixed(2)}
+                              </span>
+                              <span className="text-[#cc3f33]">
+                                ${item.price.sale.toFixed(2)}
+                              </span>
+                            </>
+                          : typeof item.price === 'number'
+                            ? `$${item.price.toFixed(2)}`
+                            : null
+                      )}
+                    </p>
+                  </div>
+                </Link>
+              ))}
             </div>
             <div className="shopall-button-wrapper">
-              <Link 
-                href="/shop/digital/dark-wonderful-world" 
-                onClick={createNavigationHandler('/shop/digital/dark-wonderful-world', 'backing', 'all')}
+              <Link
+                href="/shop/physical"
+                onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'merch')}
                 className="info-button"
               >
                 SHOP ALL

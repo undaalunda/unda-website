@@ -180,7 +180,7 @@ export default function SearchOverlay({ onClose }: { onClose: () => void }) {
                                 height={48}
                                 className="w-12 h-12 object-cover rounded group-hover:scale-105 transition-transform"
                                 loading="lazy" // 🚀 Lazy loading
-                                quality={75}   // 🎯 Optimize for thumbnails
+                                quality={95}   // 🎯 Optimize for thumbnails
                                 sizes="48px"   // 📐 Fixed size
                                 placeholder="blur" // 🌟 Smooth loading
                                 blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
