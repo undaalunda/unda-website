@@ -286,15 +286,15 @@ export const productsByCategory = {
   
   // ========== STICKER BOOK BUNDLE (ไม่มีเสื้อ) ==========
   { 
-    id: 'sticker-book-bundle', 
+    id: 'bag-book-bundle', 
     title: 'DARK WONDERFUL WORLD', 
-    subtitle: 'STICKER & BOOK BUNDLE', 
+    subtitle: 'BAG & BOOK BUNDLE',  
     category: 'Bundles' as const, 
     type: 'physical' as const, 
     price: { original: 84.80, sale: 67.84 }, 
-    tags: ['bundle', 'sticker', 'book'], 
-    image: '/dark-wonderful-world-sticker-&-book-bundle-2.webp', 
-    url: '/product/sticker-book-bundle', 
+    tags: ['bundle', 'bag', 'book'], 
+    image: '/dark-wonderful-world-bag-&-book-bundle.webp', 
+    url: '/product/bag-book-bundle',
     bundleItems: ['dark-wonderful-world-bag', 'audio-digipak', 'guitars-book'],
     weight: 1.22,
     description: 'This exclusive bundle includes:\n\n• Dark Wonderful World Bag – Premium cotton tote bag (13x14x3 inches)\n• Dark Wonderful World Digipak CD – Full album with 16-page booklet\n• Full Guitars Transcription Book – Complete guitar tabs for all 11 tracks\n\nPlease Note: Product images displayed are mock-ups; actual items may vary.'
