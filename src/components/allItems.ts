@@ -213,14 +213,14 @@ export const productsByCategory = {
     description: 'This exclusive bundle includes:\n\n• Unda Alunda Signed Keychain – Limited edition collectible\n• Dark Wonderful World Digipak CD – Full album with 16-page booklet\n• Full Guitars Transcription Book – Complete guitar tabs for all 11 tracks\n\nPlease Note: Product images displayed are mock-ups; actual items may vary.'
   },
   
-  // ========== BOOK BONUS BUNDLE (ไม่มีเสื้อ) ==========
+  // ========== BOOK BONUS BUNDLE (ไม่มีเสื้อ) - ✅ แก้ไขแล้ว ==========
   { 
     id: 'book-bonus-bundle', 
     title: 'DARK WONDERFUL WORLD', 
     subtitle: 'BOOK & BONUS MERCH BUNDLE', 
     category: 'Bundles' as const, 
     type: 'physical' as const, 
-    price: { original: 84.75, sale: 67.80 }, 
+    price: { original: 94.75, sale: 75.80 }, 
     tags: ['bundle', 'book', 'bonus'], 
     image: '/dark-wonderful-world-book-&-bonus-merch-bundle-2.webp', 
     url: '/product/book-bonus-bundle', 
@@ -284,7 +284,7 @@ export const productsByCategory = {
     description: 'This exclusive bundle includes:\n\n• Dark Wonderful World T-Shirt – Select your size (S-6XL available)\n• Dark Wonderful World Digipak CD – Full album with 16-page booklet\n• Full Guitars Transcription Book – Complete guitar tabs for all 11 tracks\n\nPlease Note: Product images displayed are mock-ups; actual items may vary.'
   },
   
-  // ========== STICKER BOOK BUNDLE (ไม่มีเสื้อ) ==========
+  // ========== BAG BOOK BUNDLE (ไม่มีเสื้อ) ==========
   { 
     id: 'bag-book-bundle', 
     title: 'DARK WONDERFUL WORLD', 
