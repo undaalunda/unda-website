@@ -1,22 +1,40 @@
-// app/product/[slug]/page.tsx - FIXED: Domain + SEO Improvements + Bundle Stock Check
-
+// app/product/[slug]/page.tsx
 import { allItems } from '@/components/allItems';
 import ProductPageContent from '@/components/ProductPageContent';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-// 🚀 FIXED: Use final domain (update when ready)
-const BASE_URL = 'https://unda-website.vercel.app'; // TODO: Change to 'https://www.undaalunda.com' when migrating
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://undaalunda.com';
 
-// 🚀 Optimized static params generation
+// ✅ เพิ่ม 2 บรรทัดนี้ (สำคัญมาก!)
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
+
+// ✅ ปรับ generateStaticParams ให้ filter เฉพาะ products ที่มี data ครบ
 export async function generateStaticParams() {
-  return allItems.map((item) => ({
-    slug: item.id,
-  }));
+  return allItems
+    .filter(item => {
+      // กรอง products ที่มี data ไม่ครบออก
+      return (
+        item.id && 
+        item.title && 
+        item.subtitle &&
+        item.image && 
+        item.price !== undefined &&
+        item.category &&
+        item.type
+      );
+    })
+    .map((item) => ({
+      slug: item.id,
+    }));
 }
 
-// 🚀 Enhanced metadata generation with better SEO
-export async function generateMetadata({ params }: any): Promise<Metadata> {
+export async function generateMetadata({ 
+  params 
+}: { 
+  params: Promise<{ slug: string }> 
+}): Promise<Metadata> {
   const { slug } = await params;
   const product = allItems.find((item) => item.id === slug);
 
@@ -35,17 +53,17 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
     ? product.subtitle.charAt(0).toUpperCase() + product.subtitle.slice(1).toLowerCase()
     : '';
 
-  // 🚀 Better title format for SEO
+  // ✅ Better title format for SEO
   const title = `${smartTitleCase(product.title)}${
     formattedSubtitle ? ` – ${formattedSubtitle}` : ''
   } | UNDA ALUNDA`;
 
-  // 🚀 Better description for SEO
+  // ✅ Better description for SEO
   const description = product.description 
     ? `${product.description.slice(0, 150)}... Official ${product.category.toLowerCase()} from Unda Alunda.`
     : `${smartTitleCase(product.title)} - ${formattedSubtitle}. Official progressive rock ${product.category.toLowerCase()} from Unda Alunda. High-quality ${product.type} product.`;
 
-  // 🚀 Calculate price for metadata
+  // ✅ Calculate price for metadata
   const price = typeof product.price === 'object' 
     ? product.price.sale 
     : product.price;
@@ -68,7 +86,7 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
       'Thailand musician',
     ].filter(Boolean),
     
-    // 🚀 Enhanced Open Graph
+    // ✅ Enhanced Open Graph
     openGraph: {
       title,
       description,
@@ -85,7 +103,7 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
       siteName: 'UNDA ALUNDA',
     },
 
-    // 🚀 Twitter Card
+    // ✅ Twitter Card
     twitter: {
       card: 'summary_large_image',
       title,
@@ -94,7 +112,7 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
       creator: '@undaalunda',
     },
 
-    // 🚀 Additional metadata
+    // ✅ Additional metadata
     other: {
       'og:title': title,
       'og:description': description,
@@ -105,7 +123,7 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
       'og:image:height': '630',
       'og:image:alt': `${product.title} - ${product.subtitle}`,
       
-      // 🚀 Product-specific metadata
+      // ✅ Product-specific metadata
       'product:price:amount': price?.toString() || '0',
       'product:price:currency': 'USD',
       'product:availability': product.type === 'physical' ? 'coming soon' : 'in stock',
@@ -115,12 +133,12 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
       'product:category': product.category,
     },
 
-    // 🚀 Canonical URL
+    // ✅ Canonical URL
     alternates: {
       canonical: `${BASE_URL}/product/${slug}`,
     },
 
-    // 🚀 Robots
+    // ✅ Robots
     robots: {
       index: true,
       follow: true,
@@ -135,11 +153,15 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
   };
 }
 
-export default async function ProductPage({ params }: any) {
+export default async function ProductPage({ 
+  params 
+}: { 
+  params: Promise<{ slug: string }> 
+}) {
   const { slug } = await params;
   const product = allItems.find((item) => item.id === slug);
 
-  // 🚀 Use Next.js notFound() for better 404 handling
+  // ✅ Use Next.js notFound() for better 404 handling
   if (!product) {
     notFound();
   }
@@ -186,7 +208,7 @@ export default async function ProductPage({ params }: any) {
     }
   }
 
-  // 🚀 Calculate pricing for schema
+  // ✅ Calculate pricing for schema
   const price = typeof product.price === 'object' 
     ? product.price.sale 
     : product.price;
@@ -199,7 +221,7 @@ export default async function ProductPage({ params }: any) {
 
   return (
     <>
-      {/* 🚀 Enhanced Product Schema.org */}
+      {/* ✅ Enhanced Product Schema.org */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -230,7 +252,7 @@ export default async function ProductPage({ params }: any) {
             "url": `${BASE_URL}/product/${product.id}`,
             "mainEntityOfPage": `${BASE_URL}/product/${product.id}`,
             
-            // 🚀 Enhanced Offer information
+            // ✅ Enhanced Offer information
             "offers": {
               "@type": "Offer",
               "url": `${BASE_URL}/product/${product.id}`,
@@ -257,7 +279,7 @@ export default async function ProductPage({ params }: any) {
               })
             },
 
-            // 🚀 Additional product details
+            // ✅ Additional product details
             "additionalProperty": [
               {
                 "@type": "PropertyValue",
@@ -286,7 +308,7 @@ export default async function ProductPage({ params }: any) {
               }))),
             ],
 
-            // 🚀 Add review aggregate (if you have reviews)
+            // ✅ Add review aggregate (if you have reviews)
             "aggregateRating": {
               "@type": "AggregateRating",
               "ratingValue": "5",
@@ -296,7 +318,7 @@ export default async function ProductPage({ params }: any) {
         }}
       />
 
-      {/* 🚀 Enhanced BreadcrumbList Schema */}
+      {/* ✅ Enhanced BreadcrumbList Schema */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -333,7 +355,7 @@ export default async function ProductPage({ params }: any) {
         }}
       />
 
-      {/* 🚀 WebPage Schema */}
+      {/* ✅ WebPage Schema */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -366,7 +388,7 @@ export default async function ProductPage({ params }: any) {
   );
 }
 
-// 🚀 Helper function for category paths
+// ✅ Helper function for category paths
 function getCategoryPath(category: string): string {
   switch (category) {
     case 'Merch':
@@ -382,7 +404,7 @@ function getCategoryPath(category: string): string {
   }
 }
 
-// 🚀 Optimized smartTitleCase function with memoization
+// ✅ Optimized smartTitleCase function with memoization
 const titleCaseCache = new Map<string, string>();
 
 function smartTitleCase(str: string): string {

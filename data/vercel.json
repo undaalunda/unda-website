@@ -1,0 +1,15 @@
+{
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "unda-website.vercel.app"
+        }
+      ],
+      "destination": "https://undaalunda.com/:path*",
+      "permanent": true
+    }
+  ]
+}
