@@ -5,7 +5,7 @@ import Link from 'next/link';
 import AppClientWrapper from '@/components/AppClientWrapper';
 
 // 🚀 FIXED: Use consistent domain
-const BASE_URL = 'https://unda-website.vercel.app';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://undaalunda.com';
 
 export const metadata: Metadata = {
   title: '404 - Page Not Found | UNDA ALUNDA',

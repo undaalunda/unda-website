@@ -4,7 +4,7 @@ import SoloCollectionPage from '@/components/SoloCollectionPage';
 import AppClientWrapper from '@/components/AppClientWrapper';
 import type { Metadata } from 'next';
 
-const BASE_URL = 'https://unda-website.vercel.app';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://undaalunda.com';
 
 export const metadata: Metadata = {
   title: 'Solo Collection | Guitar Competition Entries | UNDA ALUNDA',

@@ -6,7 +6,7 @@ import AppClientWrapper from '@/components/AppClientWrapper';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-const BASE_URL = 'https://unda-website.vercel.app';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://undaalunda.com';
 
 export async function generateStaticParams() {
   return [

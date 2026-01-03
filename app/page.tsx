@@ -3,7 +3,7 @@
 import type { Metadata } from 'next';
 import HomePage from '@/components/HomePage';
 
-const BASE_URL = 'https://unda-website.vercel.app';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://undaalunda.com';
 
 export const metadata: Metadata = {
   title: 'Unda Alunda | Official Website & Merch Store',

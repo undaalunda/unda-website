@@ -4,7 +4,7 @@ import ShopLandingContent from '@/components/ShopLandingContent';
 import AppClientWrapper from '@/components/AppClientWrapper';
 import type { Metadata } from 'next';
 
-const BASE_URL = 'https://unda-website.vercel.app';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://undaalunda.com';
 
 export const metadata: Metadata = {
   title: 'Shop | Physical & Digital Products | UNDA ALUNDA',

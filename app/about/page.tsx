@@ -3,7 +3,7 @@
 import type { Metadata } from 'next';
 import AboutClientComponent from './AboutClientComponent';
 
-const BASE_URL = 'https://unda-website.vercel.app'; // TODO: Change to undaalunda.com
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://undaalunda.com';
 
 // 🚀 Artist-Focused SEO Metadata 
 export const metadata: Metadata = {

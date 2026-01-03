@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 import TourClientComponent from './TourClientComponent';
 
 // 🚀 FIXED: Use consistent domain
-const BASE_URL = 'https://unda-website.vercel.app'; // TODO: Change to 'https://www.undaalunda.com' when migrating
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://undaalunda.com';
 
 export const metadata: Metadata = {
   title: 'Tour Dates & Live Shows | UNDA ALUNDA',
