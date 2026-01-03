@@ -21,6 +21,8 @@ export type Product = {
   sizes?: string[];
   sizeOptions?: { [productId: string]: string[] };
   sizeChartImage?: string;
+  trackStock?: boolean; 
+  stock?: number;        
 };
 
 
@@ -135,25 +137,61 @@ export const productsByCategory = {
   sizeChartImage: '/handsome-boy-tee-size-chart-2.webp' // 🆕 เพิ่มบรรทัดนี้
 },
   
-  { id: 'dark-wonderful-world-bag', title: 'DARK WONDERFUL WORLD', category: 'Merch' as const, type: 'physical' as const, subtitle: 'BAG', price: 9.9, tags: ['bag', 'accessory'], image: '/dark-wonderful-world-bag.webp', url: '/product/dark-wonderful-world-bag', weight: 0.3 },
-  
-  { id: 'cat-to-the-moon', title: 'A CAT TO THE MOON', category: 'Merch' as const, type: 'physical' as const, subtitle: 'STICKERS', price: 4.95, tags: ['sticker', 'cat'], image: '/a-cat-to-the-moon-stickers.webp', url: '/product/cat-to-the-moon', weight: 0.01, description: 'PVC Stickers (7x7cm. / piece)\n\nPlease Note: The product image displayed is a mock-up; actual item may vary.' },
-  
-  { id: 'musician-cats', title: 'A MUSICIAN CATS', category: 'Merch' as const, type: 'physical' as const, subtitle: 'STICKERS', price: 4.95, tags: ['sticker', 'cat'], image: '/a-musician-cats.webp', url: '/product/musician-cats', weight: 0.01, description: 'PVC Stickers (7x7cm. / piece)\n\nPlease Note: The product image displayed is a mock-up; actual item may vary.' },
-  
   { 
-    id: 'signed-keychain', 
-    title: 'UNDA ALUNDA', 
-    category: 'Merch' as const, 
-    type: 'physical' as const, 
-    subtitle: 'SIGNED KEYCHAIN', 
-    price: 9.95, 
-    tags: ['keychain', 'signed'], 
-    image: '/unda-alunda-sign-keychain.webp', 
-    url: '/product/signed-keychain', 
-    weight: 0.03,
-    description: 'Unda Alunda Keychain\n\n• Floating-style keychain made from metal casing\n• Size: 5 cm, thickness 2 mm\n• Polished nickel finish\n• Front side features a smooth black surface\n• Flat, clean back surface\n• Comes with a 3 cm chain and alloy connector\n\nPlease Note: The product image displayed is a mock-up; actual item may vary.'
-  }
+  id: 'dark-wonderful-world-bag', 
+  title: 'DARK WONDERFUL WORLD', 
+  category: 'Merch' as const, 
+  type: 'physical' as const, 
+  subtitle: 'BAG', 
+  price: 9.9, 
+  tags: ['bag', 'accessory'], 
+  image: '/dark-wonderful-world-bag.webp', 
+  url: '/product/dark-wonderful-world-bag', 
+  weight: 0.3,
+  description: 'DARK WONDERFUL WORLD TOTE BAG - BLACK\n\nProduct Details\n• Printed on Black Tote Bags\n• Size 13x15 inches\n• 100% Cotton\n\nPlease Note: The product image displayed is a mock-up; actual item may vary.'
+},
+  
+{ 
+  id: 'cat-to-the-moon', 
+  title: 'A CAT TO THE MOON', 
+  category: 'Merch' as const, 
+  type: 'physical' as const, 
+  subtitle: 'STICKERS', 
+  price: 4.95, 
+  tags: ['sticker', 'cat'], 
+  image: '/a-cat-to-the-moon-stickers.webp', 
+  url: '/product/cat-to-the-moon', 
+  weight: 0.01, 
+  description: 'PVC Stickers (7x7cm. / piece)\n\nPlease Note: The product image displayed is a mock-up; actual item may vary.' 
+},
+  
+{ 
+  id: 'musician-cats', 
+  title: 'A MUSICIAN CATS', 
+  category: 'Merch' as const, 
+  type: 'physical' as const, 
+  subtitle: 'STICKERS', 
+  price: 4.95, 
+  tags: ['sticker', 'cat'], 
+  image: '/a-musician-cats.webp', 
+  url: '/product/musician-cats', 
+  weight: 0.01, 
+  description: 'PVC Stickers (7x7cm. / piece)\n\nPlease Note: The product image displayed is a mock-up; actual item may vary.' 
+},
+  
+{ 
+  id: 'signed-keychain', 
+  title: 'UNDA ALUNDA', 
+  category: 'Merch' as const, 
+  type: 'physical' as const, 
+  subtitle: 'SIGNED KEYCHAIN', 
+  price: 9.95, 
+  tags: ['keychain', 'signed'], 
+  image: '/unda-alunda-sign-keychain.webp', 
+  url: '/product/signed-keychain', 
+  weight: 0.03,
+  description: 'Unda Alunda Keychain\n\nProduct Details\n• Material: Acrylic, double-sided print\n• Height: 5 cm\n• Includes the artist\'s signature\n\nPlease Note: The product image displayed is a mock-up; actual item may vary.'
+}
 ],
   
   music: [

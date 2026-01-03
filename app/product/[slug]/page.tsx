@@ -144,6 +144,25 @@ export default async function ProductPage({ params }: any) {
     notFound();
   }
 
+  // 📦 ดึง Stock จาก Database (Server-Side) ← เพิ่มตรงนี้!
+  let initialStock = null;
+  if (product.type === 'physical') {
+    try {
+      const supabase = (await import('../../../lib/supabase')).default;
+      const { data } = await supabase
+        .from('Products')
+        .select('stock, track_stock')
+        .eq('id', product.id)
+        .single();
+      
+      if (data?.track_stock) {
+        initialStock = data.stock;
+      }
+    } catch (error) {
+      console.error('Error loading stock:', error);
+    }
+  }
+
   // 🚀 Calculate pricing for schema
   const price = typeof product.price === 'object' 
     ? product.price.sale 
@@ -319,7 +338,7 @@ export default async function ProductPage({ params }: any) {
         }}
       />
 
-      <ProductPageContent product={product} />
+      <ProductPageContent product={product} initialStock={initialStock} />
     </>
   );
 }

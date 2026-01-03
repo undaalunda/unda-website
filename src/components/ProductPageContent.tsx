@@ -47,9 +47,13 @@ interface NavigationContext {
 
 type ProductPageContentProps = {
   product: Product;
+  initialStock?: number | null;  // ← เพิ่ม
 };
 
-export default function ProductPageContent({ product }: ProductPageContentProps) {
+export default function ProductPageContent({ 
+  product,
+  initialStock = null  // ← เพิ่ม
+}: ProductPageContentProps) {
   const { addToCart, removeFromCart, cartItems, setLastActionItem } = useCart();
   const [quantity, setQuantity] = useState<number>(1);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -60,6 +64,10 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
 
   // 📐 Size chart modal state
   const [showSizeChart, setShowSizeChart] = useState(false);
+
+  // 📦 Stock state - ใช้ initialStock จาก Server
+  const [currentStock, setCurrentStock] = useState<number | null>(initialStock);
+  const [stockLoading, setStockLoading] = useState(false);
   
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const isAlreadyInCart = cartItems.some((item) => item.id === product.id);
@@ -109,6 +117,8 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
         setRelatedProducts(shuffled);
       }
     }, [product?.id]);
+
+  // ❌ ลบ useEffect เช็ค Stock ออกทั้งหมด! (เพราะโหลดจาก Server แล้ว)
 
   useEffect(() => {
     const handlePopState = () => {
@@ -300,9 +310,13 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
                     </div>
                   </div>
 
-                  {product.soldOut ? (
+                  {product.soldOut || (currentStock !== null && currentStock === 0) ? (
                     <div className="mt-1 text-xs font-light tracking-wide">
                       <span className="text-red-400/80 italic">SOLD OUT</span>
+                    </div>
+                  ) : currentStock !== null && currentStock > 0 ? (
+                    <div className="mt-1 text-xs font-light tracking-wide">
+                      <span className="text-green-400/80 italic">IN STOCK</span>
                     </div>
                   ) : (
                     <div className="mt-1 text-xs font-light tracking-wide">
@@ -430,7 +444,7 @@ export default function ProductPageContent({ product }: ProductPageContentProps)
               <div className="relative mt-6 max-[927px]:mt-4 max-[696px]:mt-3">
                 {errorMessage && <CartErrorPopup message={errorMessage} />}
 
-                {product.soldOut ? (
+                {product.soldOut || (currentStock !== null && currentStock === 0) ? (
                   <button
                     disabled
                     className="add-to-cart-button cursor-not-allowed opacity-50 bg-red-900/60 text-white max-[927px]:text-sm max-[696px]:text-xs max-[696px]:py-2 max-[696px]:px-4"

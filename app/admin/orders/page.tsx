@@ -188,7 +188,7 @@ export default function AdminOrders() {
           disabled={loading}
           className="mb-6 px-4 py-2 bg-[#dc9e63]/20 border border-[#dc9e63]/50 text-[#dc9e63] rounded-lg hover:bg-[#dc9e63]/30 transition disabled:opacity-50 cursor-pointer"
         >
-          {loading ? 'Loading...' : '🔄 Refresh'}
+          {loading ? 'Loading...' : 'Refresh'}
         </button>
 
         {/* Orders count */}
@@ -199,7 +199,7 @@ export default function AdminOrders() {
         {/* Orders list */}
         {orders.length === 0 ? (
           <div className="text-center py-12 text-[#f8fcdc]/50">
-            <p className="text-lg">✅ No pending shipments</p>
+            <p className="text-lg">No pending shipments</p>
             <p className="text-sm mt-2">All orders have been processed</p>
           </div>
         ) : (
@@ -277,7 +277,7 @@ export default function AdminOrders() {
                       disabled={updatingOrderId === order.id}
                       className="px-6 py-2 bg-[#dc9e63] text-black font-bold rounded-lg hover:bg-[#f8cfa3] transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                     >
-                      {updatingOrderId === order.id ? '⏳' : '📦 Ship'}
+                      {updatingOrderId === order.id ? '⏳' : 'Ship'}
                     </button>
                   </div>
                 </div>

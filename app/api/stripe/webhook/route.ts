@@ -173,6 +173,43 @@ export async function POST(req: NextRequest) {
 
           console.log(`✅ Order ${order.id} updated successfully!`);
           console.log('📋 Updated data:', updatedData);
+          // 📦 ลด Stock สำหรับสินค้าที่ track_stock = true
+          try {
+            const items = order.items || [];
+            console.log('📦 Processing stock reduction for', items.length, 'items');
+
+            for (const item of items) {
+              // เช็คว่าสินค้ามี track_stock หรือไม่
+              const { data: product } = await supabase
+                .from('Products')
+                .select('stock, track_stock')
+                .eq('id', item.id)
+                .single();
+              
+              if (product && product.track_stock && product.stock > 0) {
+                // ลด stock
+                const newStock = Math.max(0, product.stock - (item.quantity || 1));
+                
+                const { error: stockError } = await supabase
+                  .from('Products')
+                  .update({ 
+                    stock: newStock,
+                    updated_at: new Date().toISOString()
+                  })
+                  .eq('id', item.id);
+
+                if (stockError) {
+                  console.error(`❌ Failed to reduce stock for ${item.id}:`, stockError);
+                } else {
+                  console.log(`📦 Reduced stock for ${item.id}: ${product.stock} → ${newStock}`);
+                }
+              }
+            }
+          } catch (stockError: any) {
+            console.error('❌ Stock reduction error:', stockError.message);
+            // ไม่ return error เพราะ order สำเร็จแล้ว แค่ stock ไม่ลดเท่านั้น
+          }
+
         } else {
           console.log('🟢 Order already marked as succeeded');
         }
