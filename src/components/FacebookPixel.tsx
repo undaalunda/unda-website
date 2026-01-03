@@ -1,13 +1,13 @@
-// components/FacebookPixel.tsx - FIXED with Context
+// components/FacebookPixel.tsx
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
 import { FB_PIXEL_ID, pageview } from '../../lib/facebook-pixel';
 import { useConsent } from '@/context/ConsentContext';
 
-export default function FacebookPixel() {
+function FacebookPixelContent() {
   const { hasConsent } = useConsent();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -52,5 +52,13 @@ export default function FacebookPixel() {
         />
       </noscript>
     </>
+  );
+}
+
+export default function FacebookPixel() {
+  return (
+    <Suspense fallback={null}>
+      <FacebookPixelContent />
+    </Suspense>
   );
 }
