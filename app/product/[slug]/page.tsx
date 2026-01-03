@@ -1,4 +1,4 @@
-// app/product/[slug]/page.tsx - FIXED: Domain + SEO Improvements
+// app/product/[slug]/page.tsx - FIXED: Domain + SEO Improvements + Bundle Stock Check
 
 import { allItems } from '@/components/allItems';
 import ProductPageContent from '@/components/ProductPageContent';
@@ -144,19 +144,42 @@ export default async function ProductPage({ params }: any) {
     notFound();
   }
 
-  // 📦 ดึง Stock จาก Database (Server-Side) ← เพิ่มตรงนี้!
+  // 📦 ดึง Stock จาก Database (Server-Side)
   let initialStock = null;
+
   if (product.type === 'physical') {
     try {
       const supabase = (await import('../../../lib/supabase')).default;
-      const { data } = await supabase
-        .from('Products')
-        .select('stock, track_stock')
-        .eq('id', product.id)
-        .single();
       
-      if (data?.track_stock) {
-        initialStock = data.stock;
+      // เช็คว่าเป็น Bundle ไหม
+      if (product.category === 'Bundles' && product.bundleItems && product.bundleItems.length > 0) {
+        // ดึง Stock ของสินค้าทุกชิ้นใน Bundle
+        const { data: bundleStocks } = await supabase
+          .from('Products')
+          .select('id, stock, track_stock')
+          .in('id', product.bundleItems);
+        
+        // เช็คว่ามีสินค้าที่ track_stock = true และ stock = 0 ไหม
+        if (bundleStocks && bundleStocks.length > 0) {
+          const hasSoldOutItem = bundleStocks.some(
+            item => item.track_stock === true && item.stock === 0
+          );
+          
+          if (hasSoldOutItem) {
+            initialStock = 0; // บังคับให้ Bundle แสดง SOLD OUT
+          }
+        }
+      } else {
+        // สินค้าปกติ (ไม่ใช่ Bundle)
+        const { data } = await supabase
+          .from('Products')
+          .select('stock, track_stock')
+          .eq('id', product.id)
+          .single();
+        
+        if (data?.track_stock) {
+          initialStock = data.stock;
+        }
       }
     } catch (error) {
       console.error('Error loading stock:', error);
