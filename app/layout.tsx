@@ -1,15 +1,18 @@
-// app/layout.tsx - FINAL: Unified "Official website" Strategy
+// app/layout.tsx - FINAL: With Facebook Pixel + Album OUT NOW
 
 import './globals.css';
 import type { Metadata } from 'next';
 import { CartProvider } from '@/context/CartContext';
+import { ConsentProvider } from '@/context/ConsentContext';
 import { ReactNode } from 'react';
+import CookieNotice from '@/components/CookieNotice';
+import FacebookPixel from '@/components/FacebookPixel';
 
 const BASE_URL = 'https://unda-website.vercel.app';
 
 export const metadata: Metadata = {
   title: 'Unda Alunda | Official Website & Merch Store',
-  description: 'Official Website of Unda Alunda. New album "Dark Wonderful World" out December 31, 2025 — Purchase now!',
+  description: 'Official Website of Unda Alunda. New album "Dark Wonderful World" OUT NOW — Purchase now!',
   keywords: [
     'Unda', 'Alunda', 'Unda Alunda', 'Dark Wonderful World',
     'tosin Abasi', 'animals as leaders', 'plini', 'intervals', 'panzerbullett', 'tigran hamasyan',
@@ -21,10 +24,9 @@ export const metadata: Metadata = {
   ],
   metadataBase: new URL(BASE_URL),
   
-  // 🎯 FIXED: Unified strategy - Social gets shorter version
   openGraph: {
     title: 'Unda Alunda | Official Website & Merch Store',
-    description: 'Official Website of Unda Alunda. New album "Dark Wonderful World" out December 31, 2025 — Purchase now!',
+    description: 'Official Website of Unda Alunda. New album "Dark Wonderful World" OUT NOW — Purchase now!',
     type: 'website',
     url: BASE_URL,
     siteName: 'UNDA ALUNDA',
@@ -41,7 +43,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Unda Alunda | Official Website & Merch Store',
-    description: 'Official Website of Unda Alunda. New album "Dark Wonderful World" out December 31, 2025 — Purchase now!',
+    description: 'Official Website of Unda Alunda. New album "Dark Wonderful World" OUT NOW — Purchase now!',
     creator: '@undaalunda',
     images: [`${BASE_URL}/catmoon-bg.jpeg`],
   },
@@ -52,10 +54,9 @@ export const metadata: Metadata = {
     apple: '/apple-touch-icon.png',
   },
   
-  // 🎯 FIXED: Unified meta tags for social
   other: {
     'og:title': 'Unda Alunda | Official Website & Merch Store',
-    'og:description': 'Official Website of Unda Alunda. New album "Dark Wonderful World" out December 31, 2025 — Purchase now!',
+    'og:description': 'Official Website of Unda Alunda. New album "Dark Wonderful World" OUT NOW — Purchase now!',
     'og:url': BASE_URL,
     'og:site_name': 'UNDA ALUNDA',
     'og:image': `${BASE_URL}/catmoon-bg.jpeg`,
@@ -78,6 +79,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {/* 🚀 Resource Hints */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://connect.facebook.net" />
         
         {/* 🎯 FIXED: Catmoon-bg HIGHEST PRIORITY for Google/Social */}
         <link rel="preload" href="/catmoon-bg.jpeg" as="image" type="image/jpeg" fetchPriority="high" />
@@ -98,6 +100,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="dns-prefetch" href="//www.youtube-nocookie.com" />
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+        <link rel="dns-prefetch" href="//connect.facebook.net" />
         
         {/* Fonts */}
         <link 
@@ -105,7 +108,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           rel="stylesheet"
         />
         
-        {/* Critical CSS - unchanged for website design */}
+        {/* Critical CSS */}
         <style dangerouslySetInnerHTML={{
           __html: `
             *{box-sizing:border-box}
@@ -174,7 +177,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           `
         }} />
 
-        {/* Scroll Restoration - unchanged */}
+        {/* Scroll Restoration */}
         <style dangerouslySetInnerHTML={{
           __html: `
             html { 
@@ -195,7 +198,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           `
         }} />
 
-        {/* Scroll Script - unchanged */}
+        {/* Scroll Script */}
         <script dangerouslySetInnerHTML={{
           __html: `
             (function() {
@@ -286,7 +289,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <meta property="music:musician" content="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0" />
 
-        {/* 🎯 CRITICAL: Explicit social media images */}
+        {/* Social media images */}
         <meta property="og:image" content={`${BASE_URL}/catmoon-bg.jpeg`} />
         <meta property="og:image:secure_url" content={`${BASE_URL}/catmoon-bg.jpeg`} />
         <meta property="og:image:width" content="1200" />
@@ -296,7 +299,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:image" content={`${BASE_URL}/catmoon-bg.jpeg`} />
 
-        {/* 🎯 FIXED: Structured Data - Website */}
+        {/* Structured Data - Website */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -318,7 +321,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           }}
         />
 
-        {/* 🎯 FIXED: Structured Data - Person (GUITARIST!) */}
+        {/* Structured Data - Person */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -364,7 +367,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           }}
         />
 
-        {/* 🎯 FIXED: Structured Data - MusicGroup */}
+        {/* Structured Data - MusicGroup */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -387,7 +390,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           }}
         />
 
-        {/* 🎯 FIXED: Structured Data - Album */}
+        {/* Structured Data - Album (OUT NOW!) */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -395,9 +398,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               "@context": "https://schema.org",
               "@type": "MusicAlbum",
               "name": "Dark Wonderful World",
-              "description": "The upcoming album by Unda Alunda, featuring beautiful instrumental guitar compositions.",
+              "description": "The latest album by Unda Alunda, featuring beautiful instrumental guitar compositions.",
               "image": `${BASE_URL}/catmoon-bg.jpeg`,
-              "datePublished": "2025-12-31",
+              "datePublished": "2024-12-31",
               "byArtist": { "@id": `${BASE_URL}#person` },
               "recordLabel": "Independent",
               "genre": ["Instrumental Guitar", "Melodic Rock"]
@@ -412,9 +415,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <meta name="referrer" content="strict-origin-when-cross-origin" />
       </head>
       <body className="bg-[#190000] text-[#f8fcdc] m-0 p-0 overflow-x-hidden">
-        <CartProvider>
-          {children}
-        </CartProvider>
+        <ConsentProvider>
+          <CartProvider>
+            <FacebookPixel />
+            {children}
+            <CookieNotice />
+          </CartProvider>
+        </ConsentProvider>
       </body>
     </html>
   );
