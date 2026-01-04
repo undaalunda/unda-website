@@ -237,8 +237,13 @@ export default function AlbumHubPage({
       }
 
       return typeMatch && instrumentMatch;
-    });
-  }, [allProducts, filterType, filterInstrument]);
+  })
+  .sort((a, b) => {
+    if (a.available === false && b.available !== false) return 1;
+    if (a.available !== false && b.available === false) return -1;
+    return 0;
+  });
+}, [allProducts, filterType, filterInstrument]);
 
   // Update history state when filters change
   useEffect(() => {

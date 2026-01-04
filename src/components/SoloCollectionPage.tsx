@@ -194,8 +194,13 @@ export default function SoloCollectionPage({
         (filterInstrument !== 'guitar' && (product as any).instrument?.toLowerCase().includes(filterInstrument));
 
       return typeMatch && instrumentMatch;
-    });
-  }, [allProducts, filterType, filterInstrument]);
+  })
+  .sort((a, b) => {
+    if (a.available === false && b.available !== false) return 1;
+    if (a.available !== false && b.available === false) return -1;
+    return 0;
+  });
+}, [allProducts, filterType, filterInstrument]);
 
   // 🚀 ✅ Fixed: ใช้ replaceState สำหรับ filter changes
   useEffect(() => {
