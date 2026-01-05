@@ -50,6 +50,17 @@ const nextConfig: NextConfig = {
     forceSwcTransforms: false,
   },
 
+  // 🎵 Vanity URL Redirects
+  async redirects() {
+    return [
+      {
+        source: '/dark-wonderful-world',
+        destination: '/product/audio-digipak',
+        permanent: false, // 302 redirect
+      },
+    ];
+  },
+
   async headers() {
     return [
       {
