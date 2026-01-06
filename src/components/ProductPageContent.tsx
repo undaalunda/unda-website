@@ -94,29 +94,31 @@ export default function ProductPageContent({
   }, []);
 
   useEffect(() => {
-    if (product) {
-      const pool = product.type === 'digital'
-        ? allItems.filter((item) => {
-            const isSoloCollectionItem = 
-              item.tags?.includes('contest') || 
-              item.id.includes('abasi') || 
-              item.id.includes('mayones') || 
-              item.id.includes('vola');
-            
-            return item.id !== product.id &&
-                   item.category === product.category &&
-                   item.type === 'digital' &&
-                   !isSoloCollectionItem;
-          })
-        : allItems.filter((item) =>
-            item.id !== product.id &&
-            ['Music', 'Merch', 'Bundles'].includes(item.category)
-          );
+  if (product) {
+    const pool = product.type === 'digital'
+      ? allItems.filter((item) => {
+          const isSoloCollectionItem = 
+            item.tags?.includes('contest') || 
+            item.id.includes('abasi') || 
+            item.id.includes('mayones') || 
+            item.id.includes('vola');
           
-        const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, 8);
-        setRelatedProducts(shuffled);
-      }
-    }, [product?.id]);
+          return item.id !== product.id &&
+                 item.category === product.category &&
+                 item.type === 'digital' &&
+                 !isSoloCollectionItem;
+        })
+      : allItems.filter((item) =>
+          item.id !== product.id &&
+          ['Music', 'Merch', 'Bundles'].includes(item.category) &&
+          // 🚫 ไม่แสดงสินค้าที่กดไม่ได้
+          (item.available !== false || !item.comingSoon)
+        );
+        
+      const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, 8);
+      setRelatedProducts(shuffled);
+    }
+  }, [product?.id]);
 
   // ❌ ลบ useEffect เช็ค Stock ออกทั้งหมด! (เพราะโหลดจาก Server แล้ว)
 
@@ -558,16 +560,13 @@ export default function ProductPageContent({
                             placeholder="blur"
                             blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                           />
+                          
                           {item.soldOut && (
                             <div className="absolute top-2 right-2 bg-red-900/40 text-white text-xs px-2 py-1 rounded-md font-semibold border border-red-800/50">
                               SOLD OUT
                             </div>
                           )}
-                          {item.comingSoon && !item.soldOut && (
-                            <div className="absolute top-2 right-2 bg-orange-600/50 text-white text-xs px-2 py-1 rounded-md font-semibold border border-orange-600/80">
-                              Available Dec 31
-                            </div>
-                          )}
+
                         </div>
                         <div className="stems-label-group">
                           <p className="stems-title-text text-[#d37142]">{item.title}</p>
