@@ -3,7 +3,7 @@
 import { MetadataRoute } from 'next'
 import { allItems } from '@/components/allItems'
 
-const BASE_URL = 'https://unda-website.vercel.app'
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://undaalunda.com'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   // Get all products from allItems (auto-sync!)
