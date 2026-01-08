@@ -327,13 +327,18 @@ return () => {
   disableRemotePlayback
   preload="auto"
   poster="/hero-video-fallback.webp"
-  loop={videoStarted}
   autoPlay={false}
   onError={() => {
     setVideoReady(false);
   }}
   onPlay={() => {
     setVideoStarted(true);
+  }}
+  onEnded={() => {
+    // Auto transition to hero image when video ends
+    setTimeout(() => {
+      goToHeroSlide(1);
+    }, 500); // Small delay for smooth transition
   }}
   style={{
     position: 'absolute',
@@ -489,7 +494,7 @@ return () => {
                 THE NEW ALBUM'S <span className="highlight">OUT NOW</span>
               </p>
               <p className="hero-line2">
-                AVAILABLE NOW TO <Link href="/shop/physical" onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'music')} className="hero-cta-link">PRE-ORDER</Link> &{' '}
+                AVAILABLE NOW TO <Link href="/shop/physical" onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'music')} className="hero-cta-link">PURCHASE</Link> &{' '}
                 <a href="https://orcd.co/UndaAlunda_DarkWonderfulWorld" target="_blank" rel="noopener noreferrer" className="hero-cta-link">
                   STREAM
                 </a>
@@ -501,7 +506,7 @@ return () => {
               <p className="hero-line1"><span className="highlight">OUT NOW</span></p>
               <p className="hero-line2">AVAILABLE NOW TO</p>
               <p className="hero-line2">
-               <Link href="/shop/physical" onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'music')} className="hero-cta-link">PRE-ORDER</Link> &{' '}
+               <Link href="/shop/physical" onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'music')} className="hero-cta-link">PURCHASE</Link> &{' '}
                 <a href="https://orcd.co/UndaAlunda_DarkWonderfulWorld" target="_blank" rel="noopener noreferrer" className="hero-cta-link">
                   STREAM
                 </a>
