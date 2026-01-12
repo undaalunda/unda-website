@@ -374,83 +374,96 @@ export default function CheckoutForm() {
     return cartTotal + (isDigitalOnly ? 0 : (shippingRate || 0));
   }, [cartTotal, isDigitalOnly, shippingRate]);
 
-  // 🚀 แก้ useEffect สำหรับ DHL API
-  useEffect(() => {
-    console.log('[🧪 useEffect triggered]', billingInfo.country, billingInfo.postcode);
+  // CheckoutForm.tsx - แก้เฉพาะส่วน useEffect ที่เรียก DHL API
 
-    if (!billingInfo.country || !billingInfo.postcode || !billingInfo.city) return;
-    if (isDigitalOnly) return;
+useEffect(() => {
+  console.log('[🧪 useEffect triggered]', billingInfo.country, billingInfo.postcode);
 
-    const newZone = getShippingZone(billingInfo.country);
-    setShippingZone(newZone);
+  if (!billingInfo.country || !billingInfo.postcode || !billingInfo.city) return;
+  if (isDigitalOnly) return;
 
-    if (shippingRateTimeoutRef.current) {
-      clearTimeout(shippingRateTimeoutRef.current);
-    }
+  const newZone = getShippingZone(billingInfo.country);
+  setShippingZone(newZone);
 
-    shippingRateTimeoutRef.current = setTimeout(async () => {
-      try {
-        setLoadingShipping(true);
-        const totalWeight = calculateCartWeight(cartItems);
+  if (shippingRateTimeoutRef.current) {
+    clearTimeout(shippingRateTimeoutRef.current);
+  }
 
-        // ✅ ลบ cleanCityName แล้ว - ใช้ชื่อเมืองตรงๆ
-        const payload = {
-          countryCode: billingInfo.country,
-          postalCode: billingInfo.postcode,
-          cityName: billingInfo.city,  // ✅ ส่งตรงๆ ไม่ clean
-          weight: totalWeight,
-          declaredValue: cartTotal  // ✅ เพิ่ม declaredValue
-        };
+  shippingRateTimeoutRef.current = setTimeout(async () => {
+    try {
+      setLoadingShipping(true);
+      const totalWeight = calculateCartWeight(cartItems);
 
-        console.log('[📦 DHL Request Payload]', JSON.stringify(payload, null, 2));
+      const payload = {
+        countryCode: billingInfo.country,
+        postalCode: billingInfo.postcode,
+        cityName: billingInfo.city,
+        weight: totalWeight,
+        declaredValue: cartTotal
+      };
 
-        const res = await fetch('/api/get-dhl-rate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
+      console.log('[📦 DHL Request Payload]', JSON.stringify(payload, null, 2));
 
-        const data = await res.json();
-        console.log('[💸 DHL API Response]', JSON.stringify(data, null, 2));
+      const res = await fetch('/api/get-dhl-rate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
 
-        // ✅ เช็ค Error ก่อน
-        if (!data.success || data.error) {
-          console.error('❌ Shipping rate error:', data.error);
-          setShippingRate(0);
-          setErrorMessage(data.error || 'Unable to calculate shipping rate. Please verify your address.');
-          setLoadingShipping(false); 
-          return;
-        }
+      const data = await res.json();
+      console.log('[💸 DHL API Response]', JSON.stringify(data, null, 2));
 
-        const product = data.products?.[0];
-        const thbPrice =
-          product?.totalPrice?.find((p: any) => p.currencyType === 'BILLC')?.price ?? 0;
-
-        const exchangeRate = data.exchangeRates?.find(
-          (rate: any) => rate.currency === 'THB' && rate.baseCurrency === 'USD'
-        )?.currentExchangeRate ?? 0.029;
-
-        const price = +(thbPrice * exchangeRate).toFixed(2);
-
-        if (price > 0) {
-          setShippingRate(Number(price));
-          setErrorMessage('');
-          setLoadingShipping(false);
-          console.log('✅ Shipping rate set to:', price, 'USD');
-        } else {
-          setShippingRate(0);
-          setErrorMessage('Unable to calculate shipping rate. Please check your address.');
-          setLoadingShipping(false);
-        }
-       } catch (err) {
-        console.error('❌ Shipping rate error', err);
-        setShippingRate(0);
-        setErrorMessage('Unable to calculate shipping rate. Please try again.');
-        setLoadingShipping(false); 
+      // ❌ กรณี DHL API fail - BLOCK checkout
+      if (data.fallback || !data.success || data.error) {
+        console.error('❌ Shipping rate error:', data.error);
+        
+        setShippingRate(0); // Set เป็น 0 เพื่อ disable ปุ่ม checkout
+        setErrorMessage(
+          'Unable to calculate shipping rate at the moment. ' +
+          'Please try again in a few minutes or contact support for assistance.'
+        );
+        setLoadingShipping(false);
+        return;
       }
-    }, 500);
 
-  }, [billingInfo.country, billingInfo.postcode, billingInfo.city, cartItems, isDigitalOnly, calculateCartWeight, cartTotal]);
+      // ✅ คำนวณราคาจาก DHL response
+      const product = data.products?.[0];
+      const thbPrice =
+        product?.totalPrice?.find((p: any) => p.currencyType === 'BILLC')?.price ?? 0;
+
+      const exchangeRate = data.exchangeRates?.find(
+        (rate: any) => rate.currency === 'THB' && rate.baseCurrency === 'USD'
+      )?.currentExchangeRate ?? 0.029;
+
+      const price = +(thbPrice * exchangeRate).toFixed(2);
+
+      if (price > 0) {
+        setShippingRate(Number(price));
+        setErrorMessage('');
+        setLoadingShipping(false);
+        console.log('✅ Shipping rate set to:', price, 'USD');
+      } else {
+        // ❌ ถ้าคำนวณไม่ได้ BLOCK checkout
+        setShippingRate(0);
+        setErrorMessage(
+          'Unable to calculate shipping rate. Please check your address or contact support.'
+        );
+        setLoadingShipping(false);
+      }
+    } catch (err) {
+      console.error('❌ Shipping rate error', err);
+      
+      // ❌ BLOCK checkout เมื่อเกิด error
+      setShippingRate(0);
+      setErrorMessage(
+        'Unable to calculate shipping rate at the moment. ' +
+        'Please try again or contact support for assistance.'
+      );
+      setLoadingShipping(false);
+    }
+  }, 500);
+
+}, [billingInfo.country, billingInfo.postcode, billingInfo.city, cartItems, isDigitalOnly, calculateCartWeight, cartTotal]);
 
   useEffect(() => {
     if (isDigitalOnly) return;

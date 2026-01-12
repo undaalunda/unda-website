@@ -1,27 +1,74 @@
-// app/api/get-dhl-rate/route.ts - WITH DEBUG LOGGING
+// app/api/get-dhl-rate/route.ts - FIXED VERSION
 
 import { NextRequest, NextResponse } from 'next/server';
 
+/**
+ * คำนวณวันทำการถัดไป โดยคำนึงถึง:
+ * 1. เวลาทำการ (หลัง 5 โมงเย็นนับเป็นวันถัดไป)
+ * 2. วันหยุดสุดสัปดาห์ (เสาร์-อาทิตย์)
+ */
+/**
+ * คำนวณขนาดกล่องตามน้ำหนักสินค้า
+ */
+function getBoxSize(weight: number) {
+  if (weight <= 0.15) {
+    // กล่องพัสดุเล็ก (สำหรับ CD, Sticker, Keychain)
+    return { length: 15, width: 12, height: 3 };
+    // Volumetric: (15×12×3)/5000 = 0.108 kg
+  } else if (weight <= 0.5) {
+    // กล่องเล็ก (สำหรับเสื้อ 1 ตัว, CD + Keychain)
+    return { length: 25, width: 20, height: 5 };
+    // Volumetric: (25×20×5)/5000 = 0.5 kg
+  } else if (weight <= 2) {
+    // กล่องกลาง (สำหรับเสื้อ 2-3 ตัว, CD + เสื้อ)
+    return { length: 30, width: 25, height: 10 };
+    // Volumetric: (30×25×10)/5000 = 1.5 kg
+  } else if (weight <= 5) {
+    // กล่องใหญ่ (สำหรับหนังสือ + เสื้อ, หลายชิ้น)
+    return { length: 40, width: 30, height: 20 };
+    // Volumetric: (40×30×20)/5000 = 4.8 kg
+  } else {
+    // กล่องใหญ่พิเศษ (มากกว่า 5 kg)
+    return { length: 50, width: 40, height: 30 };
+    // Volumetric: (50×40×30)/5000 = 12 kg
+  }
+}
+
 function getNextBusinessDay(daysAhead: number): string {
-  const date = new Date();
-  date.setDate(date.getDate() + daysAhead);
+  const now = new Date();
+  const pickupDate = new Date(now);
   
-  const dayOfWeek = date.getDay();
-  
-  if (dayOfWeek === 6) {
-    date.setDate(date.getDate() + 2);
-  } else if (dayOfWeek === 0) {
-    date.setDate(date.getDate() + 1);
+  // ✅ ถ้าสั่งหลัง 5 โมงเย็น (17:00) เริ่มนับจากวันถัดไป
+  if (now.getHours() >= 17) {
+    pickupDate.setDate(pickupDate.getDate() + 1);
+    console.log('⏰ After 5 PM - starting from tomorrow');
   }
   
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  const seconds = String(date.getSeconds()).padStart(2, '0');
+  // เพิ่มจำนวนวันทำการ
+  let businessDaysAdded = 0;
   
-  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}+07:00`;
+  while (businessDaysAdded < daysAhead) {
+    pickupDate.setDate(pickupDate.getDate() + 1);
+    
+    const dayOfWeek = pickupDate.getDay();
+    // ถ้าไม่ใช่เสาร์ (6) หรืออาทิตย์ (0)
+    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+      businessDaysAdded++;
+    }
+  }
+  
+  // Set เวลาเป็น 12:00 น.
+  pickupDate.setHours(12, 0, 0, 0);
+  
+  const year = pickupDate.getFullYear();
+  const month = String(pickupDate.getMonth() + 1).padStart(2, '0');
+  const day = String(pickupDate.getDate()).padStart(2, '0');
+  
+  const formattedDate = `${year}-${month}-${day}T12:00:00 GMT+07:00`;
+  
+  console.log('📅 Calculated pickup date:', formattedDate, `(${businessDaysAdded} business days from now)`);
+  
+  return formattedDate;
 }
 
 async function fetchDHLRate(
@@ -46,11 +93,10 @@ async function fetchDHLRate(
 
   const raw = await res.text();
   
-  // 🔍 แสดง Response detail
   console.log('📡 DHL Response:', {
     status: res.status,
     statusText: res.statusText,
-    bodyPreview: raw.substring(0, 500) // แสดง 500 ตัวอักษรแรก
+    bodyPreview: raw.substring(0, 500)
   });
   
   let data;
@@ -81,7 +127,7 @@ export async function POST(req: NextRequest) {
 
     // ✅ Thailand Domestic = Fixed Rate
     if (countryCode === 'TH') {
-      console.log('🇹🇭 Domestic Thailand - using domestic rate');
+      console.log('🇹🇭 Domestic Thailand - using fixed rate');
       
       return NextResponse.json({
         success: true,
@@ -90,7 +136,7 @@ export async function POST(req: NextRequest) {
           productCode: 'DOMESTIC',
           totalPrice: [{
             currencyType: 'BILLC',
-            price: 200
+            price: 200 // 200 บาท
           }]
         }],
         exchangeRates: [{
@@ -110,7 +156,6 @@ export async function POST(req: NextRequest) {
     const baseUrl = process.env.DHL_API_URL || 'https://express.api.dhl.com/mydhlapi';
     const endpoint = `${baseUrl}/rates`;
 
-    // 🔍 Debug credentials
     console.log('🔐 Credentials Check:', {
       hasUsername: !!username,
       hasPassword: !!password,
@@ -135,7 +180,15 @@ export async function POST(req: NextRequest) {
     const credentials = Buffer.from(`${username}:${password}`).toString('base64');
     const actualWeight = Math.max(0.5, weight);
 
-    // ลอง strategy แรกเท่านั้น (เพื่อดู error ชัดเจน)
+    // ✅ คำนวณขนาดกล่องตามน้ำหนัก
+    const boxSize = getBoxSize(actualWeight);
+    
+    console.log('📦 Box calculation:', {
+      weight: actualWeight,
+      boxSize
+    });
+
+    // ✅ คำนวณวันรับสินค้า - เพิ่มเป็น 5 วันทำการ (ข้ามวันหยุด)
     const plannedDate = getNextBusinessDay(5);
     
     const payload: any = {
@@ -163,14 +216,11 @@ export async function POST(req: NextRequest) {
       plannedShippingDateAndTime: plannedDate,
       unitOfMeasurement: 'metric',
       isCustomsDeclarable: true,
+      productCode: 'P',  // ✅ บังคับใช้ DHL Express Worldwide (ถูกกว่า Medical Express)
       packages: [
         {
           weight: actualWeight,
-          dimensions: {
-            length: 20,
-            width: 15,
-            height: 10
-          }
+          dimensions: boxSize  // ✅ ใช้ขนาดที่คำนวณแล้ว
         }
       ],
       monetaryAmount: [
@@ -179,17 +229,19 @@ export async function POST(req: NextRequest) {
           value: declaredValue,
           currency: 'USD'
         }
-      ],
-      productCode: 'P'
+      ]
     };
 
-    console.log('📤 Sending payload to DHL...');
+    console.log('📤 Sending payload to DHL:', JSON.stringify(payload, null, 2));
 
     try {
       const { ok, status, data, raw } = await fetchDHLRate(credentials, endpoint, payload);
 
       if (ok && data.products && data.products.length > 0) {
-        console.log('✅ DHL Rate found!');
+        console.log('✅ DHL Rate found!', {
+          productCount: data.products.length,
+          firstProduct: data.products[0].productName
+        });
         
         return NextResponse.json({
           success: true,
@@ -208,6 +260,7 @@ export async function POST(req: NextRequest) {
         error: data
       });
 
+      // ❌ Return error ชัดเจน - ไม่ใช้ fallback
       return NextResponse.json({
         success: false,
         error: 'Unable to calculate shipping rate. Please verify your shipping address and try again. If the problem persists, please contact support.',
