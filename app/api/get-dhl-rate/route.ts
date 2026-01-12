@@ -1,4 +1,4 @@
-// app/api/get-dhl-rate/route.ts
+// app/api/get-dhl-rate/route.ts - WITH DEBUG LOGGING
 
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -29,6 +29,12 @@ async function fetchDHLRate(
   endpoint: string,
   payload: any
 ) {
+  console.log('🌐 Calling DHL API:', {
+    endpoint,
+    hasCredentials: !!credentials,
+    credentialsLength: credentials.length
+  });
+
   const res = await fetch(endpoint, {
     method: 'POST',
     headers: {
@@ -40,10 +46,18 @@ async function fetchDHLRate(
 
   const raw = await res.text();
   
+  // 🔍 แสดง Response detail
+  console.log('📡 DHL Response:', {
+    status: res.status,
+    statusText: res.statusText,
+    bodyPreview: raw.substring(0, 500) // แสดง 500 ตัวอักษรแรก
+  });
+  
   let data;
   try {
     data = JSON.parse(raw);
   } catch (err) {
+    console.error('❌ Failed to parse JSON. Raw:', raw);
     throw new Error('Invalid JSON response from DHL');
   }
 
@@ -65,7 +79,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ✅ Thailand Domestic = Fixed Rate (ตามที่คุณโจ๊กบอก)
+    // ✅ Thailand Domestic = Fixed Rate
     if (countryCode === 'TH') {
       console.log('🇹🇭 Domestic Thailand - using domestic rate');
       
@@ -76,7 +90,7 @@ export async function POST(req: NextRequest) {
           productCode: 'DOMESTIC',
           totalPrice: [{
             currencyType: 'BILLC',
-            price: 200  // 200 THB
+            price: 200
           }]
         }],
         exchangeRates: [{
@@ -87,7 +101,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // 🌍 International = DHL API (ต้องได้ราคาจริงเท่านั้น!)
+    // 🌍 International = DHL API
     console.log('🌍 International shipping - calling DHL API');
 
     const username = process.env.DHL_USERNAME!;
@@ -96,7 +110,16 @@ export async function POST(req: NextRequest) {
     const baseUrl = process.env.DHL_API_URL || 'https://express.api.dhl.com/mydhlapi';
     const endpoint = `${baseUrl}/rates`;
 
-    console.log('🔗 Using endpoint:', endpoint);
+    // 🔍 Debug credentials
+    console.log('🔐 Credentials Check:', {
+      hasUsername: !!username,
+      hasPassword: !!password,
+      usernameLength: username?.length || 0,
+      passwordLength: password?.length || 0,
+      usernamePreview: username ? username.substring(0, 3) + '***' : 'undefined',
+      accountNumber,
+      endpoint
+    });
 
     if (!username || !password) {
       console.error('❌ Missing DHL credentials');
@@ -112,108 +135,101 @@ export async function POST(req: NextRequest) {
     const credentials = Buffer.from(`${username}:${password}`).toString('base64');
     const actualWeight = Math.max(0.5, weight);
 
-    // 🔄 ลองหลาย strategy
-    const strategies = [
-      { days: 3, productCode: 'P', name: 'Express Worldwide (3 days)' },
-      { days: 5, productCode: 'P', name: 'Express Worldwide (5 days)' },
-      { days: 7, productCode: 'P', name: 'Express Worldwide (7 days)' },
-      { days: 10, productCode: 'P', name: 'Express Worldwide (10 days)' },
-      { days: 3, productCode: undefined, name: 'Auto Select (3 days)' },
-      { days: 5, productCode: undefined, name: 'Auto Select (5 days)' },
-      { days: 7, productCode: undefined, name: 'Auto Select (7 days)' },
-    ];
+    // ลอง strategy แรกเท่านั้น (เพื่อดู error ชัดเจน)
+    const plannedDate = getNextBusinessDay(5);
     
-    for (const strategy of strategies) {
-      console.log(`\n🔄 Trying: ${strategy.name}`);
-      
-      const plannedDate = getNextBusinessDay(strategy.days);
-      
-      const payload: any = {
-        customerDetails: {
-          shipperDetails: {
-            postalCode: '73000',
-            cityName: 'Nakhon Pathom',
-            countryCode: 'TH',
-            addressLine1: 'Wang Taku',
-            addressLine2: 'Mueang Nakhon Pathom District'
-          },
-          receiverDetails: {
-            postalCode: postalCode,
-            cityName: cityName,
-            countryCode: countryCode,
-            addressLine1: 'Customer Address'
-          }
+    const payload: any = {
+      customerDetails: {
+        shipperDetails: {
+          postalCode: '73000',
+          cityName: 'Nakhon Pathom',
+          countryCode: 'TH',
+          addressLine1: 'Wang Taku',
+          addressLine2: 'Mueang Nakhon Pathom District'
         },
-        accounts: [
-          {
-            typeCode: 'shipper',
-            number: accountNumber
+        receiverDetails: {
+          postalCode: postalCode,
+          cityName: cityName,
+          countryCode: countryCode,
+          addressLine1: 'Customer Address'
+        }
+      },
+      accounts: [
+        {
+          typeCode: 'shipper',
+          number: accountNumber
+        }
+      ],
+      plannedShippingDateAndTime: plannedDate,
+      unitOfMeasurement: 'metric',
+      isCustomsDeclarable: true,
+      packages: [
+        {
+          weight: actualWeight,
+          dimensions: {
+            length: 20,
+            width: 15,
+            height: 10
           }
-        ],
-        plannedShippingDateAndTime: plannedDate,
-        unitOfMeasurement: 'metric',
-        isCustomsDeclarable: true,
-        packages: [
-          {
-            weight: actualWeight,
-            dimensions: {
-              length: 20,
-              width: 15,
-              height: 10
-            }
-          }
-        ],
-        monetaryAmount: [
-          {
-            typeCode: 'declaredValue',
-            value: declaredValue,
-            currency: 'USD'
-          }
-        ]
-      };
+        }
+      ],
+      monetaryAmount: [
+        {
+          typeCode: 'declaredValue',
+          value: declaredValue,
+          currency: 'USD'
+        }
+      ],
+      productCode: 'P'
+    };
 
-      if (strategy.productCode) {
-        payload.productCode = strategy.productCode;
+    console.log('📤 Sending payload to DHL...');
+
+    try {
+      const { ok, status, data, raw } = await fetchDHLRate(credentials, endpoint, payload);
+
+      if (ok && data.products && data.products.length > 0) {
+        console.log('✅ DHL Rate found!');
+        
+        return NextResponse.json({
+          success: true,
+          products: data.products,
+          exchangeRates: data.exchangeRates || [{
+            currency: 'THB',
+            baseCurrency: 'USD',
+            currentExchangeRate: 0.029
+          }]
+        });
       }
 
-      try {
-        const { ok, status, data, raw } = await fetchDHLRate(credentials, endpoint, payload);
+      // แสดง error detail
+      console.error('❌ DHL API failed:', {
+        status,
+        error: data
+      });
 
-        console.log(`[📬 Response Status: ${status}]`);
-
-        if (ok && data.products && data.products.length > 0) {
-          console.log('✅ DHL Rate found!');
-          console.log('[💰 Products]', JSON.stringify(data.products, null, 2));
-          
-          return NextResponse.json({
-            success: true,
-            products: data.products,
-            exchangeRates: data.exchangeRates || [{
-              currency: 'THB',
-              baseCurrency: 'USD',
-              currentExchangeRate: 0.029
-            }]
-          });
+      return NextResponse.json({
+        success: false,
+        error: 'Unable to calculate shipping rate. Please verify your shipping address and try again. If the problem persists, please contact support.',
+        debug: {
+          status,
+          message: data.detail || data.message || 'Unknown error'
         }
+      }, { status: 500 });
 
-        if (data.detail) {
-          console.warn(`⚠️ ${data.detail}`);
+    } catch (err: any) {
+      console.error('❌ DHL API Exception:', err);
+      
+      return NextResponse.json({
+        success: false,
+        error: 'Shipping calculation failed. Please try again.',
+        debug: {
+          message: err.message
         }
-
-      } catch (err: any) {
-        console.error(`❌ Error: ${err.message}`);
-      }
+      }, { status: 500 });
     }
 
-    // ❌ ถ้าลองทุกวิธีแล้วยังไม่ได้ = Error ไม่ใช่ราคาประมาณการ!
-    console.error('\n❌ All DHL rate strategies failed');
-    
-    return NextResponse.json({
-      success: false,
-      error: 'Unable to calculate shipping rate. Please verify your shipping address and try again. If the problem persists, please contact support.'
-    }, { status: 500 });
-
-  } catch (error) {
+  } catch (error: any) {
     console.error('🔥 DHL Rate API Error:', error);
     
     return NextResponse.json({
