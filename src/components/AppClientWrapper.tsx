@@ -642,6 +642,16 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
               >
                 SHOP
               </Link>
+
+              <a 
+      href="https://jtcguitar.com/store/package/expressive-changes" 
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={() => setMenuOpen(false)} 
+      className="hover:text-[#dc9e63] transition-colors duration-300"
+    >
+      Guitar Lessons
+    </a>
               
               {/* MUSIC DROPDOWN - เฉพาะลิงก์ที่กดได้ */}
               <div className="flex flex-col items-center z-30 font-[Cinzel] w-full">
