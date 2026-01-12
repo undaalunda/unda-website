@@ -112,6 +112,8 @@ async function fetchDHLRate(
 
 export async function POST(req: NextRequest) {
   console.log('📦 DHL Rate API called');
+  console.log('🌍 Environment:', process.env.NODE_ENV);
+  console.log('🔍 Vercel Region:', process.env.VERCEL_REGION || 'local');
 
   try {
     const { countryCode, postalCode, cityName, weight = 1, declaredValue = 50 } = await req.json();
@@ -150,11 +152,28 @@ export async function POST(req: NextRequest) {
     // 🌍 International = DHL API
     console.log('🌍 International shipping - calling DHL API');
 
-    const username = process.env.DHL_USERNAME!;
-    const password = process.env.DHL_PASSWORD!;
+    // 🔍 Debug: Check environment variables
+    const username = process.env.DHL_USERNAME;
+    const password = process.env.DHL_PASSWORD;
     const accountNumber = process.env.DHL_ACCOUNT_NUMBER || '561225618';
     const baseUrl = process.env.DHL_API_URL || 'https://express.api.dhl.com/mydhlapi';
     const endpoint = `${baseUrl}/rates`;
+
+    console.log('🔐 Environment Variables Check:', {
+      DHL_USERNAME_exists: !!process.env.DHL_USERNAME,
+      DHL_USERNAME_type: typeof process.env.DHL_USERNAME,
+      DHL_USERNAME_length: process.env.DHL_USERNAME?.length || 0,
+      DHL_USERNAME_preview: process.env.DHL_USERNAME ? process.env.DHL_USERNAME.substring(0, 3) + '***' : 'MISSING',
+      
+      DHL_PASSWORD_exists: !!process.env.DHL_PASSWORD,
+      DHL_PASSWORD_type: typeof process.env.DHL_PASSWORD,
+      DHL_PASSWORD_length: process.env.DHL_PASSWORD?.length || 0,
+      DHL_PASSWORD_preview: process.env.DHL_PASSWORD ? '***' + process.env.DHL_PASSWORD.substring(process.env.DHL_PASSWORD.length - 3) : 'MISSING',
+      
+      DHL_ACCOUNT_NUMBER: accountNumber,
+      DHL_API_URL: baseUrl,
+      endpoint
+    });
 
     console.log('🔐 Credentials Check:', {
       hasUsername: !!username,
@@ -168,10 +187,16 @@ export async function POST(req: NextRequest) {
 
     if (!username || !password) {
       console.error('❌ Missing DHL credentials');
+      console.error('❌ All env vars:', Object.keys(process.env).filter(key => key.includes('DHL')));
       return NextResponse.json(
         { 
           success: false,
-          error: 'Shipping service temporarily unavailable. Please try again later.' 
+          error: 'Shipping service temporarily unavailable. Please try again later.',
+          debug: {
+            hasUsername: !!username,
+            hasPassword: !!password,
+            availableEnvVars: Object.keys(process.env).filter(key => key.includes('DHL'))
+          }
         },
         { status: 500 }
       );
@@ -179,6 +204,15 @@ export async function POST(req: NextRequest) {
 
     const credentials = Buffer.from(`${username}:${password}`).toString('base64');
     const actualWeight = Math.max(0.5, weight);
+
+    // 🔍 Debug: Credentials encoding
+    console.log('🔐 Credentials Encoding:', {
+      rawUsernameLength: username.length,
+      rawPasswordLength: password.length,
+      base64Length: credentials.length,
+      base64Preview: credentials.substring(0, 20) + '...',
+      authHeader: `Basic ${credentials.substring(0, 20)}...`
+    });
 
     // ✅ คำนวณขนาดกล่องตามน้ำหนัก
     const boxSize = getBoxSize(actualWeight);
@@ -257,7 +291,8 @@ export async function POST(req: NextRequest) {
       // แสดง error detail
       console.error('❌ DHL API failed:', {
         status,
-        error: data
+        error: data,
+        fullResponse: raw
       });
 
       // ❌ Return error ชัดเจน - ไม่ใช้ fallback
@@ -266,28 +301,45 @@ export async function POST(req: NextRequest) {
         error: 'Unable to calculate shipping rate. Please verify your shipping address and try again. If the problem persists, please contact support.',
         debug: {
           status,
-          message: data.detail || data.message || 'Unknown error'
+          message: data.detail || data.message || 'Unknown error',
+          reasons: data.reasons || [],
+          fullError: data
         }
       }, { status: 500 });
 
     } catch (err: any) {
       console.error('❌ DHL API Exception:', err);
+      console.error('❌ Exception details:', {
+        name: err.name,
+        message: err.message,
+        stack: err.stack
+      });
       
       return NextResponse.json({
         success: false,
         error: 'Shipping calculation failed. Please try again.',
         debug: {
-          message: err.message
+          message: err.message,
+          type: err.name
         }
       }, { status: 500 });
     }
 
   } catch (error: any) {
     console.error('🔥 DHL Rate API Error:', error);
+    console.error('🔥 Error details:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    });
     
     return NextResponse.json({
       success: false,
-      error: 'Shipping calculation failed. Please try again.'
+      error: 'Shipping calculation failed. Please try again.',
+      debug: {
+        message: error.message,
+        type: error.name
+      }
     }, { status: 500 });
   }
 }
