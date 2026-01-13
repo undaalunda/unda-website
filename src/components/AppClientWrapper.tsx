@@ -650,7 +650,7 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       onClick={() => setMenuOpen(false)} 
       className="hover:text-[#dc9e63] transition-colors duration-300"
     >
-      Guitar Lessons
+      GUITAR LESSONS
     </a>
               
               {/* MUSIC DROPDOWN - เฉพาะลิงก์ที่กดได้ */}
