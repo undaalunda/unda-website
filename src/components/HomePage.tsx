@@ -458,12 +458,12 @@ return () => {
 
             {/* Dark Wonderful World */}
             <h2 className="video-hero-title" style={{ fontWeight: '300' }}>
-              Dark Wonderful World
+              C o n s o n a n c e
             </h2>
 
             {/* Live in Thailand */}
             <p className="video-hero-subtitle">
-              Live in Thailand (2024) Full Concert
+              (Official Music Video)
             </p>
 
             {/* Watch Full Video Button */}
