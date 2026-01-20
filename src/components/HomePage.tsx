@@ -468,7 +468,7 @@ return () => {
 
             {/* Watch Full Video Button */}
             <a
-              href="https://www.youtube.com/watch?v=ZxudWBd_0KQ&t=939s"
+              href="https://www.youtube.com/watch?v=hRkQyFQ1s3A"
   target="_blank"
   rel="noopener noreferrer"
   className="video-hero-button"
