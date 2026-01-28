@@ -1,4 +1,4 @@
-/* app/newsletter/page.tsx - FIXED VERSION */
+/* app/newsletter/page.tsx - WITH FIXED FOOTER */
 
 'use client';
 
@@ -66,117 +66,44 @@ export default function NewsletterPage() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen flex flex-col justify-center items-center px-4 pt-32 pb-20">
+      
+      {/* Main Content - Form อยู่ตรงกลาง */}
+      <main className="newsletter-page-main">
         <h1 className="sr-only">Unda Alunda Newsletter Sign Up</h1>
         
-        {/* Newsletter Page Content - ใช้ structure เดียวกับ footer */}
-        <div className="newsletter-page-wrapper w-full max-w-4xl mx-auto">
-          <section className="newsletter-page-section">
-            <div className="footer-logo-social">
-              <Image
-                src="/footer-logo-v7.webp"
-                alt="Unda Alunda Logo"
-                width={120}
-                height={120}
-                quality={100}
-                priority
-                unoptimized={true}
-                sizes="120px"
-                className="glow-logo mx-auto mb-6"
+        <div className="newsletter-form-container">
+          <h2 className="newsletter-title">NEWSLETTER SIGN UP</h2>
+
+          <form
+            action="https://unda-alunda.us1.list-manage.com/subscribe/post?u=3b4e88384cbe530945e9a9cfd&amp;id=835cafe901&amp;f_id=0070cce0f0"
+            method="post"
+            name="mc-embedded-subscribe-form"
+            noValidate
+            className="newsletter-form"
+          >
+            <div className="newsletter-grid">
+              <label htmlFor="newsletter-email" className="sr-only">Email Address</label>
+              <input
+                id="newsletter-email"
+                type="email"
+                name="EMAIL"
+                value={formData.EMAIL}
+                onChange={handleInputChange}
+                required
+                placeholder="Email Address"
+                className="newsletter-input"
+                aria-describedby="email-help"
               />
               
-              <div className="social-icons mb-6" role="list" aria-label="Social media links">
-                <a 
-                  href="https://www.facebook.com/UndaAlunda" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  aria-label="Follow on Facebook"
-                  role="listitem"
-                >
-                  <FacebookIcon />
-                </a>
-                <a 
-                  href="https://www.youtube.com/@undaalunda" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  aria-label="Watch on YouTube"
-                  role="listitem"
-                >
-                  <YoutubeIcon />
-                </a>
-                <a 
-                  href="https://www.instagram.com/undalunda" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  aria-label="Follow on Instagram"
-                  role="listitem"
-                >
-                  <InstagramIcon />
-                </a>
-                <a 
-                  href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0?si=JsdyQRqGRCGYfxU_nB_qvQ" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  aria-label="Listen on Spotify"
-                  role="listitem"
-                >
-                  <SpotifyIcon />
-                </a>
-                <a 
-                  href="https://twitter.com/undaalunda" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  aria-label="Follow on Twitter"
-                  role="listitem"
-                >
-                  <TwitterIcon />
-                </a>
-                <a 
-                  href="https://www.threads.net/@undalunda" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  aria-label="Follow on Threads"
-                  role="listitem"
-                >
-                  <ThreadsIcon />
-                </a>
-              </div>
-              <div className="newsletter-divider"></div>
-            </div>
-
-            <div className="newsletter-form-wrapper">
-              <h2 className="newsletter-title">NEWSLETTER SIGN UP</h2>
-
-              <form
-                action="https://unda-alunda.us1.list-manage.com/subscribe/post?u=3b4e88384cbe530945e9a9cfd&amp;id=835cafe901&amp;f_id=0070cce0f0"
-                method="post"
-                name="mc-embedded-subscribe-form"
-                noValidate
-                className="newsletter-form"
+              <label htmlFor="country-select" className="sr-only">Select your country</label>
+              <select 
+                id="country-select"
+                name="MMERGE7" 
+                value={formData.MMERGE7}
+                onChange={handleInputChange}
+                className="newsletter-select"
+                aria-label="Select your country"
               >
-                <div className="newsletter-grid">
-                  <label htmlFor="newsletter-email" className="sr-only">Email Address</label>
-                  <input
-                    id="newsletter-email"
-                    type="email"
-                    name="EMAIL"
-                    value={formData.EMAIL}
-                    onChange={handleInputChange}
-                    required
-                    placeholder="Email Address"
-                    className="newsletter-input"
-                    aria-describedby="email-help"
-                  />
-                  
-                  <label htmlFor="country-select" className="sr-only">Select your country</label>
-                  <select 
-                    id="country-select"
-                    name="MMERGE7" 
-                    value={formData.MMERGE7}
-                    onChange={handleInputChange}
-                    className="newsletter-select"
-                    aria-label="Select your country"
-                  >
   <option value="">Select a country...</option>
   <option value="Aaland Islands">Aaland Islands</option>
   <option value="Afghanistan">Afghanistan</option>
@@ -431,83 +358,155 @@ export default function NewsletterPage() {
 </select>
         </div>
 
-                <div className="newsletter-grid">
-                  <label htmlFor="first-name" className="sr-only">First Name</label>
-                  <input
-                    id="first-name"
-                    type="text"
-                    name="FNAME"
-                    value={formData.FNAME}
-                    onChange={handleInputChange}
-                    placeholder="First Name"
-                    className="newsletter-input"
-                  />
-                  
-                  <label htmlFor="last-name" className="sr-only">Last Name</label>
-                  <input
-                    id="last-name"
-                    type="text"
-                    name="LNAME"
-                    value={formData.LNAME}
-                    onChange={handleInputChange}
-                    placeholder="Last Name"
-                    className="newsletter-input"
-                  />
-                </div>
-
-                <button 
-                  type="submit" 
-                  className="newsletter-button"
-                  aria-label="Subscribe to newsletter"
-                >
-                  SUBSCRIBE
-                </button>
-
-                <div id="email-help" className="sr-only">
-                  We'll never share your email with anyone else
-                </div>
-
-                <input type="hidden" name="b_3b4e88384cbe530945e9a9cfd_835cafe901" value="" />
-                <div style={{position: 'absolute', left: '-5000px'}} aria-hidden="true">
-                  <input type="text" name="b_3b4e88384cbe530945e9a9cfd_835cafe901" tabIndex={-1} defaultValue="" />
-                </div>
-              </form>
+            <div className="newsletter-grid">
+              <label htmlFor="first-name" className="sr-only">First Name</label>
+              <input
+                id="first-name"
+                type="text"
+                name="FNAME"
+                value={formData.FNAME}
+                onChange={handleInputChange}
+                placeholder="First Name"
+                className="newsletter-input"
+              />
+              
+              <label htmlFor="last-name" className="sr-only">Last Name</label>
+              <input
+                id="last-name"
+                type="text"
+                name="LNAME"
+                value={formData.LNAME}
+                onChange={handleInputChange}
+                placeholder="Last Name"
+                className="newsletter-input"
+              />
             </div>
 
-            {/* Footer Links */}
-            <div className="footer-bottom mt-8 text-center">
-              <nav 
-                className="footer-links flex flex-wrap justify-center items-center gap-2 text-sm text-[#f8fcdc]/80 tracking-wide"
-                aria-label="Footer navigation"
-              >
-                <Link 
-                  href="/shipping-and-returns" 
-                  className="hover:text-[#dc9e63] transition-colors duration-200"
-                >
-                  SHIPPING & RETURNS
-                </Link>
-                <span className="divider" aria-hidden="true">|</span>
-                <Link 
-                  href="/terms-and-conditions" 
-                  className="hover:text-[#dc9e63] transition-colors duration-200"
-                >
-                  TERMS & CONDITIONS
-                </Link>
-                <span className="divider" aria-hidden="true">|</span>
-                <Link 
-                  href="/privacy-policy" 
-                  className="hover:text-[#dc9e63] transition-colors duration-200"
-                >
-                  PRIVACY POLICY
-                </Link>
-              </nav>
-              <p className="text-[#f8fcdc] mt-6 text-xs text-center">
-                Copyright © 2025 Unda Alunda
-              </p>
+            <button 
+              type="submit" 
+              className="newsletter-button"
+              aria-label="Subscribe to newsletter"
+            >
+              SUBSCRIBE
+            </button>
+
+            <div id="email-help" className="sr-only">
+              We'll never share your email with anyone else
             </div>
-          </section>
+
+            <input type="hidden" name="b_3b4e88384cbe530945e9a9cfd_835cafe901" value="" />
+            <div style={{position: 'absolute', left: '-5000px'}} aria-hidden="true">
+              <input type="text" name="b_3b4e88384cbe530945e9a9cfd_835cafe901" tabIndex={-1} defaultValue="" />
+            </div>
+          </form>
         </div>
       </main>
+
+      {/* Footer - อยู่ด้านล่างสุดเสมอ */}
+      <footer className="newsletter-page-footer">
+        <div className="footer-content">
+          <Image
+            src="/footer-logo-v7.webp"
+            alt="Unda Alunda Logo"
+            width={120}
+            height={120}
+            quality={100}
+            loading="lazy"
+            unoptimized={true}
+            sizes="120px"
+            className="glow-logo mx-auto mb-6"
+          />
+          
+          <div className="social-icons mb-6" role="list" aria-label="Social media links">
+            <a 
+              href="https://www.facebook.com/UndaAlunda" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              aria-label="Follow on Facebook"
+              role="listitem"
+            >
+              <FacebookIcon />
+            </a>
+            <a 
+              href="https://www.youtube.com/@undaalunda" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              aria-label="Watch on YouTube"
+              role="listitem"
+            >
+              <YoutubeIcon />
+            </a>
+            <a 
+              href="https://www.instagram.com/undalunda" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              aria-label="Follow on Instagram"
+              role="listitem"
+            >
+              <InstagramIcon />
+            </a>
+            <a 
+              href="https://open.spotify.com/artist/021SFwZ1HOSaXz2c5zHFZ0?si=JsdyQRqGRCGYfxU_nB_qvQ" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              aria-label="Listen on Spotify"
+              role="listitem"
+            >
+              <SpotifyIcon />
+            </a>
+            <a 
+              href="https://twitter.com/undaalunda" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              aria-label="Follow on Twitter"
+              role="listitem"
+            >
+              <TwitterIcon />
+            </a>
+            <a 
+              href="https://www.threads.net/@undalunda" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              aria-label="Follow on Threads"
+              role="listitem"
+            >
+              <ThreadsIcon />
+            </a>
+          </div>
+          
+          <div className="newsletter-divider"></div>
+
+          <nav 
+            className="footer-links"
+            aria-label="Footer navigation"
+          >
+            <Link 
+              href="/shipping-and-returns" 
+              className="hover:text-[#dc9e63] transition-colors duration-200"
+            >
+              SHIPPING & RETURNS
+            </Link>
+            <span className="divider" aria-hidden="true">|</span>
+            <Link 
+              href="/terms-and-conditions" 
+              className="hover:text-[#dc9e63] transition-colors duration-200"
+            >
+              TERMS & CONDITIONS
+            </Link>
+            <span className="divider" aria-hidden="true">|</span>
+            <Link 
+              href="/privacy-policy" 
+              className="hover:text-[#dc9e63] transition-colors duration-200"
+            >
+              PRIVACY POLICY
+            </Link>
+          </nav>
+          
+          <p className="copyright">
+            Copyright © 2025 Unda Alunda
+          </p>
+        </div>
+      </footer>
     </>
   );
 }

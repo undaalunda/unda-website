@@ -2468,27 +2468,27 @@ video::part(controls) {
 }
 
 
-/* ===== NEWSLETTER PAGE SPECIFIC STYLES ===== */
+/* ===== NEWSLETTER PAGE WITH FIXED FOOTER ===== */
 
-/* Newsletter Page Wrapper - à¹à¸¢à¸à¸­à¸­à¸à¸ˆà¸²à¸ footer */
-.newsletter-page-wrapper {
-  padding: 0 1rem;
+/* Main Container - Form อยู่ตรงกลาง */
+.newsletter-page-main {
+  min-height: calc(100vh - 96px); /* ลบความสูง navbar */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 8rem 1rem 4rem 1rem;
 }
 
-.newsletter-page-section {
+/* Newsletter Form Container */
+.newsletter-form-container {
   max-width: 600px;
-  margin: 0 auto;
+  width: 100%;
   text-align: center;
 }
 
-/* Newsletter Form Wrapper - à¹à¸à¹‰à¹„à¸‚ margin/padding */
-.newsletter-page-section .newsletter-form-wrapper {
-  margin-bottom: 0;
-  padding-top: 2rem;
-}
-
 /* Newsletter Title */
-.newsletter-page-section .newsletter-title {
+.newsletter-form-container .newsletter-title {
   font-size: 1.4rem;
   font-weight: 400;
   letter-spacing: 0.18em;
@@ -2500,7 +2500,7 @@ video::part(controls) {
 }
 
 /* Newsletter Grid - Form Fields */
-.newsletter-page-section .newsletter-grid {
+.newsletter-form-container .newsletter-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 0.75rem;
@@ -2508,80 +2508,14 @@ video::part(controls) {
 }
 
 @media (min-width: 768px) {
-  .newsletter-page-section .newsletter-grid {
+  .newsletter-form-container .newsletter-grid {
     grid-template-columns: 1fr 1fr;
   }
 }
 
-/* Newsletter Button */
-.newsletter-page-section .newsletter-button {
-  display: block;
-  width: 100%;
-  background-color: #dc9e63;
-  color: #0f0f0f;
-  font-weight: 600;
-  padding: 0.75rem;
-  font-size: 1rem;
-  letter-spacing: 0.1em;
-  border-radius: 0.375rem;
-  border: none;
-  cursor: pointer;
-  transition: opacity 0.3s ease;
-  margin-top: 1.5rem;
-  margin-bottom: 2rem;
-  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .newsletter-page-section .newsletter-button:hover {
-    opacity: 0.9;
-  }
-}
-
-.newsletter-page-section .newsletter-button:active {
-  opacity: 0.9;
-  transform: scale(0.98);
-}
-
-/* Footer Bottom Section - à¹€à¸§à¹‰à¸™à¸£à¸°à¸¢à¸°à¸ˆà¸²à¸ form */
-.newsletter-page-section .footer-bottom {
-  margin-top: 3rem;
-  padding-top: 2rem;
-}
-
-/* Newsletter Divider */
-.newsletter-page-section .newsletter-divider {
-  height: 1px;
-  background-color: #dc9e63;
-  transform: scaleY(0.5);
-  width: 150px;
-  margin: 3rem auto 2rem auto;
-}
-
-/* Logo & Social Icons spacing */
-.newsletter-page-section .footer-logo-social {
-  margin-bottom: 0;
-}
-
-.newsletter-page-section .glow-logo {
-  width: 120px;
-  height: auto;
-  filter: drop-shadow(0 0 4px #dc9e63)
-          drop-shadow(0 0 8px #996a3f)
-          drop-shadow(0 0 12px #53371d);
-}
-
-.newsletter-page-section .social-icons {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  font-size: 1.2rem;
-  margin-bottom: 0;
-}
-
 /* Input & Select Fields */
-.newsletter-page-section .newsletter-input,
-.newsletter-page-section .newsletter-select {
+.newsletter-form-container .newsletter-input,
+.newsletter-form-container .newsletter-select {
   background-color: rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(4px);
   color: #f8fcdc;
@@ -2598,29 +2532,117 @@ video::part(controls) {
   font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
 }
 
-.newsletter-page-section .newsletter-input::placeholder {
+.newsletter-form-container .newsletter-input::placeholder {
   color: #bbbbbb;
 }
 
-.newsletter-page-section .newsletter-select option {
+.newsletter-form-container .newsletter-select option {
   background-color: #190000;
 }
 
-.newsletter-page-section .newsletter-select:hover {
+.newsletter-form-container .newsletter-select:hover {
   cursor: pointer;
   border-color: #a67c52;
   background-color: rgba(0, 0, 0, 0.3);
 }
 
-.newsletter-page-section .newsletter-input:focus,
-.newsletter-page-section .newsletter-select:focus {
+.newsletter-form-container .newsletter-input:focus,
+.newsletter-form-container .newsletter-select:focus {
   border-color: #888;
   outline: none;
   box-shadow: none;
 }
 
+/* Newsletter Button */
+.newsletter-form-container .newsletter-button {
+  display: block;
+  width: 100%;
+  background-color: #dc9e63;
+  color: #0f0f0f;
+  font-weight: 600;
+  padding: 0.75rem;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  margin-top: 1.5rem;
+  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .newsletter-form-container .newsletter-button:hover {
+    opacity: 0.9;
+  }
+}
+
+.newsletter-form-container .newsletter-button:active {
+  opacity: 0.9;
+  transform: scale(0.98);
+}
+
+/* ===== FOOTER - ติดด้านล่างเสมอ ===== */
+.newsletter-page-footer {
+  width: 100%;
+  padding: 3rem 1rem 2.5rem 1rem;
+  text-align: center;
+  background: transparent;
+  margin-top: 8rem;
+}
+
+.newsletter-page-footer .footer-content {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Logo */
+.newsletter-page-footer .glow-logo {
+  width: 120px;
+  height: auto;
+  filter: drop-shadow(0 0 4px #dc9e63)
+          drop-shadow(0 0 8px #996a3f)
+          drop-shadow(0 0 12px #53371d);
+  margin-bottom: 1.5rem;
+}
+
+/* Social Icons */
+.newsletter-page-footer .social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.newsletter-page-footer .social-icons a {
+  color: #dc9e63;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .newsletter-page-footer .social-icons a:hover {
+    transform: scale(1.2);
+    opacity: 0.85;
+  }
+}
+
+.newsletter-page-footer .social-icons a:active {
+  transform: scale(1.1);
+  opacity: 0.85;
+}
+
+/* Newsletter Divider */
+.newsletter-page-footer .newsletter-divider {
+  height: 1px;
+  background-color: #dc9e63;
+  transform: scaleY(0.5);
+  width: 150px;
+  margin: 0 auto 3rem auto;
+}
+
 /* Footer Links */
-.newsletter-page-section .footer-links {
+.newsletter-page-footer .footer-links {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -2629,66 +2651,82 @@ video::part(controls) {
   letter-spacing: 0.03em;
   font-size: 0.75rem;
   font-weight: 500;
+  margin-top: 0rem;
   margin-bottom: 1.5rem;
   text-align: center;
   flex-wrap: wrap;
+  color: #f8fcdc;
+  opacity: 0.8;
+  font-family: 'Cinzel', serif;
 }
 
-/* à¸‹à¹ˆà¸­à¸™à¹€à¸ªà¹‰à¸™à¸‚à¸µà¸”à¸à¹ˆà¸­à¸™à¹à¸¥à¸°à¸«à¸¥à¸±à¸‡ footer links */
-.newsletter-page-section .footer-links::before,
-.newsletter-page-section .footer-links::after {
-  display: none !important;
-}
-
-.newsletter-page-section .footer-links a {
+.newsletter-page-footer .footer-links a {
   color: #dc9e63;
   text-decoration: none;
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .newsletter-page-section .footer-links a:hover {
+  .newsletter-page-footer .footer-links a:hover {
     opacity: 0.8;
   }
 }
 
-.newsletter-page-section .footer-links a:active {
+.newsletter-page-footer .footer-links a:active {
   opacity: 0.8;
 }
 
-.newsletter-page-section .divider {
+.newsletter-page-footer .divider {
   padding: 0 0.3rem;
   color: #f8fcdc;
 }
 
+/* Copyright */
+.newsletter-page-footer .copyright {
+  font-size: 0.72rem;
+  color: #f8fcdc;
+  margin-top: 1.5rem;
+  font-family: 'Cinzel', serif;
+}
+
+/* Responsive - Mobile */
 @media (max-width: 768px) {
-  .newsletter-page-section .footer-links {
+  .newsletter-page-main {
+    padding: 6rem 1rem 3rem 1rem;
+  }
+  
+  .newsletter-form-container .newsletter-title {
+    font-size: 1.2rem;
+  }
+  
+  .newsletter-page-footer {
+    padding: 2rem 1rem 2rem 1rem;
+  }
+  
+  .newsletter-page-footer .glow-logo {
+    width: 100px;
+  }
+  
+  .newsletter-page-footer .footer-links {
     flex-direction: column;
     gap: 0.5rem;
   }
 
-  .newsletter-page-section .divider {
+  .newsletter-page-footer .divider {
     display: none;
   }
 }
 
-/* Copyright Text */
-.newsletter-page-section .footer-bottom p {
-  font-size: 0.72rem;
-  color: #f8fcdc;
-  margin-top: 1rem;
+@media (max-width: 480px) {
+  .newsletter-form-container .newsletter-title {
+    font-size: 1.1rem;
+  }
 }
 
-/* Responsive adjustments */
-@media (max-width: 480px) {
-  .newsletter-page-wrapper {
-    padding: 0 0.5rem;
-  }
-  
-  .newsletter-page-section .newsletter-title {
-    font-size: 1.2rem;
-  }
-  
-  .newsletter-page-section .glow-logo {
-    width: 100px;
-  }
-}
+
+
+
+
+
+
+
+
