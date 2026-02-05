@@ -50,13 +50,27 @@ const nextConfig: NextConfig = {
     forceSwcTransforms: false,
   },
 
-  // 🎵 Vanity URL Redirects
+  // 🎵 Vanity URL Redirects + 🔥 Block Vercel Domain
   async redirects() {
     return [
+      // 🔥 FORCE REDIRECT VERCEL → CUSTOM DOMAIN
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'unda-website.vercel.app',
+          },
+        ],
+        destination: 'https://www.undaalunda.com/:path*',
+        permanent: true,
+      },
+      
+      // 🎵 Dark Wonderful World Vanity URL
       {
         source: '/dark-wonderful-world',
         destination: '/product/audio-digipak',
-        permanent: false, // 302 redirect
+        permanent: false,
       },
     ];
   },
