@@ -96,18 +96,19 @@ export default function ProductPageContent({
   useEffect(() => {
   if (product) {
     const pool = product.type === 'digital'
-      ? allItems.filter((item) => {
-          const isSoloCollectionItem = 
-            item.tags?.includes('contest') || 
-            item.id.includes('abasi') || 
-            item.id.includes('mayones') || 
-            item.id.includes('vola');
-          
-          return item.id !== product.id &&
-                 item.category === product.category &&
-                 item.type === 'digital' &&
-                 !isSoloCollectionItem;
-        })
+  ? allItems.filter((item) => {
+      const isSoloCollectionItem = 
+        item.tags?.includes('contest') || 
+        item.id.includes('abasi') || 
+        item.id.includes('mayones') || 
+        item.id.includes('vola');
+      
+      return item.id !== product.id &&
+             item.category === product.category &&
+             item.category !== 'Stem' &&
+             item.type === 'digital' &&
+             !isSoloCollectionItem;
+    })
       : allItems.filter((item) =>
           item.id !== product.id &&
           ['Music', 'Merch', 'Bundles'].includes(item.category) &&

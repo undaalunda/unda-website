@@ -13,15 +13,15 @@ const albums = [
     title: 'Dark Wonderful World',
     subtitle: 'Album • 2025',
     coverImage: '/catmoon-bg.jpeg',
-    totalProducts: 141,
+    totalProducts: 91,
     productBreakdown: {
       backingTracks: 50,
       tabs: 41,
-      stems: 50
+      stems: undefined  // ← เพิ่มบรรทัดนี้
     },
     songs: 11,
     priceRange: '$4.95 - $11.95',
-    description: 'Complete digital collection featuring backing tracks, tabs, and stems for all instruments.',
+    description: 'Complete digital collection with backing tracks and detailed tabs for all instruments.',
     available: true
   }
 ];
@@ -133,7 +133,7 @@ export default function DigitalShopContent() {
             Digital Shop
           </h1>
           <p className="text-base max-[927px]:text-sm max-[696px]:text-xs text-[#f8fcdc] opacity-80">
-            Professional high-quality backing tracks, tabs, and stems for musicians
+            Professional high-quality backing tracks and tabs for musicians
           </p>
         </div>
 
@@ -179,7 +179,7 @@ export default function DigitalShopContent() {
                     {/* Description Section - Fixed Height */}
                     <div className="xl:h-20 md:h-16 flex items-center mb-6">
                       <p className="text-[#f8fcdc] xl:text-sm md:text-xs opacity-60 text-center leading-relaxed w-full">
-                        Complete digital collection with backing tracks, detailed tabs, and high-quality stems for all instruments.
+                        Complete digital collection with backing tracks and detailed tabs for all instruments.
                       </p>
                     </div>
                     
@@ -210,10 +210,6 @@ export default function DigitalShopContent() {
                         <div className="flex justify-between items-center">
                           <span className="text-[#f8fcdc] opacity-70 xl:text-sm md:text-xs">Tabs</span>
                           <span className="text-[#f8fcdc] font-bold xl:text-sm md:text-xs">{albums[0].productBreakdown.tabs}</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-[#f8fcdc] opacity-70 xl:text-sm md:text-xs">Stems</span>
-                          <span className="text-[#f8fcdc] font-bold xl:text-sm md:text-xs">{albums[0].productBreakdown.stems}</span>
                         </div>
                       </div>
                     </div>
@@ -414,10 +410,12 @@ export default function DigitalShopContent() {
                                 <span className="text-[#f8fcdc] opacity-70 text-xs">Tabs</span>
                                 <span className="text-[#f8fcdc] font-bold text-xs">{collection.productBreakdown.tabs}</span>
                               </div>
-                              <div className="flex justify-between items-center">
-                                <span className="text-[#f8fcdc] opacity-70 text-xs">Stems</span>
-                                <span className="text-[#f8fcdc] font-bold text-xs">{collection.productBreakdown.stems}</span>
-                              </div>
+                              {collection.productBreakdown.stems !== undefined && (
+                                <div className="flex justify-between items-center">
+                                  <span className="text-[#f8fcdc] opacity-70 text-xs">Stems</span>
+                                  <span className="text-[#f8fcdc] font-bold text-xs">{collection.productBreakdown.stems}</span>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>

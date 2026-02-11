@@ -221,7 +221,7 @@ useEffect(() => {
 
   return q.length > 0
     ? allItems
-        .filter((item) => item.category !== 'Tabs')
+        .filter((item) => item.category !== 'Tabs' && item.category !== 'Stem')
         .filter((item) => {
           const fields = [
             item.title,
