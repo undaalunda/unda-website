@@ -209,7 +209,7 @@ export const productsByCategory = {
   description: 'Digipak CD + Booklet – Dark Wonderful World\n\n• Full-color printed cover with matte laminate finish\n• 16-page full-color booklet\n\nAmidst the whispers of darkness and the cries of hope, Dark Wonderful World is a love letter to every broken piece inside you. The music wraps around your hidden wounds and unleashes the demons you never dared to name.\n\nHere, sorrow isn\'t an end—it\'s a brutal beginning, in a world that\'s devastatingly beautiful.\n\nTracklist:\n1) The Dark\n2) Anomic\n3) JYY\n4) Consonance\n5) Red Down\n6) Atlantic\n7) Out of the Dark\n8) Can\'t Feel My Face\n9) Feign\n10) Dark Wonderful World\n11) Quietness\n\nPlease Note: The product image displayed is a mock-up; actual item may vary.' 
 },
     { id: 'live-cd', title: 'DARK WONDERFUL WORLD', subtitle: 'LIVE CD', category: 'Music' as const, type: 'physical' as const, price: 14.95, tags: ['live', 'cd', 'album'], image: '/live-cd-dww.webp', url: '/product/live-cd', weight: 0.12, description: 'The first live performance under the name Unda Alunda, recorded at the official album launch concert in Thailand on April 18, 2024.\n\nFeatures 8 tracks from the Dark Wonderful World album, performed by the full live band.\n\nTracklist:\n1) The Dark\n2) Anomic\n3) Consonance\n4) Out of the Dark\n5) Can\'t Feel My Face\n6) Feign\n7) Dark Wonderful World\n8) Quietness\n\nUnda Alunda – Guitars\nWarit Techakanont – Keyboard & Synth\nThirakoon Matsri – Bass\nTJ Trinidad – Drums\n\nAudio Engineered, Mixed & Mastered by Atiruj Worakittichat\nFilmed by Titikorn Poomanee, Sattawat Polpanna, Supanut Ditjaroen, Anon Preeyasaksakul\nCamera Assisted by Thanathorn Ngamchaleaw\nEdited by lukpee\nArtwork by Zandy Nwt\nPlease Note: The product image displayed is a mock-up; actual item may vary.' },
-    { id: 'guitars-book', title: 'FULL GUITARS TRANSCRIPTION', subtitle: 'PRINTED BOOK', category: 'Music' as const, type: 'physical' as const, price: 49.95, tags: ['book', 'transcription', 'guitar'], image: '/full-guitars-transcription.webp', url: '/product/guitars-book', weight: 0.8, description: 'The complete guitar transcription for Unda Alunda\'s 2025 album \'Dark Wonderful World\'.\n\nTracklist:\n1) The Dark\n2) Anomic\n3) JYY\n4) Consonance\n5) Red Down\n6) Atlantic\n7) Out of the Dark\n8) Can\'t Feel My Face\n9) Feign\n10) Dark Wonderful World\n11) Quietness\n\nPlease Note: The product image displayed is a mock-up; actual item may vary.' },
+    { id: 'guitars-book', title: 'FULL GUITARS TRANSCRIPTION', subtitle: 'PRINTED BOOK', category: 'Music' as const, type: 'physical' as const, price: 49.95, tags: ['book', 'transcription', 'guitar'], image: '/full-guitars-transcription.webp', url: '/product/guitars-book', weight: 0.8, available: false, comingSoon: true, description: 'The complete guitar transcription for Unda Alunda\'s 2025 album \'Dark Wonderful World\'.\n\nTracklist:\n1) The Dark\n2) Anomic\n3) JYY\n4) Consonance\n5) Red Down\n6) Atlantic\n7) Out of the Dark\n8) Can\'t Feel My Face\n9) Feign\n10) Dark Wonderful World\n11) Quietness\n\nPlease Note: The product image displayed is a mock-up; actual item may vary.' },
     { id: 'bass-book', title: 'FULL BASS TRANSCRIPTION', subtitle: 'PRINTED BOOK', category: 'Music' as const, type: 'physical' as const, price: 49.95, tags: ['book', 'transcription', 'bass'], image: '/full-bass-transcription.webp', url: '/product/bass-book', weight: 0.3, available: false, comingSoon: true },
     { id: 'keys-book', title: 'FULL KEYS TRANSCRIPTION', subtitle: 'PRINTED BOOK', category: 'Music' as const, type: 'physical' as const, price: 49.95, tags: ['book', 'transcription', 'keys'], image: '/full-keys-transcription.webp', url: '/product/keys-book', weight: 0.3, available: false, comingSoon: true },
     { id: 'drums-book', title: 'FULL DRUMS TRANSCRIPTION', subtitle: 'PRINTED BOOK', category: 'Music' as const, type: 'physical' as const, price: 49.95, tags: ['book', 'transcription', 'drums'], image: '/full-drums-transcription.webp', url: '/product/drums-book', weight: 0.3, available: false, comingSoon: true }
@@ -247,6 +247,7 @@ export const productsByCategory = {
     image: '/dark-wonderful-world-book-&-merch-bundle-2.webp', 
     url: '/product/book-merch-bundle', 
     bundleItems: ['signed-keychain', 'audio-digipak', 'guitars-book'],
+    available: false, comingSoon: true,
     weight: 1.15,
     description: 'This exclusive bundle includes:\n\n• Unda Alunda Signed Keychain – Limited edition collectible\n• Dark Wonderful World Digipak CD – Full album with 16-page booklet\n• Full Guitars Transcription Book – Complete guitar tabs for all 11 tracks\n\nPlease Note: Product images displayed are mock-ups; actual items may vary.'
   },
@@ -263,6 +264,7 @@ export const productsByCategory = {
     image: '/dark-wonderful-world-book-&-bonus-merch-bundle-2.webp', 
     url: '/product/book-bonus-bundle', 
     bundleItems: ['guitars-book', 'signed-keychain', 'audio-digipak', 'dark-wonderful-world-bag'],
+    available: false, comingSoon: true,
     weight: 1.25,
     description: 'This exclusive bundle includes:\n\n• Full Guitars Transcription Book – Complete guitar tabs for all 11 tracks\n• Unda Alunda Signed Keychain – Limited edition collectible\n• Dark Wonderful World Digipak CD – Full album with 16-page booklet\n• Dark Wonderful World Bag – Premium cotton tote bag (13x14x3 inches)\n\nPlease Note: Product images displayed are mock-ups; actual items may vary.'
   },
@@ -299,6 +301,7 @@ export const productsByCategory = {
     image: '/dark-wonderful-world-book-bundle-2.webp', 
     url: '/product/book-bundle', 
     bundleItems: ['guitars-book', 'audio-digipak'],
+    available: false, comingSoon: true,
     weight: 0.92,
     description: 'This exclusive bundle includes:\n\n• Full Guitars Transcription Book – Complete guitar tabs for all 11 tracks\n• Dark Wonderful World Digipak CD – Full album with 16-page booklet\n\nPlease Note: Product images displayed are mock-ups; actual items may vary.'
   },
@@ -318,6 +321,7 @@ export const productsByCategory = {
     sizeOptions: {
       'dark-wonderful-world-t-shirt': ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL']
     },
+    available: false, comingSoon: true,
     weight: 1.12,
     description: 'This exclusive bundle includes:\n\n• Dark Wonderful World T-Shirt – Select your size (S-6XL available)\n• Dark Wonderful World Digipak CD – Full album with 16-page booklet\n• Full Guitars Transcription Book – Complete guitar tabs for all 11 tracks\n\nPlease Note: Product images displayed are mock-ups; actual items may vary.'
   },
@@ -334,6 +338,7 @@ export const productsByCategory = {
     image: '/dark-wonderful-world-bag-&-book-bundle.webp', 
     url: '/product/bag-book-bundle',
     bundleItems: ['dark-wonderful-world-bag', 'audio-digipak', 'guitars-book'],
+    available: false, comingSoon: true,
     weight: 1.22,
     description: 'This exclusive bundle includes:\n\n• Dark Wonderful World Bag – Premium cotton tote bag (13x14x3 inches)\n• Dark Wonderful World Digipak CD – Full album with 16-page booklet\n• Full Guitars Transcription Book – Complete guitar tabs for all 11 tracks\n\nPlease Note: Product images displayed are mock-ups; actual items may vary.'
 },
