@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://undaalunda.com
+
+# Sitemaps
+Sitemap: https://undaalunda.com/sitemap.xml

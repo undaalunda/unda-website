@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
-<url><loc>https://unda-website.vercel.app/about</loc><lastmod>2026-01-03T22:03:46.397Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://unda-website.vercel.app/admin/orders</loc><lastmod>2026-01-03T22:03:46.398Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://unda-website.vercel.app/admin/stock</loc><lastmod>2026-01-03T22:03:46.398Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://unda-website.vercel.app/cart</loc><lastmod>2026-01-03T22:03:46.398Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://unda-website.vercel.app/checkout</loc><lastmod>2026-01-03T22:03:46.398Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://unda-website.vercel.app/contact</loc><lastmod>2026-01-03T22:03:46.398Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://unda-website.vercel.app/order-status</loc><lastmod>2026-01-03T22:03:46.398Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://unda-website.vercel.app</loc><lastmod>2026-01-03T22:03:46.398Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://unda-website.vercel.app/privacy-policy</loc><lastmod>2026-01-03T22:03:46.398Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://unda-website.vercel.app/shipping-and-returns</loc><lastmod>2026-01-03T22:03:46.398Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://unda-website.vercel.app/shop/digital</loc><lastmod>2026-01-03T22:03:46.398Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://unda-website.vercel.app/shop</loc><lastmod>2026-01-03T22:03:46.398Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://unda-website.vercel.app/sitemap.xml</loc><lastmod>2026-01-03T22:03:46.398Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://unda-website.vercel.app/terms-and-conditions</loc><lastmod>2026-01-03T22:03:46.398Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://unda-website.vercel.app/thank-you</loc><lastmod>2026-01-03T22:03:46.398Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://unda-website.vercel.app/tour</loc><lastmod>2026-01-03T22:03:46.398Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://undaalunda.com/about</loc><lastmod>2026-03-02T13:36:09.106Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://undaalunda.com/admin/orders</loc><lastmod>2026-03-02T13:36:09.106Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://undaalunda.com/admin/stock</loc><lastmod>2026-03-02T13:36:09.106Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://undaalunda.com/cart</loc><lastmod>2026-03-02T13:36:09.106Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://undaalunda.com/checkout</loc><lastmod>2026-03-02T13:36:09.106Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://undaalunda.com/contact</loc><lastmod>2026-03-02T13:36:09.106Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://undaalunda.com/newsletter</loc><lastmod>2026-03-02T13:36:09.106Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://undaalunda.com/order-status</loc><lastmod>2026-03-02T13:36:09.106Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://undaalunda.com</loc><lastmod>2026-03-02T13:36:09.106Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://undaalunda.com/privacy-policy</loc><lastmod>2026-03-02T13:36:09.106Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://undaalunda.com/robots.txt</loc><lastmod>2026-03-02T13:36:09.106Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://undaalunda.com/shipping-and-returns</loc><lastmod>2026-03-02T13:36:09.106Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://undaalunda.com/shop/digital</loc><lastmod>2026-03-02T13:36:09.106Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://undaalunda.com/shop</loc><lastmod>2026-03-02T13:36:09.106Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://undaalunda.com/sitemap.xml</loc><lastmod>2026-03-02T13:36:09.106Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://undaalunda.com/terms-and-conditions</loc><lastmod>2026-03-02T13:36:09.106Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://undaalunda.com/thank-you</loc><lastmod>2026-03-02T13:36:09.106Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://undaalunda.com/tour</loc><lastmod>2026-03-02T13:36:09.106Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
 </urlset>
