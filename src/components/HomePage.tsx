@@ -683,82 +683,91 @@ return () => {
         </section>
 
         {/* MUSIC & MERCH - 🚀 OPTIMIZED */}
-        <section className="stems-section">
-          <div ref={musicMerchRef} className={`fade-trigger ${showMerch ? 'fade-in' : ''}`}>
-            <p className="stems-sub">MUSIC IN YOUR HANDS</p>
-            <h2 className="stems-title">MUSIC & MERCH</h2>
-            <div className="stems-row">
-              {homepageItems.map((item) => (
-                <Link href={item.url || `/product/${item.id}`} key={item.id} className="stems-item product-label-link">
-                  <div className="relative">
-                    <ProductImage
-                      src={item.image}
-                      alt={item.title}
-                      width={200}
-                      height={200}
-                      className="stems-image"
-                      quality={95}
-                      sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
-                    />
-                    {item.soldOut && (
-                      <div className="absolute top-2 right-2 bg-red-900/40 text-white text-xs px-2 py-1 rounded-md font-semibold border border-red-800/50">
-                        SOLD OUT
-                      </div>
-                    )}
-                    {item.comingSoon && !item.soldOut && (
-                      <div className="absolute top-2 right-2 bg-orange-600/50 text-white text-xs px-2 py-1 rounded-md font-semibold border border-orange-500/60">
-                        Available Dec 31
-                      </div>
-                    )}
-                  </div>
-                  <div className="stems-label-group">
-                    <h3 className="sr-only">{`${item.title} – ${item.subtitle.replace(' BACKING TRACK', '').replace(' STEM', '').replace(' TAB', '')}`}</h3>
-                    <p className="stems-title-text">{item.title}</p>
-                    <p className="stems-subtitle-tiny">
-                      {item.subtitle
-                        .replace(' BACKING TRACK', '')
-                        .replace(' STEM', '')
-                        .replace(' TAB', '')}
-                    </p>
-                    <p className="stems-price">
-                      {item.comingSoon ? (
-                        <span className="invisible">
-                          {typeof item.price === 'object' && item.price !== null
-                            ? `$${item.price.sale.toFixed(2)}`
-                            : typeof item.price === 'number'
-                              ? `$${item.price.toFixed(2)}`
-                              : null}
-                        </span>
-                      ) : (
-                        typeof item.price === 'object' && item.price !== null
-                          ? <>
-                              <span className="line-through mr-1 text-[#f8fcdc]">
-                                ${item.price.original.toFixed(2)}
-                              </span>
-                              <span className="text-[#cc3f33]">
-                                ${item.price.sale.toFixed(2)}
-                              </span>
-                            </>
-                          : typeof item.price === 'number'
-                            ? `$${item.price.toFixed(2)}`
-                            : null
-                      )}
-                    </p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-            <div className="shopall-button-wrapper">
-              <Link
-                href="/shop/physical"
-                onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'merch')}
-                className="info-button"
-              >
-                SHOP ALL
-              </Link>
-            </div>
+<section className="stems-section">
+  <div ref={musicMerchRef} className={`fade-trigger ${showMerch ? 'fade-in' : ''}`}>
+    <p className="stems-sub">MUSIC IN YOUR HANDS</p>
+    <h2 className="stems-title">MUSIC & MERCH</h2>
+    <div className="stems-row">
+      {homepageItems.map((item) => (
+        <div
+          key={item.id}
+          onClick={() => {
+            if (!item.comingSoon || item.available) {
+              router.push(item.url || `/product/${item.id}`);
+            }
+          }}
+          className={`stems-item product-label-link ${
+            !item.comingSoon || item.available
+              ? 'cursor-pointer'
+              : 'opacity-60 cursor-not-allowed'
+          } ${item.tags?.includes('keychain') ? 'keychain-glow' : ''}`}
+        >
+          <div className="relative">
+            <ProductImage
+              src={item.image}
+              alt={item.title}
+              width={200}
+              height={200}
+              className="stems-image"
+              quality={95}
+              sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 180px"
+            />
+            {item.soldOut && (
+              <div className="absolute top-2 right-2 bg-red-900/40 text-white text-xs px-2 py-1 rounded-md font-semibold border border-red-800/50">
+                SOLD OUT
+              </div>
+            )}
+            
+        
           </div>
-        </section>
+          <div className="stems-label-group">
+            <h3 className="sr-only">{`${item.title} – ${item.subtitle}`}</h3>
+            <p className="stems-title-text">{item.title}</p>
+            <p className="stems-subtitle-tiny">
+              {item.subtitle
+                .replace(' BACKING TRACK', '')
+                .replace(' STEM', '')
+                .replace(' TAB', '')}
+            </p>
+            <p className="stems-price">
+              {item.comingSoon ? (
+                <span className="invisible">
+                  {typeof item.price === 'object' && item.price !== null
+                    ? `$${item.price.sale.toFixed(2)}`
+                    : typeof item.price === 'number'
+                      ? `$${item.price.toFixed(2)}`
+                      : null}
+                </span>
+              ) : (
+                typeof item.price === 'object' && item.price !== null
+                  ? <>
+                      <span className="line-through mr-1 text-[#f8fcdc]">
+                        ${item.price.original.toFixed(2)}
+                      </span>
+                      <span className="text-[#cc3f33]">
+                        ${item.price.sale.toFixed(2)}
+                      </span>
+                    </>
+                  : typeof item.price === 'number'
+                    ? `$${item.price.toFixed(2)}`
+                    : null
+              )}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+    <div className="shopall-button-wrapper">
+      <Link
+        href="/shop/physical"
+        onClick={createNavigationHandler('/shop/physical', undefined, undefined, 'merch')}
+        className="info-button"
+      >
+        SHOP ALL
+      </Link>
+    </div>
+  </div>
+</section>
 
         {/* TOUR SECTION */}
         <section ref={tourRef} className="tour-section">
