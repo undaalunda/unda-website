@@ -20,7 +20,7 @@ const allowedItems = [
   'cat-in-the-cloud-longsleeve',
   'mr-feign-t-shirt',
   'dark-wonderful-world-bag',
-  'guitars-book',
+  'unda-alunda-pick',
   'signed-keychain',
   'audio-digipak',
   'dual-album-bundle'
