@@ -193,7 +193,7 @@ export const productsByCategory = {
   description: 'Unda Alunda Keychain\n\nProduct Details\n• Material: Acrylic, double-sided print\n• Height: 5 cm\n• Includes the artist\'s signature\n\nPlease Note: The product image displayed is a mock-up; actual item may vary.'
 },
 
-{ id: 'unda-alunda-pick', title: 'UNDA ALUNDA', category: 'Merch' as const, type: 'physical' as const, subtitle: 'PICK', price: 4.95, tags: ['pick', 'accessory', 'guitar'], image: '/unda-alunda-pick.webp', url: '/product/unda-alunda-pick', weight: 0.01, description: 'Unda Alunda Pick\n\nProduct Details\n• Jazz-shaped pick\n• 0.6 mm thickness\n\nPlease Note: The product image displayed is a mock-up; actual item may vary.' },
+{ id: 'unda-alunda-pick', title: 'UNDA ALUNDA', category: 'Merch' as const, type: 'physical' as const, subtitle: 'PICK', price: 2.95, tags: ['pick', 'accessory', 'guitar'], image: '/unda-alunda-pick.webp', url: '/product/unda-alunda-pick', weight: 0.01, description: 'Unda Alunda Pick\n\nProduct Details\n• Jazz-shaped pick\n• 0.6 mm thickness\n\nPlease Note: The product image displayed is a mock-up; actual item may vary.' },
 
 ],
 
