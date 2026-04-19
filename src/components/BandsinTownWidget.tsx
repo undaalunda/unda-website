@@ -2,152 +2,356 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Script from 'next/script';
+
+interface Event {
+  id: string;
+  datetime: string;
+  description?: string;
+  venue: {
+    name: string;
+    city: string;
+    country: string;
+  };
+  offers: {
+    type: string;
+    url: string;
+    status: string;
+  }[];
+  url: string;
+}
+
+function parseVenueName(description: string): string | null {
+  if (!description) return null;
+  const match = description.match(/Venue:\s*([^\n/]+)/i);
+  if (match) return match[1].trim();
+  return null;
+}
 
 export default function BandsinTownWidget() {
-  const [scriptLoaded, setScriptLoaded] = useState(false);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const appId = process.env.NEXT_PUBLIC_BANDSINTOWN_APP_ID;
+        const res = await fetch(
+          `https://rest.bandsintown.com/artists/Unda%20Alunda/events?app_id=${appId}&date=upcoming`
+        );
+        if (!res.ok) throw new Error('Failed to fetch');
+        const data = await res.json();
+        setEvents(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error('Bandsintown fetch error:', err);
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  const formatDate = (datetime: string) => {
+    const date = new Date(datetime);
+    return date.toLocaleDateString('en-US', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    }).toUpperCase();
+  };
+
+  const formatTime = (datetime: string) => {
+    const date = new Date(datetime);
+    return date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
+  };
+
+  const getTicketUrl = (event: Event) => {
+    const ticketOffer = event.offers?.find((o) => o.type === 'Tickets');
+    return ticketOffer?.url || event.url;
+  };
+
+  if (loading) {
+    return (
+      <div style={{ color: 'rgba(248,252,220,0.5)', padding: '2rem 0', fontSize: '12px', letterSpacing: '0.1em' }}>
+        LOADING TOUR DATES...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ color: 'rgba(248,252,220,0.4)', padding: '2rem 0', fontSize: '12px' }}>
+        Could not load tour dates. Please check back later.
+      </div>
+    );
+  }
 
   return (
     <>
-      <Script
-        src="https://widget.bandsintown.com/main.min.js"
-        strategy="lazyOnload"
-        onLoad={() => {
-          setScriptLoaded(true);
-          console.log('Bandsintown widget loaded lazily');
-          
-          // รอให้ script โหลดเสร็จแล้วค่อย init
-          setTimeout(() => {
-            try {
-              if (typeof window !== 'undefined' && (window as any).BIT?.Widget?.init) {
-                (window as any).BIT.Widget.init();
-                console.log('Widget initialized successfully');
-                
-                // Custom styling after widget loads
-                setTimeout(() => {
-                  // Make text smaller
-                  const widgetTexts = document.querySelectorAll('.bit-widget p, .bit-widget span, .bit-widget div');
-                  widgetTexts.forEach((el: any) => {
-                    if (el && !el.querySelector('button')) {
-                      el.style.fontSize = '12px';
-                      el.style.lineHeight = '1.4';
-                    }
-                  });
-                  
-                  // Make "No Upcoming" less prominent
-                  const noEventsText = document.querySelector('.bit-widget');
-                  if (noEventsText) {
-                    const textContent = noEventsText.textContent || '';
-                    if (textContent.includes('NO UPCOMING') || textContent.includes('No upcoming')) {
-                      const noEventElements = document.querySelectorAll('.bit-widget *');
-                      noEventElements.forEach((el: any) => {
-                        if (el.textContent && (el.textContent.includes('NO UPCOMING') || el.textContent.includes('No upcoming'))) {
-                          el.style.color = 'rgba(248, 252, 220, 0.4)';
-                          el.style.opacity = '0.6';
-                        }
-                      });
-                    }
-                  }
-                }, 2000);
-              }
-            } catch (error) {
-              console.error('Widget init failed:', error);
-            }
-          }, 1000);
-        }}
-      />
-      
-      <div
-        className="bit-widget-initializer"
-        data-artist-name="Unda Alunda"
-        data-background-color="transparent"
-        data-limit="5"
-        data-separator-color="rgba(255,255,255,0.1)"
-        data-text-color="#f8fcdc"
-        data-link-color="#2a0000"
-        data-display-local-dates="false"
-        data-display-past-dates="false"
-        data-auto-style="false"
-        data-display-limit="5"
-        data-date-format="ddd, MMM D, YYYY"
-        data-request-show="true"
-        data-language="en"
-      />
-      
+      <div className="bit-custom-widget">
+        {events.length === 0 ? (
+          <p style={{ color: 'rgba(248,252,220,0.4)', fontSize: '12px', letterSpacing: '0.1em' }}>
+            NO UPCOMING TOUR DATES
+          </p>
+        ) : (
+          <div className="bit-events-list">
+            {events.map((event) => {
+              const venueName = parseVenueName(event.description || '') || event.venue.name;
+              return (
+                // ✅ div + onClick แทน <a> ซ้อน <a>
+                <div
+                  key={event.id}
+                  className="bit-event-row"
+                  onClick={() => window.open(event.url, '_blank', 'noopener,noreferrer')}
+                  role="link"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') window.open(event.url, '_blank', 'noopener,noreferrer');
+                  }}
+                >
+                  {/* LEFT — Venue + Date */}
+                  <div className="bit-event-left">
+                    <p className="bit-event-venue">{venueName}</p>
+                    <p className="bit-event-date">
+                      {formatDate(event.datetime)} @ {formatTime(event.datetime)}
+                    </p>
+                  </div>
+
+                  {/* CENTER — City, Country */}
+                  <div className="bit-event-center">
+                    <p className="bit-event-location">
+                      {event.venue.city}, {event.venue.country}
+                    </p>
+                  </div>
+
+                  {/* RIGHT — Buttons */}
+                  <div
+                    className="bit-event-right"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <a
+                      href={event.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bit-btn bit-btn-rsvp"
+                    >
+                      RSVP
+                    </a>
+                    <a
+                      href={getTicketUrl(event)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bit-btn bit-btn-tickets"
+                    >
+                      TICKETS
+                    </a>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Request a Show */}
+        <div className="bit-request-show">
+          <a
+            href="https://www.bandsintown.com/a/15621474?came_from=267&utm_medium=api&utm_source=public_api&utm_campaign=artist"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bit-btn-request"
+          >
+            REQUEST A SHOW
+          </a>
+        </div>
+      </div>
+
       <style jsx global>{`
-        /* REQUEST A SHOW Button Styling */
-        .bit-widget button,
-        .bit-widget .bit-button,
-        .bit-widget .bit-button--solid,
-        .tour-section button,
-        .tour-widget-container button {
-          background-color: #2a0000 !important;
-          background: #2a0000 !important;
-          border: 1px solid #2a0000 !important;
-          color: #f8fcdc !important;
-          font-family: 'Cinzel', serif !important;
-          font-size: 14px !important;
-          letter-spacing: 0.15rem !important;
-          border-radius: 3px !important;
-          font-weight: 500 !important;
-          text-align: center !important;
-          transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
-          cursor: pointer !important;
+        .bit-custom-widget {
+          width: 100%;
+          font-family: 'Cinzel', serif;
         }
-        
-        /* Hover Effect for Desktop */
+
+        .bit-events-list {
+          width: 100%;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .bit-event-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 1.2rem 0.75rem;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          gap: 1rem;
+          transition: background-color 0.25s ease;
+          border-radius: 2px;
+          margin: 0 -0.75rem;
+          cursor: pointer;
+        }
+
         @media (hover: hover) and (pointer: fine) {
-          .bit-widget button:hover,
-          .bit-widget .bit-button:hover,
-          .bit-widget .bit-button--solid:hover,
-          .tour-section button:hover,
-          .tour-widget-container button:hover {
-            background-color: #5d0000 !important;
-            background: #5d0000 !important;
-            border: 1px solid #5d0000 !important;
-            color: #f8fcdc !important;
+          .bit-event-row:hover {
+            background-color: rgba(248, 252, 220, 0.03);
           }
         }
-        
-        /* Active State for Mobile */
-        .bit-widget button:active,
-        .bit-widget .bit-button:active,
-        .bit-widget .bit-button--solid:active,
-        .tour-section button:active,
-        .tour-widget-container button:active {
-          background-color: #5d0000 !important;
-          background: #5d0000 !important;
-          border: 1px solid #5d0000 !important;
+
+        /* LEFT */
+        .bit-event-left {
+          flex: 1.5;
+          min-width: 0;
+        }
+
+        .bit-event-venue {
+          color: #dc9e63;
+          font-size: 12px;
+          font-weight: 600;
+          letter-spacing: 0.08em;
+          margin: 0 0 0.25rem 0;
+          text-transform: uppercase;
+        }
+
+        .bit-event-date {
+          color: #f8fcdc;
+          font-size: 11px;
+          font-weight: 400;
+          letter-spacing: 0.06em;
+          margin: 0;
+          opacity: 0.85;
+        }
+
+        /* CENTER */
+        .bit-event-center {
+          flex: 1.5;
+          text-align: center;
+        }
+
+        .bit-event-location {
+          color: #f8fcdc;
+          font-size: 12px;
+          font-weight: 500;
+          letter-spacing: 0.1em;
+          margin: 0;
+          text-transform: uppercase;
+        }
+
+        /* RIGHT */
+        .bit-event-right {
+          flex: 1;
+          display: flex;
+          justify-content: flex-end;
+          gap: 0.6rem;
+        }
+
+        .bit-btn {
+          display: inline-block;
+          padding: 0.45rem 1rem;
+          font-family: 'Cinzel', serif;
+          font-size: 11px;
+          font-weight: 500;
+          letter-spacing: 0.12em;
+          text-decoration: none !important;
+          border-radius: 3px;
+          transition: background-color 0.3s ease, border-color 0.3s ease;
+          text-align: center;
+          white-space: nowrap;
+        }
+
+        /* ✅ RSVP — บางมากๆ */
+        .bit-btn-rsvp {
+          background-color: transparent;
+          border: 0.3px solid rgba(248, 252, 220, 0.35);
           color: #f8fcdc !important;
-          transform: scale(0.98) !important;
         }
 
-        /* Bandsintown Widget Text Styling */
-        .bit-widget p {
-          font-size: 12px !important;
-          line-height: 1.4 !important;
+        .bit-btn-tickets {
+          background-color: #2a0000;
+          border: 1px solid #2a0000;
+          color: #f8fcdc !important;
         }
 
-        /* Target all text elements in the widget */
-        .bit-widget * {
-          font-size: 12px !important;
+        @media (hover: hover) and (pointer: fine) {
+          .bit-btn-rsvp:hover {
+            background-color: rgba(248, 252, 220, 0.06);
+            border-color: rgba(248, 252, 220, 0.5);
+          }
+          .bit-btn-tickets:hover {
+            background-color: #5d0000;
+            border-color: #5d0000;
+          }
         }
 
-        /* Keep buttons at normal size */
-        .bit-widget button,
-        .bit-widget .bit-button,
-        .bit-widget .bit-button--solid {
-          font-size: 14px !important;
+        .bit-btn-rsvp:active {
+          background-color: rgba(248, 252, 220, 0.06);
+          transform: scale(0.98);
         }
 
-        /* Make "No Upcoming Tour Dates" less prominent */
-        .bit-widget div:contains("NO UPCOMING"),
-        .bit-widget span:contains("NO UPCOMING"),
-        .bit-widget p:contains("NO UPCOMING"),
-        .bit-widget *[class*="no-events"],
-        .bit-widget *[class*="empty"] {
-          color: rgba(248, 252, 220, 0.4) !important;
-          opacity: 0.6 !important;
+        .bit-btn-tickets:active {
+          background-color: #5d0000;
+          border-color: #5d0000;
+          transform: scale(0.98);
+        }
+
+        /* REQUEST A SHOW */
+        .bit-request-show {
+          margin-top: 1.5rem;
+          width: 100%;
+        }
+
+        .bit-btn-request {
+          display: block;
+          width: 100%;
+          padding: 1rem;
+          background-color: #2a0000;
+          border: 1px solid #2a0000;
+          color: #f8fcdc !important;
+          font-family: 'Cinzel', serif;
+          font-size: 14px;
+          font-weight: 500;
+          letter-spacing: 0.15rem;
+          text-align: center;
+          text-decoration: none !important;
+          border-radius: 3px;
+          transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+          .bit-btn-request:hover {
+            background-color: #5d0000;
+            border-color: #5d0000;
+          }
+        }
+
+        .bit-btn-request:active {
+          background-color: #5d0000;
+          border-color: #5d0000;
+          transform: scale(0.98);
+        }
+
+        /* Mobile */
+        @media (max-width: 640px) {
+          .bit-event-row {
+            flex-wrap: wrap;
+            gap: 0.75rem;
+          }
+
+          .bit-event-left {
+            flex: 1 1 100%;
+          }
+
+          .bit-event-center {
+            flex: 1 1 auto;
+            text-align: left;
+          }
+
+          .bit-event-right {
+            flex: 0 0 auto;
+          }
         }
       `}</style>
     </>
