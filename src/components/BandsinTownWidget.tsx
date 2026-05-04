@@ -161,7 +161,7 @@ export default function BandsinTownWidget() {
         {/* Request a Show */}
         <div className="bit-request-show">
           <a
-            href="https://www.bandsintown.com/a/15621474?came_from=267&utm_medium=api&utm_source=public_api&utm_campaign=artist"
+            href="https://www.bandsintown.com/artist-subscribe/15554165-unda-alunda"
             target="_blank"
             rel="noopener noreferrer"
             className="bit-btn-request"
