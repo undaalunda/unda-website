@@ -625,63 +625,6 @@ return () => {
         
         <p className="since-note">Delivering Worldwide Since 2025</p>
 
-        {/* TRANSCRIPTION SECTION - 🚀 OPTIMIZED */}
-        <section className="transcription-section">
-          <div ref={transcriptionRef} className={`fade-trigger ${showTranscriptions ? 'fade-in' : ''}`}>
-            <p className="transcription-sub">LEARN THE MUSIC</p>
-            <h2 className="transcription-title">TRANSCRIPTIONS</h2>
-            <div className="product-row">
-              {["guitar", "keys", "bass", "drums"].map((inst, i) => (
-                <Link 
-                  href="/shop/digital/dark-wonderful-world" 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    
-                    const context = {
-                      from: 'homepage',
-                      returnUrl: '/',
-                      filter: 'tabs',
-                      instrument: inst
-                    };
-                    
-                    sessionStorage.setItem('navigationContext', JSON.stringify(context));
-                    router.push('/shop/digital/dark-wonderful-world');
-                  }}
-                  key={i} 
-                  className="product-item product-label-link"
-                >
-                  <ProductImage
-                    src={`/product-${inst}.webp`}
-                    alt={`${inst} Book`}
-                    width={200}
-                    height={200}
-                    className="product-image"
-                    quality={95}
-                    sizes="(max-width: 480px) 140px, (max-width: 1279px) 160px, 200px"
-                  />
-                  <div className="product-label-group">
-                    <h3 className="product-title">
-                      DARK WONDERFUL WORLD
-                      <span className="product-subtitle block">
-                        THE COMPLETE {inst.toUpperCase()} TRANSCRIPTION
-                      </span>
-                    </h3>
-                  </div>
-                </Link>
-              ))}
-            </div>
-            <div className="shopall-button-wrapper">
-              <Link 
-                href="/shop/digital/dark-wonderful-world" 
-                onClick={createNavigationHandler('/shop/digital/dark-wonderful-world', 'tabs', 'all')}
-                className="info-button"
-              >
-                SHOP ALL
-              </Link>
-            </div>
-          </div>
-        </section>
-
         {/* MUSIC & MERCH - 🚀 OPTIMIZED */}
 <section className="stems-section">
   <div ref={musicMerchRef} className={`fade-trigger ${showMerch ? 'fade-in' : ''}`}>
