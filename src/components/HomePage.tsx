@@ -625,6 +625,8 @@ return () => {
         
         <p className="since-note">Delivering Worldwide Since 2025</p>
 
+       
+
         {/* MUSIC & MERCH - 🚀 OPTIMIZED */}
 <section className="stems-section">
   <div ref={musicMerchRef} className={`fade-trigger ${showMerch ? 'fade-in' : ''}`}>
