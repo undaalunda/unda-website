@@ -2,6 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Script from 'next/script';
 
 interface Event {
   id: string;
@@ -31,6 +32,7 @@ export default function BandsinTownWidget() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [trackBarReady, setTrackBarReady] = useState(false);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -52,6 +54,27 @@ export default function BandsinTownWidget() {
 
     fetchEvents();
   }, []);
+
+  useEffect(() => {
+  if (loading) return;
+
+  const interval = setInterval(() => {
+    const widget = document.querySelector('.bit-widget');
+    if (widget && widget.children.length > 0) {
+      setTrackBarReady(true);
+      clearInterval(interval);
+    }
+  }, 100);
+
+  const timeout = setTimeout(() => {
+    clearInterval(interval);
+  }, 5000);
+
+  return () => {
+    clearInterval(interval);
+    clearTimeout(timeout);
+  };
+}, [loading]);
 
   const formatDate = (datetime: string) => {
     const date = new Date(datetime);
@@ -94,9 +117,37 @@ export default function BandsinTownWidget() {
 
   return (
     <>
+    <Script
+  src="https://widget.bandsintown.com/main.min.js"
+  strategy="afterInteractive"
+/>
+
+<div
+  style={{
+    opacity: trackBarReady ? 1 : 0,
+    transition: 'opacity 0.3s ease',
+    height: trackBarReady ? 'auto' : '0',
+    overflow: 'hidden'
+  }}
+>
+  <div
+    className="bit-widget-initializer"
+    data-artist-name="Unda Alunda"
+    data-background-color="transparent"
+    data-separator-color="rgba(255,255,255,0.1)"
+    data-text-color="#f8fcdc"
+    data-link-color="#2a0000"
+    data-display-local-dates="false"
+    data-display-past-dates="false"
+    data-auto-style="false"
+    data-date-format="ddd, MMM D, YYYY"
+    data-request-show="false"
+    data-language="en"
+  />
+</div>
       <div className="bit-custom-widget">
         {events.length === 0 ? (
-          <p style={{ color: 'rgba(248,252,220,0.4)', fontSize: '12px', letterSpacing: '0.1em' }}>
+          <p style={{ color: 'rgba(52, 56, 27, 0.4)', fontSize: '12px', letterSpacing: '0.1em' }}>
             NO UPCOMING TOUR DATES
           </p>
         ) : (
@@ -172,6 +223,27 @@ export default function BandsinTownWidget() {
       </div>
 
       <style jsx global>{`
+      .bit-widget .bit-offers,
+.bit-widget .bit-event,
+.bit-widget .bit-no-dates,
+.bit-widget .bit-request-show,
+.bit-widget [class*="event-list"],
+.bit-widget [class*="eventList"] {
+  display: none !important;
+}
+.bit-widget,
+.bit-widget * {
+  font-size: 11px !important;
+}
+.bit-widget [class*="upcoming"],
+.bit-widget [class*="Upcoming"],
+.bit-widget .bit-upcoming-dates,
+.bit-widget .bit-header {
+  display: block !important;
+  font-size: 11px !important;
+  opacity: 1 !important;
+  font-weight: 300 !important;
+}
         .bit-custom-widget {
           width: 100%;
           font-family: 'Cinzel', serif;
@@ -218,7 +290,7 @@ export default function BandsinTownWidget() {
 
         .bit-event-date {
           color: #f8fcdc;
-          font-size: 11px;
+          font-size: 14px;
           font-weight: 400;
           letter-spacing: 0.06em;
           margin: 0;
@@ -228,7 +300,7 @@ export default function BandsinTownWidget() {
         /* CENTER */
         .bit-event-center {
           flex: 1.5;
-          text-align: center;
+          text-align: left;
         }
 
         .bit-event-location {

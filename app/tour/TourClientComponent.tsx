@@ -1,46 +1,32 @@
-//TourClientComponent.tsx
+// TourClientComponent.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
-import Script from 'next/script';
 import AppClientWrapper from '@/components/AppClientWrapper';
 import { generateEventJsonLD } from '../../lib/generateEventJsonLD';
+import BandsinTownWidget from '@/components/BandsinTownWidget';
 
 export default function TourClientComponent() {
   const [events, setEvents] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
-  const maxRetries = 3;
 
-  // ฟังก์ชัน fetch events
-  const fetchEvents = async (attempt = 1) => {
-    try {
-      const appId = process.env.NEXT_PUBLIC_BANDSINTOWN_APP_ID;
-      const url = `https://rest.bandsintown.com/artists/Unda%20Alunda/events?app_id=${appId}`;
-      
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      
-      const data = await response.json();
-      setEvents(Array.isArray(data) ? data : []);
-      setIsLoading(false);
-    } catch (error) {
-      console.error(`Attempt ${attempt} failed:`, error);
-      
-      if (attempt < maxRetries) {
-        setTimeout(() => {
-          fetchEvents(attempt + 1);
-        }, 2000 * attempt);
-      } else {
-        setIsLoading(false);
-        console.error('All attempts failed');
-      }
-    }
-  };
-
-  // เริ่มต้น component
   useEffect(() => {
     setIsMounted(true);
+
+    const fetchEvents = async () => {
+      try {
+        const appId = process.env.NEXT_PUBLIC_BANDSINTOWN_APP_ID;
+        const res = await fetch(
+          `https://rest.bandsintown.com/artists/Unda%20Alunda/events?app_id=${appId}`
+        );
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        setEvents(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error('Fetch failed:', error);
+      }
+    };
+
     fetchEvents();
   }, []);
 
@@ -52,7 +38,6 @@ export default function TourClientComponent() {
     />
   ));
 
-  // รอให้ component mount เสร็จก่อน
   if (!isMounted) {
     return (
       <AppClientWrapper>
@@ -66,94 +51,81 @@ export default function TourClientComponent() {
       </AppClientWrapper>
     );
   }
-  
+
   return (
     <AppClientWrapper>
-      {/* Bandsintown Script */}
-      <Script
-        src="https://widget.bandsintown.com/main.min.js"
-        strategy="lazyOnload"
-        onLoad={() => {
-          console.log('Bandsintown script loaded');
-          // รอให้ script โหลดเสร็จแล้วค่อย init
-          setTimeout(() => {
-            try {
-              if (typeof window !== 'undefined' && (window as any).BIT?.Widget?.init) {
-                (window as any).BIT.Widget.init();
-                console.log('Widget initialized successfully');
-                
-                // Custom styling after widget loads
-                setTimeout(() => {
-                  // Make text smaller
-                  const widgetTexts = document.querySelectorAll('.bit-widget p, .bit-widget span, .bit-widget div');
-                  widgetTexts.forEach((el: any) => {
-                    if (el && !el.querySelector('button')) {
-                      el.style.fontSize = '12px';
-                      el.style.lineHeight = '1.4';
-                    }
-                  });
-                  
-                  // Make "No Upcoming" less prominent
-                  const noEventsText = document.querySelector('.bit-widget');
-                  if (noEventsText) {
-                    const textContent = noEventsText.textContent || '';
-                    if (textContent.includes('NO UPCOMING') || textContent.includes('No upcoming')) {
-                      const noEventElements = document.querySelectorAll('.bit-widget *');
-                      noEventElements.forEach((el: any) => {
-                        if (el.textContent && (el.textContent.includes('NO UPCOMING') || el.textContent.includes('No upcoming'))) {
-                          el.style.color = 'rgba(248, 252, 220, 0.4)';
-                          el.style.opacity = '0.6';
-                        }
-                      });
-                    }
-                  }
-                }, 2000);
-              }
-            } catch (error) {
-              console.error('Widget init failed:', error);
-            }
-          }, 1000);
-        }}
-        onError={(error) => {
-          console.error('Script loading failed:', error);
-        }}
-      />
-      
+     
+
       <main className="min-h-screen flex flex-col justify-center items-center text-[#f8fcdc] font-[Cinzel] px-4 pt-28">
         <section className="text-center w-full max-w-4xl">
           <h3 className="text-3xl md:text-4xl font-bold mb-8 text-[#dc9e63] uppercase tracking-wide">
             Tour Dates
           </h3>
-          
-          {/* JSON-LD */}
+
           {jsonLd}
-          
-          {/* Bandsintown Widget Container with Responsive Styling */}
+
           <div className="tour-widget-container">
             <div style={{ textAlign: 'left' }}>
-              <div
-                className="bit-widget-initializer"
-                data-artist-name="Unda Alunda"
-                data-background-color="transparent"
-                data-limit="10"
-                data-separator-color="rgba(255,255,255,0.1)"
-                data-text-color="#f8fcdc"
-                data-link-color="#2a0000"
-                data-display-local-dates="false"
-                data-display-past-dates="false"
-                data-auto-style="false"
-                data-date-format="ddd, MMM D, YYYY"
-                data-request-show="true"
-                data-language="en"
-              />
+
+              <BandsinTownWidget />
             </div>
           </div>
         </section>
       </main>
-      
-      {/* CSS Styling with Responsive Design - Same as Homepage */}
+
       <style jsx global>{`
-        /* Tour Section Responsive Container - Same as Homepage */
+        /* ซ่อน event list ของ official widget เหลือแค่ Track bar */
+        .bit-widget .bit-offers,
+        .bit-widget .bit-event,
+        .bit-widget .bit-no-dates,
+        .bit-widget .bit-request-show,
+        .bit-widget [class*="event-list"],
+        .bit-widget [class*="eventList"] {
+          display: none !important;
+        }
+
+        /* ดัน official widget ลงมา */
+        .bit-widget {
+  margin-top: 4rem !important;
+  padding-bottom: 0 !important;
+}
+
+        /* ลด font size Track bar */
+        .bit-widget,
+        .bit-widget * {
+          font-size: 11px !important;
+        }
+
+        /* Upcoming Dates — บางแต่ไม่จาง */
+        .bit-widget [class*="upcoming"],
+        .bit-widget [class*="Upcoming"],
+        .bit-widget .bit-upcoming-dates,
+        .bit-widget .bit-header {
+          display: block !important;
+          font-size: 11px !important;
+          opacity: 1 !important;
+          font-weight: 300 !important;
+        }
+
+        /* Restore hover สำหรับ custom widget */
+        @media (hover: hover) and (pointer: fine) {
+          .bit-event-row:hover {
+            background-color: rgba(248, 252, 220, 0.03) !important;
+          }
+          .bit-btn-rsvp:hover {
+            background-color: rgba(248, 252, 220, 0.06) !important;
+            border-color: rgba(248, 252, 220, 0.5) !important;
+          }
+          .bit-btn-tickets:hover {
+            background-color: #5d0000 !important;
+            border-color: #5d0000 !important;
+          }
+          .bit-btn-request:hover {
+            background-color: #5d0000 !important;
+            border-color: #5d0000 !important;
+          }
+        }
+
         .tour-widget-container {
           width: 100%;
           margin-left: auto;
@@ -179,87 +151,6 @@ export default function TourClientComponent() {
           .tour-widget-container {
             max-width: 960px;
           }
-        }
-
-        /* Bandsintown Widget Text Styling - More general selectors */
-        .bit-widget p {
-          font-size: 12px !important;
-          line-height: 1.4 !important;
-        }
-
-        /* Target all text elements in the widget */
-        .bit-widget * {
-          font-size: 12px !important;
-        }
-
-        /* Keep buttons at normal size */
-        .bit-widget button,
-        .bit-widget .bit-button,
-        .bit-widget .bit-button--solid {
-          font-size: 14px !important;
-        }
-
-        /* Make "No Upcoming Tour Dates" less prominent - try multiple selectors */
-        .bit-widget div:contains("NO UPCOMING"),
-        .bit-widget span:contains("NO UPCOMING"),
-        .bit-widget p:contains("NO UPCOMING"),
-        .bit-widget *[class*="no-events"],
-        .bit-widget *[class*="empty"] {
-          color: rgba(248, 252, 220, 0.4) !important;
-          opacity: 0.6 !important;
-        }
-
-        /* Button Styling - Same as Homepage */
-        .bit-widget button,
-        .bit-widget .bit-button,
-        .bit-widget .bit-button--solid,
-        .tour-section button,
-        .tour-widget-container button {
-          background-color: #2a0000 !important;
-          background: #2a0000 !important;
-          border: 1px solid #2a0000 !important;
-          color: #f8fcdc !important;
-          font-family: 'Cinzel', serif !important;
-          font-size: 14px !important;
-          letter-spacing: 0.15rem !important;
-          border-radius: 3px !important;
-          font-weight: 500 !important;
-          text-align: center !important;
-          transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
-          cursor: pointer !important;
-        }
-        
-        /* Hover Effect for Desktop - Same as Homepage */
-        @media (hover: hover) and (pointer: fine) {
-          .bit-widget button:hover,
-          .bit-widget .bit-button:hover,
-          .bit-widget .bit-button--solid:hover,
-          .tour-section button:hover,
-          .tour-widget-container button:hover {
-            background-color: #5d0000 !important;
-            background: #5d0000 !important;
-            border: 1px solid #5d0000 !important;
-            color: #f8fcdc !important;
-          }
-        }
-        
-        /* Active State for Mobile - Same as Homepage */
-        .bit-widget button:active,
-        .bit-widget .bit-button:active,
-        .bit-widget .bit-button--solid:active,
-        .tour-section button:active,
-        .tour-widget-container button:active {
-          background-color: #5d0000 !important;
-          background: #5d0000 !important;
-          border: 1px solid #5d0000 !important;
-          color: #f8fcdc !important;
-          transform: scale(0.98) !important;
-        }
-
-        /* Additional Button Styling - Same as Homepage */
-        .bit-button,
-        .bit-button--solid {
-          border-radius: 3px !important;
         }
       `}</style>
     </AppClientWrapper>
