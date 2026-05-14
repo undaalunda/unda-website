@@ -187,13 +187,13 @@ export default function BandsinTownWidget() {
                     onClick={(e) => e.stopPropagation()}
                   >
                     <a
-                      href={event.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bit-btn bit-btn-rsvp"
-                    >
-                      RSVP
-                    </a>
+                      href={event.url.replace('/e/', '/artist-rsvp/15554165-unda-alunda?event_id=')}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="bit-btn bit-btn-rsvp"
+>
+  RSVP
+</a>
                     <a
                       href={getTicketUrl(event)}
                       target="_blank"
@@ -212,7 +212,7 @@ export default function BandsinTownWidget() {
         {/* Request a Show */}
         <div className="bit-request-show">
           <a
-            href="https://www.bandsintown.com/artist-subscribe/15554165-unda-alunda"
+            href="https://www.bandsintown.com/artist-subscribe/15554165-unda-alunda?affil_code=js_www.undaalunda.com&app_id=js_www.undaalunda.com&bg-color=transparent&border-color=%23ec5d29&came_from=700&cta-bg-color=%23ec5d29&cta-border-color=%23ec5d29&cta-border-radius=30px&cta-border-width=2px&cta-text-color=%23100607&play-my-city=true&spn=0&utm_campaign=play_my_city&utm_medium=web&utm_source=widget"
             target="_blank"
             rel="noopener noreferrer"
             className="bit-btn-request"
