@@ -273,7 +273,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <meta name="robots" content="index, follow" />
         <meta name="author" content="Unda Alunda" />
         <meta name="publisher" content="Unda Alunda" />
-        <meta name="theme-color" content="#160000" />
+        <meta name="theme-color" content="#160000" media="not (prefers-color-scheme: dark)" />
+        <meta name="theme-color" content="#160000" media="(prefers-color-scheme: dark)" />
         <meta name="theme-color" media="(prefers-color-scheme: light)" content="#160000" />
         <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#160000" />
         <meta name="msapplication-TileColor" content="#160000" />
