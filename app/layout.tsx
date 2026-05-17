@@ -198,6 +198,23 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           `
         }} />
 
+        {/* 🎯 Force theme-color script */}
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            (function() {
+              function setThemeColor() {
+                var metas = document.querySelectorAll('meta[name="theme-color"]');
+                metas.forEach(function(meta) {
+                  meta.setAttribute('content', '#160000');
+                });
+              }
+              setThemeColor();
+              window.addEventListener('load', setThemeColor);
+              document.addEventListener('DOMContentLoaded', setThemeColor);
+            })();
+          `
+        }} />
+
         {/* Scroll Script */}
         <script dangerouslySetInnerHTML={{
           __html: `
@@ -273,8 +290,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <meta name="robots" content="index, follow" />
         <meta name="author" content="Unda Alunda" />
         <meta name="publisher" content="Unda Alunda" />
-        <meta name="theme-color" content="#160000" media="not (prefers-color-scheme: dark)" />
-        <meta name="theme-color" content="#160000" media="(prefers-color-scheme: dark)" />
+        <meta name="theme-color" content="#160000" />
         <meta name="theme-color" media="(prefers-color-scheme: light)" content="#160000" />
         <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#160000" />
         <meta name="msapplication-TileColor" content="#160000" />
