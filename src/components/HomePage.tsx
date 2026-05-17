@@ -379,17 +379,19 @@ return () => {
 />
 
                 {/* Dark overlay for video */}
-<div 
-  style={{
-    position: 'absolute',
-    inset: 0,
-    width: '100%',
-    height: '100%',
-    background: 'linear-gradient(to bottom, #160000 0%, rgba(22, 0, 0, 0.4) 8%, rgba(0,0,0,0.2) 20%, rgba(0,0,0,0.2) 80%, rgba(0,0,0,0) 100%)',
-    zIndex: 1,
-    pointerEvents: 'none'
-  }}
-/>
+                <div 
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                    zIndex: -1,
+                    pointerEvents: 'none',
+                    maskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.2) 98%, rgba(0, 0, 0, 0) 100%)',
+                    WebkitMaskImage: 'linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0.2) 98%, rgba(0, 0, 0, 0) 100%)'
+                  }}
+                />
               </>
             )}
             <div 
