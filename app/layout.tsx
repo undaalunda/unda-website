@@ -202,15 +202,34 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <script dangerouslySetInnerHTML={{
           __html: `
             (function() {
-              function setThemeColor() {
+              var COLOR = '#160000';
+              
+              function forceThemeColor() {
                 var metas = document.querySelectorAll('meta[name="theme-color"]');
-                metas.forEach(function(meta) {
-                  meta.setAttribute('content', '#160000');
-                });
+                metas.forEach(function(m) { m.setAttribute('content', COLOR); });
+                if (!metas.length) {
+                  var m = document.createElement('meta');
+                  m.name = 'theme-color';
+                  m.content = COLOR;
+                  document.head.appendChild(m);
+                }
               }
-              setThemeColor();
-              window.addEventListener('load', setThemeColor);
-              document.addEventListener('DOMContentLoaded', setThemeColor);
+              
+              forceThemeColor();
+              document.addEventListener('DOMContentLoaded', forceThemeColor);
+              window.addEventListener('load', forceThemeColor);
+              window.addEventListener('popstate', forceThemeColor);
+              
+              var _push = history.pushState;
+              history.pushState = function() {
+                _push.apply(history, arguments);
+                forceThemeColor();
+              };
+              var _replace = history.replaceState;
+              history.replaceState = function() {
+                _replace.apply(history, arguments);
+                forceThemeColor();
+              };
             })();
           `
         }} />
