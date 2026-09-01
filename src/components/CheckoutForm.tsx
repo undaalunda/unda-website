@@ -1,4 +1,4 @@
-//CheckoutForm.tsx - แก้เฉพาะส่วนที่เกี่ยวกับ DHL
+//CheckoutForm.tsx - เพิ่ม PromptPay
 
 "use client";
 
@@ -296,12 +296,12 @@ export default function CheckoutForm() {
   const stripe = useStripe();
   const elements = useElements();
   const { cartItems, clearCart, cartTotal } = useCart();
-  
-  const isDigitalOnly = useMemo(() => 
-    cartItems.every(item => item.type === 'digital'), 
+
+  const isDigitalOnly = useMemo(() =>
+    cartItems.every(item => item.type === 'digital'),
     [cartItems]
   );
-  
+
   const [shippingZone, setShippingZone] = useState<'TH' | 'ASIA' | 'ROW'>('TH');
   const [shippingRate, setShippingRate] = useState(0);
   const [loadingShipping, setLoadingShipping] = useState(false);
@@ -313,24 +313,43 @@ export default function CheckoutForm() {
   const [success, setSuccess] = useState(false);
   const [consentTerms, setConsentTerms] = useState(false);
   const [consentMarketing, setConsentMarketing] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'paypal'>('card');
+  // 🆕 เปลี่ยน type จาก 'card' | 'paypal' เป็น 'card' | 'promptpay'
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'promptpay'>('card');
   const [missingFields, setMissingFields] = useState<string[]>([]);
   const [missingBillingFields, setMissingBillingFields] = useState<string[]>([]);
   const [missingShippingFields, setMissingShippingFields] = useState<string[]>([]);
   const [termsError, setTermsError] = useState(false);
 
+  // 🆕 PromptPay state
+  const [promptPayQrUrl, setPromptPayQrUrl] = useState<string | null>(null);
+  const [promptPayAmountThb, setPromptPayAmountThb] = useState<number | null>(null);
+  const [promptPayStatus, setPromptPayStatus] = useState<'idle' | 'awaiting_scan' | 'expired'>('idle');
+  const promptPayPollRef = useRef<NodeJS.Timeout | null>(null);
+  const promptPayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [promptPaySecondsLeft, setPromptPaySecondsLeft] = useState<number | null>(null);
+  const promptPayCountdownRef = useRef<NodeJS.Timeout | null>(null);
+  // เก็บข้อมูลที่ต้องใช้ตอน polling สำเร็จ (ส่งอีเมล / save order / redirect)
+  const pendingOrderRef = useRef<{
+    orderId: string;
+    trimmedBilling: typeof billingInfoInitial;
+    trimmedShipping: typeof shippingInfoInitial;
+    shipToDifferent: boolean;
+  } | null>(null);
+
   const debounceRef = useRef(false);
   const shippingRateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const [billingInfo, setBillingInfo] = useState({
+  const billingInfoInitial = {
     firstName: '', lastName: '', company: '', country: '', address: '', address2: '',
     city: '', county: '', postcode: '', phone: '', email: ''
-  });
-
-  const [shippingInfo, setShippingInfo] = useState({
+  };
+  const shippingInfoInitial = {
     firstName: '', lastName: '', company: '', country: '', address: '', address2: '',
     city: '', county: '', postcode: ''
-  });
+  };
+
+  const [billingInfo, setBillingInfo] = useState(billingInfoInitial);
+  const [shippingInfo, setShippingInfo] = useState(shippingInfoInitial);
 
   const billingRequired = ['firstName', 'lastName', 'address', 'city', 'postcode', 'phone', 'email', 'country'];
   const shippingRequired = ['firstName', 'lastName', 'address', 'city', 'postcode', 'country'];
@@ -374,96 +393,90 @@ export default function CheckoutForm() {
     return cartTotal + (isDigitalOnly ? 0 : (shippingRate || 0));
   }, [cartTotal, isDigitalOnly, shippingRate]);
 
-  // CheckoutForm.tsx - แก้เฉพาะส่วน useEffect ที่เรียก DHL API
+  useEffect(() => {
+    console.log('[🧪 useEffect triggered]', billingInfo.country, billingInfo.postcode);
 
-useEffect(() => {
-  console.log('[🧪 useEffect triggered]', billingInfo.country, billingInfo.postcode);
+    if (!billingInfo.country || !billingInfo.postcode || !billingInfo.city) return;
+    if (isDigitalOnly) return;
 
-  if (!billingInfo.country || !billingInfo.postcode || !billingInfo.city) return;
-  if (isDigitalOnly) return;
+    const newZone = getShippingZone(billingInfo.country);
+    setShippingZone(newZone);
 
-  const newZone = getShippingZone(billingInfo.country);
-  setShippingZone(newZone);
+    if (shippingRateTimeoutRef.current) {
+      clearTimeout(shippingRateTimeoutRef.current);
+    }
 
-  if (shippingRateTimeoutRef.current) {
-    clearTimeout(shippingRateTimeoutRef.current);
-  }
+    shippingRateTimeoutRef.current = setTimeout(async () => {
+      try {
+        setLoadingShipping(true);
+        const totalWeight = calculateCartWeight(cartItems);
 
-  shippingRateTimeoutRef.current = setTimeout(async () => {
-    try {
-      setLoadingShipping(true);
-      const totalWeight = calculateCartWeight(cartItems);
+        const payload = {
+          countryCode: billingInfo.country,
+          postalCode: billingInfo.postcode,
+          cityName: billingInfo.city,
+          weight: totalWeight,
+          declaredValue: cartTotal
+        };
 
-      const payload = {
-        countryCode: billingInfo.country,
-        postalCode: billingInfo.postcode,
-        cityName: billingInfo.city,
-        weight: totalWeight,
-        declaredValue: cartTotal
-      };
+        console.log('[📦 DHL Request Payload]', JSON.stringify(payload, null, 2));
 
-      console.log('[📦 DHL Request Payload]', JSON.stringify(payload, null, 2));
+        const res = await fetch('/api/get-dhl-rate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
 
-      const res = await fetch('/api/get-dhl-rate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+        const data = await res.json();
+        console.log('[💸 DHL API Response]', JSON.stringify(data, null, 2));
 
-      const data = await res.json();
-      console.log('[💸 DHL API Response]', JSON.stringify(data, null, 2));
+        if (data.fallback || !data.success || data.error) {
+          console.error('❌ Shipping rate error:', data.error);
 
-      // ❌ กรณี DHL API fail - BLOCK checkout
-      if (data.fallback || !data.success || data.error) {
-        console.error('❌ Shipping rate error:', data.error);
-        
-        setShippingRate(0); // Set เป็น 0 เพื่อ disable ปุ่ม checkout
-        setErrorMessage(
-          'Unable to calculate shipping rate at the moment. ' +
-          'Please try again in a few minutes or contact support for assistance.'
-        );
-        setLoadingShipping(false);
-        return;
-      }
+          setShippingRate(0);
+          setErrorMessage(
+            'Unable to calculate shipping rate at the moment. ' +
+            'Please try again in a few minutes or contact support for assistance.'
+          );
+          setLoadingShipping(false);
+          return;
+        }
 
-      // ✅ คำนวณราคาจาก DHL response
-      const product = data.products?.[0];
-      const thbPrice =
-        product?.totalPrice?.find((p: any) => p.currencyType === 'BILLC')?.price ?? 0;
+        const product = data.products?.[0];
+        const thbPrice =
+          product?.totalPrice?.find((p: any) => p.currencyType === 'BILLC')?.price ?? 0;
 
-      const exchangeRate = data.exchangeRates?.find(
-        (rate: any) => rate.currency === 'THB' && rate.baseCurrency === 'USD'
-      )?.currentExchangeRate ?? 0.029;
+        const exchangeRate = data.exchangeRates?.find(
+          (rate: any) => rate.currency === 'THB' && rate.baseCurrency === 'USD'
+        )?.currentExchangeRate ?? 0.029;
 
-      const price = +(thbPrice * exchangeRate).toFixed(2);
+        const price = +(thbPrice * exchangeRate).toFixed(2);
 
-      if (price > 0) {
-        setShippingRate(Number(price));
-        setErrorMessage('');
-        setLoadingShipping(false);
-        console.log('✅ Shipping rate set to:', price, 'USD');
-      } else {
-        // ❌ ถ้าคำนวณไม่ได้ BLOCK checkout
+        if (price > 0) {
+          setShippingRate(Number(price));
+          setErrorMessage('');
+          setLoadingShipping(false);
+          console.log('✅ Shipping rate set to:', price, 'USD');
+        } else {
+          setShippingRate(0);
+          setErrorMessage(
+            'Unable to calculate shipping rate. Please check your address or contact support.'
+          );
+          setLoadingShipping(false);
+        }
+      } catch (err) {
+        console.error('❌ Shipping rate error', err);
+
         setShippingRate(0);
         setErrorMessage(
-          'Unable to calculate shipping rate. Please check your address or contact support.'
+          'Unable to calculate shipping rate at the moment. ' +
+          'Please try again or contact support for assistance.'
         );
         setLoadingShipping(false);
       }
-    } catch (err) {
-      console.error('❌ Shipping rate error', err);
-      
-      // ❌ BLOCK checkout เมื่อเกิด error
-      setShippingRate(0);
-      setErrorMessage(
-        'Unable to calculate shipping rate at the moment. ' +
-        'Please try again or contact support for assistance.'
-      );
-      setLoadingShipping(false);
-    }
-  }, 500);
+    }, 500);
 
-}, [billingInfo.country, billingInfo.postcode, billingInfo.city, cartItems, isDigitalOnly, calculateCartWeight, cartTotal]);
+  }, [billingInfo.country, billingInfo.postcode, billingInfo.city, cartItems, isDigitalOnly, calculateCartWeight, cartTotal]);
 
   useEffect(() => {
     if (isDigitalOnly) return;
@@ -498,6 +511,135 @@ useEffect(() => {
     };
     document.head.appendChild(script);
   }, []);
+
+  // 🆕 เคลียร์ polling/timeout timer เมื่อ component unmount
+  useEffect(() => {
+    return () => {
+      if (promptPayPollRef.current) clearInterval(promptPayPollRef.current);
+      if (promptPayTimeoutRef.current) clearTimeout(promptPayTimeoutRef.current);
+      if (promptPayCountdownRef.current) clearInterval(promptPayCountdownRef.current);
+    };
+  }, []);
+
+  // 🆕 ฟังก์ชันรวม: หลังจ่ายเงินสำเร็จ (ทั้งบัตรและ PromptPay) ทำ 3 อย่างนี้เหมือนกัน
+  const finalizeSuccessfulOrder = useCallback(async ({
+    orderId,
+    trimmedBilling,
+    trimmedShipping,
+    shipToDifferentFlag,
+    receiptUrl,
+  }: {
+    orderId: string;
+    trimmedBilling: typeof billingInfoInitial;
+    trimmedShipping: typeof shippingInfoInitial;
+    shipToDifferentFlag: boolean;
+    receiptUrl: string | null;
+  }) => {
+    setSuccess(true);
+    clearCart();
+
+    await fetch('/api/send-confirmation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: trimmedBilling.firstName,
+        email: trimmedBilling.email,
+        cartItems,
+        receiptUrl,
+        orderId,
+      }),
+    });
+
+    const totalWeight = calculateCartWeight(cartItems);
+
+    const saveRes = await fetch('/api/save-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        billingInfo: trimmedBilling,
+        shippingInfo: shipToDifferentFlag ? trimmedShipping : trimmedBilling,
+        cartItems,
+        shippingMethod,
+        shippingZone,
+        shippingRate,
+        email: trimmedBilling.email,
+        orderId,
+        totalWeight,
+      }),
+    });
+
+    const saveData = await saveRes.json();
+
+    if (!saveRes.ok || !saveData.orderId) {
+      throw new Error('Failed to save order or missing order ID');
+    }
+
+    if (consentMarketing) {
+      try {
+        await subscribeToNewsletter({
+          email: trimmedBilling.email,
+          firstName: trimmedBilling.firstName,
+          lastName: trimmedBilling.lastName,
+          country: trimmedBilling.country,
+        });
+      } catch (error) {
+        console.error('Subscription failed:', error);
+      }
+    }
+
+    router.push(`/thank-you?email=${encodeURIComponent(trimmedBilling.email)}&orderId=${orderId}`);
+  }, [cartItems, calculateCartWeight, shippingMethod, shippingZone, shippingRate, consentMarketing, clearCart, router]);
+
+  // 🆕 เริ่ม polling เช็คสถานะ PromptPay ทุก 3 วิ จนกว่าจะสำเร็จ หรือหมดเวลา 10 นาที
+      const startPromptPayPolling = useCallback((paymentIntentId: string) => {
+    setPromptPayStatus('awaiting_scan');
+
+    const totalSeconds = 10 * 60;
+    setPromptPaySecondsLeft(totalSeconds);
+
+    promptPayCountdownRef.current = setInterval(() => {
+      setPromptPaySecondsLeft((prev) => {
+        if (prev === null || prev <= 1) {
+          if (promptPayCountdownRef.current) clearInterval(promptPayCountdownRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    promptPayPollRef.current = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/check-payment-status?paymentIntentId=${paymentIntentId}`);
+        const data = await res.json();
+
+        if (data.status === 'succeeded') {
+          if (promptPayPollRef.current) clearInterval(promptPayPollRef.current);
+          if (promptPayTimeoutRef.current) clearTimeout(promptPayTimeoutRef.current);
+          if (promptPayCountdownRef.current) clearInterval(promptPayCountdownRef.current);
+
+          const pending = pendingOrderRef.current;
+          if (pending) {
+            await finalizeSuccessfulOrder({
+              orderId: pending.orderId,
+              trimmedBilling: pending.trimmedBilling,
+              trimmedShipping: pending.trimmedShipping,
+              shipToDifferentFlag: pending.shipToDifferent,
+              receiptUrl: null,
+            });
+          }
+        }
+      } catch (err) {
+        console.error('[🔥 check-payment-status polling error]', err);
+      }
+    }, 3000);
+
+    promptPayTimeoutRef.current = setTimeout(() => {
+      if (promptPayPollRef.current) clearInterval(promptPayPollRef.current);
+      if (promptPayCountdownRef.current) clearInterval(promptPayCountdownRef.current);
+      setPromptPayStatus('expired');
+      setErrorMessage('QR code expired. Please try again.');
+    }, totalSeconds * 1000);
+  }, [finalizeSuccessfulOrder]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -600,6 +742,30 @@ useEffect(() => {
     }
 
     const shippingCost = isDigitalOnly ? 0 : shippingRate;
+    const amountToCharge = Math.round((cartTotal + shippingCost) * 100);
+
+    // ✅ สร้าง order ก่อนเสมอ ไม่ว่าจะจ่ายช่องทางไหน
+    const orderRes = await fetch('/api/create-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: trimmedBilling.email,
+        amount: amountToCharge,
+        cartItems,
+        shippingMethod,
+        shippingZone,
+      }),
+    });
+
+    const orderJson = await orderRes.json();
+    const orderId = orderJson.orderId;
+
+    if (!orderId) {
+      setErrorMessage('❌ Failed to create order.');
+      setLoading(false);
+      debounceRef.current = false;
+      return;
+    }
 
     if (paymentMethod === 'card') {
       if (!stripe || !elements) {
@@ -628,33 +794,11 @@ useEffect(() => {
       }
 
       try {
-        const amountToCharge = Math.round((cartTotal + shippingCost) * 100);
-
-        const orderRes = await fetch('/api/create-order', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: trimmedBilling.email,
-            amount: amountToCharge,
-            cartItems,
-            shippingMethod,
-            shippingZone,
-          }),
-        });
-
-        const orderJson = await orderRes.json();
-        const orderId = orderJson.orderId;
-
-        if (!orderId) {
-          setErrorMessage('❌ Failed to create order.');
-          setLoading(false);
-          return;
-        }
-
         const res = await fetch('/api/create-payment-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            paymentMethod: 'card',
             paymentMethodId: pm.id,
             amount: amountToCharge,
             token,
@@ -669,59 +813,49 @@ useEffect(() => {
         if (result.error) {
           setErrorMessage(result.error);
         } else {
-          setSuccess(true);
-          clearCart();
-
-          await fetch('/api/send-confirmation', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              name: trimmedBilling.firstName,
-              email: trimmedBilling.email,
-              cartItems,
-              receiptUrl: result.receiptUrl,
-              orderId: orderId,
-            }),
+          await finalizeSuccessfulOrder({
+            orderId,
+            trimmedBilling,
+            trimmedShipping,
+            shipToDifferentFlag: shipToDifferent,
+            receiptUrl: result.receiptUrl,
           });
+        }
+      } catch (err: any) {
+        console.error('[🔥 API error]', err);
+        setErrorMessage('Something went wrong. Please try again.');
+      }
 
-          const totalWeight = calculateCartWeight(cartItems);
+    } else if (paymentMethod === 'promptpay') {
+      try {
+        const res = await fetch('/api/create-payment-intent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            paymentMethod: 'promptpay',
+            amount: amountToCharge,
+            token,
+            email: trimmedBilling.email,
+            marketing: consentMarketing,
+            orderId,
+          }),
+        });
 
-          const saveRes = await fetch('/api/save-order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              billingInfo: trimmedBilling,
-              shippingInfo: shipToDifferent ? trimmedShipping : trimmedBilling,
-              cartItems,
-              shippingMethod,
-              shippingZone,
-              shippingRate,
-              email: trimmedBilling.email,
-              orderId,
-              totalWeight,
-            }),
-          });
+        const result = await res.json();
 
-          const saveData = await saveRes.json();
-
-          if (!saveRes.ok || !saveData.orderId) {
-            throw new Error('Failed to save order or missing order ID');
-          }
-
-          if (consentMarketing) {
-            try {
-              await subscribeToNewsletter({
-                email: trimmedBilling.email,
-                firstName: trimmedBilling.firstName,
-                lastName: trimmedBilling.lastName,
-                country: trimmedBilling.country,
-              });
-            } catch (error) {
-              console.error('Subscription failed:', error);
-            }
-          }
-
-          router.push(`/thank-you?email=${encodeURIComponent(trimmedBilling.email)}&orderId=${orderId}`);
+        if (result.error || !result.qrCodeUrl) {
+          setErrorMessage(result.error || 'Failed to generate PromptPay QR code.');
+        } else {
+          // 🆕 เก็บข้อมูลไว้ใช้ตอน polling สำเร็จ
+          pendingOrderRef.current = {
+            orderId,
+            trimmedBilling,
+            trimmedShipping,
+            shipToDifferent,
+          };
+          setPromptPayQrUrl(result.qrCodeUrl);
+          setPromptPayAmountThb(result.amountThb);
+          startPromptPayPolling(result.paymentIntentId);
         }
       } catch (err: any) {
         console.error('[🔥 API error]', err);
@@ -734,10 +868,21 @@ useEffect(() => {
   }, [
     billingInfo, shippingInfo, shipToDifferent, isDigitalOnly, cartItems, shippingRate,
     captchaReady, consentTerms, consentMarketing, paymentMethod, stripe, elements,
-    cartTotal, shippingMethod, shippingZone, clearCart, router, calculateCartWeight
+    cartTotal, shippingMethod, shippingZone, finalizeSuccessfulOrder, startPromptPayPolling
   ]);
 
-  // JSX part remains the same...
+  // 🆕 ยกเลิก PromptPay แล้วกลับไปเลือกช่องทางใหม่
+    const cancelPromptPay = useCallback(() => {
+    if (promptPayPollRef.current) clearInterval(promptPayPollRef.current);
+    if (promptPayTimeoutRef.current) clearTimeout(promptPayTimeoutRef.current);
+    if (promptPayCountdownRef.current) clearInterval(promptPayCountdownRef.current);
+    setPromptPayQrUrl(null);
+    setPromptPayAmountThb(null);
+    setPromptPayStatus('idle');
+    setPromptPaySecondsLeft(null);
+    pendingOrderRef.current = null;
+  }, []);
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center pt-[120px] text-[#f8fcdc] font-[Cinzel] px-6">
       <h1 className="text-4xl font-extrabold tracking-wide mb-8 text-[#dc9e63]">CHECKOUT</h1>
@@ -762,7 +907,7 @@ useEffect(() => {
         onSubmit={handleSubmit}
         className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto p-6"
       >
-        
+
         {/* Billing Details */}
         <div>
           <h2 className="text-xl font-bold text-[#dc9e63] mb-4">BILLING DETAILS</h2>
@@ -926,27 +1071,27 @@ useEffect(() => {
               </li>
 
               {!isDigitalOnly && (
-  <li className="pt-2">
-    <span className="font-bold block mb-2">Shipping</span>
-    <div className="flex justify-between text-[#f8fcdc]/70 font-extralight">
-      <span>
-        {shippingMethod === 'asia-tracked' && 'Asia Tracked'}
-        {shippingMethod === 'row-tracked' && 'ROW Tracked'}
-        {shippingMethod === 'domestic' && 'Domestic Delivery (TH)'}
-      </span>
-      <span className="flex items-center gap-2">
-        {loadingShipping ? (
-          <>
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#dc9e63]"></div>
-            <em>Calculating...</em>
-          </>
-        ) : (
-          `$${shippingRate.toFixed(2)}`
-        )}
-      </span>
-    </div>
-  </li>
-)}
+                <li className="pt-2">
+                  <span className="font-bold block mb-2">Shipping</span>
+                  <div className="flex justify-between text-[#f8fcdc]/70 font-extralight">
+                    <span>
+                      {shippingMethod === 'asia-tracked' && 'Asia Tracked'}
+                      {shippingMethod === 'row-tracked' && 'ROW Tracked'}
+                      {shippingMethod === 'domestic' && 'Domestic Delivery (TH)'}
+                    </span>
+                    <span className="flex items-center gap-2">
+                      {loadingShipping ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#dc9e63]"></div>
+                          <em>Calculating...</em>
+                        </>
+                      ) : (
+                        `$${shippingRate.toFixed(2)}`
+                      )}
+                    </span>
+                  </div>
+                </li>
+              )}
 
               <li className="flex justify-between font-bold text-2xl uppercase border-t border-[#f8fcdc]/10 pt-4 mt-4">
                 <span className="uppercase text-[#f8fcdc]">TOTAL</span>
@@ -958,9 +1103,37 @@ useEffect(() => {
           </div>
 
           <h2 className="text-xl text-[#dc9e63] font-bold mb-4">PAYMENT</h2>
-          <div className="bg-[#1e0000]/50 p-4 rounded-xl shadow-xl mb-6">        
+          <div className="bg-[#1e0000]/50 p-4 rounded-xl shadow-xl mb-6">
 
-            {paymentMethod === 'card' && (
+            {/* 🆕 ตัวเลือกช่องทางจ่ายเงิน — ซ่อนตอนกำลังรอสแกน QR อยู่ */}
+            {!promptPayQrUrl && (
+              <div className="flex gap-2 mb-4">
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('card')}
+                  className={`flex-1 py-2 px-4 rounded-lg text-sm font-bold transition-colors cursor-pointer ${
+                    paymentMethod === 'card'
+                      ? 'bg-[#dc9e63] text-black'
+                      : 'bg-[#160000]/50 text-[#f8fcdc]/70 hover:text-[#f8fcdc]'
+                  }`}
+                >
+                  CARD
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('promptpay')}
+                  className={`flex-1 py-2 px-4 rounded-lg text-sm font-bold transition-colors cursor-pointer ${
+                    paymentMethod === 'promptpay'
+                      ? 'bg-[#dc9e63] text-black'
+                      : 'bg-[#160000]/50 text-[#f8fcdc]/70 hover:text-[#f8fcdc]'
+                  }`}
+                >
+                  PROMTPAY
+                </button>
+              </div>
+            )}
+
+                        {paymentMethod === 'card' && !promptPayQrUrl && (
               <div className="relative mt-2">
                 <div className="absolute -top-2 left-6 w-0 h-0 border-l-8 border-r-8 border-b-8 border-transparent border-b-[#f8fcdc]" />
                 <div className="bg-[#f8fcdc] text-black p-4 rounded shadow">
@@ -981,6 +1154,76 @@ useEffect(() => {
                 </div>
               </div>
             )}
+
+            {/* 🆕 PromptPay: ก่อนกด PLACE ORDER แค่โชว์คำอธิบายสั้นๆ */}
+            {paymentMethod === 'promptpay' && !promptPayQrUrl && (
+              <div className="relative mt-2">
+                <div className="absolute -top-2 right-6 w-0 h-0 border-l-8 border-r-8 border-b-8 border-transparent border-b-[#f8fcdc]" />
+                <div className="bg-[#f8fcdc] text-black p-4 rounded shadow text-sm">
+                  Scan a QR code with your banking app to pay in Thai Baht (THB).
+                  A QR code will appear after you click Place Order.
+                </div>
+              </div>
+            )}
+
+            {/* 🆕 PromptPay: หลังกด PLACE ORDER แล้ว โชว์ QR + รอผล */}
+            {promptPayQrUrl && (
+  <div className="bg-[#1e0000]/50 text-[#f8fcdc] p-4 rounded shadow text-center">
+    <p className="text-sm mb-3 font-bold">Scan to pay with PromptPay</p>
+    <div className={`bg-white p-3 rounded inline-block mb-3 transition-opacity ${
+      promptPayStatus === 'expired' ? 'opacity-30' : 'opacity-100'
+    }`}>
+      <img
+        src={promptPayQrUrl}
+        alt="PromptPay QR Code"
+        className="w-56 h-56 object-contain"
+      />
+    </div>
+    {promptPayAmountThb !== null && (
+      <p className="text-lg font-bold mb-2 text-[#dc9e63]">฿{promptPayAmountThb.toFixed(2)}</p>
+    )}
+
+                    {promptPayStatus === 'awaiting_scan' && (
+                  <div className="flex flex-col items-center gap-1 text-sm text-[#f8fcdc]/70">
+                    <div className="flex items-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#dc9e63]"></div>
+                      Waiting for payment confirmation...
+                    </div>
+                    {promptPaySecondsLeft !== null && (
+                      <span className="text-xs text-[#f8fcdc]/50">
+                        Expires in {Math.floor(promptPaySecondsLeft / 60)}:{String(promptPaySecondsLeft % 60).padStart(2, '0')}
+                      </span>
+                    )}
+                  </div>
+                )}
+
+    {promptPayStatus === 'expired' && (
+      <div>
+        <p className="text-sm text-red-400 font-bold mb-3">QR code expired.</p>
+        <button
+          type="button"
+          onClick={() => {
+            cancelPromptPay();
+            // จะ trigger handleSubmit ใหม่อีกรอบผ่าน onClick ปกติ หรือแยกฟังก์ชัน regenerate ก็ได้
+          }}
+          className="bg-[#dc9e63] text-black px-4 py-2 rounded-lg text-sm font-bold cursor-pointer hover:bg-[#f8cfa3] transition-colors"
+        >
+          Generate New QR Code
+        </button>
+      </div>
+    )}
+
+    {promptPayStatus !== 'expired' && (
+      <button
+        type="button"
+        onClick={cancelPromptPay}
+        className="mt-4 text-xs text-[#f8fcdc]/60 underline cursor-pointer hover:text-[#f8fcdc]"
+      >
+        Cancel and choose a different payment method
+      </button>
+    )}
+  </div>
+)}
           </div>
 
           <p className="text-[14px] text-[#f8fcdc] mb-4">
@@ -1023,13 +1266,16 @@ useEffect(() => {
           {errorMessage && <div className="text-red-500 text-sm mb-4">{errorMessage}</div>}
           {success && <div className="text-green-500 text-sm mb-4">Payment Successful!</div>}
 
-          <button
-            type="submit"
-            disabled={loading || (!isDigitalOnly && (shippingRate === null || shippingRate === 0))}
-            className="w-full bg-[#dc9e63] text-black py-3 rounded-xl text-lg font-extrabold tracking-wide hover:bg-[#f8cfa3] transition-colors shadow-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? 'Processing...' : 'PLACE ORDER'}
-          </button>
+          {/* 🆕 ซ่อนปุ่ม Place Order ตอนกำลังรอสแกน QR อยู่ */}
+          {!promptPayQrUrl && (
+            <button
+              type="submit"
+              disabled={loading || (!isDigitalOnly && (shippingRate === null || shippingRate === 0))}
+              className="w-full bg-[#dc9e63] text-black py-3 rounded-xl text-lg font-extrabold tracking-wide hover:bg-[#f8cfa3] transition-colors shadow-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Processing...' : 'PLACE ORDER'}
+            </button>
+          )}
         </div>
       </form>
     </main>

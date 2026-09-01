@@ -30,15 +30,42 @@ const stripe = stripeSecretKey ? new Stripe(stripeSecretKey, {
   apiVersion: '2024-04-10' as Stripe.LatestApiVersion,
 }) : null;
 
+// 🆕 อีเมลสำรอง — ยิงกรณีลูกค้าปิดแท็บไปก่อนที่ frontend จะส่งอีเมลเองได้ทัน
+// (เช่น สแกน PromptPay QR แล้วปิดเว็บก่อนที่ polling จะจับได้ว่าจ่ายสำเร็จ)
+async function sendFallbackConfirmation(order: any) {
+  try {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.undaalunda.com';
+    const res = await fetch(`${siteUrl}/api/send-confirmation`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: order.billing_info?.firstName || '', // ✅ ดึงจาก JSON billing_info
+        email: order.email,
+        cartItems: order.items || [],
+        receiptUrl: null,
+        orderId: order.id,
+      }),
+    });
+
+    if (!res.ok) {
+      console.error('❌ Fallback send-confirmation failed:', await res.text());
+    } else {
+      console.log('✅ Fallback confirmation email sent for order:', order.id);
+    }
+  } catch (err: any) {
+    console.error('❌ Fallback send-confirmation error:', err.message);
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     console.log('🎯 Webhook received');
-    
+
     if (!stripe) {
       console.error('❌ Stripe not initialized');
       return NextResponse.json({ error: 'Stripe configuration missing' }, { status: 500 });
     }
-    
+
     const body = await req.text();
     const sig = req.headers.get('stripe-signature');
 
@@ -48,7 +75,7 @@ export async function POST(req: NextRequest) {
     }
 
     let event: Stripe.Event;
-    
+
     try {
       event = stripe.webhooks.constructEvent(body, sig, webhookSecret!);
       console.log('✅ Event constructed successfully:', event.type);
@@ -61,11 +88,9 @@ export async function POST(req: NextRequest) {
 
     if (event.type === 'payment_intent.succeeded' || event.type === 'charge.succeeded') {
       const object = event.data.object as any;
-      
-      // 🔍 DEBUG: ดู metadata ทั้งหมด
+
       console.log('🔍 FULL METADATA:', JSON.stringify(object.metadata, null, 2));
-      
-      // ✅ ลองหา orderId จากหลาย field
+
       const email = object.metadata?.email;
       const orderId = object.metadata?.id || object.metadata?.orderId || object.metadata?.order_id;
 
@@ -76,18 +101,16 @@ export async function POST(req: NextRequest) {
       if (!email || !orderId) {
         console.warn('⚠️ Missing metadata:', { email: !!email, orderId: !!orderId });
         console.warn('⚠️ Full metadata object:', object.metadata);
-        return NextResponse.json({ 
-          received: true, 
+        return NextResponse.json({
+          received: true,
           warning: 'Missing metadata',
           debug: { metadata: object.metadata }
         });
       }
 
       try {
-        // 🔍 DEBUG: ค้นหา order ทุกวิธี
         console.log('🔍 Searching for order with:', { email, orderId });
-        
-        // ✅ ค้นหาแบบ flexible - ลอง search ทั้ง string และ UUID
+
         const { data: orders, error: fetchError } = await supabase
           .from('Orders')
           .select('*')
@@ -96,45 +119,43 @@ export async function POST(req: NextRequest) {
 
         if (fetchError) {
           console.error('❌ Supabase fetch error:', fetchError.message);
-          
-          // ✅ ลองค้นหาแบบอื่น
-          const { data: allOrders, error: altError } = await supabase
+
+          const { data: allOrders } = await supabase
             .from('Orders')
             .select('*')
             .eq('email', email)
             .order('created_at', { ascending: false })
             .limit(5);
-            
+
           console.log('🔍 Recent orders for email:', allOrders?.map(o => ({ id: o.id, status: o.payment_status })));
-          
+
           return NextResponse.json({ error: 'Database fetch failed' }, { status: 500 });
         }
 
         console.log('🔍 Found orders:', orders?.length || 0);
-        console.log('🔍 Orders data:', orders?.map(o => ({ 
-          id: o.id, 
+        console.log('🔍 Orders data:', orders?.map(o => ({
+          id: o.id,
           payment_status: o.payment_status,
-          created_at: o.created_at 
+          created_at: o.created_at
         })));
 
         if (!orders || orders.length === 0) {
-          // ✅ ลองค้นหาด้วย email อย่างเดียว
           const { data: emailOrders } = await supabase
             .from('Orders')
             .select('*')
             .eq('email', email)
             .order('created_at', { ascending: false })
             .limit(3);
-            
-          console.log('🔍 All orders for this email:', emailOrders?.map(o => ({ 
-            id: o.id, 
-            payment_status: o.payment_status 
+
+          console.log('🔍 All orders for this email:', emailOrders?.map(o => ({
+            id: o.id,
+            payment_status: o.payment_status
           })));
-          
+
           console.error('❌ Order not found for ID:', orderId, 'Email:', email);
-          return NextResponse.json({ 
+          return NextResponse.json({
             error: 'Order not found',
-            debug: { 
+            debug: {
               searchedOrderId: orderId,
               searchedEmail: email,
               foundOrders: emailOrders?.length || 0
@@ -145,13 +166,15 @@ export async function POST(req: NextRequest) {
         const order = orders[0];
         console.log('📦 Found order:', order.id, 'Current payment_status:', order.payment_status);
 
-        // ✅ อัพเดทสถานะถ้ายังไม่เป็น succeeded
-        if (order.payment_status !== 'succeeded') {
-          const updateData: any = { 
+        // ✅ ทำงาน (update + ลด stock + ส่งอีเมล) เฉพาะตอนที่เพิ่ง "สำเร็จใหม่" เท่านั้น
+        // กันไม่ให้ทำซ้ำหรือส่งอีเมลซ้ำถ้า webhook ยิงเข้ามาหลายรอบสำหรับ event เดียวกัน
+        const wasAlreadySucceeded = order.payment_status === 'succeeded';
+
+        if (!wasAlreadySucceeded) {
+          const updateData: any = {
             payment_status: 'succeeded'
           };
 
-          // ✅ ถ้าเป็น digital only ให้เปลี่ยนสถานะเป็น paid
           if (!order.shipping_method || order.shipping_method === null) {
             updateData.status = 'paid';
             console.log('🎵 Digital order detected, setting status to paid');
@@ -173,26 +196,25 @@ export async function POST(req: NextRequest) {
 
           console.log(`✅ Order ${order.id} updated successfully!`);
           console.log('📋 Updated data:', updatedData);
+
           // 📦 ลด Stock สำหรับสินค้าที่ track_stock = true
           try {
             const items = order.items || [];
             console.log('📦 Processing stock reduction for', items.length, 'items');
 
             for (const item of items) {
-              // เช็คว่าสินค้ามี track_stock หรือไม่
               const { data: product } = await supabase
                 .from('Products')
                 .select('stock, track_stock')
                 .eq('id', item.id)
                 .single();
-              
+
               if (product && product.track_stock && product.stock > 0) {
-                // ลด stock
                 const newStock = Math.max(0, product.stock - (item.quantity || 1));
-                
+
                 const { error: stockError } = await supabase
                   .from('Products')
-                  .update({ 
+                  .update({
                     stock: newStock,
                     updated_at: new Date().toISOString()
                   })
@@ -210,11 +232,14 @@ export async function POST(req: NextRequest) {
             // ไม่ return error เพราะ order สำเร็จแล้ว แค่ stock ไม่ลดเท่านั้น
           }
 
+          // 🆕 ส่งอีเมลสำรอง เผื่อ frontend ไม่ได้ส่งเอง
+          await sendFallbackConfirmation({ ...order, ...updatedData?.[0] });
+
         } else {
-          console.log('🟢 Order already marked as succeeded');
+          console.log('🟢 Order already marked as succeeded — skipping duplicate email');
         }
 
-        return NextResponse.json({ 
+        return NextResponse.json({
           received: true,
           processed: true,
           orderId: order.id,
@@ -226,7 +251,7 @@ export async function POST(req: NextRequest) {
         console.error('💥 Full stack:', dbError.stack);
         return NextResponse.json({ error: 'Database error' }, { status: 500 });
       }
-      
+
     } else {
       console.log('🙅 Ignored event type:', event.type);
     }
