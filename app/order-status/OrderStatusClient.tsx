@@ -278,7 +278,7 @@ const OrderDetails = ({ order, onBack }: { order: Order; onBack: () => void }) =
           <div className="space-y-3">
             <div className="flex justify-between">
               <span className="text-[#f8fcdc]/70">Total Amount:</span>
-              <span className="text-xl font-bold text-[#f8fcdc]">${order.amount.toFixed(2)}</span>
+              <span className="text-xl font-bold text-[#f8fcdc]">${(order.amount / 100).toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-[#f8fcdc]/70">Status:</span>
@@ -462,7 +462,7 @@ const AdminOrdersList = ({ orders, onBack, onOrderClick }: {
   // Statistics
   const stats = useMemo(() => {
     const total = orders.length;
-    const totalRevenue = orders.reduce((sum, order) => sum + order.amount, 0);
+    const totalRevenue = orders.reduce((sum, order) => sum + (order.amount / 100), 0);
     const statusCounts = orders.reduce((acc, order) => {
       const status = order.payment_status.toLowerCase();
       acc[status] = (acc[status] || 0) + 1;
@@ -513,13 +513,13 @@ const AdminOrdersList = ({ orders, onBack, onOrderClick }: {
   const exportCSV = () => {
     const headers = ['id', 'email', 'amount', 'payment_status', 'created_at', 'items_count'];
     const rows = sortedOrders.map((o) => [
-      o.id,
-      o.email, 
-      o.amount, 
-      o.payment_status, 
-      o.created_at,
-      o.items?.length || 0
-    ]);
+  o.id,
+  o.email, 
+  (o.amount / 100).toFixed(2), 
+  o.payment_status, 
+  o.created_at,
+  o.items?.length || 0
+]);
     const csvContent = [headers, ...rows].map((r) => r.join(',')).join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
@@ -675,8 +675,8 @@ const AdminOrdersList = ({ orders, onBack, onOrderClick }: {
                 {/* Amount */}
                 <div className="mb-3 md:mb-4">
                   <div className="text-xl md:text-2xl font-bold text-[#dc9e63]">
-                    ${order.amount.toFixed(2)}
-                  </div>
+  ${(order.amount / 100).toFixed(2)}
+</div>
                   <div className="text-xs text-[#f8fcdc]/50">
                     {new Date(order.created_at).toLocaleDateString('en-US', {
                       month: 'short',
