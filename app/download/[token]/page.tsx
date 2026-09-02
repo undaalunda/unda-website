@@ -1,4 +1,4 @@
-// /app/download/[token]/page.tsx - แก้ไข + เพิ่ม debug
+// /app/download/[token]/page.tsx - ใช้ตาราง DownloadTokens แยกต่างหาก
 
 import { notFound } from 'next/navigation';
 import supabase from '../../../lib/supabase';
@@ -14,60 +14,44 @@ export default async function DownloadPage({ params }: PageProps) {
   const { token } = await params;
 
   console.log('🔍 Looking up download token:', token);
-  console.log('🔍 Token length:', token.length);
 
   try {
-    // 🆕 แสดงข้อมูล token ที่กำลังหา
-    console.log('🔎 Searching for token in Supabase:', {
-      token: token,
-      tokenLength: token.length,
-      tokenType: typeof token
-    });
-
-    // ค้นหา token ใน Supabase
-    const { data: order, error } = await supabase
-      .from('Orders')
+    // ✅ ค้นหา token ในตาราง DownloadTokens แทน Orders
+    const { data: tokenRecord, error } = await supabase
+      .from('DownloadTokens')
       .select('*')
-      .eq('download_token', token)
+      .eq('token', token)
       .single();
 
-    if (error || !order) {
+    if (error || !tokenRecord) {
       console.error('❌ Token not found:', token, error);
       notFound();
     }
 
-    // ใช้ record ที่เจอ
-    const orderRecord = order;
-    
-    console.log('✅ Token found in Supabase:', {
+    console.log('✅ Token found:', {
       token: token.substring(0, 8) + '...',
-      orderId: orderRecord.id,
-      filePath: orderRecord.file_path,
-      isUsed: orderRecord.is_used,
-      expiresAt: orderRecord.download_expires,
-      usedAt: orderRecord.used_at,
-      fullTokenInDB: orderRecord.download_token
+      orderId: tokenRecord.order_id,
+      filePath: tokenRecord.file_path,
+      isUsed: tokenRecord.is_used,
+      expiresAt: tokenRecord.expires_at
     });
 
-    // 🆕 เปรียบเทียบ token ที่เข้ามากับที่อยู่ใน DB
-    if (orderRecord.download_token !== token) {
-      console.log('⚠️ Token mismatch:', {
-        requestToken: token,
-        dbToken: orderRecord.download_token,
-        areEqual: orderRecord.download_token === token
-      });
-    }
+    // ดึงข้อมูลอีเมลจาก Orders มาแสดงประกอบ (ไม่บังคับ แต่ช่วย debug/UX)
+    const { data: order } = await supabase
+      .from('Orders')
+      .select('email')
+      .eq('id', tokenRecord.order_id)
+      .single();
 
     // เช็ค expiration
     const now = new Date();
-    const expiresAt = new Date(orderRecord.download_expires);
+    const expiresAt = new Date(tokenRecord.expires_at);
     const isExpired = now > expiresAt;
 
     console.log('⏰ Time check:', {
       now: now.toISOString(),
-      expiresAt: orderRecord.download_expires,
-      isExpired,
-      timeDiff: expiresAt.getTime() - now.getTime()
+      expiresAt: tokenRecord.expires_at,
+      isExpired
     });
 
     // ✅ ถ้า token หมดอายุแล้ว
@@ -79,80 +63,76 @@ export default async function DownloadPage({ params }: PageProps) {
           entry={{
             token,
             filePath: 'expired',
-            createdAt: orderRecord.created_at,
+            createdAt: tokenRecord.created_at,
             expiresInMinutes: 0,
-            orderId: orderRecord.id
+            orderId: tokenRecord.order_id
           }}
           supabaseData={{
-            orderId: orderRecord.id,
+            orderId: tokenRecord.order_id,
             isExpired: true
           }}
-          expiresAt={orderRecord.download_expires}
+          expiresAt={tokenRecord.expires_at}
           isCompleted={false}
         />
       );
     }
 
     // ✅ ถ้า token ถูกใช้งานแล้ว (downloaded completed)
-    if (orderRecord.is_used && orderRecord.used_at) {
-      console.log('🔒 Token already used:', token, 'at:', orderRecord.used_at);
+    if (tokenRecord.is_used && tokenRecord.used_at) {
+      console.log('🔒 Token already used:', token, 'at:', tokenRecord.used_at);
       return (
         <DownloadPageClient
           token={token}
           entry={{
             token,
-            filePath: orderRecord.file_path || 'used',
-            createdAt: orderRecord.created_at,
+            filePath: tokenRecord.file_path || 'used',
+            createdAt: tokenRecord.created_at,
             expiresInMinutes: 0,
-            orderId: orderRecord.id,
+            orderId: tokenRecord.order_id,
             downloadCompleted: true
           }}
           supabaseData={{
-            orderId: orderRecord.id,
+            orderId: tokenRecord.order_id,
             isUsed: true
           }}
-          expiresAt={orderRecord.download_expires}
+          expiresAt={tokenRecord.expires_at}
           isCompleted={true}
-          completedAt={orderRecord.used_at}
+          completedAt={tokenRecord.used_at}
         />
       );
     }
 
-    // ✅ Token ยังใช้งานได้ (ยังไม่ได้ download หรือ is_used = false)
+    // ✅ Token ยังใช้งานได้
     console.log('💚 Token is valid and ready for download');
     return (
       <DownloadPageClient
         token={token}
         entry={{
           token,
-          filePath: orderRecord.file_path || '/default-download',
-          createdAt: orderRecord.created_at,
-          expiresInMinutes: 2880, // 48 hours
-          orderId: orderRecord.id,
+          filePath: tokenRecord.file_path || '/default-download',
+          createdAt: tokenRecord.created_at,
+          expiresInMinutes: 2880,
+          orderId: tokenRecord.order_id,
           downloadStarted: false,
           downloadCompleted: false
         }}
         supabaseData={{
-          orderId: orderRecord.id,
-          email: orderRecord.email,
-          filePath: orderRecord.file_path
+          orderId: tokenRecord.order_id,
+          email: order?.email,
+          filePath: tokenRecord.file_path
         }}
-        expiresAt={orderRecord.download_expires}
+        expiresAt={tokenRecord.expires_at}
         isCompleted={false}
       />
     );
 
   } catch (error) {
     console.error('🔥 Error in download page:', error);
-    
-    // 🆕 แสดง error ที่ละเอียดขึ้น
     console.error('🔥 Detailed error info:', {
       message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : 'No stack trace',
-      token: token,
-      tokenLength: token.length
+      token: token
     });
-    
+
     notFound();
   }
 }

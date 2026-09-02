@@ -2,9 +2,28 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import supabase from '../../../lib/supabase';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const R2_URL = process.env.R2_PUBLIC_URL || '';
+
+// 🆕 เช็คสมุดบันทึกก่อนส่ง — ถ้ายังไม่มีใครส่ง ให้ "จอง" สิทธิ์ทันทีแล้วส่งได้
+// ถ้ามีคนจองไปแล้ว ให้หยุด ไม่ส่งซ้ำ
+async function tryClaimEmailSending(orderId: string): Promise<boolean> {
+  const { data, error } = await supabase
+    .from('Orders')
+    .update({ confirmation_email_sent: true })
+    .eq('id', orderId)
+    .eq('confirmation_email_sent', false)
+    .select();
+
+  if (error) {
+    console.error('❌ Error claiming email sending right:', error.message);
+    return false;
+  }
+
+  return !!(data && data.length > 0);
+}
 
 interface CartItem {
   id: string;
@@ -236,6 +255,15 @@ export async function POST(req: NextRequest) {
 
   const { name, email, cartItems, receiptUrl, orderId } = await req.json();
   console.log('🧾 Request data:', { name, email, cartItemsCount: cartItems?.length, receiptUrl, orderId });
+
+  // 🆕 เช็คสมุดบันทึกก่อนส่ง กันอีเมลซ้ำ (ไม่ว่าจะเรียกจากหน้าเว็บหรือระบบหลังบ้าน)
+  if (orderId) {
+    const claimed = await tryClaimEmailSending(orderId);
+    if (!claimed) {
+      console.log('🟢 Email already sent for this order — skipping duplicate send');
+      return NextResponse.json({ success: true, skipped: true });
+    }
+  }
 
   try {
     let linksHtml = '';
