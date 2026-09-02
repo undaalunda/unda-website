@@ -30,6 +30,10 @@ const stripe = stripeSecretKey ? new Stripe(stripeSecretKey, {
   apiVersion: '2024-04-10' as Stripe.LatestApiVersion,
 }) : null;
 
+function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 // 🆕 อีเมลสำรอง — ยิงกรณีลูกค้าปิดแท็บไปก่อนที่ frontend จะส่งอีเมลเองได้ทัน
 // (เช่น สแกน PromptPay QR แล้วปิดเว็บก่อนที่ polling จะจับได้ว่าจ่ายสำเร็จ)
 async function sendFallbackConfirmation(order: any) {
@@ -39,7 +43,7 @@ async function sendFallbackConfirmation(order: any) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        name: order.billing_info?.firstName || '', // ✅ ดึงจาก JSON billing_info
+        name: order.billing_info?.firstName || '',
         email: order.email,
         cartItems: order.items || [],
         receiptUrl: null,
@@ -55,6 +59,34 @@ async function sendFallbackConfirmation(order: any) {
   } catch (err: any) {
     console.error('❌ Fallback send-confirmation error:', err.message);
   }
+}
+
+// 🆕 เช็คว่า frontend บันทึก billing_info เสร็จหรือยัง (แปลว่า frontend
+// น่าจะส่งอีเมลที่ถูกต้องไปแล้ว) รอสูงสุด ~6 วิ ก่อนตัดสินใจว่าต้องส่ง fallback ไหม
+async function shouldSendFallbackEmail(orderId: string): Promise<{ send: boolean; latestOrder: any }> {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await wait(2000); // รอ 2 วิต่อรอบ รวม 3 รอบ = 6 วิ
+
+    const { data: latestOrder } = await supabase
+      .from('Orders')
+      .select('*')
+      .eq('id', orderId)
+      .single();
+
+    if (latestOrder?.billing_info?.firstName) {
+      // frontend บันทึกข้อมูลลูกค้าสำเร็จแล้ว = น่าจะส่งอีเมลไปแล้วเช่นกัน
+      return { send: false, latestOrder };
+    }
+  }
+
+  // รอครบแล้วยังไม่มีข้อมูล — frontend น่าจะไม่ได้ทำงานต่อ (ลูกค้าปิดแท็บ) ต้องส่ง fallback
+  const { data: latestOrder } = await supabase
+    .from('Orders')
+    .select('*')
+    .eq('id', orderId)
+    .single();
+
+  return { send: true, latestOrder };
 }
 
 export async function POST(req: NextRequest) {
@@ -166,8 +198,7 @@ export async function POST(req: NextRequest) {
         const order = orders[0];
         console.log('📦 Found order:', order.id, 'Current payment_status:', order.payment_status);
 
-        // ✅ ทำงาน (update + ลด stock + ส่งอีเมล) เฉพาะตอนที่เพิ่ง "สำเร็จใหม่" เท่านั้น
-        // กันไม่ให้ทำซ้ำหรือส่งอีเมลซ้ำถ้า webhook ยิงเข้ามาหลายรอบสำหรับ event เดียวกัน
+        // ✅ ทำงาน (update + ลด stock) เฉพาะตอนที่เพิ่ง "สำเร็จใหม่" เท่านั้น
         const wasAlreadySucceeded = order.payment_status === 'succeeded';
 
         if (!wasAlreadySucceeded) {
@@ -229,14 +260,21 @@ export async function POST(req: NextRequest) {
             }
           } catch (stockError: any) {
             console.error('❌ Stock reduction error:', stockError.message);
-            // ไม่ return error เพราะ order สำเร็จแล้ว แค่ stock ไม่ลดเท่านั้น
           }
 
-          // 🆕 ส่งอีเมลสำรอง เผื่อ frontend ไม่ได้ส่งเอง
-          await sendFallbackConfirmation({ ...order, ...updatedData?.[0] });
+          // 🆕 รอเช็คว่า frontend บันทึก billing_info เสร็จหรือยัง ก่อนตัดสินใจส่ง fallback email
+          // กันไม่ให้ webhook แซงส่งอีเมลก่อน frontend ทำเสร็จ (ซึ่งจะทำให้อีเมลไม่มีชื่อ/ลิงก์ใช้ไม่ได้)
+          const { send, latestOrder } = await shouldSendFallbackEmail(order.id);
+
+          if (send) {
+            console.log('📧 Frontend did not complete in time — sending fallback email');
+            await sendFallbackConfirmation(latestOrder || { ...order, ...updatedData?.[0] });
+          } else {
+            console.log('🟢 Frontend already completed the order — skipping fallback email');
+          }
 
         } else {
-          console.log('🟢 Order already marked as succeeded — skipping duplicate email');
+          console.log('🟢 Order already marked as succeeded — skipping duplicate processing');
         }
 
         return NextResponse.json({
