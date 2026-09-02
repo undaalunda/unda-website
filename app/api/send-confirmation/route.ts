@@ -287,12 +287,14 @@ export async function POST(req: NextRequest) {
         console.log('📁 File path for item:', filePath);
         
         if (filePath) {
+          // ✅ แก้แล้ว: ใช้ domain จริง www.undaalunda.com แทน unda-website.vercel.app
+          // (URL เก่าโดน 308 redirect ทำให้เรียก API ไม่สำเร็จ ลิงก์เลยหายไปจากอีเมล)
           const apiBaseUrl = process.env.NODE_ENV === 'production' 
-            ? (process.env.NEXT_PUBLIC_BASE_URL || 'https://unda-website.vercel.app')
+            ? (process.env.NEXT_PUBLIC_BASE_URL || 'https://www.undaalunda.com')
             : 'http://localhost:3000';
             
           const publicBaseUrl = process.env.NODE_ENV === 'production'
-            ? (process.env.NEXT_PUBLIC_BASE_URL || 'https://unda-website.vercel.app')
+            ? (process.env.NEXT_PUBLIC_BASE_URL || 'https://www.undaalunda.com')
             : 'http://localhost:3000';
           
           console.log('🔗 Creating download link for:', filePath);
@@ -381,7 +383,8 @@ export async function POST(req: NextRequest) {
       `;
     }
 
-    const publicBaseUrl = 'https://unda-website.vercel.app';
+    // ✅ แก้แล้ว: ใช้ domain จริงแทน unda-website.vercel.app
+    const publicBaseUrl = 'https://www.undaalunda.com';
       
     const receiptHtml = receiptUrl
       ? `<p style="margin-top: 24px;">You can view your payment receipt here:<br/>
