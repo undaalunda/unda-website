@@ -1,4 +1,4 @@
-// /app/api/mark-downloaded/route.ts - แก้ใช้ Supabase แทน file system
+// /app/api/mark-downloaded/route.ts - ใช้ตาราง DownloadTokens แยกต่างหาก
 
 import { NextRequest, NextResponse } from 'next/server';
 import supabase from '../../../lib/supabase';
@@ -13,15 +13,15 @@ export async function POST(req: NextRequest) {
 
     console.log('🔒 Marking download as used:', { token: token.substring(0, 8) + '...', orderId });
 
-    // อัพเดท Supabase - mark as used
+    // ✅ อัพเดทในตาราง DownloadTokens แทน Orders
     const { data, error } = await supabase
-      .from('Orders')
+      .from('DownloadTokens')
       .update({
         is_used: true,
         used_at: new Date().toISOString()
       })
-      .eq('download_token', token)
-      .select('id, is_used, used_at, file_path')
+      .eq('token', token)
+      .select('id, order_id, is_used, used_at, file_path')
       .single();
 
     if (error) {
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     }
 
     console.log('✅ Download marked as used successfully:', {
-      orderId: data.id,
+      orderId: data.order_id,
       usedAt: data.used_at,
       filePath: data.file_path?.split('/').pop()
     });

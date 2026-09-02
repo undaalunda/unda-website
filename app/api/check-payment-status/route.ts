@@ -3,6 +3,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const isLive = process.env.NODE_ENV === 'production';
 
 const stripeSecretKey =
@@ -31,10 +34,19 @@ export async function GET(req: NextRequest) {
 
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
 
-    return NextResponse.json({
-      status: paymentIntent.status, // 'succeeded' | 'processing' | 'requires_action' | 'requires_payment_method' | ...
-      orderId: paymentIntent.metadata?.id || null,
-    });
+    return NextResponse.json(
+      {
+        status: paymentIntent.status,
+        orderId: paymentIntent.metadata?.id || null,
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        },
+      }
+    );
 
   } catch (err: any) {
     console.error('🔥 check-payment-status error:', err);

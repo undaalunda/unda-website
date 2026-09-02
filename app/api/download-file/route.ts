@@ -24,11 +24,11 @@ export async function GET(request: NextRequest) {
     
     console.log('📥 Download request:', { token, filename });
     
-    // ตรวจสอบ token ใน Supabase table Orders
+    // ✅ ตรวจสอบ token ในตาราง DownloadTokens แทน Orders
     const { data: tokenData, error } = await supabase
-      .from('Orders')
+      .from('DownloadTokens')
       .select('*')
-      .eq('download_token', token)
+      .eq('token', token)
       .single();
     
     if (error || !tokenData) {
@@ -36,10 +36,10 @@ export async function GET(request: NextRequest) {
       return new Response('Invalid token', { status: 403 });
     }
     
-    console.log('✅ Token found in Orders table:', {
-      orderId: tokenData.id,
+    console.log('✅ Token found in DownloadTokens table:', {
+      orderId: tokenData.order_id,
       isUsed: tokenData.is_used,
-      expiresAt: tokenData.download_expires
+      expiresAt: tokenData.expires_at
     });
     
     // เช็คว่า token หมดอายุหรือใช้แล้วหรือยัง
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       return new Response('Token already used', { status: 403 });
     }
     
-    const expiresAt = new Date(tokenData.download_expires);
+    const expiresAt = new Date(tokenData.expires_at);
     if (expiresAt < new Date()) {
       console.error('❌ Token expired:', token);
       return new Response('Token expired', { status: 403 });
@@ -69,7 +69,6 @@ export async function GET(request: NextRequest) {
     
     console.log('✅ File found, streaming to client');
     
-    // ส่งไฟล์กลับไปให้ client
     const headers = new Headers();
     headers.set('Content-Type', fileResponse.headers.get('Content-Type') || 'application/octet-stream');
     headers.set('Content-Disposition', `attachment; filename="${filename}"`);
