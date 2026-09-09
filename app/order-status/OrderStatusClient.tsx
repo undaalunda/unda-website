@@ -15,9 +15,70 @@ type Order = {
   courier?: string;
   shipping_method?: string;
   shipping_zone?: string;
+  billing_info?: {
+    firstName?: string;
+    lastName?: string;
+    company?: string;
+    address?: string;
+    address2?: string;
+    city?: string;
+    county?: string;
+    postcode?: string;
+    country?: string;
+    phone?: string;
+    email?: string;
+  };
+  shipping_info?: {
+    firstName?: string;
+    lastName?: string;
+    company?: string;
+    address?: string;
+    address2?: string;
+    city?: string;
+    county?: string;
+    postcode?: string;
+    country?: string;
+  };
 };
 
 type ViewMode = 'form' | 'single_order' | 'admin_orders';
+
+// 🆕 ระบบจำรหัสผ่าน admin ไว้ใน localStorage
+const ADMIN_SESSION_KEY = 'unda_admin_pwd';
+const ADMIN_SESSION_EXPIRY_KEY = 'unda_admin_pwd_expires';
+const ADMIN_SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 วัน
+
+const saveAdminSession = (password: string) => {
+  try {
+    localStorage.setItem(ADMIN_SESSION_KEY, password);
+    localStorage.setItem(ADMIN_SESSION_EXPIRY_KEY, String(Date.now() + ADMIN_SESSION_DURATION_MS));
+  } catch (e) {
+    console.error('Failed to save admin session', e);
+  }
+};
+
+const clearAdminSession = () => {
+  try {
+    localStorage.removeItem(ADMIN_SESSION_KEY);
+    localStorage.removeItem(ADMIN_SESSION_EXPIRY_KEY);
+  } catch (e) {
+    console.error('Failed to clear admin session', e);
+  }
+};
+
+const getStoredAdminPassword = (): string | null => {
+  try {
+    const pwd = localStorage.getItem(ADMIN_SESSION_KEY);
+    const expiry = localStorage.getItem(ADMIN_SESSION_EXPIRY_KEY);
+    if (pwd && expiry && Date.now() < Number(expiry)) {
+      return pwd;
+    }
+    clearAdminSession();
+    return null;
+  } catch (e) {
+    return null;
+  }
+};
 
 // Main form component - choose between customer lookup or admin access
 const MainForm = ({ onCustomerSubmit, onAdminSubmit }: { 
@@ -43,7 +104,7 @@ const MainForm = ({ onCustomerSubmit, onAdminSubmit }: {
   };
 
   return (
-    <div className="pt-32 md:pt-44 px-6 max-w-md mx-auto">
+    <div className="pt-32 md:pt-44 pb-24 md:pb-32 px-6 max-w-md mx-auto">
      <div className="bg-[#1a0000]/60 border border-[#f8fcdc]/20 p-6 md:p-8 rounded-lg shadow-lg">
       <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-[#dc9e63] text-center font-[Cinzel]">
           Track Your Orders
@@ -188,7 +249,7 @@ const ErrorState = ({ error, onReset }: { error: string; onReset: () => void }) 
 );
 
 // Single order details display
-const OrderDetails = ({ order, onBack }: { order: Order; onBack: () => void }) => {
+const OrderDetails = ({ order, onBack, isAdmin = false }: { order: Order; onBack: () => void; isAdmin?: boolean }) => {
   const [trackingData, setTrackingData] = useState<any>(null);
   const [trackingLoading, setTrackingLoading] = useState(false);
   const [trackingError, setTrackingError] = useState<string | null>(null);
@@ -247,7 +308,7 @@ const OrderDetails = ({ order, onBack }: { order: Order; onBack: () => void }) =
   };
 
   return (
-    <main className="pt-32 md:pt-44 px-6 max-w-4xl mx-auto text-[#f8fcdc] font-[Cinzel]">
+    <main className="pt-32 md:pt-44 pb-24 md:pb-32 px-6 max-w-4xl mx-auto text-[#f8fcdc] font-[Cinzel]">
       <div className="mb-4 md:mb-6">
         <button
           onClick={onBack}
@@ -271,6 +332,55 @@ const OrderDetails = ({ order, onBack }: { order: Order; onBack: () => void }) =
             <span className="text-[#f8fcdc]">{order.email}</span>
           </div>
         </div>
+
+        {/* Shipping Address — admin view only */}
+        {isAdmin && (order.shipping_info || order.billing_info) && (
+          <div className="bg-[#1a0000]/60 border border-[#f8fcdc]/20 p-6 rounded-lg">
+            <h2 className="text-xl font-semibold mb-4 text-[#dc9e63]">Shipping Address</h2>
+            {(() => {
+              const addr = order.shipping_info || order.billing_info;
+              if (!addr) return null;
+              return (
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-[#f8fcdc]/70">Name:</span>
+                    <span className="text-[#f8fcdc]">{addr.firstName} {addr.lastName}</span>
+                  </div>
+                  {addr.company && (
+                    <div className="flex justify-between">
+                      <span className="text-[#f8fcdc]/70">Company:</span>
+                      <span className="text-[#f8fcdc]">{addr.company}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span className="text-[#f8fcdc]/70">Address:</span>
+                    <span className="text-[#f8fcdc] text-right max-w-[70%]">
+                      {addr.address}{addr.address2 ? `, ${addr.address2}` : ''}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#f8fcdc]/70">City:</span>
+                    <span className="text-[#f8fcdc]">{addr.city}{addr.county ? `, ${addr.county}` : ''}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#f8fcdc]/70">Postcode:</span>
+                    <span className="text-[#f8fcdc]">{addr.postcode}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#f8fcdc]/70">Country:</span>
+                    <span className="text-[#f8fcdc]">{addr.country}</span>
+                  </div>
+                  {order.billing_info?.phone && (
+                    <div className="flex justify-between">
+                      <span className="text-[#f8fcdc]/70">Phone:</span>
+                      <span className="text-[#f8fcdc]">{order.billing_info.phone}</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+          </div>
+        )}
 
         {/* Order Summary */}
         <div className="bg-[#1a0000]/60 border border-[#f8fcdc]/20 p-6 rounded-lg">
@@ -448,16 +558,17 @@ const OrderDetails = ({ order, onBack }: { order: Order; onBack: () => void }) =
 };
 
 // Admin orders list display
-const AdminOrdersList = ({ orders, onBack, onOrderClick }: { 
+const AdminOrdersList = ({ orders, onBack, onOrderClick, onLogout }: { 
   orders: Order[]; 
   onBack: () => void;
   onOrderClick: (order: Order) => void;
+  onLogout: () => void;
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState<'date' | 'amount' | 'status'>('date');
   const [filterStatus, setFilterStatus] = useState<string>('all');
-  const ordersPerPage = 12;
+  const ordersPerPage = 6;
 
   // Statistics
   const stats = useMemo(() => {
@@ -542,16 +653,26 @@ const AdminOrdersList = ({ orders, onBack, onOrderClick }: {
   }, [searchTerm, filterStatus, sortBy]);
 
   return (
-    <main className="pt-32 px-6 max-w-7xl mx-auto text-[#f8fcdc] font-[Cinzel]">
+    <main className="pt-32 px-6 max-w-7xl mx-auto text-[#f8fcdc] font-[Cinzel]" style={{ paddingBottom: '400px' }}>
       {/* Header */}
       <div className="mb-6 md:mb-8">
-        <button
-          onClick={onBack}
-          className="group flex items-center gap-2 text-[#dc9e63] hover:text-[#f8cfa3] transition-colors mb-4 md:mb-6 cursor-pointer"
-        >
-          <span className="group-hover:-translate-x-1 transition-transform">←</span>
-          Back to Login
-        </button>
+        <div className="flex items-center justify-between mb-4 md:mb-6">
+          <button
+            onClick={onBack}
+            className="group flex items-center gap-2 text-[#dc9e63] hover:text-[#f8cfa3] transition-colors cursor-pointer"
+          >
+            <span className="group-hover:-translate-x-1 transition-transform">←</span>
+            Back
+          </button>
+
+          {/* 🆕 Logout button */}
+          <button
+            onClick={onLogout}
+            className="text-xs text-[#f8fcdc]/50 hover:text-[#f8fcdc]/80 underline cursor-pointer"
+          >
+            Logout
+          </button>
+        </div>
 
         <div className="text-center mb-6 md:mb-8">
           <h1 className="text-2xl md:text-3xl xl:text-4xl font-bold mb-2 text-[#dc9e63] tracking-wide">
@@ -785,15 +906,23 @@ export default function OrderStatusClient() {
   const router = useRouter();
 
   const email = useMemo(() => searchParams?.get('email') || '', [searchParams]);
-const orderId = useMemo(() => searchParams?.get('id') || '', [searchParams]);
-const isAdmin = useMemo(() => searchParams?.get('admin') === 'true', [searchParams]);
-const adminPwd = useMemo(() => searchParams?.get('pwd') || '', [searchParams]);
+  const orderId = useMemo(() => searchParams?.get('id') || '', [searchParams]);
+  const adminPwd = useMemo(() => searchParams?.get('pwd') || '', [searchParams]);
 
   const [viewMode, setViewMode] = useState<ViewMode>('form');
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
   const [allOrders, setAllOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // 🆕 isAdmin เป็น state แยกต่างหาก อัปเดตได้ทั้งจาก URL param และตอน login สำเร็จ (รวมถึง auto-login จาก localStorage)
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (searchParams?.get('admin') === 'true') {
+      setIsAdmin(true);
+    }
+  }, [searchParams]);
 
   // Fetch single order (customer)
   const fetchSingleOrder = useCallback(async (emailParam: string, orderIdParam: string) => {
@@ -826,9 +955,11 @@ const adminPwd = useMemo(() => searchParams?.get('pwd') || '', [searchParams]);
   }, []);
 
   // Fetch all orders (admin)
-  const fetchAllOrders = useCallback(async (password: string) => {
-    setLoading(true);
-    setError(null);
+  const fetchAllOrders = useCallback(async (password: string, silent = false) => {
+    if (!silent) {
+      setLoading(true);
+      setError(null);
+    }
 
     try {
       const basicAuth = btoa(`admin:${password}`);
@@ -839,14 +970,25 @@ const adminPwd = useMemo(() => searchParams?.get('pwd') || '', [searchParams]);
       });
 
       if (!response.ok) {
+        // 🆕 ถ้ารหัสที่เก็บไว้ใช้ไม่ได้แล้ว ให้ลบทิ้งเงียบๆ ไม่ต้องโชว์ error รบกวน
+        if (silent) {
+          clearAdminSession();
+          setLoading(false);
+          return;
+        }
         throw new Error(response.status === 403 ? 'Invalid admin password' : 'Failed to fetch orders');
       }
 
       const data = await response.json();
       setAllOrders(data.orders || []);
       setViewMode('admin_orders');
+      setIsAdmin(true);
+      // 🆕 จำรหัสผ่านไว้เมื่อล็อกอินสำเร็จ
+      saveAdminSession(password);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error occurred');
+      if (!silent) {
+        setError(err instanceof Error ? err.message : 'Unknown error occurred');
+      }
     } finally {
       setLoading(false);
     }
@@ -859,10 +1001,8 @@ const adminPwd = useMemo(() => searchParams?.get('pwd') || '', [searchParams]);
   }, [router, fetchSingleOrder]);
 
   const handleAdminSubmit = useCallback((password: string) => {
-  const newUrl = `/order-status?admin=true&pwd=${encodeURIComponent(password)}`;
-  router.push(newUrl);
-  fetchAllOrders(password);
-}, [router, fetchAllOrders]);
+    fetchAllOrders(password);
+  }, [fetchAllOrders]);
 
   const handleBackToForm = useCallback(() => {
   setViewMode('form');
@@ -871,6 +1011,13 @@ const adminPwd = useMemo(() => searchParams?.get('pwd') || '', [searchParams]);
   setError(null);
   router.push('/order-status');
 }, [router]);
+
+  // 🆕 Logout — ลบ session ที่จำไว้ แล้วกลับไปหน้า form
+  const handleAdminLogout = useCallback(() => {
+    clearAdminSession();
+    setIsAdmin(false);
+    handleBackToForm();
+  }, [handleBackToForm]);
 
   const handleOrderClick = useCallback((order: Order) => {
     setCurrentOrder(order);
@@ -891,14 +1038,28 @@ useEffect(() => {
     fetchAllOrders(adminPwd);
   }
 }, [isAdmin, adminPwd, fetchAllOrders]);
+
+  // 🆕 พอเปิดหน้ามาแล้วไม่มี admin param ใน URL ให้เช็คว่ามีรหัสที่จำไว้ใน localStorage ไหม
+  // ถ้ามีและยังไม่หมดอายุ ให้ล็อกอินอัตโนมัติแบบเงียบๆ ไม่ต้องพิมพ์รหัสซ้ำ
+  useEffect(() => {
+    if (searchParams?.get('admin') === 'true' && adminPwd) return; // มี URL param อยู่แล้ว ให้ effect ด้านบนจัดการ
+    if (email || orderId) return; // กำลังดูออเดอร์ลูกค้าอยู่ ไม่ต้องยุ่ง
+
+    const stored = getStoredAdminPassword();
+    if (stored) {
+      fetchAllOrders(stored, true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   if (loading) return <LoadingState />;
   if (error) return <ErrorState error={error} onReset={handleBackToForm} />;
 
   switch (viewMode) {
     case 'single_order':
-      return <OrderDetails order={currentOrder!} onBack={handleBackToForm} />;
+      return <OrderDetails order={currentOrder!} onBack={handleBackToForm} isAdmin={isAdmin} />;
     case 'admin_orders':
-      return <AdminOrdersList orders={allOrders} onBack={handleBackToForm} onOrderClick={handleOrderClick} />;
+      return <AdminOrdersList orders={allOrders} onBack={handleBackToForm} onOrderClick={handleOrderClick} onLogout={handleAdminLogout} />;
     default:
       return <MainForm onCustomerSubmit={handleCustomerSubmit} onAdminSubmit={handleAdminSubmit} />;
   }

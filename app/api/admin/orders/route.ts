@@ -38,7 +38,9 @@ export async function GET(req: NextRequest) {
       tracking_number,
       courier,
       shipping_zone,
-      shipping_method
+      shipping_method,
+      billing_info,
+      shipping_info
     `)
     .order('created_at', { ascending: false });
 
