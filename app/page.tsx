@@ -7,7 +7,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://undaalunda.com';
 
 export const metadata: Metadata = {
   title: 'Unda Alunda | Official Website & Merch Store',
-  description: 'Official website of Unda Alunda. New album "Dark Wonderful World" coming December 31, 2025. Shop exclusive music, merch, backing tracks and more.',
+  description: 'Official website of Unda Alunda. The new album "Dark Wonderful World" out now!. Shop exclusive music, merch, backing tracks and more.',
   keywords: [
     'Unda Alunda',
     'Dark Wonderful World',
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   // 🎯 FIXED: Unified strategy - Same "Official website" start
   openGraph: {
     title: 'Unda Alunda | Official Website & Merch Store',
-    description: 'Official website of Unda Alunda. New album "Dark Wonderful World" coming December 31, 2025.',
+    description: 'Official website of Unda Alunda. The new album "Dark Wonderful World" out now!.',
     type: 'website',
     url: BASE_URL,
     siteName: 'UNDA ALUNDA',
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Unda Alunda | Official Website & Merch Store',
-    description: 'Official website of Unda Alunda. New album "Dark Wonderful World" coming December 31, 2025.',
+    description: 'Official website of Unda Alunda. The new album "Dark Wonderful World" out now!.',
     creator: '@undaalunda',
     images: [`${BASE_URL}/catmoon-bg.jpeg`],
   },
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
   // 🎯 FIXED: Unified meta tags for social
   other: {
     'og:title': 'Unda Alunda | Official Website & Merch Store',
-    'og:description': 'Official website of Unda Alunda. New album "Dark Wonderful World" coming December 31, 2025.',
+    'og:description': 'Official website of Unda Alunda. The new album "Dark Wonderful World" out now!.',
     'og:type': 'website',
     'og:url': BASE_URL,
     'og:image': `${BASE_URL}/catmoon-bg.jpeg`,
