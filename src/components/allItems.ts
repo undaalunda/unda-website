@@ -198,7 +198,7 @@ export const productsByCategory = {
 
 // ========== ASIA TOUR 2026 T-SHIRT ==========
 {
-  id: 'asia-tour-26-t-shirt',
+  id: 'asia-tour-2026-t-shirt',
   title: 'ASIA TOUR 2026',
   category: 'Merch' as const,
   type: 'physical' as const,
@@ -388,7 +388,7 @@ music: [
   type: 'physical' as const,
   price: { original: 45.90, sale: 40.95 },
   tags: ['bundle', 'tour', 'asia tour'],
-  image: '/asia-tour-set.webp',
+  image: '/asia-tour-set-fixed.webp',
   url: '/product/asia-tour-set',
   bundleItems: ['asia-tour-2026-t-shirt', 'asia-tour-2026-poster'],
   sizeOptions: {
