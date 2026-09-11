@@ -451,6 +451,34 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <meta name="referrer" content="strict-origin-when-cross-origin" />
       </head>
       <body className="bg-[#190000] text-[#f8fcdc] m-0 p-0 overflow-x-hidden">
+  {/* 🎯 iOS 26 Liquid Glass Safari toolbar tint fix — invisible, non-interactive */}
+  <div
+    aria-hidden="true"
+    style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      height: 'env(safe-area-inset-top, 60px)',
+      backgroundColor: '#160000',
+      zIndex: -1,
+      pointerEvents: 'none',
+    }}
+  />
+  <div
+    aria-hidden="true"
+    style={{
+      position: 'fixed',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      height: 'env(safe-area-inset-bottom, 34px)',
+      backgroundColor: '#160000',
+      zIndex: -1,
+      pointerEvents: 'none',
+    }}
+  />
+  
         <ConsentProvider>
           <CartProvider>
             <FacebookPixel />
