@@ -2722,8 +2722,19 @@ video::part(controls) {
   }
 }
 
+/* Fix: iOS status bar / Dynamic Island area may show inconsistent
+   background across different iPhone models (varying safe-area
+   sizes). This sets <html> background AND accounts for safe-area
+   insets without touching any existing rule. */
+html {
+  background-color: #190000;
+}
 
-
+@supports (padding-top: env(safe-area-inset-top)) {
+  body {
+    padding-top: env(safe-area-inset-top);
+  }
+}
 
 
 
