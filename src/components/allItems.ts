@@ -27,7 +27,7 @@ export type Product = {
 
 
 // 🚀 PERFORMANCE: Group products by category for faster filtering
-export const productsByCategory = {
+const rawProductsByCategory = {
   merch: [
   // ไม่แก้ (soldOut)
   { id: 'cat-scores-t-shirt-black', title: 'CAT SCORES T-SHIRT', category: 'Merch' as const, type: 'physical' as const, subtitle: 'BLACK', price: 29.95, tags: ['t-shirt', 'black', 'shirt'], image: '/black-cats-scores-tee-2.webp', url: '/product/cat-scores-t-shirt-black', weight: 0.2, soldOut: true },
@@ -543,6 +543,19 @@ tabs: [
     { id: 'quietness-drums', title: 'QUIETNESS', subtitle: 'DRUMS BACKING TRACK', category: 'Backing Track' as const, type: 'digital' as const, price: 7.95, tags: ['drums', 'track'], image: '/backing-drums-quietness.webp', url: '/product/quietness-drums', available: true, comingSoon: false, description: '**QUIETNESS – Drums Backing Track**\nHigh-resolution backing track without **drums**, perfect for practice, covers, or performances.\n\n• **Format:** WAV, 48 kHz / 24-bit\n• **Full-length**, professionally mixed\n• Compatible with all major DAWs\n\n**Mixed & Mastered by Atipoung Wanlua**\n\nFor personal use only.\nSee our Terms & Conditions for license details.\n\n**Copyright © 2025 Unda Alunda**' }
   ],
 
+};
+
+// 🙈 ซ่อนสินค้าที่ยังไม่เปิดขาย (comingSoon: true หรือ available: false)
+// พร้อมขายเมื่อไหร่ ให้ลบ available: false, comingSoon: true ออกจากสินค้านั้น
+const isListed = (p: { id: string; available?: boolean; comingSoon?: boolean }) =>
+  !p.comingSoon && p.available !== false;
+
+export const productsByCategory = {
+  merch: rawProductsByCategory.merch.filter(isListed),
+  music: rawProductsByCategory.music.filter(isListed),
+  bundles: rawProductsByCategory.bundles.filter(isListed),
+  tabs: rawProductsByCategory.tabs.filter(isListed),
+  backingTracks: rawProductsByCategory.backingTracks.filter(isListed),
 };
 
 // 🚀 PERFORMANCE: Flatten array with optimized structure
