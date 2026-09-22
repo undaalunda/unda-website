@@ -256,8 +256,8 @@ export default function ProductPageContent({
             </div>
 
             <div className="w-full md:w-1/2 flex flex-col">
-              <h1 className="product-title-detail capitalize whitespace-nowrap overflow-hidden text-ellipsis">{product.title}</h1>
-              <p className="product-subtitle-detail capitalize whitespace-nowrap overflow-hidden text-ellipsis" style={{ color: '#f8fcdc' }}>{product.subtitle}</p>
+              <h1 className="product-title-detail capitalize break-words">{product.title}</h1>
+              <p className="product-subtitle-detail capitalize break-words" style={{ color: '#f8fcdc' }}>{product.subtitle}</p>
 
               {!product.comingSoon && (
                 <div className="product-price-detail">

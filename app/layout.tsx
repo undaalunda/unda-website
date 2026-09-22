@@ -118,7 +118,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               background-color:#190000;
               margin:0;
               padding:0;
-              overflow-x:hidden;
+              overflow-x:clip;
               font-family:'Cinzel', Georgia, 'Times New Roman', serif;
               font-display: block;
               opacity:1 !important;
@@ -159,11 +159,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 max-width: 400px;
               }
               
-              body {
-                -webkit-overflow-scrolling: touch;
+               html {
                 overscroll-behavior-y: contain;
               }
-            }
+              
+              body {
+                -webkit-overflow-scrolling: touch;
+              }
             
             @keyframes fadeInHero{
               from{opacity:0;transform:translateX(-50%) translateY(20px)}
@@ -450,7 +452,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />
         <meta name="referrer" content="strict-origin-when-cross-origin" />
       </head>
-      <body className="bg-[#190000] text-[#f8fcdc] m-0 p-0 overflow-x-hidden">
+            <body className="bg-[#190000] text-[#f8fcdc] m-0 p-0 overflow-x-clip">
   {/* 🎯 iOS 26 Liquid Glass Safari toolbar tint fix — invisible, non-interactive */}
   <div
     aria-hidden="true"

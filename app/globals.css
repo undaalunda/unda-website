@@ -16,7 +16,7 @@
 
 html {
   background-color: transparent;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body {
@@ -24,7 +24,7 @@ body {
   margin: 0;
   padding: 0;
   position: relative;
-  overflow-x: hidden;
+  overflow-x: clip;
   overscroll-behavior: auto;
   -webkit-overflow-scrolling: touch;
   background-color: #190000;
@@ -1487,6 +1487,13 @@ button svg,
   .product-detail-wrapper {
     flex-direction: row;
     gap: 6rem;
+    align-items: flex-start;
+  }
+
+  .product-detail-image {
+    position: sticky;
+    top: 120px;
+    align-self: flex-start;
   }
 }
 
