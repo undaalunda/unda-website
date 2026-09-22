@@ -195,7 +195,7 @@ const rawProductsByCategory = {
 },
 
 { id: 'unda-alunda-pick', title: 'UNDA ALUNDA PICK', category: 'Merch' as const, type: 'physical' as const, subtitle: 'GUITAR PICK', price: 2.95, tags: ['pick', 'accessory', 'guitar'], image: '/unda-alunda-pick.webp', url: '/product/unda-alunda-pick', weight: 0.01, soldOut: true, description: 'Unda Alunda Pick\n\nProduct Details\n• Jazz-shaped pick\n• 0.6 mm thickness\n\nPlease Note: The product image displayed is a mock-up; actual item may vary.' },
-{ id: 'unda-alunda-pick-limited', title: 'UNDA ALUNDA PICK', category: 'Merch' as const, type: 'physical' as const, subtitle: 'GUITAR PICK - LIMITED EDITION', price: 3.95, tags: ['pick', 'accessory', 'guitar', 'limited'], image: '/unda-alunda-pick-limited.webp', url: '/product/unda-alunda-pick-limited', weight: 0.01, description: 'Unda Alunda Pick - Limited Edition\n\nProduct Details\n• Jazz-shaped pick\n• 0.6 mm thickness\n• Limited edition design\n\nPlease Note: The product image displayed is a mock-up; actual item may vary.' },
+{ id: 'unda-alunda-pick-limited', title: 'UNDA ALUNDA PICK - LIMITED EDITION', category: 'Merch' as const, type: 'physical' as const, subtitle: 'GUITAR PICK', price: 3.95, tags: ['pick', 'accessory', 'guitar', 'limited'], image: '/unda-alunda-pick-limited.webp', url: '/product/unda-alunda-pick-limited', weight: 0.01, description: 'Unda Alunda Pick - Limited Edition\n\nProduct Details\n• Jazz-shaped pick\n• 0.6 mm thickness\n• Limited edition design\n\nPlease Note: The product image displayed is a mock-up; actual item may vary.' },
 
 // ========== ASIA TOUR 2026 T-SHIRT ==========
 {
