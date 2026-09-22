@@ -22,8 +22,8 @@ const allowedItems = [
   'dark-wonderful-world-bag',
   'unda-alunda-pick-limited',
   'signed-keychain',
-  'audio-digipak',
-  'dual-album-bundle'
+  'dark-wonderful-world-vinyl-crimson-burst',
+  'dark-wonderful-world-vinyl-gilded-burst'
 ];
 
 const homepageItems = allItems.filter(
