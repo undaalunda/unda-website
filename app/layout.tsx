@@ -118,6 +118,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               background-color:#190000;
               margin:0;
               padding:0;
+              overflow-x:hidden;
               overflow-x:clip;
               font-family:'Cinzel', Georgia, 'Times New Roman', serif;
               font-display: block;
@@ -166,6 +167,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               body {
                 -webkit-overflow-scrolling: touch;
               }
+            }
             
             @keyframes fadeInHero{
               from{opacity:0;transform:translateX(-50%) translateY(20px)}

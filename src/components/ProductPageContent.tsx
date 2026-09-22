@@ -65,6 +65,37 @@ export default function ProductPageContent({
   // 📐 Size chart modal state
   const [showSizeChart, setShowSizeChart] = useState(false);
 
+  // 🔍 Lightbox state
+  const [showLightbox, setShowLightbox] = useState(false);
+
+  // 🖼️ Gallery state
+  const gallery = product.images && product.images.length > 0 ? product.images : [product.image];
+  const [activeImage, setActiveImage] = useState(0);
+
+  const showPrevImage = () => setActiveImage((i) => (i - 1 + gallery.length) % gallery.length);
+  const showNextImage = () => setActiveImage((i) => (i + 1) % gallery.length);
+
+  useEffect(() => {
+    setActiveImage(0);
+  }, [product.id]);
+
+  useEffect(() => {
+    if (!showLightbox) return;
+    const root = document.documentElement;
+    const prevOverflow = root.style.overflow;
+    root.style.overflow = 'hidden';
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowLightbox(false);
+      if (gallery.length > 1 && e.key === 'ArrowLeft') setActiveImage((i) => (i - 1 + gallery.length) % gallery.length);
+      if (gallery.length > 1 && e.key === 'ArrowRight') setActiveImage((i) => (i + 1) % gallery.length);
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => {
+      root.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', handleKey);
+    };
+  }, [showLightbox, gallery.length]);
+
   // 📦 Stock state - ใช้ initialStock จาก Server
   const [currentStock, setCurrentStock] = useState<number | null>(initialStock);
   const [stockLoading, setStockLoading] = useState(false);
@@ -240,18 +271,85 @@ export default function ProductPageContent({
           <div className="flex flex-col max-[927px]:flex-col md:flex-row gap-4 md:gap-6 xl:gap-8 mb-20">
             <div className="w-full md:w-1/2 flex justify-center">
               <div className="sticky top-32 self-start w-full max-w-[500px] max-[1280px]:max-w-[400px]">
-                <div className={`relative aspect-square w-full ${product.tags?.includes('keychain') ? 'keychain-glow' : ''}`}>
-                  <Image
-                    src={product.image}
-                    alt={product.title}
-                    fill
-                    sizes="(max-width: 1280px) 400px, 500px"
-                    className="object-contain"
-                    priority
-                    quality={100}
-                    unoptimized={true}
-                  />
+                <div className="relative">
+                  <div
+                    className={`relative aspect-square w-full cursor-zoom-in ${product.tags?.includes('keychain') ? 'keychain-glow' : ''}`}
+                    onClick={() => setShowLightbox(true)}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`View ${product.title} full screen`}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setShowLightbox(true);
+                      }
+                    }}
+                  >
+                    <Image
+                      src={gallery[activeImage]}
+                      alt={`${product.title} - image ${activeImage + 1}`}
+                      fill
+                      sizes="(max-width: 1280px) 400px, 500px"
+                      className="object-contain"
+                      priority
+                      quality={100}
+                      unoptimized={true}
+                    />
+                  </div>
+
+                  {gallery.length > 1 && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={showPrevImage}
+                        className="absolute left-0 top-1/2 -translate-y-1/2 p-2 text-[#f8fcdc]/70 hover:text-[#dc9e63] transition-colors cursor-pointer"
+                        aria-label="Previous image"
+                      >
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <polyline points="15 18 9 12 15 6" />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={showNextImage}
+                        className="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-[#f8fcdc]/70 hover:text-[#dc9e63] transition-colors cursor-pointer"
+                        aria-label="Next image"
+                      >
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <polyline points="9 18 15 12 9 6" />
+                        </svg>
+                      </button>
+                    </>
+                  )}
                 </div>
+
+                {gallery.length > 1 && (
+                  <div className="flex justify-center gap-3 mt-4">
+                    {gallery.map((src, idx) => (
+                      <button
+                        key={src}
+                        type="button"
+                        onClick={() => setActiveImage(idx)}
+                        className={`relative w-12 h-12 border transition-all cursor-pointer ${
+                          idx === activeImage
+                            ? 'border-[#dc9e63] opacity-100'
+                            : 'border-transparent opacity-50 hover:opacity-100'
+                        }`}
+                        aria-label={`Show image ${idx + 1}`}
+                        aria-current={idx === activeImage}
+                      >
+                        <Image
+                          src={src}
+                          alt=""
+                          fill
+                          sizes="48px"
+                          className="object-contain"
+                          unoptimized={true}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -684,6 +782,64 @@ export default function ProductPageContent({
         </div>
       </div>
       
+      {/* 🔍 Fullscreen Image Lightbox */}
+      {showLightbox && (
+        <div
+          className="fixed inset-0 z-[10000] bg-black/90 flex items-center justify-center cursor-zoom-out animate-fadeIn"
+          onClick={() => setShowLightbox(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${product.title} image`}
+        >
+          <button
+            onClick={() => setShowLightbox(false)}
+            className="absolute right-4 md:right-8 text-[#f8fcdc]/70 hover:text-[#dc9e63] transition-colors cursor-pointer z-10"
+            style={{ top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }}
+            aria-label="Close full screen image"
+          >
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+
+          {gallery.length > 1 && (
+            <>
+              <button
+                onClick={(e) => { e.stopPropagation(); showPrevImage(); }}
+                className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 p-3 text-[#f8fcdc]/70 hover:text-[#dc9e63] transition-colors cursor-pointer z-10"
+                aria-label="Previous image"
+              >
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); showNextImage(); }}
+                className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 p-3 text-[#f8fcdc]/70 hover:text-[#dc9e63] transition-colors cursor-pointer z-10"
+                aria-label="Next image"
+              >
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </button>
+            </>
+          )}
+
+          <div className="relative w-[92vw] h-[85vh]">
+            <Image
+              src={gallery[activeImage]}
+              alt={`${product.title} - image ${activeImage + 1}`}
+              fill
+              sizes="92vw"
+              className="object-contain"
+              quality={100}
+              unoptimized={true}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Size Chart Modal */}
       {product.sizeChartImage && (
         <SizeChartModal

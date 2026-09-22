@@ -197,7 +197,7 @@ export default function PhysicalShopContent({ initialTab }: { initialTab?: Physi
   // 🚀 Prevent any flash - render with opacity until ready
   if (!shouldRender) {
     return (
-      <main className="min-h-screen flex flex-col justify-center items-center text-[#f8fcdc] font-[Cinzel] px-4 pt-32">
+    <main className="min-h-screen flex flex-col items-center text-[#f8fcdc] font-[Cinzel] px-4 pt-32">
         <div className="w-full max-w-6xl" style={{ opacity: 0 }}>
           {/* Hidden content that matches final render structure */}
           <div className="mb-6 text-sm max-[927px]:text-xs max-[696px]:text-xs text-[#f8fcdc]/70 max-[1280px]:text-center">
@@ -229,7 +229,7 @@ export default function PhysicalShopContent({ initialTab }: { initialTab?: Physi
   }
 
   return (
-    <main className="min-h-screen flex flex-col justify-center items-center text-[#f8fcdc] font-[Cinzel] px-4 pt-32">
+    <main className="min-h-screen flex flex-col items-center text-[#f8fcdc] font-[Cinzel] px-4 pt-32">
       {/* Container for all content */}
       <div className="w-full max-w-6xl">
         
@@ -350,20 +350,7 @@ export default function PhysicalShopContent({ initialTab }: { initialTab?: Physi
               </motion.div>
             </AnimatePresence>
           )}
-        </div>
-
-        {/* Back to Shop Link */}
-        <div className="text-center mt-16 max-[927px]:mt-12 max-[696px]:mt-8">
-          <Link 
-            href="/shop" 
-            className="inline-flex items-center space-x-2 text-[#dc9e63]/70 hover:text-[#fcc276] 
-                     transition-colors duration-300 text-base max-[927px]:text-sm"
-          >
-            <span>←</span>
-            <span>Back to Shop</span>
-          </Link>
-        </div>
-        
+        </div>     
       </div>
     </main>
   );
