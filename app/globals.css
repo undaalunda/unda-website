@@ -2214,7 +2214,7 @@ button svg,
   align-items: center;
   gap: 0.5rem;
   padding: 1rem 2.3rem;
-  border: 0.5px solid rgba(248, 252, 220, 0.3);
+  border: none;
   background-color: transparent;
   color: #f8fcdc;
   text-decoration: none;
@@ -2232,22 +2232,20 @@ button svg,
 
 @media (hover: hover) and (pointer: fine) {
   .video-hero-button:hover {
-    background-color: #dc9e63;
-    color: #0d0d0d;
-    border-color: #dc9e63;
-    opacity: 1;
+    background-color: transparent;
+    color: #f8fcdc;
+    opacity: 0.4;
   }
   
   .video-hero-button:hover svg {
-    fill: #0d0d0d;
+    fill: #f8fcdc;
   }
 }
 
 .video-hero-button:active {
-  background-color: #dc9e63;
-  color: #0d0d0d;
-  border-color: #dc9e63;
-  opacity: 1;
+  background-color: transparent;
+  color: #f8fcdc;
+  opacity: 0.4;
 }
 
 @media (max-width: 1279px) {
