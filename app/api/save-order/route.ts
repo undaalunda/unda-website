@@ -116,15 +116,22 @@ export async function POST(req: NextRequest) {
       return product.type === 'digital';
     });
 
-    const amount = Math.round(
+        // 💰 ค่าสินค้า (คูณจำนวนชิ้นด้วย)
+    const subtotal = Math.round(
       cartItems.reduce((total: number, cartItem: any) => {
         const product = allItems.find((p) => p.id === cartItem.id);
         if (!product) return total;
         const price =
           typeof product.price === 'number' ? product.price : product.price.sale;
-        return total + price;
+        return total + price * (cartItem.quantity || 1);
       }, 0) * 100
     );
+
+    // 🚚 ค่าส่งที่เก็บจากลูกค้า (หน่วยเซนต์)
+    const shippingCents = isDigitalOnly ? 0 : Math.round((Number(shippingRate) || 0) * 100);
+
+    // 💳 ยอดรวมที่ตัดเงินลูกค้าจริง = ค่าสินค้า + ค่าส่ง
+    const amount = subtotal + shippingCents;
 
     // 🆕 ไม่สร้าง tracking ปลอมอีกต่อไป!
     let shipmentResult: {

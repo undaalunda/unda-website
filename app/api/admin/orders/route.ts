@@ -39,6 +39,7 @@ export async function GET(req: NextRequest) {
       courier,
       shipping_zone,
       shipping_method,
+      shipping_rate,
       billing_info,
       shipping_info
     `)

@@ -15,6 +15,7 @@ type Order = {
   courier?: string;
   shipping_method?: string;
   shipping_zone?: string;
+  shipping_rate?: number | null;
   billing_info?: {
     firstName?: string;
     lastName?: string;
@@ -42,6 +43,25 @@ type Order = {
 };
 
 type ViewMode = 'form' | 'single_order' | 'admin_orders';
+
+// 💰 คำนวณยอดจากรายการสินค้า + ค่าส่ง (ใช้ได้ทั้งออเดอร์เก่าและใหม่)
+const getItemUnitPrice = (item: any): number => {
+  const p = item?.price;
+  if (p && typeof p === 'object') return Number(p.sale) || 0;
+  return Number(p) || 0;
+};
+
+const getOrderShipping = (order: Order): number => Number(order.shipping_rate) || 0;
+
+const getOrderSubtotal = (order: Order): number => {
+  const fromItems = (order.items || []).reduce(
+    (sum: number, item: any) => sum + getItemUnitPrice(item) * (item.quantity || 1),
+    0
+  );
+  return fromItems > 0 ? fromItems : Math.max(0, (order.amount || 0) / 100 - getOrderShipping(order));
+};
+
+const getOrderTotal = (order: Order): number => getOrderSubtotal(order) + getOrderShipping(order);
 
 // 🆕 ระบบจำรหัสผ่าน admin ไว้ใน localStorage
 const ADMIN_SESSION_KEY = 'unda_admin_pwd';
@@ -386,9 +406,19 @@ const OrderDetails = ({ order, onBack, isAdmin = false }: { order: Order; onBack
         <div className="bg-[#1a0000]/60 border border-[#f8fcdc]/20 p-6 rounded-lg">
           <h2 className="text-xl font-semibold mb-4 text-[#dc9e63]">Order Summary</h2>
           <div className="space-y-3">
+                        <div className="flex justify-between">
+              <span className="text-[#f8fcdc]/70">Subtotal:</span>
+              <span className="text-[#f8fcdc]">${getOrderSubtotal(order).toFixed(2)}</span>
+            </div>
+            {order.shipping_method && (
+              <div className="flex justify-between">
+                <span className="text-[#f8fcdc]/70">Shipping:</span>
+                <span className="text-[#f8fcdc]">${getOrderShipping(order).toFixed(2)}</span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span className="text-[#f8fcdc]/70">Total Amount:</span>
-              <span className="text-xl font-bold text-[#f8fcdc]">${(order.amount / 100).toFixed(2)}</span>
+              <span className="text-xl font-bold text-[#f8fcdc]">${getOrderTotal(order).toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-[#f8fcdc]/70">Status:</span>
@@ -573,7 +603,8 @@ const AdminOrdersList = ({ orders, onBack, onOrderClick, onLogout }: {
   // Statistics
   const stats = useMemo(() => {
     const total = orders.length;
-    const totalRevenue = orders.reduce((sum, order) => sum + (order.amount / 100), 0);
+    const totalRevenue = orders.reduce((sum, order) => sum + getOrderTotal(order), 0);
+    const totalShipping = orders.reduce((sum, order) => sum + getOrderShipping(order), 0);
     const statusCounts = orders.reduce((acc, order) => {
       const status = order.payment_status.toLowerCase();
       acc[status] = (acc[status] || 0) + 1;
@@ -583,6 +614,7 @@ const AdminOrdersList = ({ orders, onBack, onOrderClick, onLogout }: {
     return {
       total,
       totalRevenue,
+      totalShipping,
       succeeded: statusCounts.succeeded || 0,
       pending: statusCounts.pending || 0,
       failed: (statusCounts.failed || 0) + (statusCounts.cancelled || 0)
@@ -607,7 +639,7 @@ const AdminOrdersList = ({ orders, onBack, onOrderClick, onLogout }: {
     const sorted = [...filteredOrders];
     switch (sortBy) {
       case 'amount':
-        return sorted.sort((a, b) => b.amount - a.amount);
+                return sorted.sort((a, b) => getOrderTotal(b) - getOrderTotal(a));
       case 'status':
         return sorted.sort((a, b) => a.payment_status.localeCompare(b.payment_status));
       case 'date':
@@ -622,11 +654,13 @@ const AdminOrdersList = ({ orders, onBack, onOrderClick, onLogout }: {
   const totalPages = Math.ceil(sortedOrders.length / ordersPerPage);
 
   const exportCSV = () => {
-    const headers = ['id', 'email', 'amount', 'payment_status', 'created_at', 'items_count'];
+        const headers = ['id', 'email', 'subtotal', 'shipping', 'total', 'payment_status', 'created_at', 'items_count'];
     const rows = sortedOrders.map((o) => [
   o.id,
   o.email, 
-  (o.amount / 100).toFixed(2), 
+    getOrderSubtotal(o).toFixed(2),
+  getOrderShipping(o).toFixed(2),
+  getOrderTotal(o).toFixed(2),
   o.payment_status, 
   o.created_at,
   o.items?.length || 0
@@ -690,7 +724,8 @@ const AdminOrdersList = ({ orders, onBack, onOrderClick, onLogout }: {
         </div>
         <div className="bg-gradient-to-br from-[#1a0000]/80 to-[#2a0000]/60 border border-[#f8fcdc]/10 rounded-xl p-3 md:p-4 backdrop-blur-sm">
           <div className="text-lg md:text-2xl font-bold text-emerald-400">${stats.totalRevenue.toFixed(2)}</div>
-          <div className="text-xs md:text-sm text-[#f8fcdc]/60">Total Revenue</div>
+                    <div className="text-xs md:text-sm text-[#f8fcdc]/60">Total Revenue</div>
+          <div className="text-[10px] md:text-xs text-[#f8fcdc]/40 mt-1">Shipping collected: ${stats.totalShipping.toFixed(2)}</div>
         </div>
         <div className="bg-gradient-to-br from-[#1a0000]/80 to-[#2a0000]/60 border border-[#f8fcdc]/10 rounded-xl p-3 md:p-4 backdrop-blur-sm">
           <div className="text-lg md:text-2xl font-bold text-emerald-400">{stats.succeeded}</div>
@@ -795,9 +830,12 @@ const AdminOrdersList = ({ orders, onBack, onOrderClick, onLogout }: {
 
                 {/* Amount */}
                 <div className="mb-3 md:mb-4">
-                  <div className="text-xl md:text-2xl font-bold text-[#dc9e63]">
-  ${(order.amount / 100).toFixed(2)}
+                                    <div className="text-xl md:text-2xl font-bold text-[#dc9e63]">
+  ${getOrderTotal(order).toFixed(2)}
 </div>
+                  {getOrderShipping(order) > 0 && (
+                    <div className="text-xs text-[#f8fcdc]/50">incl. ${getOrderShipping(order).toFixed(2)} shipping</div>
+                  )}
                   <div className="text-xs text-[#f8fcdc]/50">
                     {new Date(order.created_at).toLocaleDateString('en-US', {
                       month: 'short',
