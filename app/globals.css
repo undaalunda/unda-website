@@ -2002,7 +2002,7 @@ button svg,
 /* 🔥 BUTTON COLORS - Background removed for Tailwind control */
 .shop-landing-card-button {
   color: #f8fcdc;
-  padding: 0.75rem 2rem;
+  padding: 0.9rem 2rem;
   border-radius: 2rem;
   font-weight: bold;
   font-size: 1rem;
@@ -2213,7 +2213,7 @@ button svg,
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 2.3rem;
+  padding: 0.9rem 2.3rem;
   border: none;
   background-color: rgba(0, 0, 0, 0.35);
   color: #f8fcdc;
@@ -2269,7 +2269,7 @@ button svg,
   
   .video-hero-button {
     font-size: 0.75rem;
-    padding: 0.75rem 2rem;
+    padding: 0.9rem 1.6rem;
   }
 }
 
@@ -2319,7 +2319,7 @@ button svg,
   
   .video-hero-button {
     font-size: 0.7rem;
-    padding: 0.45rem 1.2rem;
+    padding: 0.55rem 1.2rem;
   }
 }
 
