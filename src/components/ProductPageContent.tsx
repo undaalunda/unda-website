@@ -566,7 +566,14 @@ export default function ProductPageContent({
                         ? 'bg-green-700/80 text-[#f8fcdc] cursor-pointer'
                         : 'cursor-pointer'
                     }`}
-                    onClick={() => {
+                                        onClick={() => {
+                      // 🚫 ห้ามซื้อสินค้า physical กับ digital ปนกัน
+                      if (!isAlreadyInCart && cartItems.some((item) => item.type !== product.type)) {
+                        setErrorMessage('Physical and digital items must be ordered separately. Please complete or clear your current cart first.');
+                        setTimeout(() => setErrorMessage(null), 4000);
+                        return;
+                      }
+
                       // 🎽 Bundle validation
                       if (isProductBundle && hasBundleSizeOptions) {
                         if (!validateBundleSizes()) {
@@ -605,7 +612,7 @@ export default function ProductPageContent({
                             : (product.subtitle ?? ''),
                           price: product.price,
                           image: product.image,
-                          quantity: 1,
+                          quantity: quantity,
                           type: product.type,
                           weight: product.weight ?? 0,
                           size: sizeInfo ?? undefined,
@@ -619,7 +626,7 @@ export default function ProductPageContent({
                         if (isAlreadyInCart) {
                           removeFromCart(product.id);
                         } else {
-                          addToCart(product.id, 1, sizeInfo ?? undefined);
+                          addToCart(product.id, quantity, sizeInfo ?? undefined);
                           setErrorMessage(null);
                         }
                         setLastActionItem(cartActionItem);

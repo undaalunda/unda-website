@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import AppClientWrapper from '@/components/AppClientWrapper'; // ✅ สำคัญ!
 
 // 🚀 Memoize cart item component เพื่อลด re-renders
@@ -110,7 +110,27 @@ const CartItemComponent = memo(function CartItemComponent({
 });
 
 export default function CartClientComponent() {
-  const { cartItems, removeFromCart, updateQuantity, clearCart, cartTotal } = useCart();
+  const { cartItems, removeFromCart, updateQuantity, clearCart, cartTotal, hasPhysicalItems } = useCart();
+
+    // 🛍️ กลับไปหน้าร้านให้ตรงกับประเภทของในตะกร้า (จำไว้แม้เคลียร์ตะกร้าหมดแล้ว)
+  const [shopHref, setShopHref] = useState('/shop');
+
+  useEffect(() => {
+    try {
+      if (cartItems.length > 0) {
+        const type = hasPhysicalItems ? 'physical' : 'digital';
+        sessionStorage.setItem('lastShopType', type);
+        setShopHref(`/shop/${type}`);
+      } else {
+        const saved = sessionStorage.getItem('lastShopType');
+        if (saved === 'physical' || saved === 'digital') {
+          setShopHref(`/shop/${saved}`);
+        }
+      }
+    } catch {
+      // ถ้าเบราว์เซอร์ไม่ให้จำ ก็ไปหน้า Shop รวมตามเดิม
+    }
+  }, [cartItems.length, hasPhysicalItems]);
   const router = useRouter();
 
   const handleGoToCheckout = useCallback(() => {
@@ -122,7 +142,7 @@ export default function CartClientComponent() {
       {cartItems.length === 0 ? (
         <main className="min-h-screen flex flex-col justify-center items-center text-[#f8fcdc] font-[Cinzel] p-8">
           <h1 className="text-2xl mb-6">Your cart is empty.</h1>
-          <Link href="/shop" className="text-[#dc9e63] hover:underline">
+            <Link href={shopHref} className="text-[#dc9e63] hover:underline">
             Return to Shop
           </Link>
         </main>
@@ -152,8 +172,8 @@ export default function CartClientComponent() {
               </h2>
 
               <div className="flex flex-col md:flex-row justify-end gap-4">
-                <Link
-                  href="/shop"
+                  <Link
+                  href={shopHref}
                   className="px-6 py-3 border border-[#dc9e63] text-[#dc9e63] hover:bg-[#dc9e63]/10 text-center rounded-xl text-sm cursor-pointer"
                 >
                   Continue Shopping

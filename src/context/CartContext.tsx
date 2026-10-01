@@ -136,7 +136,13 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
     const itemWeight = item.weight ?? 0;
 
-    setCartItems((prev) => {
+        setCartItems((prev) => {
+      // 🚫 ห้ามใส่สินค้า physical กับ digital ปนกันในตะกร้าเดียว
+      if (prev.some((cartItem) => cartItem.type !== item.type)) {
+        setCartError('Physical and digital items must be ordered separately. Please complete or clear your current cart first.');
+        return prev;
+      }
+
       // 🚀 Use Map for O(1) lookup in cart too
       // ✅ ถ้ามี size ให้เช็คทั้ง id + size
 const cartKey = size ? `${id}-${size}` : id;

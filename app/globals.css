@@ -2213,15 +2213,15 @@ button svg,
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 1rem 2.3rem;
-  border: 0.5px solid rgba(248, 252, 220, 0.3);
-  background-color: transparent;
+  padding: 0.75rem 2.3rem;
+  border: none;
+  background-color: rgba(0, 0, 0, 0.35);
   color: #f8fcdc;
   text-decoration: none;
   font-size: 0.85rem;
   font-weight: 500;
   letter-spacing: 0.05em;
-  border-radius: 4px;
+  border-radius: 12px;
   opacity: 0.7;
   transition: all 0.3s ease;
 }
@@ -2232,22 +2232,20 @@ button svg,
 
 @media (hover: hover) and (pointer: fine) {
   .video-hero-button:hover {
-    background-color: #dc9e63;
-    color: #0d0d0d;
-    border-color: #dc9e63;
-    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.35);
+    color: #f8fcdc;
+    opacity: 0.4;
   }
   
   .video-hero-button:hover svg {
-    fill: #0d0d0d;
+    fill: #f8fcdc;
   }
 }
 
 .video-hero-button:active {
-  background-color: #dc9e63;
-  color: #0d0d0d;
-  border-color: #dc9e63;
-  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.35);
+  color: #f8fcdc;
+  opacity: 0.4;
 }
 
 @media (max-width: 1279px) {
@@ -2271,7 +2269,7 @@ button svg,
   
   .video-hero-button {
     font-size: 0.75rem;
-    padding: 1rem 2rem;
+    padding: 0.75rem 2rem;
   }
 }
 
@@ -2296,7 +2294,7 @@ button svg,
   
   .video-hero-button {
     font-size: 0.7rem;
-    padding: 1rem 1.6rem;
+    padding: 0.75rem 1.6rem;
   }
 }
 
@@ -2321,7 +2319,7 @@ button svg,
   
   .video-hero-button {
     font-size: 0.7rem;
-    padding: 0.6rem 1.2rem;
+    padding: 0.45rem 1.2rem;
   }
 }
 
