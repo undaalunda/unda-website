@@ -748,12 +748,15 @@ export default function CheckoutForm() {
     const orderRes = await fetch('/api/create-order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+            body: JSON.stringify({
         email: trimmedBilling.email,
         amount: amountToCharge,
         cartItems,
-        shippingMethod,
-        shippingZone,
+        shippingMethod: isDigitalOnly ? null : shippingMethod,
+        shippingZone: isDigitalOnly ? null : shippingZone,
+        billingInfo: trimmedBilling,
+        shippingInfo: (!isDigitalOnly && shipToDifferent) ? trimmedShipping : trimmedBilling,
+        shippingRate: shippingCost,
       }),
     });
 
