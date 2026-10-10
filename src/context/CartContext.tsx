@@ -25,8 +25,8 @@ export type LastActionItem = {
 interface CartContextType {
   cartItems: CartItem[];
   addToCart: (id: string, quantity?: number, size?: string) => void;
-  removeFromCart: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
+  removeFromCart: (id: string, size?: string) => void;
+  updateQuantity: (id: string, quantity: number, size?: string) => void;
   clearCart: () => void;
   lastActionItem: LastActionItem | null;
   setLastActionItem: (item: LastActionItem | null) => void;
@@ -41,6 +41,10 @@ interface CartContextType {
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
+
+// 🎽 เช็คว่าเป็นบรรทัดเดียวกันในตะกร้า (สินค้าเดียวกัน + ไซส์เดียวกัน)
+const isSameLine = (cartItem: CartItem, id: string, size?: string) =>
+  cartItem.id === id && (cartItem.size || '') === (size || '');
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -167,7 +171,7 @@ const existing = cartMap.get(cartKey);
       if (existing) {
         // 🎯 Update existing item
         updatedCart = prev.map((cartItem) =>
-          cartItem.id === id
+          isSameLine(cartItem, id, size)
             ? { ...cartItem, quantity: newQuantity }
             : cartItem
         );
@@ -207,19 +211,19 @@ const existing = cartMap.get(cartKey);
   }, []);
 
   // 🚀 Optimized removeFromCart
-  const removeFromCart = useCallback((id: string) => {
+    const removeFromCart = useCallback((id: string, size?: string) => {
     setCartItems((prev) => {
-      const item = prev.find((item) => item.id === id);
+        const item = prev.find((item) => isSameLine(item, id, size));
       if (item) {
         setLastActionItem({ item, action: 'remove' });
       }
-      return prev.filter((item) => item.id !== id);
+         return prev.filter((item) => !isSameLine(item, id, size));
     });
     setCartError(null);
   }, []);
 
   // 🚀 Optimized updateQuantity with validation
-  const updateQuantity = useCallback((id: string, quantity: number) => {
+    const updateQuantity = useCallback((id: string, quantity: number, size?: string) => {
     const validatedQuantity = Math.max(1, Math.min(20, quantity));
     
     if (quantity > 20) {
@@ -229,7 +233,7 @@ const existing = cartMap.get(cartKey);
 
     setCartItems((prev) =>
       prev.map((item) =>
-        item.id === id
+        isSameLine(item, id, size)
           ? { ...item, quantity: validatedQuantity }
           : item
       )

@@ -1,7 +1,7 @@
 // app/order-status/OrderStatusClient.tsx
 'use client';
 
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
 type Order = {
@@ -329,14 +329,6 @@ const OrderDetails = ({ order, onBack, isAdmin = false }: { order: Order; onBack
 
   return (
     <main className="pt-32 md:pt-44 pb-24 md:pb-32 px-6 max-w-4xl mx-auto text-[#f8fcdc] font-[Cinzel]">
-      <div className="mb-4 md:mb-6">
-        <button
-          onClick={onBack}
-          className="text-[#dc9e63] hover:text-[#f8cfa3] transition-colors cursor-pointer text-sm md:text-base"
-        >
-          ← Back to Search
-        </button>
-      </div>
 
       <div className="text-center mb-6 md:mb-8">
         <h1 className="text-2xl md:text-3xl font-bold mb-2 text-[#dc9e63]">Order Details</h1>
@@ -1061,10 +1053,29 @@ export default function OrderStatusClient() {
     handleBackToForm();
   }, [handleBackToForm]);
 
+    // 📍 จำตำแหน่งที่เลื่อนอยู่ในหน้ารวมออเดอร์ ไว้กลับมาที่เดิม
+  const adminListScrollRef = useRef(0);
+
   const handleOrderClick = useCallback((order: Order) => {
+    adminListScrollRef.current = window.scrollY;
     setCurrentOrder(order);
     setViewMode('single_order');
+    window.history.pushState({ adminOrderView: true }, '');
+    window.scrollTo(0, 0);
   }, []);
+
+  // ↩️ กลับจากหน้ารายละเอียดออเดอร์ → หน้ารวมออเดอร์ (ทั้งปุ่ม Back ในหน้า และปุ่ม Back ของเบราว์เซอร์)
+  useEffect(() => {
+    const handlePopState = () => {
+      if (viewMode === 'single_order' && isAdmin && allOrders.length > 0) {
+        setCurrentOrder(null);
+        setViewMode('admin_orders');
+        setTimeout(() => window.scrollTo(0, adminListScrollRef.current), 0);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [viewMode, isAdmin, allOrders.length]);
 
   // Auto-fetch if URL has both email and order ID parameters
   useEffect(() => {
@@ -1096,6 +1107,23 @@ useEffect(() => {
 
   if (loading) return <LoadingState />;
   if (error) return <ErrorState error={error} onReset={handleBackToForm} />;
+
+    // 🗂️ โหมด admin: เก็บหน้ารวมออเดอร์ไว้ตลอด (แค่ซ่อนตอนดูรายละเอียด) หน้า ตัวกรอง และคำค้นหาจะไม่หาย
+  const isAdminView = isAdmin && allOrders.length > 0 && (viewMode === 'admin_orders' || viewMode === 'single_order');
+
+  if (isAdminView) {
+    const showingOrder = viewMode === 'single_order' && !!currentOrder;
+    return (
+      <>
+        <div style={{ display: showingOrder ? 'none' : 'block' }}>
+          <AdminOrdersList orders={allOrders} onBack={handleBackToForm} onOrderClick={handleOrderClick} onLogout={handleAdminLogout} />
+        </div>
+        {showingOrder && (
+          <OrderDetails order={currentOrder!} onBack={() => window.history.back()} isAdmin={isAdmin} />
+        )}
+      </>
+    );
+  }
 
   switch (viewMode) {
     case 'single_order':

@@ -16,20 +16,20 @@ const CartItemComponent = memo(function CartItemComponent({
   onRemove 
 }: { 
   item: any;
-  onUpdateQuantity: (id: string, quantity: number) => void;
-  onRemove: (id: string) => void;
+  onUpdateQuantity: (id: string, quantity: number, size?: string) => void;
+  onRemove: (id: string, size?: string) => void;
 }) {
-  const handleIncrement = useCallback(() => {
-    onUpdateQuantity(item.id, item.quantity + 1);
-  }, [item.id, item.quantity, onUpdateQuantity]);
+    const handleIncrement = useCallback(() => {
+    onUpdateQuantity(item.id, item.quantity + 1, item.size);
+  }, [item.id, item.size, item.quantity, onUpdateQuantity]);
 
   const handleDecrement = useCallback(() => {
-    onUpdateQuantity(item.id, item.quantity - 1);
-  }, [item.id, item.quantity, onUpdateQuantity]);
+    onUpdateQuantity(item.id, item.quantity - 1, item.size);
+  }, [item.id, item.size, item.quantity, onUpdateQuantity]);
 
   const handleRemove = useCallback(() => {
-    onRemove(item.id);
-  }, [item.id, onRemove]);
+    onRemove(item.id, item.size);
+  }, [item.id, item.size, onRemove]);
 
   return (
     <motion.div
@@ -157,7 +157,7 @@ export default function CartClientComponent() {
               <AnimatePresence>
                 {cartItems.map((item) => (
                   <CartItemComponent
-                    key={item.id}
+                    key={`${item.id}-${item.size ?? ''}`}
                     item={item}
                     onUpdateQuantity={updateQuantity}
                     onRemove={removeFromCart}

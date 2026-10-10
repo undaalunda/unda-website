@@ -101,7 +101,10 @@ export default function ProductPageContent({
   const [stockLoading, setStockLoading] = useState(false);
   
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
-  const isAlreadyInCart = cartItems.some((item) => item.id === product.id);
+    const isAlreadyInCart = cartItems.some((item) =>
+    item.id === product.id &&
+    (!(product.sizes && product.sizes.length > 0) || item.size === selectedSize)
+  );
   const stockStatus = getStockStatus(product);
   const router = useRouter();
   const [navigationContext, setNavigationContext] = useState<NavigationContext | null>(null);
@@ -624,7 +627,7 @@ export default function ProductPageContent({
 
                       setTimeout(() => {
                         if (isAlreadyInCart) {
-                          removeFromCart(product.id);
+                          removeFromCart(product.id, sizeInfo ?? undefined);
                         } else {
                           addToCart(product.id, quantity, sizeInfo ?? undefined);
                           setErrorMessage(null);
