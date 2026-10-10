@@ -204,17 +204,7 @@ export async function POST(req: NextRequest) {
       status: isDigitalOnly ? 'paid' : 'pending_shipment'
     });
 
-    // 🆕 ส่งอีเมลแจ้งเตือนเจ้าของร้าน (ไม่ block response หลักถ้าส่งพลาด)
-    await sendOwnerNotification({
-      orderId,
-      email,
-      billingInfo,
-      shippingInfo,
-      cartItems,
-      amount,
-      isDigitalOnly,
-      shippingMethod: isDigitalOnly ? null : shippingMethod,
-    });
+        // 📧 อีเมลแจ้งเจ้าของร้านย้ายไปส่งจาก Stripe webhook แล้ว (ส่งได้แม้ลูกค้าปิดหน้าเว็บ)
 
     return NextResponse.json({
       success: true,

@@ -4,7 +4,7 @@ import supabase from '../../../lib/supabase';
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { email, amount, cartItems, shippingMethod, shippingZone } = body;
+  const { email, amount, cartItems, shippingMethod, shippingZone, billingInfo, shippingInfo, shippingRate } = body;
 
   console.log('📦 Incoming order:', {
     email,
@@ -24,6 +24,9 @@ export async function POST(req: NextRequest) {
       shipping_zone: shippingZone,
       payment_status: 'pending',
       currency: 'usd',
+      billing_info: billingInfo || null,
+      shipping_info: shippingInfo || null,
+      shipping_rate: typeof shippingRate === 'number' ? shippingRate : null,
     })
     .select()
     .single();

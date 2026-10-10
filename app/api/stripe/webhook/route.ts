@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import supabase from '../../../../lib/supabase';
+import { sendOwnerNotification } from '../../../../lib/owner-notification';
 
 const isLive = process.env.NODE_ENV === 'production';
 
@@ -228,6 +229,20 @@ export async function POST(req: NextRequest) {
           } catch (stockError: any) {
             console.error('❌ Stock reduction error:', stockError.message);
           }
+
+           // 📧 แจ้งเตือนเจ้าของร้านทุกครั้งที่จ่ายเงินสำเร็จ (ทำงานแม้ลูกค้าปิดหน้าเว็บไปแล้ว)
+          const orderItems = order.items || [];
+          const orderIsDigitalOnly = orderItems.length > 0 && orderItems.every((i: any) => i.type === 'digital');
+          await sendOwnerNotification({
+            orderId: order.id,
+            email: order.email,
+            billingInfo: order.billing_info,
+            shippingInfo: order.shipping_info,
+            cartItems: orderItems,
+            amount: order.amount,
+            isDigitalOnly: orderIsDigitalOnly,
+            shippingMethod: orderIsDigitalOnly ? null : order.shipping_method,
+          });
 
           // 🆕 เรียก sendFallbackConfirmation ได้เลยตรงๆ — ตัวเช็คกันซ้ำอยู่ในไฟล์
           // send-confirmation แล้ว ไม่ต้องเช็คซ้ำที่นี่อีก

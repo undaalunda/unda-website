@@ -441,9 +441,12 @@ const OrderDetails = ({ order, onBack, isAdmin = false }: { order: Order; onBack
               {order.items.map((item, index) => (
                 <div key={index} className="flex justify-between items-center py-2 border-b border-[#f8fcdc]/10 last:border-b-0">
                   <div>
-                    <span className="text-[#f8fcdc]">{item.title || item.name || 'Unnamed Item'}</span>
+                     <span className="text-[#f8fcdc]">{item.title || item.name || 'Unnamed Item'}</span>
                     {item.quantity && (
                       <span className="text-[#f8fcdc]/60 ml-2">×{item.quantity}</span>
+                    )}
+                    {item.subtitle && (
+                      <div className="text-xs text-[#f8fcdc]/60 mt-0.5">{item.subtitle}</div>
                     )}
                   </div>
                   <div className="text-[#dc9e63] text-sm md:text-base">
@@ -857,6 +860,7 @@ const AdminOrdersList = ({ orders, onBack, onOrderClick, onLogout }: {
                       {order.items.slice(0, 2).map((item, idx) => (
                         <span key={idx} className="inline-block">
                           {item.title || 'Unnamed Item'}
+                          {item.subtitle && ` – ${item.subtitle}`}
                           {item.quantity && ` ×${item.quantity}`}
                           {idx < Math.min(order.items.length - 1, 1) && ', '}
                         </span>
